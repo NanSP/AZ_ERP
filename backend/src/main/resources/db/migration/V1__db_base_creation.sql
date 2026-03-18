@@ -1,10 +1,4 @@
---criacao da base do banco e os schemas
-
-DROP DATABASE IF EXISTS az_erp_db;
-
-CREATE DATABASE az_erp_db;
-
-\c az_erp_db;
+--criacao da base dos schemas
 
 CREATE SCHEMA IF NOT EXISTS fi
     AUTHORIZATION postgres;
@@ -96,7 +90,7 @@ CREATE SCHEMA IF NOT EXISTS tributos
 COMMENT ON SCHEMA tributos IS 'Gestão de Tributos - Cálculos, alíquotas, regimes tributários';
 --============================================================
 
-CREATE SCHEMA IF NOT EXISTS usarios
+CREATE SCHEMA IF NOT EXISTS usuarios
     AUTHORIZATION postgres;
 
 COMMENT ON SCHEMA usuarios IS 'Schema de usuarios';
