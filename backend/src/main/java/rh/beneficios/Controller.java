@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("beneficios")
-public class ProjectController {
+public class Controller {
 
     @Autowired
     private BeneficiosRepository repository;
@@ -30,7 +30,7 @@ public class ProjectController {
 
         Optional<Beneficios> beneficios = repository.findById(id);
         if(beneficios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Projeto não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
         BeneficiosResponseDTO beneficiosDTO = new BeneficiosResponseDTO(beneficios.get());
         return  ResponseEntity.ok(beneficiosDTO);
@@ -68,6 +68,6 @@ public class ProjectController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
         repository.delete(beneficios.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Project deleted");
+        return  ResponseEntity.status(HttpStatus.OK).body("Beneficio deleted");
     }
 }

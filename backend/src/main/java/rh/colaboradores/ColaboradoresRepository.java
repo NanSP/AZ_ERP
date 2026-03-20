@@ -1,4 +1,6 @@
 package rh.colaboradores;
 
-public interface ColaboradoresRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ColaboradoresRepository extends JpaRepository<Colaboradores, Integer> {
 }
