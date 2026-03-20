@@ -1,8 +1,5 @@
 package rh.colaboradores;
 
-import jakarta.persistence.Column;
-import rh.beneficios.Beneficios;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
