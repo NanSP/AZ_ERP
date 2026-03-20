@@ -1,4 +1,6 @@
 package core.enderecos;
 
-public interface EnderecosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EnderecosRepository extends JpaRepository<Enderecos, Integer> {
 }

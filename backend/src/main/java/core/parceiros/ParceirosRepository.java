@@ -1,4 +1,6 @@
 package core.parceiros;
 
-public interface ParceirosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ParceirosRepository extends JpaRepository<Parceiros, Integer> {
 }

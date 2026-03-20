@@ -1,4 +1,6 @@
 package core.contatos;
 
-public interface ContatosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ContatosRepository extends JpaRepository<Contatos, Integer> {
 }
