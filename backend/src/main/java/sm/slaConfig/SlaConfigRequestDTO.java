@@ -1,4 +1,13 @@
 package sm.slaConfig;
 
-public record SlaConfigRequestDTO() {
+import java.time.LocalDateTime;
+
+public record SlaConfigRequestDTO
+        (
+                String tipoServico,
+                String prioridade,
+                Integer tempoAtendimentoHoras,
+                Integer tempoResolucaoHoras,
+                LocalDateTime createdAt
+        ) {
 }

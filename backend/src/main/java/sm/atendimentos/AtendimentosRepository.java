@@ -1,4 +1,6 @@
 package sm.atendimentos;
 
-public interface AtendimentosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AtendimentosRepository extends JpaRepository<Atendimentos, Integer> {
 }
