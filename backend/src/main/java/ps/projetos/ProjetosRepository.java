@@ -1,4 +1,6 @@
 package ps.projetos;
 
-public interface ProjetosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProjetosRepository extends JpaRepository<Projetos, Integer> {
 }

@@ -1,4 +1,6 @@
 package ps.tarefas;
 
-public interface TarefasRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TarefasRepository extends JpaRepository<Tarefas, Integer> {
 }
