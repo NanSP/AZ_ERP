@@ -1,4 +1,6 @@
 package am.manutencoes;
 
-public interface ManutencoesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ManutencoesRepository extends JpaRepository<Manutencoes, Integer> {
 }

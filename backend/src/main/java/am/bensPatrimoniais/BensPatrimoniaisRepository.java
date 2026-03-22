@@ -1,4 +1,6 @@
 package am.bensPatrimoniais;
 
-public interface BensPatrimoniaisRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BensPatrimoniaisRepository extends JpaRepository<BensPatrimoniais, Integer> {
 }
