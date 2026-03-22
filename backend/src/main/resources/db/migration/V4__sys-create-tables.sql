@@ -25,10 +25,10 @@ CREATE TABLE sys.perfis (
 );
 
 CREATE TABLE sys.usuario_perfil (
+    id SERIAL PRIMARY KEY,
     usuario_id INTEGER REFERENCES sys.usuarios(id),
     perfil_id INTEGER REFERENCES sys.perfis(id),
-    data_atribuicao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (usuario_id, perfil_id)
+    data_atribuicao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE sys.permissoes (
@@ -42,7 +42,7 @@ CREATE TABLE sys.permissoes (
 );
 
 CREATE TABLE sys.perfil_permissao (
+    id SERIAL PRIMARY KEY,
     perfil_id INTEGER REFERENCES sys.perfis(id),
-    permissao_id INTEGER REFERENCES sys.permissoes(id),
-    PRIMARY KEY (perfil_id, permissao_id)
+    permissao_id INTEGER REFERENCES sys.permissoes(id)
 );

@@ -67,6 +67,6 @@ public class Controller {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
         repository.delete(contatos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Beneficio deleted");
+        return  ResponseEntity.status(HttpStatus.OK).body("Contato deleted");
     }
 }
