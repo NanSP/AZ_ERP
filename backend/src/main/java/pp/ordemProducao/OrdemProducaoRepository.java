@@ -1,4 +1,6 @@
 package pp.ordemProducao;
 
-public interface OrdemProducaoRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OrdemProducaoRepository extends JpaRepository<OrdemProducao, Integer> {
 }

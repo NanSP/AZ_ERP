@@ -1,4 +1,6 @@
 package pp.apontamentos;
 
-public interface ApontamentosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ApontamentosRepository extends JpaRepository<Apontamentos, Integer> {
 }
