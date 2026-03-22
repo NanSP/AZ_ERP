@@ -1,4 +1,6 @@
 package sd.contratos;
 
-public interface ContratosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ContratosRepository extends JpaRepository<Contratos, Integer> {
 }

@@ -1,4 +1,6 @@
 package sd.oportunidades;
 
-public interface OportunidadesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OportunidadesRepository extends JpaRepository<Oportunidades,Integer> {
 }

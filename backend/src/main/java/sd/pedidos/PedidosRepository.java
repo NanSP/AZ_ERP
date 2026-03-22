@@ -1,4 +1,6 @@
 package sd.pedidos;
 
-public interface PedidosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PedidosRepository extends JpaRepository<Pedidos, Integer> {
 }

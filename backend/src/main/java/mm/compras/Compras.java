@@ -3,9 +3,6 @@ package mm.compras;
 import core.parceiros.Parceiros;
 import jakarta.persistence.*;
 import lombok.*;
-import mm.estoques.Estoques;
-import mm.movimentacoes.MovimentacoesRequestDTO;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
