@@ -1,4 +1,6 @@
 package qm.inspecoes;
 
-public interface InspecoesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface InspecoesRepository extends JpaRepository<Inspecoes, Integer> {
 }
