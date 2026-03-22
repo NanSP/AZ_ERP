@@ -1,7 +1,7 @@
 --SCHEMA FINANCEIRO
 
 -- Plano de Contas
-CREATE TABLE financeiro.plano_contas (
+CREATE TABLE contabil.plano_contas (
     id SERIAL PRIMARY KEY,
     codigo VARCHAR(20) UNIQUE NOT NULL,
     nome VARCHAR(200) NOT NULL,

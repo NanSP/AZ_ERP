@@ -1,4 +1,6 @@
 package fi.fluxoCaixa;
 
-public interface FluxoCaixaRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface FluxoCaixaRepository extends JpaRepository<FluxoCaixa, Integer> {
 }
