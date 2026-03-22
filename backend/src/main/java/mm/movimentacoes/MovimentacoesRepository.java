@@ -1,4 +1,6 @@
 package mm.movimentacoes;
 
-public interface MovimentacoesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MovimentacoesRepository extends JpaRepository<Movimentacoes, Integer> {
 }

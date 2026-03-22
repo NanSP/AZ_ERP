@@ -1,4 +1,6 @@
 package mm.inventarios;
 
-public interface InventariosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface InventariosRepository extends JpaRepository<Inventarios, Integer> {
 }

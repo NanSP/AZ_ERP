@@ -1,4 +1,6 @@
 package mm.compraItens;
 
-public interface CompraItensRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CompraItensRepository extends JpaRepository<CompraItens, Integer> {
 }
