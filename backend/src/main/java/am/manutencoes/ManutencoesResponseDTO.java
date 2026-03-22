@@ -1,9 +1,6 @@
 package am.manutencoes;
 
 import am.bensPatrimoniais.BensPatrimoniais;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import rh.colaboradores.Colaboradores;
 
 import java.math.BigDecimal;

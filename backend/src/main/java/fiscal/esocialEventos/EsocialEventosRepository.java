@@ -1,4 +1,6 @@
 package fiscal.esocialEventos;
 
-public interface EsocialEventosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EsocialEventosRepository extends JpaRepository<EsocialEventos, Integer> {
 }

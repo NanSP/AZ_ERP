@@ -1,4 +1,6 @@
 package fiscal.edcRegistros;
 
-public interface EdcRegistrosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EdcRegistrosRepository extends JpaRepository<EdcRegistros, Integer> {
 }

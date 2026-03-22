@@ -1,4 +1,14 @@
 package fiscal.esocialEventos;
 
-public record EsocialEventosRequestDTO() {
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+public record EsocialEventosRequestDTO
+        (
+                LocalDate periodoApuracao,
+                String tipoEvento,
+                String eventoId,
+                String conteudo,
+                LocalDateTime createdAt
+        ) {
 }
