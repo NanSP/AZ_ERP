@@ -16,10 +16,10 @@ public record ContasReceberRequestDTO
                 String numeroDocumento,
                 String descricao,
                 BigDecimal valorOriginal,
-                BigDecimal valorPago,
+                BigDecimal valorRecebido,
                 LocalDate dataEmissao,
                 LocalDate dataVencimento,
-                LocalDate dataPagamento,
+                LocalDate dataRecebimento,
                 String status,
                 String formaPagamento,
                 LocalDateTime createdAt

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/mm/comprasItens")
+@RequestMapping("/mm/compraItens")
 public class CompraItensController {
 
     @Autowired

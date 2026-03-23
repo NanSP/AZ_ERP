@@ -40,14 +40,14 @@ public class ContasReceber {
     private String descricao;
     @Column(name = "valor_original", precision = 10, scale = 2)
     private BigDecimal valorOriginal;
-    @Column(name = "valor_pago", precision = 10, scale = 2)
-    private BigDecimal valorPago;
+    @Column(name = "valor_recebido", precision = 10, scale = 2)
+    private BigDecimal valorRecebido;
     @Column(name = "data_emissao")
     private LocalDate dataEmissao;
     @Column(name = "data_vencimento")
     private LocalDate dataVencimento;
-    @Column(name = "data_pagamento")
-    private LocalDate dataPagamento;
+    @Column(name = "data_recebimento")
+    private LocalDate dataRecebimento;
     private String status;
     @Column(name = "forma_pagamento")
     private String formaPagamento;
@@ -61,10 +61,10 @@ public class ContasReceber {
         this.centroCustoId = data.centroCustoId();
         this.descricao = data.descricao();
         this.valorOriginal = data.valorOriginal();
-        this.valorPago = data.valorPago();
+        this.valorRecebido = data.valorRecebido();
         this.dataEmissao = data.dataEmissao();
         this.dataVencimento = data.dataVencimento();
-        this.dataPagamento = data.dataPagamento();
+        this.dataRecebimento = data.dataRecebimento();
         this.createdAt = data.createdAt();
         this.formaPagamento = data.formaPagamento();
         this.status = data.status();

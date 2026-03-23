@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/rh/folha_pagamento")
+@RequestMapping("/rh/folhaDePagamento")
 public class FolhaDePagamentoController {
 
     @Autowired
