@@ -24,7 +24,7 @@ public class Controller {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("core/empresas/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
 
         Optional<Empresas> empresas = repository.findById(id);
@@ -45,7 +45,7 @@ public class Controller {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PutMapping("core/empresas/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateEmpresa(@PathVariable(value = "id") Integer id, @RequestBody EmpresasRequestDTO upData){
 
         Optional<Empresas> empresas = repository.findById(id);
@@ -59,7 +59,7 @@ public class Controller {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @DeleteMapping("core/empresas/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEmpresa(@PathVariable(value = "id") Integer id){
 
         Optional<Empresas> empresas = repository.findById(id);

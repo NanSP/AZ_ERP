@@ -25,7 +25,7 @@ public class Controller {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @GetMapping("core/enderecos/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
 
         Optional<Enderecos> enderecos = repository.findById(id);
@@ -46,7 +46,7 @@ public class Controller {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @PutMapping("core/enderecos/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateEndereco(@PathVariable(value = "id") Integer id, @RequestBody EnderecosRequestDTO upData){
 
         Optional<Enderecos> enderecos = repository.findById(id);
@@ -60,7 +60,7 @@ public class Controller {
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
-    @DeleteMapping("core/enderecos/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEndereco(@PathVariable(value = "id") Integer id){
 
         Optional<Enderecos> enderecos = repository.findById(id);
