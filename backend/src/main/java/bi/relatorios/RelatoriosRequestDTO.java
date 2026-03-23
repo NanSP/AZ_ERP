@@ -1,14 +1,15 @@
-package bi.dashboards;
+package bi.relatorios;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public record DashboardsRequestDTO
+public record RelatoriosRequestDTO
         (
                 String nome,
                 String descricao,
-                Map<String, Object> layout,
-                Map<String, Object> configuracoes,
+                String tipoRelatorio,
+                String querySql,
+                Map<String, Object> parametros,
                 LocalDateTime createdAt
         ) {
 }

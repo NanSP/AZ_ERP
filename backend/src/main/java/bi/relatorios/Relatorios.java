@@ -1,4 +1,4 @@
-package bi.dashboards;
+package bi.relatorios;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,14 +8,14 @@ import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Table(name = "dashboards", schema = "bi")
+@Table(name = "relatorios", schema = "bi")
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Dashboards {
+public class Relatorios {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,23 +23,24 @@ public class Dashboards {
 
     private String nome;
     private String descricao;
+    @Column(name = "tipo_relatorio")
+    private String tipoRelatorio;
+    @Column(name = "query_sql")
+    private String querySql;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "layout",columnDefinition = "jsonb")
-    private Map<String, Object> layout;
-
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "configuracoes",columnDefinition = "jsonb")
-    private Map<String, Object> configuracoes;
+    @Column(name = "parametros",columnDefinition = "jsonb")
+    private Map<String, Object> parametros;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Dashboards(DashboardsRequestDTO data) {
+    public Relatorios(RelatoriosRequestDTO data) {
         this.nome = data.nome();
+        this.tipoRelatorio = data.tipoRelatorio();
         this.descricao = data.descricao();
-        this.layout = data.layout();
-        this.configuracoes = data.configuracoes();
+        this.parametros = data.parametros();
+        this.querySql = data.querySql();
         this.createdAt = data.createdAt();
     }
 }

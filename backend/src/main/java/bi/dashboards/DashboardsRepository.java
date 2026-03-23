@@ -1,4 +1,6 @@
 package bi.dashboards;
 
-public interface DashboardsRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DashboardsRepository extends JpaRepository<Dashboards, Integer> {
 }
