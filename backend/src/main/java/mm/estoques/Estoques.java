@@ -4,11 +4,14 @@ import core.empresas.Empresas;
 import core.produtos.Produtos;
 import jakarta.persistence.*;
 import lombok.*;
+import mm.movimentacoes.Movimentacoes;
 
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "estoques", schema = "materiais")
 @Entity
@@ -43,6 +46,9 @@ public class Estoques {
     @Column(name = "data_validade")
     private LocalDate dataValidade;
 
+    @OneToMany(mappedBy = "estoqueId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Movimentacoes> movimentacoes = new ArrayList<>();
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -56,6 +62,7 @@ public class Estoques {
         this.quantidadeMaxima = data.quantidadeMaxima();
         this.valorUnitario = data.valorUnitario();
         this.dataValidade = data.dataValidade();
+        this.movimentacoes = data.movimentacoes();
         this.createdAt = data.createdAt();
     }
 }

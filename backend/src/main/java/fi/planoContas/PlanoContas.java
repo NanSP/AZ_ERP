@@ -3,6 +3,9 @@ package fi.planoContas;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Table(name = "plano_contas", schema = "contabil")
 @Entity
 @Getter
@@ -25,6 +28,9 @@ public class PlanoContas {
     private PlanoContas planoContas;
     private String situacao;
 
+    @OneToMany(mappedBy = "planoContas", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlanoContas> contasFilhas = new ArrayList<>();
+
     public PlanoContas(PlanoContasRequestDTO data){
         this.codigo = data.codigo();
         this.nome = data.nome();
@@ -32,5 +38,6 @@ public class PlanoContas {
         this.natureza = data.natureza();
         this.planoContas = data.planoContas();
         this.situacao = data.situacao();
+        this.contasFilhas = data.contasFilhas();
     }
 }

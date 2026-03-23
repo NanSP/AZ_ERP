@@ -1,7 +1,11 @@
 package core.parceiros;
 
+import fi.contasPagar.ContasPagar;
+import fi.contasReceber.ContasReceber;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ParceirosRequestDTO
         (
@@ -15,6 +19,8 @@ public record ParceirosRequestDTO
                 BigDecimal limiteCredito,
                 Integer diasPrazo,
                 String observacoes,
+                List<ContasPagar> contasAPagar,
+                List<ContasReceber> contasAReceber,
                 LocalDateTime createdAt
         ) {
 }

@@ -1,5 +1,7 @@
 package fi.planoContas;
 
+import java.util.List;
+
 public record PlanoContasResponseDTO
         (
                 Integer id,
@@ -8,7 +10,8 @@ public record PlanoContasResponseDTO
                 String tipoConta,
                 String natureza,
                 PlanoContas planoContas,
-                String situacao
+                String situacao,
+                List<PlanoContas> contasFilhas
         )
     {
         public PlanoContasResponseDTO(PlanoContas planoContas) {
@@ -20,7 +23,8 @@ public record PlanoContasResponseDTO
                             planoContas.getTipoConta(),
                             planoContas.getNatureza(),
                             planoContas.getPlanoContas(),
-                            planoContas.getSituacao()
+                            planoContas.getSituacao(),
+                            planoContas.getContasFilhas()
                     );
         }
 }

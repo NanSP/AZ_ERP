@@ -1,5 +1,7 @@
 package fi.planoContas;
 
+import java.util.List;
+
 public record PlanoContasRequestDTO
         (
                 String codigo,
@@ -7,6 +9,7 @@ public record PlanoContasRequestDTO
                 String tipoConta,
                 String natureza,
                 PlanoContas planoContas,
-                String situacao
+                String situacao,
+                List<PlanoContas> contasFilhas
         ) {
 }

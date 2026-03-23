@@ -1,10 +1,14 @@
 package core.parceiros;
 
+import fi.contasPagar.ContasPagar;
+import fi.contasReceber.ContasReceber;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "parceiros", schema = "core")
 @Entity
@@ -33,6 +37,13 @@ public class Parceiros {
     @Column(name = "dias_prazo")
     private Integer diasPrazo;
     private String observacoes;
+
+    @OneToMany(mappedBy = "fornecedorId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ContasPagar> contasAPagar = new ArrayList<>();
+
+    @OneToMany(mappedBy = "clienteId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ContasReceber> contasAReceber = new ArrayList<>();
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -47,6 +58,8 @@ public class Parceiros {
         this.limiteCredito = data.limiteCredito();
         this.diasPrazo = data.diasPrazo();
         this.observacoes = data.observacoes();
+        this.contasAPagar = data.contasAPagar();
+        this.contasAReceber = data.contasAReceber();
         this.createdAt = data.createdAt();
     }
 }

@@ -2,9 +2,12 @@ package mm.estoques;
 
 import core.empresas.Empresas;
 import core.produtos.Produtos;
+import mm.movimentacoes.Movimentacoes;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record EstoquesResponseDTO
         (
@@ -18,6 +21,7 @@ public record EstoquesResponseDTO
                 BigDecimal quantidadeMaxima,
                 BigDecimal valorUnitario,
                 LocalDate dataValidade,
+                List<Movimentacoes> movimentacoes,
                 LocalDateTime createdAt
         )
     {
@@ -34,6 +38,7 @@ public record EstoquesResponseDTO
                             estoques.getQuantidadeMaxima(),
                             estoques.getValorUnitario(),
                             estoques.getDataValidade(),
+                            estoques.getMovimentacoes(),
                             estoques.getCreatedAt()
                     );
         }
