@@ -5,39 +5,27 @@ import "./pages.css";
 export default function Home() {
   return (
     <div className="page">
-      <h1>🏢 AZ_ERP - Sistema Empresarial</h1>
-      <p style={{ fontSize: "1.1rem", marginBottom: "2rem", color: "#64748b" }}>
+      <h1>🏢 AZ ERP - Sistema Empresarial</h1>
+      <p className="page-subtitle">
         Gerencie todos os módulos do seu ERP através desta interface web.
         Selecione um módulo abaixo para visualizar, criar, editar ou excluir
         registros.
       </p>
 
-      <div style={{ marginBottom: "2rem" }}>
-        <h2
-          style={{
-            color: "#334155",
-            borderBottom: "2px solid #e2e8f0",
-            paddingBottom: "0.5rem",
-          }}
-        >
-          📋 Módulos Disponíveis
-        </h2>
+      <div className="page-section">
+        <h2>📋 Módulos Disponíveis</h2>
       </div>
 
       <ul className="module-list">
         {modules.map((m) => (
           <li key={`${m.schema}-${m.entity}`}>
             <Link to={`/module/${m.schema}/${m.entity}`}>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-              >
-                <span style={{ fontSize: "1.2rem" }}>
-                  {getModuleIcon(m.entity)}
-                </span>
+              <div className="module-card-content">
+                <span className="module-icon">{getModuleIcon(m.entity)}</span>
                 <div>
                   <strong>{m.label}</strong>
                   <br />
-                  <small style={{ color: "#64748b" }}>
+                  <small className="module-metadata">
                     {m.schema}/{m.entity}
                   </small>
                 </div>
@@ -47,17 +35,9 @@ export default function Home() {
         ))}
       </ul>
 
-      <div
-        style={{
-          marginTop: "3rem",
-          padding: "1.5rem",
-          background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-          borderRadius: "8px",
-          border: "1px solid #e2e8f0",
-        }}
-      >
-        <h3 style={{ marginTop: 0, color: "#334155" }}>💡 Como usar</h3>
-        <ul style={{ margin: 0, paddingLeft: "1.5rem", color: "#64748b" }}>
+      <div className="section-card">
+        <h3>💡 Como usar</h3>
+        <ul className="instructions-list">
           <li>Clique em qualquer módulo para acessar o CRUD completo</li>
           <li>Use o editor JSON para criar ou editar registros</li>
           <li>Os dados são salvos diretamente no backend Spring Boot</li>

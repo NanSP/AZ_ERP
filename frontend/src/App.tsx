@@ -9,9 +9,12 @@ function App() {
       <div>
         <header
           className="app-header"
-          style={{ padding: "16px", background: "#f0f2f5" }}
+          style={{
+            padding: "16px",
+            background: "linear-gradient(135deg, #87a2d8 0%, #8e9fc2 100%)",
+          }}
         >
-          <h1>AZ_ERP Frontend</h1>
+          <h1>AZ ERP</h1>
           <nav>
             <NavLink to="/" end style={{ marginRight: 12 }}>
               Início

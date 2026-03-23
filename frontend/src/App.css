@@ -1,10 +1,14 @@
 /* App.css - Estilos principais da aplicação */
 
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    #0f172a 0%,
+    #1e293b 100%
+  ); /* header mais escuro */
+  color: black;
   padding: 1rem 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.35);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -23,22 +27,24 @@
 }
 
 .app-header nav a {
-  color: white;
+  color: black;
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
   transition: all 0.3s ease;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .app-header nav a:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
+  color: #e2e8f0;
   transform: translateY(-1px);
 }
 
 .app-header nav a.active {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(100, 116, 139, 0.25);
+  color: #f8fafc;
   font-weight: 600;
 }
 

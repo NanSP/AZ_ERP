@@ -34,6 +34,38 @@
   margin-bottom: 1rem;
 }
 
+.page-subtitle {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: #64748b;
+}
+
+.page-section {
+  margin-bottom: 2rem;
+}
+
+.section-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 1.5rem;
+}
+
+.section-card h3 {
+  margin-top: 0;
+  color: #334155;
+}
+
+.instructions-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #64748b;
+}
+
+.module-metadata {
+  color: #64748b;
+}
+
 .module-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -69,6 +101,16 @@
 
 .module-list a:hover {
   color: #667eea;
+}
+
+.module-card-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.module-icon {
+  font-size: 1.2rem;
 }
 
 /* Estilos para tabelas */
@@ -107,6 +149,62 @@ tr:last-child td {
 }
 
 /* Botões */
+.btn {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
+  color: white;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.35);
+}
+
+.btn:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+}
+
+.btn-secondary {
+  background: var(--primary-dark);
+}
+
+.btn-success {
+  background: #10b981;
+}
+
+.btn-safe {
+  background: #059669;
+}
+
+.btn-info {
+  background: #0ea5e9;
+}
+
+.btn-warning {
+  background: #f59e0b;
+}
+
+.btn-danger {
+  background: #ef4444;
+}
+
+.btn-github,
+.btn-yellow {
+  background: #f59e0b;
+}
+
 button {
   background: #667eea;
   color: white;
@@ -149,6 +247,37 @@ textarea:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.api-code {
+  background: #f1f5f9;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: "Fira Code", "Monaco", "Menlo", monospace;
+}
+
+.table-cell-ellipsis {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hint-text {
+  color: #64748b;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.75rem 0;
+}
+
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+  }
 }
 
 label {

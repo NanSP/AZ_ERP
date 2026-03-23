@@ -116,37 +116,26 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     <div className="page fade-in">
       <h2>{label}</h2>
       <p>
-        <strong>API:</strong>{" "}
-        <code
-          style={{
-            background: "#f1f5f9",
-            padding: "0.25rem 0.5rem",
-            borderRadius: "4px",
-          }}
-        >
-          {urlEntity}
-        </code>
+        <strong>API:</strong> <code className="api-code">{urlEntity}</code>
       </p>
 
       {error && <div className="error">{error}</div>}
       {loading && <div className="loading">Carregando... aguarde</div>}
 
-      <div className="form-row" style={{ marginBottom: "1.5rem" }}>
-        <div>
-          <button onClick={loadData} style={{ background: "#10b981" }}>
-            🔄 Recarregar
-          </button>
-          <button onClick={handleCreate} style={{ background: "#059669" }}>
-            ➕ Criar
-          </button>
-          <button
-            onClick={handleUpdate}
-            disabled={!selectedItem}
-            style={{ background: "#0ea5e9" }}
-          >
-            ✏️ Atualizar
-          </button>
-        </div>
+      <div className="form-row action-buttons">
+        <button className="btn btn-success" onClick={loadData}>
+          🔄 Recarregar
+        </button>
+        <button className="btn btn-safe" onClick={handleCreate}>
+          ➕ Criar
+        </button>
+        <button
+          className="btn btn-info"
+          onClick={handleUpdate}
+          disabled={!selectedItem}
+        >
+          ✏️ Atualizar
+        </button>
       </div>
 
       <div className="form-row">
@@ -166,38 +155,21 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
                 {items.map((item) => (
                   <tr key={item.id ?? JSON.stringify(item)}>
                     {columns.map((col) => (
-                      <td
-                        key={col}
-                        style={{
-                          maxWidth: "200px",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
+                      <td key={col} className="table-cell-ellipsis">
                         {String(item[col] ?? "")}
                       </td>
                     ))}
                     <td>
                       <button
+                        className="btn btn-warning"
                         onClick={() => selectItem(item)}
-                        style={{
-                          background: "#f59e0b",
-                          color: "white",
-                          fontSize: "0.8rem",
-                          padding: "0.25rem 0.5rem",
-                        }}
                       >
                         ✏️ Editar
                       </button>
                       {item.id != null && (
                         <button
+                          className="btn btn-danger"
                           onClick={() => handleDelete(item.id)}
-                          style={{
-                            background: "#ef4444",
-                            color: "white",
-                            fontSize: "0.8rem",
-                            padding: "0.25rem 0.5rem",
-                          }}
                         >
                           🗑️ Excluir
                         </button>
@@ -218,7 +190,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
             onChange={(e) => setPayload(e.target.value)}
             placeholder='{"nome": "exemplo", "ativo": true}'
           />
-          <small style={{ color: "#64748b" }}>
+          <small className="hint-text">
             Para criar: insira JSON válido
             <br />
             Para editar: selecione um item da tabela
