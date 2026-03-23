@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import sd.pedidos.Pedidos;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -28,7 +28,7 @@ public class Faturas {
     @Column(name = "data_emissao")
     private LocalDate dataEmissao;
     @Column(name = "valor_total", precision = 10, scale = 2)
-    private BigInteger valorTotal;
+    private BigDecimal valorTotal;
     @Column(name = "data_vencimento")
     private LocalDate dataVencimento;
     private String status;

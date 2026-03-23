@@ -1,6 +1,5 @@
 package bi.metricas;
 
-import bi.relatorios.RelatoriosRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

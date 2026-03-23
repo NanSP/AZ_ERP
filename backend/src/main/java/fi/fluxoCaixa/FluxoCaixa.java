@@ -1,6 +1,5 @@
 package fi.fluxoCaixa;
 
-import fi.contasReceber.ContasReceberRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 

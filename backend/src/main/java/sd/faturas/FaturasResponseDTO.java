@@ -1,8 +1,10 @@
 package sd.faturas;
 
-import sd.pedidoItens.PedidoItens;
+
 import sd.pedidos.Pedidos;
-import java.math.BigInteger;
+
+import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -12,7 +14,7 @@ public record FaturasResponseDTO
                 Pedidos pedidoId,
                 String numeroFatura,
                 LocalDate dataEmissao,
-                BigInteger valorTotal,
+                BigDecimal valorTotal,
                 LocalDate dataVencimento,
                 String status,
                 LocalDateTime createdAt

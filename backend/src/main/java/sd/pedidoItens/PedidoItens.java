@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import sd.pedidos.Pedidos;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Table(name = "pedidoItens", schema = "vendas")
@@ -29,13 +29,13 @@ public class PedidoItens {
     @JoinColumn(name = "produto_id")
     private Produtos produtoId;
     @Column(precision = 10, scale = 4)
-    private BigInteger quantidade;
+    private BigDecimal quantidade;
     @Column(name ="valor_unitario",precision = 10, scale = 4)
-    private BigInteger valorUnitario;
+    private BigDecimal valorUnitario;
     @Column(name ="valor_total",precision = 10, scale = 4)
-    private BigInteger valorTotal;
+    private BigDecimal valorTotal;
     @Column(precision = 10, scale = 4)
-    private BigInteger desconto;
+    private BigDecimal desconto;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
