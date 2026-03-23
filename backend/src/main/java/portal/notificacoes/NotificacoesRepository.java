@@ -1,4 +1,6 @@
 package portal.notificacoes;
 
-public interface NotificacoesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface NotificacoesRepository extends JpaRepository<Notificacoes, Integer> {
 }

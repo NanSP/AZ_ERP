@@ -1,4 +1,6 @@
 package portal.dispositivos;
 
-public interface DispositivosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DispositivosRepository extends JpaRepository<Dispositivos, Integer> {
 }

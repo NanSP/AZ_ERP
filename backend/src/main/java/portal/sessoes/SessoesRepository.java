@@ -1,4 +1,6 @@
 package portal.sessoes;
 
-public interface SessoesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SessoesRepository extends JpaRepository<Sessoes, Integer> {
 }
