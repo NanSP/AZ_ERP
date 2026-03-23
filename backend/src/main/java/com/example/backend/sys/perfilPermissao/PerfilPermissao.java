@@ -1,0 +1,32 @@
+package com.example.backend.sys.perfilPermissao;
+
+import com.example.backend.sys.perfis.Perfis;
+import com.example.backend.sys.permissoes.Permissoes;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Table(name = "perfil_permissao", schema = "com/example/backend/sys")
+@Entity
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class PerfilPermissao {
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne
+    @JoinColumn(name = "perfil_id")
+    private Perfis perfilId;
+
+    @ManyToOne
+    @JoinColumn(name = "permissao_id")
+    private Permissoes permissaoId;
+
+    public PerfilPermissao(PerfilPermissaoRequestDTO data){
+        this.permissaoId = data.permissaoId();
+        this.perfilId = data.perfilId();
+    }
+}
