@@ -1,7 +1,7 @@
 /* pages.css - Estilos para páginas e componentes */
 
 .page {
-  max-width: 1200px;
+  max-width: 2000px;
   margin: 2rem auto;
   padding: 2rem;
   background: white;
@@ -307,11 +307,19 @@ label {
 }
 
 /* Layout flex para formulários */
-.form-row {
+.action-buttons {
+  flex-direction: row;
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
   align-items: flex-start;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column; /* Altera para coluna */
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .form-row > div {

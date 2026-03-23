@@ -122,7 +122,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
       {error && <div className="error">{error}</div>}
       {loading && <div className="loading">Carregando... aguarde</div>}
 
-      <div className="form-row action-buttons">
+      <div className="action-buttons">
         <button className="btn btn-success" onClick={loadData}>
           🔄 Recarregar
         </button>
