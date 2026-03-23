@@ -1,4 +1,6 @@
 package grc.controles;
 
-public interface ControlesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ControlesRepository extends JpaRepository<Controles, Integer> {
 }

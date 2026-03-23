@@ -1,4 +1,6 @@
 package grc.riscos;
 
-public interface RiscosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RiscosRepository extends JpaRepository<Riscos, Integer> {
 }

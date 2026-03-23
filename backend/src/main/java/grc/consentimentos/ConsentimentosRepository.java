@@ -1,4 +1,6 @@
 package grc.consentimentos;
 
-public interface ConsentimentosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ConsentimentosRepository extends JpaRepository<Consentimentos,Integer> {
 }
