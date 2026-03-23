@@ -1,9 +1,12 @@
 package sd.pedidos;
 
 import core.parceiros.Parceiros;
+import sd.pedidoItens.PedidoItens;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PedidosResponseDTO
         (
@@ -17,6 +20,7 @@ public record PedidosResponseDTO
                 String condicoesPagamento,
                 String status,
                 String observacoes,
+                List<PedidoItens> itens,
                 LocalDateTime createdAt
         )
     {
@@ -33,6 +37,7 @@ public record PedidosResponseDTO
                             pedidos.getCondicoesPagamento(),
                             pedidos.getStatus(),
                             pedidos.getObservacoes(),
+                            pedidos.getItens(),
                             pedidos.getCreatedAt()
                     );
         }

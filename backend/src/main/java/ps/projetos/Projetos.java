@@ -24,7 +24,7 @@ public class Projetos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(mappedBy = "projetoId")
+    @OneToMany(mappedBy = "projetoId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefas> tarefas = new ArrayList<>();
 
     private String codigo;

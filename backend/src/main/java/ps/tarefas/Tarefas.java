@@ -32,7 +32,7 @@ public class Tarefas {
     @JoinColumn(name = "tarefa_pai_id")
     private Tarefas tarefaPaiId;
 
-    @OneToMany(mappedBy = "tarefaPai", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "tarefaPaiId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefas> subtarefas = new ArrayList<>();
 
 

@@ -3,9 +3,13 @@ package sd.pedidos;
 import core.parceiros.Parceiros;
 import jakarta.persistence.*;
 import lombok.*;
+import sd.pedidoItens.PedidoItens;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "pedidos", schema = "vendas")
 @Entity
@@ -37,6 +41,9 @@ public class Pedidos {
     private String status;
     private String observacoes;
 
+    @OneToMany(mappedBy = "pedidoId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PedidoItens> itens = new ArrayList<>();
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -50,6 +57,7 @@ public class Pedidos {
         this.condicoesPagamento = data.condicoesPagamento();
         this.status = data.status();
         this.observacoes = data.observacoes();
+        this.itens = data.itens();
         this.createdAt = data.createdAt();
     }
 }

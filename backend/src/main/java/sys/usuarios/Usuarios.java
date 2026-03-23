@@ -1,10 +1,17 @@
 package sys.usuarios;
 
+import auditoria.logAcoes.LogAcoes;
+import auditoria.logErros.LogErros;
 import jakarta.persistence.*;
 import lombok.*;
+import portal.dispositivos.Dispositivos;
+import portal.notificacoes.Notificacoes;
+import portal.sessoes.Sessoes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "usuarios", schema = "sys")
 @Entity
@@ -34,6 +41,22 @@ public class Usuarios {
     @Column(name = "tentativas_login")
     private Integer tentativasLogin;
     @Column(name = "created_at")
+
+    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sessoes> sessoes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LogAcoes> logAcoes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LogErros> logErros = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notificacoes> notificacoes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Dispositivos> dispositivos = new ArrayList<>();
+
     private LocalDateTime createdAt;
 
     public Usuarios(UsuariosRequestDTO data){
@@ -47,6 +70,11 @@ public class Usuarios {
         this.ultimoAcesso = data.ultimoAcesso();
         this.expiracaoSenha = data.expiracaoSenha();
         this.tentativasLogin = data.tentativasLogin();
+        this.sessoes = data.sessoes();
+        this.logAcoes = data.logAcoes();
+        this.logErros = data.logErros();
+        this.notificacoes = data.notificacoes();
+        this.dispositivos = data.dispositivos();
         this.createdAt = data.createdAt();
     }
 }
