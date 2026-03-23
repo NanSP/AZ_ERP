@@ -1,4 +1,6 @@
 package auditoria.logAcoes;
 
-public interface LogAcoesRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface LogAcoesRepository extends JpaRepository<LogAcoes, Integer> {
 }

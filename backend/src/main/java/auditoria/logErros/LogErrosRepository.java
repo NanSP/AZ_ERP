@@ -1,4 +1,6 @@
 package auditoria.logErros;
 
-public interface LogErrosRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface LogErrosRepository extends JpaRepository<LogErros, Integer> {
 }

@@ -1,4 +1,20 @@
 package auditoria.logErros;
 
-public record LogErrosRequestDTO() {
+import sys.usuarios.Usuarios;
+
+import java.net.InetAddress;
+import java.time.LocalDateTime;
+import java.util.Map;
+
+public record LogErrosRequestDTO
+        (
+                Integer erroCodigo,
+                Integer erroMensagem,
+                String modulo,
+                Usuarios usuarioId,
+                String url,
+                Map<String, Object> parametros,
+                InetAddress ipAddress,
+                LocalDateTime createdAt
+        ) {
 }
