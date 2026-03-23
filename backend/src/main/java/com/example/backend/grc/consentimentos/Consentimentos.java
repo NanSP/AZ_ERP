@@ -8,7 +8,7 @@ import org.hibernate.type.SqlTypes;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 
-@Table(name = "consentimentos", schema = "com/example/backend/grc")
+@Table(name = "consentimentos", schema = "grc")
 @Entity
 @Getter
 @Setter

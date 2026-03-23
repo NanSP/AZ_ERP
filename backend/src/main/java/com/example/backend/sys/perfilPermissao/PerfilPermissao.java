@@ -5,7 +5,7 @@ import com.example.backend.sys.permissoes.Permissoes;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name = "perfil_permissao", schema = "com/example/backend/sys")
+@Table(name = "perfil_permissao", schema = "sys")
 @Entity
 @Getter
 @Setter

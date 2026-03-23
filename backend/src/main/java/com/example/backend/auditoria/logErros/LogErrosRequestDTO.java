@@ -9,7 +9,7 @@ import java.util.Map;
 public record LogErrosRequestDTO
         (
                 Integer erroCodigo,
-                Integer erroMensagem,
+                String erroMensagem,
                 String modulo,
                 Usuarios usuarioId,
                 String url,

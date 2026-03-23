@@ -8,7 +8,7 @@ import com.example.backend.sd.pedidos.Pedidos;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Table(name = "documentos", schema = "com/example/backend/fiscal")
+@Table(name = "documentos", schema = "fiscal")
 @Entity
 @Getter
 @Setter

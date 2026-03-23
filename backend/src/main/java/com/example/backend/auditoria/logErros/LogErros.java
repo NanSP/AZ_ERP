@@ -10,7 +10,7 @@ import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Table(name = "log_erros", schema = "com/example/backend/auditoria")
+@Table(name = "log_erros", schema = "auditoria")
 @Entity
 @Getter
 @Setter
@@ -26,7 +26,7 @@ public class LogErros {
     @Column(name = "erro_codigo")
     private Integer erroCodigo;
     @Column(name = "erro_mensagem")
-    private Integer erroMensagem;
+    private String erroMensagem;
     private String modulo;
     @ManyToOne
     @JoinColumn(name = "usuario_id")

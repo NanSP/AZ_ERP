@@ -6,7 +6,7 @@ import com.example.backend.sys.usuarios.Usuarios;
 
 import java.time.LocalDateTime;
 
-@Table(name = "controles", schema = "com/example/backend/grc")
+@Table(name = "controles", schema = "grc")
 @Entity
 @Getter
 @Setter

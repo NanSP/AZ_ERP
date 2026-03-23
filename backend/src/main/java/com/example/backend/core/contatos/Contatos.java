@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Table(name = "contatos", schema = "com/example/backend/core")
+@Table(name = "contatos", schema = "core")
 @Entity
 @Getter
 @Setter

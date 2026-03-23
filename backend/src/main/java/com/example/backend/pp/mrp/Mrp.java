@@ -32,9 +32,9 @@ public class Mrp {
     private BigDecimal estoqueAtual;
     @Column(name = "estoque_seguranca", precision = 10, scale = 4)
     private BigDecimal estoqueSeguranca;
-    @Column(name = "estoque_atual", precision = 10, scale = 4)
+    @Column(name = "necessidade_compra", precision = 10, scale = 4)
     private BigDecimal necessidadeCompra;
-    @Column(name = "estoque_atual", precision = 10, scale = 4)
+    @Column(name = "necessidade_producao", precision = 10, scale = 4)
     private BigDecimal necessidadeProducao;
     @Column(name = "data_necessidade")
     private LocalDate dataNecessidade;

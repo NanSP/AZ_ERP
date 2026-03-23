@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name = "parceiros", schema = "com/example/backend/core")
+@Table(name = "parceiros", schema = "core")
 @Entity
 @Getter
 @Setter

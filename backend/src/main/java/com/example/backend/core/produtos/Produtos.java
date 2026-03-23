@@ -6,7 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Table(name = "produtos", schema = "com/example/backend/core")
+@Table(name = "produtos", schema = "core")
 @Entity
 @Getter
 @Setter

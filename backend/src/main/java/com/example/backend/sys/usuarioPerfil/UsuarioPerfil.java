@@ -7,7 +7,7 @@ import com.example.backend.sys.perfis.Perfis;
 
 import java.time.LocalDateTime;
 
-@Table(name = "usuario_perfil", schema = "com/example/backend/sys")
+@Table(name = "usuario_perfil", schema = "sys")
 @Entity
 @Getter
 @Setter

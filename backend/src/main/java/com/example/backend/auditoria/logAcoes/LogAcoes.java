@@ -10,7 +10,7 @@ import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Table(name = "log_acoes", schema = "com/example/backend/auditoria")
+@Table(name = "log_acoes", schema = "auditoria")
 @Entity
 @Getter
 @Setter

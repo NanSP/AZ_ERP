@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Table(name = "historico_metricas", schema = "com/example/backend/bi")
+@Table(name = "historico_metricas", schema = "bi")
 @Entity
 @Getter
 @Setter

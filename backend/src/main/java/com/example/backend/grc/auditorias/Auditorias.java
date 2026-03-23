@@ -7,7 +7,7 @@ import com.example.backend.sys.usuarios.Usuarios;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Table(name = "dashboards", schema = "com/example/backend/grc")
+@Table(name = "dashboards", schema = "grc")
 @Entity
 @Getter
 @Setter

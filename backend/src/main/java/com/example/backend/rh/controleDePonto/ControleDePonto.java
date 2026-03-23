@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Table(name = "ponto_eletronico", schema = "com/example/backend/rh")
+@Table(name = "ponto_eletronico", schema = "rh")
 @Entity
 @Getter
 @Setter

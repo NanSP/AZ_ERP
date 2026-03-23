@@ -38,7 +38,7 @@ public class OrdensServico {
     private String prioridade;
     @Column(name = "data_abertura")
     private LocalDateTime dataAbertura;
-    @Column(name = "data_abertura")
+    @Column(name = "data_agendamento")
     private LocalDateTime dataAgendamento;
     @Column(name = "data_inicio")
     private LocalDateTime dataInicio;

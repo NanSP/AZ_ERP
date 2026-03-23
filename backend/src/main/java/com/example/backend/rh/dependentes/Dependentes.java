@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Table(name = "dependetes", schema = "com/example/backend/rh")
+@Table(name = "dependetes", schema = "rh")
 @Entity
 @Getter
 @Setter
