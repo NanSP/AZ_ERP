@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/fiscal/documentos")
+@RequestMapping("fiscal/documentos")
 public class Controller {
 
     @Autowired

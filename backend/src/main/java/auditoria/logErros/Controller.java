@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auditoria/logErros")
+@RequestMapping("auditoria/logErros")
 public class Controller {
 
     @Autowired

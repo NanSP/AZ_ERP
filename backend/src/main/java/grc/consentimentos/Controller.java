@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/grc/consentimentos")
+@RequestMapping("grc/consentimentos")
 public class Controller {
 
     @Autowired

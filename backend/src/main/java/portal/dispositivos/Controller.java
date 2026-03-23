@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/portal/dispositivos")
+@RequestMapping("portal/dispositivos")
 public class Controller {
 
     @Autowired

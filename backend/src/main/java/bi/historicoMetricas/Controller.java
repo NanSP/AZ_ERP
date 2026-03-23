@@ -1,9 +1,5 @@
-package bi.historicoHistoricoMetricas;
+package bi.historicoMetricas;
 
-import bi.historicoMetricas.HistoricoMetricas;
-import bi.historicoMetricas.HistoricoMetricasRepository;
-import bi.historicoMetricas.HistoricoMetricasRequestDTO;
-import bi.historicoMetricas.HistoricoMetricasResponseDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/bi/historicoHistoricoMetricas")
+@RequestMapping("bi/historicoMetricas")
 public class Controller {
 
     @Autowired
