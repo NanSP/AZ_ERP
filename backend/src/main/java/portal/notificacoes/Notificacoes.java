@@ -19,6 +19,7 @@ public class Notificacoes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuarios usuarioId;
     private String titulo;

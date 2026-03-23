@@ -23,6 +23,7 @@ public class Bom {
     @JoinColumn(name = "produto_pai_id")
     private Produtos produtoPaiId;
 
+    @ManyToOne
     @JoinColumn(name = "componente_id")
     private Produtos componenteId;
     @Column(precision = 10, scale = 4)

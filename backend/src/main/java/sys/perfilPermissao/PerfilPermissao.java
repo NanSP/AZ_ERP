@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import sys.perfis.Perfis;
 import sys.permissoes.Permissoes;
-import sys.usuarioPerfil.UsuarioPerfilRequestDTO;
-import sys.usuarios.Usuarios;
 
 @Table(name = "perfil_permissao", schema = "sys")
 @Entity
@@ -19,11 +17,11 @@ public class PerfilPermissao {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "perfil_id")
     private Perfis perfilId;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "permissao_id")
     private Permissoes permissaoId;
 

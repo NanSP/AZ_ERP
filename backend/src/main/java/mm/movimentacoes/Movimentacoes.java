@@ -35,7 +35,7 @@ public class Movimentacoes {
     private String documentoReferencia;
     private String motivo;
     @ManyToOne
-    @JoinColumn(name = "estoque_id")
+    @JoinColumn(name = "usuario_id")
     private Usuarios usuarioId;
 
     @Column(name = "created_at")

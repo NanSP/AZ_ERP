@@ -3,9 +3,13 @@ package mm.compras;
 import core.parceiros.Parceiros;
 import jakarta.persistence.*;
 import lombok.*;
+import mm.compraItens.CompraItens;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "compras", schema = "materiais")
 @Entity
@@ -18,6 +22,9 @@ public class Compras {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @OneToMany(mappedBy = "compraId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CompraItens> itens = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id")
@@ -40,7 +47,7 @@ public class Compras {
 
 
     public Compras(ComprasRequestDTO data) {
-        this.fornecedorId = data.fornecedorId();
+        this.itens = data.itens();
         this.dataPedido = data.dataPedido();
         this.dataPrevistaEntrega = data.dataPrevistaEntrega();
         this.dataEntrega = data.dataEntrega();

@@ -6,12 +6,14 @@ import sys.usuarios.Usuarios;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record TarefasResponseDTO
         (
                 Integer id,
                 Projetos projetoId,
                 Tarefas tarefaPaiId,
+                List<Tarefas> subtarefas,
                 String titulo,
                 String descricao,
                 Usuarios responsavelId,
@@ -29,6 +31,7 @@ public record TarefasResponseDTO
                 tarefas.getId(),
                 tarefas.getProjetoId(),
                 tarefas.getTarefaPaiId(),
+                tarefas.getSubtarefas(),
                 tarefas.getTitulo(),
                 tarefas.getDescricao(),
                 tarefas.getResponsavelId(),

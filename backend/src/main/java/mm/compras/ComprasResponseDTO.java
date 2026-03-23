@@ -1,15 +1,17 @@
 package mm.compras;
 
 import core.parceiros.Parceiros;
-import mm.movimentacoes.Movimentacoes;
+import mm.compraItens.CompraItens;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record ComprasResponseDTO
         (
                 Integer id,
+                List<CompraItens> itens,
                 Parceiros fornecedorId,
                 LocalDate dataPedido,
                 LocalDate dataPrevistaEntrega,
@@ -25,6 +27,7 @@ public record ComprasResponseDTO
             this
                     (
                             compras.getId(),
+                            compras.getItens(),
                             compras.getFornecedorId(),
                             compras.getDataPedido(),
                             compras.getDataPrevistaEntrega(),

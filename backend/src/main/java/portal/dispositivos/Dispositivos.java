@@ -19,6 +19,7 @@ public class Dispositivos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuarios usuarioId;
     @Column(name = "device_id")

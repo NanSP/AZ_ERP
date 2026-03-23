@@ -20,11 +20,11 @@ public class UsuarioPerfil {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "usuario_id")
     private Usuarios usuarioId;
 
-    @ManyToMany
+    @ManyToOne
     @JoinColumn(name = "perfil_id")
     private Perfis perfilId;
 

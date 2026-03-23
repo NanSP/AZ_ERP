@@ -20,9 +20,11 @@ public class CompraItens {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @ManyToOne
     @JoinColumn(name = "compra_id")
     private Compras compraId;
 
+    @ManyToOne
     @JoinColumn(name = "produto_id")
     private Produtos produtoId;
     @Column(precision = 10, scale = 4)

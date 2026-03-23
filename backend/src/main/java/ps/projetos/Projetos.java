@@ -3,10 +3,13 @@ package ps.projetos;
 import core.parceiros.Parceiros;
 import jakarta.persistence.*;
 import lombok.*;
+import ps.tarefas.Tarefas;
 import sys.usuarios.Usuarios;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "projetos", schema = "projetos")
 @Entity
@@ -20,6 +23,9 @@ public class Projetos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @OneToMany(mappedBy = "projetoId")
+    private List<Tarefas> tarefas = new ArrayList<>();
 
     private String codigo;
     private String nome;
@@ -53,6 +59,7 @@ public class Projetos {
     private LocalDateTime createdAt;
 
     public Projetos(ProjetosRequestDTO data) {
+        this.tarefas = data.tarefas();
         this.codigo = data.codigo();
         this.nome = data.nome();
         this.descricao = data.descricao();
