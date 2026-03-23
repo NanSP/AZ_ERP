@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("parceiros")
+@RequestMapping("/api/core/parceiros")
 public class Controller {
 
     @Autowired

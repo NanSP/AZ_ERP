@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("controleDePonto")
+@RequestMapping("/api/rh/controleDePonto")
 public class Controller {
 
     @Autowired

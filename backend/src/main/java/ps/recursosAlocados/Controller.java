@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("recursosAlocados")
+@RequestMapping("/api/ps/recursosAlocados")
 public class Controller {
 
     @Autowired

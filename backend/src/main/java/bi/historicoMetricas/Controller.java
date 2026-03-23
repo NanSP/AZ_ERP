@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("historicoHistoricoMetricas")
+@RequestMapping("/api/bi/historicoHistoricoMetricas")
 public class Controller {
 
     @Autowired

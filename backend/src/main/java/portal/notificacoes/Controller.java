@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("notificacoes")
+@RequestMapping("/api/portal/notificacoes")
 public class Controller {
 
     @Autowired
