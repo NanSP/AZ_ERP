@@ -1,4 +1,6 @@
 package com.example.backend.master.platform.systemUsers;
 
-public interface SystemUsersRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SystemUsersRepository extends JpaRepository<SystemUsers, Integer> {
 }

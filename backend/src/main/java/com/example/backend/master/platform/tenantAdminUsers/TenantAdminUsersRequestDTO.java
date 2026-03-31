@@ -1,4 +1,20 @@
 package com.example.backend.master.platform.tenantAdminUsers;
 
-public record TenantAdminUsersRequestDTO() {
+import com.example.backend.master.platform.tenants.Tenants;
+
+import java.time.LocalDateTime;
+
+public record TenantAdminUsersRequestDTO
+        (
+                Tenants tenantId,
+                String nome,
+                String email,
+                String login,
+                String senhaHash,
+                String role,
+                String status,
+                LocalDateTime ultimoAcesso,
+                LocalDateTime createdAt,
+                LocalDateTime updatedAt
+        ) {
 }

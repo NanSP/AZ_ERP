@@ -1,4 +1,6 @@
 package com.example.backend.master.platform.provisioningLogs;
 
-public interface ProvisioningLogsRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProvisioningLogsRepository extends JpaRepository<ProvisioningLogs, Integer> {
 }
