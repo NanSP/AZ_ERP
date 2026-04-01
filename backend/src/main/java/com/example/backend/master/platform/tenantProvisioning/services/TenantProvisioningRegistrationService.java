@@ -9,7 +9,6 @@ import com.example.backend.master.platform.tenantAdminUsers.TenantAdminUsersRepo
 import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRepository;
 import com.example.backend.master.platform.tenantProvisioning.TenantProvisioningRequestDTO;
-import com.example.backend.master.platform.tenantProvisioning.TenantProvisioningResponseDTO;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
 import org.springframework.stereotype.Service;
@@ -21,33 +20,30 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class TenantProvisioningService {
+public class TenantProvisioningRegistrationService {
 
     private final TenantsRepository tenantsRepository;
     private final TenantDatabasesRepository tenantDatabasesRepository;
     private final TenantAdminUsersRepository tenantAdminUsersRepository;
     private final ProvisioningLogsRepository provisioningLogsRepository;
     private final SystemUsersRepository systemUsersRepository;
-    private final TenantDatabaseProvisioningService tenantDatabaseProvisioningService;
 
-    public TenantProvisioningService(
+    public TenantProvisioningRegistrationService(
             TenantsRepository tenantsRepository,
             TenantDatabasesRepository tenantDatabasesRepository,
             TenantAdminUsersRepository tenantAdminUsersRepository,
             ProvisioningLogsRepository provisioningLogsRepository,
-            SystemUsersRepository systemUsersRepository,
-            TenantDatabaseProvisioningService tenantDatabaseProvisioningService
+            SystemUsersRepository systemUsersRepository
     ) {
         this.tenantsRepository = tenantsRepository;
         this.tenantDatabasesRepository = tenantDatabasesRepository;
         this.tenantAdminUsersRepository = tenantAdminUsersRepository;
         this.provisioningLogsRepository = provisioningLogsRepository;
         this.systemUsersRepository = systemUsersRepository;
-        this.tenantDatabaseProvisioningService = tenantDatabaseProvisioningService;
     }
 
     @Transactional
-    public TenantProvisioningResponseDTO provision(TenantProvisioningRequestDTO data) {
+    public RegistrationResult register(TenantProvisioningRequestDTO data) {
         validarDuplicidades(data);
 
         LocalDateTime now = LocalDateTime.now();
@@ -145,65 +141,11 @@ public class TenantProvisioningService {
                 now
         );
 
-        try {
-            tenantDatabaseProvisioningService.createTenantDatabase(tenantDatabase.getDatabaseName());
-
-            tenantDatabase.setProvisionStatus("ATIVO");
-            tenantDatabase.setProvisionedAt(LocalDateTime.now());
-            tenantDatabase.setUpdatedAt(LocalDateTime.now());
-            tenantDatabasesRepository.save(tenantDatabase);
-            etapasExecutadas.add("DATABASE_CREATED");
-
-            salvarLog(
-                    tenant,
-                    executor,
-                    "DATABASE_CREATED",
-                    "SUCESSO",
-                    "Banco físico do tenant criado com sucesso",
-                    Map.of(
-                            "tenantDatabaseId", tenantDatabase.getId(),
-                            "databaseName", tenantDatabase.getDatabaseName(),
-                            "status", tenantDatabase.getProvisionStatus()
-                    ),
-                    LocalDateTime.now()
-            );
-
-        } catch (Exception ex) {
-            tenantDatabase.setProvisionStatus("ERRO");
-            tenantDatabase.setUpdatedAt(LocalDateTime.now());
-            tenantDatabasesRepository.save(tenantDatabase);
-            etapasExecutadas.add("DATABASE_ERROR");
-
-            salvarLog(
-                    tenant,
-                    executor,
-                    "DATABASE_CREATED",
-                    "ERRO",
-                    "Erro ao criar banco físico do tenant",
-                    Map.of(
-                            "tenantDatabaseId", tenantDatabase.getId(),
-                            "databaseName", tenantDatabase.getDatabaseName(),
-                            "erro", ex.getMessage()
-                    ),
-                    LocalDateTime.now()
-            );
-
-            throw new RuntimeException("Falha no provisionamento físico do banco: " + ex.getMessage(), ex);
-        }
-
-        return new TenantProvisioningResponseDTO(
-                tenant.getId(),
-                tenant.getCodigo(),
-                tenant.getNome(),
-                tenant.getStatus(),
-                tenantDatabase.getId(),
-                tenantDatabase.getDatabaseName(),
-                tenantDatabase.getProvisionStatus(),
-                tenantAdmin.getId(),
-                tenantAdmin.getNome(),
-                tenantAdmin.getEmail(),
-                tenantAdmin.getLogin(),
-                tenantDatabase.getProvisionedAt(),
+        return new RegistrationResult(
+                tenant,
+                tenantDatabase,
+                tenantAdmin,
+                executor,
                 etapasExecutadas
         );
     }
