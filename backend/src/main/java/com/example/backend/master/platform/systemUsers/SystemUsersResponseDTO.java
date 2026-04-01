@@ -4,11 +4,10 @@ import java.time.LocalDateTime;
 
 public record SystemUsersResponseDTO
         (
-                Integer id,
+                Long id,
                 String nome,
                 String email,
                 String login,
-                String senhaHash,
                 String role,
                 String status,
                 LocalDateTime ultimoAcesso,
@@ -23,7 +22,6 @@ public record SystemUsersResponseDTO
                             systemUsers.getNome(),
                             systemUsers.getEmail(),
                             systemUsers.getLogin(),
-                            systemUsers.getSenhaHash(),
                             systemUsers.getRole(),
                             systemUsers.getStatus(),
                             systemUsers.getUltimoAcesso(),

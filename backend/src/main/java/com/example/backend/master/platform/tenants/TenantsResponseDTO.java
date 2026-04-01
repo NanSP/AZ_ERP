@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record TenantsResponseDTO
         (
-                Integer id,
+                Long id,
                 String codigo,
                 String nome,
                 String nomeFantasia,

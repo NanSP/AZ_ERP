@@ -16,7 +16,7 @@ public class Tenants {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String codigo;
     private String nome;

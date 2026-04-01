@@ -29,7 +29,7 @@ public class SystemUsersController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
 
-        Optional<SystemUsers> systemUsers = repository.findById(id);
+        Optional<SystemUsers> systemUsers = repository.findById(Long.valueOf(id));
         if(systemUsers.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -39,7 +39,7 @@ public class SystemUsersController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody SystemUsersRequestDTO data){
+    public void saveSystemUsers(@RequestBody SystemUsersRequestDTO data){
 
         SystemUsers systemUsersData = new SystemUsers(data);
         repository.save(systemUsersData);
@@ -50,7 +50,7 @@ public class SystemUsersController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateSystemUsers(@PathVariable(value = "id") Integer id, @RequestBody SystemUsersRequestDTO upData){
 
-        Optional<SystemUsers> systemUsers = repository.findById(id);
+        Optional<SystemUsers> systemUsers = repository.findById(Long.valueOf(id));
         if(systemUsers.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -64,7 +64,7 @@ public class SystemUsersController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSystemUsers(@PathVariable(value = "id") Integer id){
 
-        Optional<SystemUsers> systemUsers = repository.findById(id);
+        Optional<SystemUsers> systemUsers = repository.findById(Long.valueOf(id));
         if(systemUsers.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }

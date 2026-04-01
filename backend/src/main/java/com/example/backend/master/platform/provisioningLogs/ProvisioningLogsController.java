@@ -28,7 +28,7 @@ public class ProvisioningLogsController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
 
-        Optional<ProvisioningLogs> provisioningLogs = repository.findById(id);
+        Optional<ProvisioningLogs> provisioningLogs = repository.findById(Long.valueOf(id));
         if(provisioningLogs.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -38,7 +38,7 @@ public class ProvisioningLogsController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody ProvisioningLogsRequestDTO data){
+    public void saveProvisioningLog(@RequestBody ProvisioningLogsRequestDTO data){
 
         ProvisioningLogs provisioningLogsData = new ProvisioningLogs(data);
         repository.save(provisioningLogsData);
@@ -49,7 +49,7 @@ public class ProvisioningLogsController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProvisioningLogs(@PathVariable(value = "id") Integer id, @RequestBody ProvisioningLogsRequestDTO upData){
 
-        Optional<ProvisioningLogs> provisioningLogs = repository.findById(id);
+        Optional<ProvisioningLogs> provisioningLogs = repository.findById(Long.valueOf(id));
         if(provisioningLogs.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -63,7 +63,7 @@ public class ProvisioningLogsController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProvisioningLogs(@PathVariable(value = "id") Integer id){
 
-        Optional<ProvisioningLogs> provisioningLogs = repository.findById(id);
+        Optional<ProvisioningLogs> provisioningLogs = repository.findById(Long.valueOf(id));
         if(provisioningLogs.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }

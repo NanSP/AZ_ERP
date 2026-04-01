@@ -17,7 +17,7 @@ public class TenantDatabases {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -35,7 +35,7 @@ public class TenantDatabases {
     @Column(name = "db_password_encrypted")
     private String dbPasswordEncrypted;
     @Column(name = "provisioned_at")
-    private String provisionedAt;
+    private LocalDateTime provisionedAt;
     @Column(name = "provision_status")
     private String provisionStatus;
     @Column(name = "last_check_at")

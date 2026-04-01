@@ -5,12 +5,11 @@ import java.time.LocalDateTime;
 
 public record TenantAdminUsersResponseDTO
         (
-                Integer id,
+                Long id,
                 Tenants tenantId,
                 String nome,
                 String email,
                 String login,
-                String senhaHash,
                 String role,
                 String status,
                 LocalDateTime ultimoAcesso,
@@ -26,7 +25,6 @@ public record TenantAdminUsersResponseDTO
                             tenantAdminUsers.getNome(),
                             tenantAdminUsers.getEmail(),
                             tenantAdminUsers.getLogin(),
-                            tenantAdminUsers.getSenhaHash(),
                             tenantAdminUsers.getRole(),
                             tenantAdminUsers.getStatus(),
                             tenantAdminUsers.getUltimoAcesso(),

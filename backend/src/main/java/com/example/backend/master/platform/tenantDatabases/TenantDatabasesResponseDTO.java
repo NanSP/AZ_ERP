@@ -1,12 +1,11 @@
 package com.example.backend.master.platform.tenantDatabases;
 
-import com.example.backend.master.platform.tenantAdminUsers.TenantAdminUsers;
 import com.example.backend.master.platform.tenants.Tenants;
 import java.time.LocalDateTime;
 
 public record TenantDatabasesResponseDTO
         (
-                Integer id,
+                Long id,
                 Tenants tenantId,
                 String databaseName,
                 String templateName,
@@ -14,7 +13,7 @@ public record TenantDatabasesResponseDTO
                 Integer dbPort,
                 String dbUsername,
                 String dbPasswordEncrypted,
-                String provisionedAt,
+                LocalDateTime provisionedAt,
                 String provisionStatus,
                 LocalDateTime lastCheckAt,
                 LocalDateTime createdAt,

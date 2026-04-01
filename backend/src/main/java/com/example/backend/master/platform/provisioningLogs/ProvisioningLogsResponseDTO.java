@@ -7,7 +7,7 @@ import java.util.Map;
 
 public record ProvisioningLogsResponseDTO
         (
-                Integer id,
+                Long id,
                 Tenants tenantId,
                 String etapa,
                 String status,

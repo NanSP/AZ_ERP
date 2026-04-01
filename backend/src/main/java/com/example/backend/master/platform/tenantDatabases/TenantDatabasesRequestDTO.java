@@ -13,7 +13,7 @@ public record TenantDatabasesRequestDTO
                 Integer dbPort,
                 String dbUsername,
                 String dbPasswordEncrypted,
-                String provisionedAt,
+                LocalDateTime provisionedAt,
                 String provisionStatus,
                 LocalDateTime lastCheckAt,
                 LocalDateTime createdAt,

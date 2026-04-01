@@ -1,6 +1,7 @@
 package com.example.backend.master.platform.tenantAdminUsers;
 
 import com.example.backend.master.platform.tenants.Tenants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +18,7 @@ public class TenantAdminUsers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "tenant_id")
@@ -27,6 +28,7 @@ public class TenantAdminUsers {
     private String email;
     private String login;
 
+    @JsonIgnore
     @Column(name = "senha_hash")
     private String senhaHash;
     private String role;

@@ -1,5 +1,6 @@
 package com.example.backend.master.platform.systemUsers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -15,11 +16,13 @@ public class SystemUsers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String nome;
     private String email;
     private String login;
+
+    @JsonIgnore
     @Column(name = "senha_hash")
     private String senhaHash;
     private String role;
