@@ -1,5 +1,6 @@
 package com.example.backend.master.platform.tenantProvisioning;
 
+import com.example.backend.master.platform.tenantProvisioning.services.TenantProvisioningService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -29,7 +29,7 @@ public class TenantDatabasesService {
         entity.setDbHost(data.dbHost());
         entity.setDbPort(data.dbPort());
         entity.setDbUsername(data.dbUsername());
-        entity.setDbPasswordEncrypted(data.dbPasswordEncrypted());
+        entity.setDbPassword(data.dbPassword());
         entity.setProvisionedAt(data.provisionedAt());
         entity.setProvisionStatus(data.provisionStatus());
         entity.setLastCheckAt(data.lastCheckAt());
@@ -52,7 +52,7 @@ public class TenantDatabasesService {
         entity.setDbHost(data.dbHost());
         entity.setDbPort(data.dbPort());
         entity.setDbUsername(data.dbUsername());
-        entity.setDbPasswordEncrypted(data.dbPasswordEncrypted());
+        entity.setDbPassword(data.dbPassword());
         entity.setProvisionedAt(data.provisionedAt());
         entity.setProvisionStatus(data.provisionStatus());
         entity.setLastCheckAt(data.lastCheckAt());

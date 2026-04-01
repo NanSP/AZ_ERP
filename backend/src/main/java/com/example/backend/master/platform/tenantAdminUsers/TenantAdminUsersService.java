@@ -27,7 +27,7 @@ public class TenantAdminUsersService {
         entity.setNome(data.nome());
         entity.setEmail(data.email());
         entity.setLogin(data.login());
-        entity.setSenhaHash(data.senhaHash());
+        entity.setSenha(data.senha());
         entity.setRole(data.role());
         entity.setStatus(data.status());
         entity.setUltimoAcesso(data.ultimoAcesso());
@@ -48,7 +48,7 @@ public class TenantAdminUsersService {
         entity.setNome(data.nome());
         entity.setEmail(data.email());
         entity.setLogin(data.login());
-        entity.setSenhaHash(data.senhaHash());
+        entity.setSenha(data.senha());
         entity.setRole(data.role());
         entity.setStatus(data.status());
         entity.setUltimoAcesso(data.ultimoAcesso());
