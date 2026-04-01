@@ -1,12 +1,12 @@
 package com.example.backend.master.platform.tenantDatabases;
 
-import com.example.backend.master.platform.tenants.Tenants;
-
 import java.time.LocalDateTime;
 
 public record TenantDatabasesRequestDTO
         (
-                Tenants tenantId,
+                Long tenantId,
+                String tenantCodigo,
+                String tenantNome,
                 String databaseName,
                 String templateName,
                 String dbHost,

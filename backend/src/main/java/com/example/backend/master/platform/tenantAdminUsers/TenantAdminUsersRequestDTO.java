@@ -1,12 +1,12 @@
 package com.example.backend.master.platform.tenantAdminUsers;
 
-import com.example.backend.master.platform.tenants.Tenants;
-
 import java.time.LocalDateTime;
 
 public record TenantAdminUsersRequestDTO
         (
-                Tenants tenantId,
+                Long tenantId,
+                String tenantCodigo,
+                String tenantNome,
                 String nome,
                 String email,
                 String login,

@@ -1,7 +1,5 @@
 package com.example.backend.master.platform.provisioningLogs;
 
-import com.example.backend.master.platform.systemUsers.SystemUsers;
-import com.example.backend.master.platform.tenants.Tenants;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -15,7 +13,9 @@ public record ProvisioningLogsResponseDTO
                 String status,
                 String mensagem,
                 Map<String, Object> detalhes,
-                SystemUsers executadoPor,
+                Long executadoPorId,
+                String executadoPorLogin,
+                String executadoPorNome,
                 LocalDateTime createdAt
         )
     {
@@ -30,7 +30,9 @@ public record ProvisioningLogsResponseDTO
                             provisioningLogs.getStatus(),
                             provisioningLogs.getMensagem(),
                             provisioningLogs.getDetalhes(),
-                            provisioningLogs.getExecutadoPor(),
+                            provisioningLogs.getExecutadoPor() != null ? provisioningLogs.getExecutadoPor().getId() : null,
+                            provisioningLogs.getExecutadoPor() != null ? provisioningLogs.getExecutadoPor().getLogin() : null,
+                            provisioningLogs.getExecutadoPor() != null ? provisioningLogs.getExecutadoPor().getNome() : null,
                             provisioningLogs.getCreatedAt()
                     );
         }
