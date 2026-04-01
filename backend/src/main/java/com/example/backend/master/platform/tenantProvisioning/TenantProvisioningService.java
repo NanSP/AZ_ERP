@@ -43,8 +43,13 @@ public class TenantProvisioningService {
 
     @Transactional
     public TenantProvisioningResponseDTO provision(TenantProvisioningRequestDTO data) {
-        List<String> etapasExecutadas = new ArrayList<>();
+        validarDuplicidades(data);
+
         LocalDateTime now = LocalDateTime.now();
+        List<String> etapasExecutadas = new ArrayList<>();
+
+        SystemUsers executor = systemUsersRepository.findById(data.systemUserId())
+                .orElseThrow(() -> new RuntimeException("Usuário executor não encontrado"));
 
         Tenants tenant = new Tenants();
         tenant.setCodigo(data.codigo());
@@ -62,6 +67,20 @@ public class TenantProvisioningService {
         tenant = tenantsRepository.save(tenant);
         etapasExecutadas.add("TENANT_CREATED");
 
+        salvarLog(
+                tenant,
+                executor,
+                "TENANT_CREATED",
+                "SUCESSO",
+                "Tenant criado com sucesso",
+                Map.of(
+                        "tenantId", tenant.getId(),
+                        "codigo", tenant.getCodigo(),
+                        "nome", tenant.getNome()
+                ),
+                now
+        );
+
         TenantDatabases tenantDatabase = new TenantDatabases();
         tenantDatabase.setTenantId(tenant);
         tenantDatabase.setDatabaseName(data.databaseName());
@@ -69,7 +88,7 @@ public class TenantProvisioningService {
         tenantDatabase.setDbHost(data.dbHost());
         tenantDatabase.setDbPort(data.dbPort());
         tenantDatabase.setDbUsername(data.dbUsername());
-        tenantDatabase.setDbPasswordEncrypted(data.dbPasswordEncrypted());
+        tenantDatabase.setDbPassword(data.dbPassword());
         tenantDatabase.setProvisionStatus("PENDENTE");
         tenantDatabase.setProvisionedAt(null);
         tenantDatabase.setLastCheckAt(null);
@@ -78,12 +97,27 @@ public class TenantProvisioningService {
         tenantDatabase = tenantDatabasesRepository.save(tenantDatabase);
         etapasExecutadas.add("DATABASE_REGISTERED");
 
+        salvarLog(
+                tenant,
+                executor,
+                "DATABASE_REGISTERED",
+                "SUCESSO",
+                "Banco do tenant registrado com sucesso",
+                Map.of(
+                        "tenantDatabaseId", tenantDatabase.getId(),
+                        "databaseName", tenantDatabase.getDatabaseName(),
+                        "dbHost", tenantDatabase.getDbHost(),
+                        "dbPort", tenantDatabase.getDbPort()
+                ),
+                now
+        );
+
         TenantAdminUsers tenantAdmin = new TenantAdminUsers();
         tenantAdmin.setTenantId(tenant);
         tenantAdmin.setNome(data.adminNome());
         tenantAdmin.setEmail(data.adminEmail());
         tenantAdmin.setLogin(data.adminLogin());
-        tenantAdmin.setSenhaHash(data.adminSenhaHash());
+        tenantAdmin.setSenha(data.adminSenha());
         tenantAdmin.setRole("ADMIN_TENANT");
         tenantAdmin.setStatus("ATIVO");
         tenantAdmin.setUltimoAcesso(null);
@@ -92,49 +126,20 @@ public class TenantProvisioningService {
         tenantAdmin = tenantAdminUsersRepository.save(tenantAdmin);
         etapasExecutadas.add("TENANT_ADMIN_CREATED");
 
-        SystemUsers executor = systemUsersRepository.findAll()
-                .stream()
-                .findFirst()
-                .orElse(null);
-
-        ProvisioningLogs logTenant = new ProvisioningLogs();
-        logTenant.setTenantId(tenant);
-        logTenant.setEtapa("TENANT_CREATED");
-        logTenant.setStatus("SUCESSO");
-        logTenant.setMensagem("Tenant criado com sucesso");
-        logTenant.setDetalhes(Map.of(
-                "tenantId", tenant.getId(),
-                "codigo", tenant.getCodigo()
-        ));
-        logTenant.setExecutadoPor(executor);
-        logTenant.setCreatedAt(now);
-        provisioningLogsRepository.save(logTenant);
-
-        ProvisioningLogs logDatabase = new ProvisioningLogs();
-        logDatabase.setTenantId(tenant);
-        logDatabase.setEtapa("DATABASE_REGISTERED");
-        logDatabase.setStatus("SUCESSO");
-        logDatabase.setMensagem("Banco do tenant registrado com sucesso");
-        logDatabase.setDetalhes(Map.of(
-                "tenantDatabaseId", tenantDatabase.getId(),
-                "databaseName", tenantDatabase.getDatabaseName()
-        ));
-        logDatabase.setExecutadoPor(executor);
-        logDatabase.setCreatedAt(now);
-        provisioningLogsRepository.save(logDatabase);
-
-        ProvisioningLogs logAdmin = new ProvisioningLogs();
-        logAdmin.setTenantId(tenant);
-        logAdmin.setEtapa("TENANT_ADMIN_CREATED");
-        logAdmin.setStatus("SUCESSO");
-        logAdmin.setMensagem("Administrador inicial do tenant criado com sucesso");
-        logAdmin.setDetalhes(Map.of(
-                "tenantAdminUserId", tenantAdmin.getId(),
-                "adminLogin", tenantAdmin.getLogin()
-        ));
-        logAdmin.setExecutadoPor(executor);
-        logAdmin.setCreatedAt(now);
-        provisioningLogsRepository.save(logAdmin);
+        salvarLog(
+                tenant,
+                executor,
+                "TENANT_ADMIN_CREATED",
+                "SUCESSO",
+                "Administrador inicial do tenant criado com sucesso",
+                Map.of(
+                        "tenantAdminUserId", tenantAdmin.getId(),
+                        "adminNome", tenantAdmin.getNome(),
+                        "adminEmail", tenantAdmin.getEmail(),
+                        "adminLogin", tenantAdmin.getLogin()
+                ),
+                now
+        );
 
         return new TenantProvisioningResponseDTO(
                 tenant.getId(),
@@ -151,5 +156,44 @@ public class TenantProvisioningService {
                 now,
                 etapasExecutadas
         );
+    }
+
+    private void validarDuplicidades(TenantProvisioningRequestDTO data) {
+        if (tenantsRepository.existsByCodigoIgnoreCase(data.codigo())) {
+            throw new RuntimeException("Já existe um tenant com esse código");
+        }
+
+        if (tenantDatabasesRepository.existsByDatabaseNameIgnoreCase(data.databaseName())) {
+            throw new RuntimeException("Já existe um banco cadastrado com esse nome");
+        }
+
+        if (tenantAdminUsersRepository.existsByEmailIgnoreCase(data.adminEmail())) {
+            throw new RuntimeException("Já existe um admin de tenant com esse email");
+        }
+
+        if (tenantAdminUsersRepository.existsByLoginIgnoreCase(data.adminLogin())) {
+            throw new RuntimeException("Já existe um admin de tenant com esse login");
+        }
+    }
+
+    private void salvarLog(
+            Tenants tenant,
+            SystemUsers executor,
+            String etapa,
+            String status,
+            String mensagem,
+            Map<String, Object> detalhes,
+            LocalDateTime createdAt
+    ) {
+        ProvisioningLogs log = new ProvisioningLogs();
+        log.setTenantId(tenant);
+        log.setEtapa(etapa);
+        log.setStatus(status);
+        log.setMensagem(mensagem);
+        log.setDetalhes(detalhes);
+        log.setExecutadoPor(executor);
+        log.setCreatedAt(createdAt);
+
+        provisioningLogsRepository.save(log);
     }
 }

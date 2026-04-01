@@ -1,6 +1,7 @@
 package com.example.backend.master.platform.tenantProvisioning;
 
 public record TenantProvisioningRequestDTO(
+        Long systemUserId,
         String codigo,
         String nome,
         String nomeFantasia,
@@ -13,10 +14,10 @@ public record TenantProvisioningRequestDTO(
         String dbHost,
         Integer dbPort,
         String dbUsername,
-        String dbPasswordEncrypted,
+        String dbPassword,
         String adminNome,
         String adminEmail,
         String adminLogin,
-        String adminSenhaHash
+        String adminSenha
 ) {}
 

@@ -8,7 +8,7 @@ public record TenantAdminUsersRequestDTO
                 String nome,
                 String email,
                 String login,
-                String senhaHash,
+                String senha,
                 String role,
                 String status,
                 LocalDateTime ultimoAcesso,

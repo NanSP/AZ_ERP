@@ -19,7 +19,7 @@ public class TenantDatabases {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "tenant_id")
     private Tenants tenantId;
     @Column(name = "database_name")
@@ -33,7 +33,7 @@ public class TenantDatabases {
     @Column(name = "db_username")
     private String dbUsername;
     @Column(name = "db_password_encrypted")
-    private String dbPasswordEncrypted;
+    private String dbPassword;
     @Column(name = "provisioned_at")
     private LocalDateTime provisionedAt;
     @Column(name = "provision_status")
@@ -51,7 +51,7 @@ public class TenantDatabases {
         this.dbUsername = data.dbUsername();
         this.dbPort = data.dbPort();
         this.dbHost = data.dbHost();
-        this.dbPasswordEncrypted = data.dbPasswordEncrypted();
+        this.dbPassword = data.dbPassword();
         this.provisionStatus = data.provisionStatus();
         this.provisionedAt = data.provisionedAt();
         this.lastCheckAt = data.lastCheckAt();

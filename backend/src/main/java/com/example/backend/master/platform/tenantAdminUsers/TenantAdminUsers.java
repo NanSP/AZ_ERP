@@ -30,7 +30,7 @@ public class TenantAdminUsers {
 
     @JsonIgnore
     @Column(name = "senha_hash")
-    private String senhaHash;
+    private String senha;
     private String role;
     private String status;
 
@@ -45,7 +45,7 @@ public class TenantAdminUsers {
         this.nome = data.nome();
         this.email = data.email();
         this.login = data.login();
-        this.senhaHash = data.senhaHash();
+        this.senha = data.senha();
         this.role = data.role();
         this.status = data.status();
         this.ultimoAcesso = data.ultimoAcesso();
