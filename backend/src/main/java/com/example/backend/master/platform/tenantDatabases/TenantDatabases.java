@@ -46,7 +46,6 @@ public class TenantDatabases {
     private LocalDateTime updatedAt;
 
     public TenantDatabases(TenantDatabasesRequestDTO data) {
-        this.tenantId = data.tenantId();
         this.databaseName = data.databaseName();
         this.templateName = data.templateName();
         this.dbUsername = data.dbUsername();

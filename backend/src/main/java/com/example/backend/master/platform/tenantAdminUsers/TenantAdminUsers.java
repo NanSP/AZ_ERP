@@ -42,7 +42,6 @@ public class TenantAdminUsers {
     private LocalDateTime updatedAt;
 
     public TenantAdminUsers(TenantAdminUsersRequestDTO data) {
-        this.tenantId = data.tenantId();
         this.nome = data.nome();
         this.email = data.email();
         this.login = data.login();

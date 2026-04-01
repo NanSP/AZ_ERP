@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 public record TenantDatabasesRequestDTO
         (
                 Long tenantId,
-                String tenantCodigo,
-                String tenantNome,
                 String databaseName,
                 String templateName,
                 String dbHost,

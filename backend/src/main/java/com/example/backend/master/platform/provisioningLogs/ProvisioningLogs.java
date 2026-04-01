@@ -42,12 +42,10 @@ public class ProvisioningLogs {
     private LocalDateTime createdAt;
 
     public ProvisioningLogs(ProvisioningLogsRequestDTO data) {
-        this.tenantId = data.tenantId();
         this.etapa = data.etapa();
         this.status = data.status();
         this.mensagem = data.mensagem();
         this.detalhes = data.detalhes();
-        this.executadoPor = data.executadoPor();
         this.createdAt = data.createdAt();
     }
 }

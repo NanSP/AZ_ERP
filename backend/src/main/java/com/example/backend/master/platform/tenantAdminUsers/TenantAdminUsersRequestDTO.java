@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 public record TenantAdminUsersRequestDTO
         (
                 Long tenantId,
-                String tenantCodigo,
-                String tenantNome,
                 String nome,
                 String email,
                 String login,
