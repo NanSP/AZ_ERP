@@ -1,12 +1,13 @@
 package com.example.backend.master.platform.tenantDatabases;
 
-import com.example.backend.master.platform.tenants.Tenants;
 import java.time.LocalDateTime;
 
 public record TenantDatabasesResponseDTO
         (
                 Long id,
-                Tenants tenantId,
+                Long tenantId,
+                String tenantCodigo,
+                String tenantNome,
                 String databaseName,
                 String templateName,
                 String dbHost,
@@ -23,7 +24,9 @@ public record TenantDatabasesResponseDTO
             this
                     (
                             tenantDatabases.getId(),
-                            tenantDatabases.getTenantId(),
+                            tenantDatabases.getTenantId() != null ? tenantDatabases.getTenantId().getId() : null,
+                            tenantDatabases.getTenantId() != null ? tenantDatabases.getTenantId().getCodigo() : null,
+                            tenantDatabases.getTenantId() != null ? tenantDatabases.getTenantId().getNome() : null,
                             tenantDatabases.getDatabaseName(),
                             tenantDatabases.getTemplateName(),
                             tenantDatabases.getDbHost(),

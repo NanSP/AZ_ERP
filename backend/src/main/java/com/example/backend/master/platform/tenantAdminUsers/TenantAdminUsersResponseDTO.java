@@ -1,12 +1,13 @@
 package com.example.backend.master.platform.tenantAdminUsers;
 
-import com.example.backend.master.platform.tenants.Tenants;
 import java.time.LocalDateTime;
 
 public record TenantAdminUsersResponseDTO
         (
                 Long id,
-                Tenants tenantId,
+                Long tenantId,
+                String tenantCodigo,
+                String tenantNome,
                 String nome,
                 String email,
                 String login,
@@ -21,7 +22,9 @@ public record TenantAdminUsersResponseDTO
             this
                     (
                             tenantAdminUsers.getId(),
-                            tenantAdminUsers.getTenantId(),
+                            tenantAdminUsers.getTenantId() != null ? tenantAdminUsers.getTenantId().getId() : null,
+                            tenantAdminUsers.getTenantId() != null ? tenantAdminUsers.getTenantId().getCodigo() : null,
+                            tenantAdminUsers.getTenantId() != null ? tenantAdminUsers.getTenantId().getNome() : null,
                             tenantAdminUsers.getNome(),
                             tenantAdminUsers.getEmail(),
                             tenantAdminUsers.getLogin(),

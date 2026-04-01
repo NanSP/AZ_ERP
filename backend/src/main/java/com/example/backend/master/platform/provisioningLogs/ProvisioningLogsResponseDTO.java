@@ -8,7 +8,9 @@ import java.util.Map;
 public record ProvisioningLogsResponseDTO
         (
                 Long id,
-                Tenants tenantId,
+                Long tenantId,
+                String tenantCodigo,
+                String tenantNome,
                 String etapa,
                 String status,
                 String mensagem,
@@ -21,7 +23,9 @@ public record ProvisioningLogsResponseDTO
             this
                     (
                             provisioningLogs.getId(),
-                            provisioningLogs.getTenantId(),
+                            provisioningLogs.getTenantId() != null ? provisioningLogs.getTenantId().getId() : null,
+                            provisioningLogs.getTenantId() != null ? provisioningLogs.getTenantId().getCodigo() : null,
+                            provisioningLogs.getTenantId() != null ? provisioningLogs.getTenantId().getNome() : null,
                             provisioningLogs.getEtapa(),
                             provisioningLogs.getStatus(),
                             provisioningLogs.getMensagem(),
