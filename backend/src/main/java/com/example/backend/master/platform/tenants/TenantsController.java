@@ -26,9 +26,9 @@ public class TenantsController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
+    public ResponseEntity<?> getById(@PathVariable(value = "id") Long id){
 
-        Optional<Tenants> tenants = repository.findById(Long.valueOf(id));
+        Optional<Tenants> tenants = repository.findById(id);
         if(tenants.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -47,9 +47,9 @@ public class TenantsController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTenants(@PathVariable(value = "id") Integer id, @RequestBody TenantsRequestDTO upData){
+    public ResponseEntity<?> updateTenants(@PathVariable(value = "id") Long id, @RequestBody TenantsRequestDTO upData){
 
-        Optional<Tenants> tenants = repository.findById(Long.valueOf(id));
+        Optional<Tenants> tenants = repository.findById(id);
         if(tenants.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -61,9 +61,9 @@ public class TenantsController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTenants(@PathVariable(value = "id") Integer id){
+    public ResponseEntity<?> deleteTenants(@PathVariable(value = "id") Long id){
 
-        Optional<Tenants> tenants = repository.findById(Long.valueOf(id));
+        Optional<Tenants> tenants = repository.findById(id);
         if(tenants.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }

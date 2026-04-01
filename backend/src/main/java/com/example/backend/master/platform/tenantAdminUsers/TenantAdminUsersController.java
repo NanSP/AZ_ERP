@@ -26,9 +26,9 @@ public class TenantAdminUsersController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
+    public ResponseEntity<?> getById(@PathVariable(value = "id") Long id){
 
-        Optional<TenantAdminUsers> tenantAdminUsers = repository.findById(Long.valueOf(id));
+        Optional<TenantAdminUsers> tenantAdminUsers = repository.findById(id);
         if(tenantAdminUsers.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -47,9 +47,9 @@ public class TenantAdminUsersController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTenantAdminUsers(@PathVariable(value = "id") Integer id, @RequestBody TenantAdminUsersRequestDTO upData){
+    public ResponseEntity<?> updateTenantAdminUsers(@PathVariable(value = "id") Long id, @RequestBody TenantAdminUsersRequestDTO upData){
 
-        Optional<TenantAdminUsers> tenantAdminUsers = repository.findById(Long.valueOf(id));
+        Optional<TenantAdminUsers> tenantAdminUsers = repository.findById(id);
         if(tenantAdminUsers.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
@@ -61,9 +61,9 @@ public class TenantAdminUsersController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTenantAdminUsers(@PathVariable(value = "id") Integer id){
+    public ResponseEntity<?> deleteTenantAdminUsers(@PathVariable(value = "id") Long id){
 
-        Optional<TenantAdminUsers> tenantAdminUsers = repository.findById(Long.valueOf(id));
+        Optional<TenantAdminUsers> tenantAdminUsers = repository.findById(id);
         if(tenantAdminUsers.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
