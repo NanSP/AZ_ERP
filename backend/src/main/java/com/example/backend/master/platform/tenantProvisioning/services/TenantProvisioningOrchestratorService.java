@@ -49,6 +49,7 @@ public class TenantProvisioningOrchestratorService {
             );
 
             result.tenant().setStatus("ATIVO");
+            result.tenant().setUpdatedAt(now);
             tenantsRepository.save(result.tenant());
 
             tenantDatabase.setProvisionStatus("ATIVO");
@@ -74,6 +75,7 @@ public class TenantProvisioningOrchestratorService {
         } catch (Exception ex) {
 
             result.tenant().setStatus("SUSPENSO");
+            result.tenant().setUpdatedAt(now);
             tenantsRepository.save(result.tenant());
 
             tenantDatabase.setProvisionStatus("ERRO");
