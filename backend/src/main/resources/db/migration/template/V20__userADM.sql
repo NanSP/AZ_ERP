@@ -47,9 +47,9 @@ WHERE p.nome = 'USUARIO_PADRAO';
 
 INSERT INTO sys.usuarios (nome, email, login, senha_hash, tipo_usuario, status)
 VALUES
-    ('Master Tecnico', 'master@tenant.local', 'master.tenant', '240be518fabd2724ddb6f04eebbf2f062801ab8ff993b0b3cf7e8cfa2d789a22', 'sistema', 'ativo'),
-    ('Administrador Tenant', 'admin@tenant.local', 'admin.tenant', '240be518fabd2724ddb6f04eebbf2f062801ab8ff993b0b3cf7e8cfa2d789a22', 'administrador', 'ativo'),
-    ('Usuario Padrao', 'user@tenant.local', 'user.tenant', 'e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446', 'usuario', 'ativo');
+    ('Master Tecnico', 'master@tenant.local', 'master.tenant', '$2a$10$8N0JmLw8mQ4r6Q5eWQn8QeYQm2g7Hj0rD6xTt8m0xK1sP9bL2aF5G', 'sistema', 'ativo'),
+    ('Administrador Tenant', 'admin@tenant.local', 'admin.tenant', '$2a$10$8N0JmLw8mQ4r6Q5eWQn8QeYQm2g7Hj0rD6xTt8m0xK1sP9bL2aF5G', 'administrador', 'ativo'),
+    ('Usuario Padrao', 'user@tenant.local', 'user.tenant', '$2y$10$D1iNdmIQ9k3vMVtcQ9Js5ORtB8ZzQNFzVZzMABX8z1ir472MUBOq.', 'usuario', 'ativo');
 
 INSERT INTO sys.usuario_perfil (usuario_id, perfil_id)
 SELECT u.id, p.id
