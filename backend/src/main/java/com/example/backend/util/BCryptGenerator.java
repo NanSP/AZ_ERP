@@ -7,7 +7,7 @@ public class BCryptGenerator {
     public static void main(String[] args) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        String senha = "admin123";
+        String senha = "user123";
         String hash = encoder.encode(senha);
 
         System.out.println("Senha: " + senha);

@@ -11,28 +11,31 @@ import java.time.temporal.ChronoUnit;
 @Service
 public class JwtService {
 
-    private static final String SECRET = "trocar-essa-chave-na-fase-3";
-    private static final String ISSUER = "az-erp-backend";
+    private final JwtProperties jwtProperties;
+
+    public JwtService(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+    }
 
     public String generateToken(Long userId, String login, String role, String scope) {
-        Algorithm algorithm = Algorithm.HMAC256(SECRET);
+        Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret());
 
         return JWT.create()
-                .withIssuer(ISSUER)
+                .withIssuer(jwtProperties.getIssuer())
                 .withSubject(login)
                 .withClaim("userId", userId)
                 .withClaim("role", role)
                 .withClaim("scope", scope)
                 .withIssuedAt(Instant.now())
-                .withExpiresAt(Instant.now().plus(8, ChronoUnit.HOURS))
+                .withExpiresAt(Instant.now().plus(jwtProperties.getExpirationHours(), ChronoUnit.HOURS))
                 .sign(algorithm);
     }
 
     public DecodedJWT validateToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(SECRET);
+        Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret());
 
         return JWT.require(algorithm)
-                .withIssuer(ISSUER)
+                .withIssuer(jwtProperties.getIssuer())
                 .build()
                 .verify(token);
     }
