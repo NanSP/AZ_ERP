@@ -9,7 +9,7 @@ INSERT INTO platform.system_users (
     'Administrador do Sistema',
     'admin@azerp.com',
     'admin.sistema',
-    '$argon2id$v=19$m=65536,t=3,p=4$pNox9EB/zttWypEKaBdyGA$uKZQ9Gn2CPgYkHh2QTunK9Nmwz/QmOubi6n9K4ciTps',
+    '$2a$10$8N0JmLw8mQ4r6Q5eWQn8QeYQm2g7Hj0rD6xTt8m0xK1sP9bL2aF5G',
     'ADMIN_SISTEMA',
     'ATIVO'
 );
