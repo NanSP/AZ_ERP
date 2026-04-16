@@ -31,6 +31,28 @@ public class JwtService {
                 .sign(algorithm);
     }
 
+    public String generateTenantToken(
+            Long tenantId,
+            String tenantCode,
+            Long userId,
+            String login,
+            String role
+    ) {
+        Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret());
+
+        return JWT.create()
+                .withIssuer(jwtProperties.getIssuer())
+                .withSubject(login)
+                .withClaim("tenantId", tenantId)
+                .withClaim("tenantCode", tenantCode)
+                .withClaim("userId", userId)
+                .withClaim("role", role)
+                .withClaim("scope", "tenant")
+                .withIssuedAt(Instant.now())
+                .withExpiresAt(Instant.now().plus(jwtProperties.getExpirationHours(), ChronoUnit.HOURS))
+                .sign(algorithm);
+    }
+
     public DecodedJWT validateToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret());
 
@@ -54,5 +76,13 @@ public class JwtService {
 
     public String extractScope(String token) {
         return validateToken(token).getClaim("scope").asString();
+    }
+
+    public Long extractTenantId(String token) {
+        return validateToken(token).getClaim("tenantId").asLong();
+    }
+
+    public String extractTenantCode(String token) {
+        return validateToken(token).getClaim("tenantCode").asString();
     }
 }

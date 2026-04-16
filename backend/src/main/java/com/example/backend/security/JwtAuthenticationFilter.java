@@ -40,11 +40,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             DecodedJWT decodedJWT = jwtService.validateToken(token);
 
+            String scope = decodedJWT.getClaim("scope").asString();
+            Long tenantId = null;
+            String tenantCode = null;
+
+            if ("tenant".equalsIgnoreCase(scope)) {
+                tenantId = decodedJWT.getClaim("tenantId").asLong();
+                tenantCode = decodedJWT.getClaim("tenantCode").asString();
+            }
+
             SecurityUserPrincipal principal = new SecurityUserPrincipal(
                     decodedJWT.getClaim("userId").asLong(),
                     decodedJWT.getSubject(),
                     decodedJWT.getClaim("role").asString(),
-                    decodedJWT.getClaim("scope").asString()
+                    scope,
+                    tenantId,
+                    tenantCode
             );
 
             UsernamePasswordAuthenticationToken authentication =
