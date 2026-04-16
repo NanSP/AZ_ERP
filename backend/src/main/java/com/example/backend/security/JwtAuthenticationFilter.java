@@ -1,10 +1,11 @@
 package com.example.backend.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.servlet.FilterChain;
+import com.example.backend.tenant.context.TenantContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -28,49 +29,53 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String token = authHeader.substring(7);
-
         try {
-            DecodedJWT decodedJWT = jwtService.validateToken(token);
+            String authHeader = request.getHeader("Authorization");
 
-            String scope = decodedJWT.getClaim("scope").asString();
-            Long tenantId = null;
-            String tenantCode = null;
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
 
-            if ("tenant".equalsIgnoreCase(scope)) {
-                tenantId = decodedJWT.getClaim("tenantId").asLong();
-                tenantCode = decodedJWT.getClaim("tenantCode").asString();
+                DecodedJWT decodedJWT = jwtService.validateToken(token);
+
+                String scope = decodedJWT.getClaim("scope").asString();
+                Long tenantId = null;
+                String tenantCode = null;
+
+                if ("tenant".equalsIgnoreCase(scope)) {
+                    tenantId = decodedJWT.getClaim("tenantId").asLong();
+                    tenantCode = decodedJWT.getClaim("tenantCode").asString();
+                    TenantContext.setTenant(tenantCode);
+                }
+
+                SecurityUserPrincipal principal = new SecurityUserPrincipal(
+                        decodedJWT.getClaim("userId").asLong(),
+                        decodedJWT.getSubject(),
+                        decodedJWT.getClaim("role").asString(),
+                        scope,
+                        tenantId,
+                        tenantCode
+                );
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                principal,
+                                null,
+                                principal.getAuthorities()
+                        );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
-            SecurityUserPrincipal principal = new SecurityUserPrincipal(
-                    decodedJWT.getClaim("userId").asLong(),
-                    decodedJWT.getSubject(),
-                    decodedJWT.getClaim("role").asString(),
-                    scope,
-                    tenantId,
-                    tenantCode
-            );
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            principal,
-                            null,
-                            principal.getAuthorities()
-                    );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request, response);
 
         } catch (Exception ex) {
             SecurityContextHolder.clearContext();
+            TenantContext.clear();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Token invalido ou expirado\"}");
+        } finally {
+            TenantContext.clear();
         }
-
-        filterChain.doFilter(request, response);
     }
 }
