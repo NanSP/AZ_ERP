@@ -24,7 +24,7 @@ public class Empresas {
     @Column(name = "nome_fantasia")
     private String nomeFantasia;
     private String cnpj;
-    @Column(name = "incricao_estadual")
+    @Column(name = "inscricao_estadual")
     private String inscricaoEstadual;
     @Column(name = "inscricao_municipal")
     private String inscricaoMunicipal;
