@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("permissoes")
+@RequestMapping("/sys/permissoes")
 public class PermissoesController {
 
     @Autowired

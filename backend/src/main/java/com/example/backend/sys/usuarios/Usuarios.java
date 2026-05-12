@@ -40,23 +40,8 @@ public class Usuarios {
     private LocalDate expiracaoSenha;
     @Column(name = "tentativas_login")
     private Integer tentativasLogin;
+
     @Column(name = "created_at")
-
-    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Sessoes> sessoes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LogAcoes> logAcoes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LogErros> logErros = new ArrayList<>();
-
-    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Notificacoes> notificacoes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "usuarioId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Dispositivos> dispositivos = new ArrayList<>();
-
     private LocalDateTime createdAt;
 
     public Usuarios(UsuariosRequestDTO data){
@@ -70,11 +55,6 @@ public class Usuarios {
         this.ultimoAcesso = data.ultimoAcesso();
         this.expiracaoSenha = data.expiracaoSenha();
         this.tentativasLogin = data.tentativasLogin();
-        this.sessoes = data.sessoes();
-        this.logAcoes = data.logAcoes();
-        this.logErros = data.logErros();
-        this.notificacoes = data.notificacoes();
-        this.dispositivos = data.dispositivos();
         this.createdAt = data.createdAt();
     }
 }
