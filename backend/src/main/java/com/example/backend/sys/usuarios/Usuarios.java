@@ -1,17 +1,9 @@
 package com.example.backend.sys.usuarios;
 
-import com.example.backend.auditoria.logAcoes.LogAcoes;
-import com.example.backend.auditoria.logErros.LogErros;
 import jakarta.persistence.*;
 import lombok.*;
-import com.example.backend.portal.dispositivos.Dispositivos;
-import com.example.backend.portal.notificacoes.Notificacoes;
-import com.example.backend.portal.sessoes.Sessoes;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Table(name = "usuarios", schema = "sys")
 @Entity
