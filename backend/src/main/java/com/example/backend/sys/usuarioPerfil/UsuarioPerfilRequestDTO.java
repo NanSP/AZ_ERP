@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 public record UsuarioPerfilRequestDTO
         (
-                Integer usuarioId,
-                Integer perfilId,
+                Integer usuario,
+                Integer perfil,
                 LocalDateTime dataAtribuicao
         ) {
 }

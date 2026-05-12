@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 public record UsuarioPerfilResponseDTO
         (
                 Integer id,
-                Integer usuarioId,
-                Integer perfilId,
+                Integer usuario,
+                Integer perfil,
                 LocalDateTime dataAtribuicao
         )
     {
         public UsuarioPerfilResponseDTO(UsuarioPerfil usuarioPerfil) {
             this(
                     usuarioPerfil.getId(),
-                    usuarioPerfil.getUsuarioId() != null ? usuarioPerfil.getUsuarioId().getId() : null,
-                    usuarioPerfil.getPerfilId() != null ? usuarioPerfil.getPerfilId().getId() : null,
+                    usuarioPerfil.getUsuario() != null ? usuarioPerfil.getUsuario().getId() : null,
+                    usuarioPerfil.getPerfil() != null ? usuarioPerfil.getPerfil().getId() : null,
                     usuarioPerfil.getDataAtribuicao()
             );
         }

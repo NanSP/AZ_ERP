@@ -21,19 +21,13 @@ public class UsuarioPerfil {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuarios usuarioId;
+    private Usuarios usuario;
 
     @ManyToOne
     @JoinColumn(name = "perfil_id")
-    private Perfis perfilId;
+    private Perfis perfil;
 
     @Column(name = "data_atribuicao")
     private LocalDateTime dataAtribuicao;
 
-    public UsuarioPerfil(UsuarioPerfilRequestDTO data){
-
-        this.usuarioId = data.usuarioId();
-        this.perfilId = data.perfilId();
-        this.dataAtribuicao = data.dataAtribuicao();
-    }
 }

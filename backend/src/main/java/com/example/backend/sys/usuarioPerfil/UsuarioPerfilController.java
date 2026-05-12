@@ -1,7 +1,9 @@
 package com.example.backend.sys.usuarioPerfil;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sys.perfis.Perfis;
+import com.example.backend.sys.perfis.PerfisRepository;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +14,19 @@ import java.util.Optional;
 @RequestMapping("/sys/usuarioPerfil")
 public class UsuarioPerfilController {
 
-    @Autowired
-    private UsuarioPerfilRepository repository;
+    private final UsuarioPerfilRepository repository;
+    private final UsuariosRepository usuariosRepository;
+    private final PerfisRepository perfisRepository;
+
+    public UsuarioPerfilController(
+            UsuarioPerfilRepository repository,
+            UsuariosRepository usuariosRepository,
+            PerfisRepository perfisRepository
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+        this.perfisRepository = perfisRepository;
+    }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping
@@ -37,26 +50,53 @@ public class UsuarioPerfilController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveUsuarioPerfil(@RequestBody UsuarioPerfilRequestDTO data){
+    public ResponseEntity<?> saveUsuarioPerfil(@RequestBody UsuarioPerfilRequestDTO data) {
+        try {
+            Usuarios usuario = usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"));
 
-        UsuarioPerfil usuarioPerfilData = new UsuarioPerfil(data);
-        repository.save(usuarioPerfilData);
-        return;
+            Perfis perfil = perfisRepository.findById(data.perfil())
+                    .orElseThrow(() -> new RuntimeException("Perfil nao encontrado"));
+
+            UsuarioPerfil entity = new UsuarioPerfil();
+            entity.setUsuario(usuario);
+            entity.setPerfil(perfil);
+            entity.setDataAtribuicao(data.dataAtribuicao());
+
+            UsuarioPerfil saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioPerfilResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
+
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUsuarioPerfil(@PathVariable(value = "id") Integer id, @RequestBody UsuarioPerfilRequestDTO upData){
+    public ResponseEntity<?> updateUsuarioPerfil(@PathVariable Integer id, @RequestBody UsuarioPerfilRequestDTO data) {
+        try {
+            UsuarioPerfil entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Relacao usuario_perfil nao encontrada"));
 
-        Optional<UsuarioPerfil> usuarioPerfil = repository.findById(id);
-        if(usuarioPerfil.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Usuarios usuario = usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"));
+
+            Perfis perfil = perfisRepository.findById(data.perfil())
+                    .orElseThrow(() -> new RuntimeException("Perfil nao encontrado"));
+
+            entity.setUsuario(usuario);
+            entity.setPerfil(perfil);
+            entity.setDataAtribuicao(data.dataAtribuicao());
+
+            UsuarioPerfil updated = repository.save(entity);
+            return ResponseEntity.ok(new UsuarioPerfilResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        UsuarioPerfil usuarioPerfilModel = usuarioPerfil.get();
-        BeanUtils.copyProperties(upData, usuarioPerfilModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(usuarioPerfilModel));
     }
+
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
