@@ -19,14 +19,10 @@ public class PerfilPermissao {
 
     @ManyToOne
     @JoinColumn(name = "perfil_id")
-    private Perfis perfilId;
+    private Perfis perfil;
 
     @ManyToOne
     @JoinColumn(name = "permissao_id")
-    private Permissoes permissaoId;
+    private Permissoes permissao;
 
-    public PerfilPermissao(PerfilPermissaoRequestDTO data){
-        this.permissaoId = data.permissaoId();
-        this.perfilId = data.perfilId();
-    }
 }

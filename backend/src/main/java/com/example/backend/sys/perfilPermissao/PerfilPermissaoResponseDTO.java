@@ -1,20 +1,17 @@
 package com.example.backend.sys.perfilPermissao;
 
-import com.example.backend.sys.perfis.Perfis;
-import com.example.backend.sys.permissoes.Permissoes;
-
 public record PerfilPermissaoResponseDTO
         (
                 Integer id,
-                Perfis perfilId,
-                Permissoes permissaoId
+                Integer perfil,
+                Integer permissao
         )
     {
         public PerfilPermissaoResponseDTO(PerfilPermissao perfilPermissao) {
             this(
                     perfilPermissao.getId(),
-                    perfilPermissao.getPerfilId(),
-                    perfilPermissao.getPermissaoId()
+                    perfilPermissao.getPerfil() != null ? perfilPermissao.getPerfil().getId() : null,
+                    perfilPermissao.getPermissao() != null ? perfilPermissao.getPermissao().getId() : null
             );
         }
 }
