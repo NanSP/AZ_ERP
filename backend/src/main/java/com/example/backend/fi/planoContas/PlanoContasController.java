@@ -1,7 +1,5 @@
 package com.example.backend.fi.planoContas;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +11,11 @@ import java.util.Optional;
 @RequestMapping("/fi/planoContas")
 public class PlanoContasController {
 
-    @Autowired
-    private PlanoContasRepository repository;
+    private final PlanoContasRepository repository;
+
+    public PlanoContasController(PlanoContasRepository repository) {
+        this.repository = repository;
+    }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping
@@ -38,26 +39,60 @@ public class PlanoContasController {
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void savePlanoContas(@RequestBody PlanoContasRequestDTO data){
+    public ResponseEntity<?> savePlanoContas(@RequestBody PlanoContasRequestDTO data) {
+        try {
+            PlanoContas contaPai = null;
 
-        PlanoContas planoContasData = new PlanoContas(data);
-        repository.save(planoContasData);
-        return;
+            if (data.contaPai() != null) {
+                contaPai = repository.findById(data.contaPai())
+                        .orElseThrow(() -> new RuntimeException("Conta pai nao encontrada"));
+            }
+
+            PlanoContas entity = new PlanoContas();
+            entity.setCodigo(data.codigo());
+            entity.setNome(data.nome());
+            entity.setTipoConta(data.tipoConta());
+            entity.setNatureza(data.natureza());
+            entity.setContaPai(contaPai);
+            entity.setSituacao(data.situacao());
+
+            PlanoContas saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new PlanoContasResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePlanoContas(@PathVariable(value = "id") Integer id, @RequestBody PlanoContasRequestDTO upData){
+    public ResponseEntity<?> updatePlanoContas(@PathVariable Integer id, @RequestBody PlanoContasRequestDTO data) {
+        try {
+            PlanoContas entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Plano de contas nao encontrado"));
 
-        Optional<PlanoContas> planoContas = repository.findById(id);
-        if(planoContas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            PlanoContas contaPai = null;
+
+            if (data.contaPai() != null) {
+                contaPai = repository.findById(data.contaPai())
+                        .orElseThrow(() -> new RuntimeException("Conta pai nao encontrada"));
+            }
+
+            entity.setCodigo(data.codigo());
+            entity.setNome(data.nome());
+            entity.setTipoConta(data.tipoConta());
+            entity.setNatureza(data.natureza());
+            entity.setContaPai(contaPai);
+            entity.setSituacao(data.situacao());
+
+            PlanoContas updated = repository.save(entity);
+            return ResponseEntity.ok(new PlanoContasResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        PlanoContas planoContasModel = planoContas.get();
-        BeanUtils.copyProperties(upData, planoContasModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(planoContasModel));
     }
+
 
     @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")

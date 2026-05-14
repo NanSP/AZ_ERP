@@ -25,19 +25,11 @@ public class PlanoContas {
     private String natureza;
     @ManyToOne
     @JoinColumn(name = "conta_pai_id")
-    private PlanoContas planoContas;
+    private PlanoContas contaPai;
     private String situacao;
 
     @OneToMany(mappedBy = "planoContas", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlanoContas> contasFilhas = new ArrayList<>();
 
-    public PlanoContas(PlanoContasRequestDTO data){
-        this.codigo = data.codigo();
-        this.nome = data.nome();
-        this.tipoConta = data.tipoConta();
-        this.natureza = data.natureza();
-        this.planoContas = data.planoContas();
-        this.situacao = data.situacao();
-        this.contasFilhas = data.contasFilhas();
-    }
+
 }

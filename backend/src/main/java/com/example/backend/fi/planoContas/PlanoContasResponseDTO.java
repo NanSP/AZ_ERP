@@ -1,7 +1,5 @@
 package com.example.backend.fi.planoContas;
 
-import java.util.List;
-
 public record PlanoContasResponseDTO
         (
                 Integer id,
@@ -9,9 +7,9 @@ public record PlanoContasResponseDTO
                 String nome,
                 String tipoConta,
                 String natureza,
-                PlanoContas planoContas,
-                String situacao,
-                List<PlanoContas> contasFilhas
+                Integer contaPai,
+                String situacao
+
         )
     {
         public PlanoContasResponseDTO(PlanoContas planoContas) {
@@ -22,9 +20,9 @@ public record PlanoContasResponseDTO
                             planoContas.getNome(),
                             planoContas.getTipoConta(),
                             planoContas.getNatureza(),
-                            planoContas.getPlanoContas(),
-                            planoContas.getSituacao(),
-                            planoContas.getContasFilhas()
+                            planoContas.getContaPai()!= null ? planoContas.getContaPai().getId() : null,
+                            planoContas.getSituacao()
+
                     );
         }
 }
