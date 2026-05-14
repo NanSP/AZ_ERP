@@ -68,6 +68,6 @@ public class CentrosCustoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
         }
         repository.delete(centrosCusto.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Plano Contas deleted");
+        return  ResponseEntity.status(HttpStatus.OK).body("Centro de custo deleted");
     }
 }

@@ -25,6 +25,7 @@ public class CentrosCusto {
         this.codigo = data.codigo();
         this.nome = data.nome();
         this.tipo = data.tipo();
+        this.responsavel = data.responsavel();
         this.ativo = data.ativo();
     }
 }
