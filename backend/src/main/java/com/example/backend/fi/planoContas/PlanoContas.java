@@ -28,7 +28,7 @@ public class PlanoContas {
     private PlanoContas contaPai;
     private String situacao;
 
-    @OneToMany(mappedBy = "planoContas", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "contaPai", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlanoContas> contasFilhas = new ArrayList<>();
 
 
