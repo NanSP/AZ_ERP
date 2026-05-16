@@ -1,18 +1,14 @@
 package com.example.backend.fi.contasPagar;
 
-import com.example.backend.core.empresas.Empresas;
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.fi.centrosCusto.CentrosCusto;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record ContasPagarRequestDTO
         (
-                Empresas empresaId,
-                Parceiros fornecedorId,
-                CentrosCusto centroCustoId,
+                Integer empresa,
+                Integer fornecedor,
+                Integer centroCusto,
                 String numeroDocumento,
                 String descricao,
                 BigDecimal valorOriginal,

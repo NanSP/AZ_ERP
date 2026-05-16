@@ -24,22 +24,22 @@ public class ContasPagar {
 
     @ManyToOne
     @JoinColumn(name = "empresa_id")
-    private Empresas empresaId;
+    private Empresas empresa;
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id")
-    private Parceiros fornecedorId;
+    private Parceiros fornecedor;
 
     @ManyToOne
     @JoinColumn(name = "centro_custo_id")
-    private CentrosCusto centroCustoId;
+    private CentrosCusto centroCusto;
 
     @Column(name = "numero_documento")
     private String numeroDocumento;
     private String descricao;
-    @Column(name = "valor_original", precision = 10, scale = 2)
+    @Column(name = "valor_original", precision = 15, scale = 2)
     private BigDecimal valorOriginal;
-    @Column(name = "valor_pago", precision = 10, scale = 2)
+    @Column(name = "valor_pago", precision = 15, scale = 2)
     private BigDecimal valorPago;
     @Column(name = "data_emissao")
     private LocalDate dataEmissao;
@@ -53,19 +53,4 @@ public class ContasPagar {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public ContasPagar(ContasPagarRequestDTO data){
-        this.empresaId = data.empresaId();
-        this.fornecedorId = data.fornecedorId();
-        this.numeroDocumento = data.numeroDocumento();
-        this.centroCustoId = data.centroCustoId();
-        this.descricao = data.descricao();
-        this.valorOriginal = data.valorOriginal();
-        this.valorPago = data.valorPago();
-        this.dataEmissao = data.dataEmissao();
-        this.dataVencimento = data.dataVencimento();
-        this.dataPagamento = data.dataPagamento();
-        this.createdAt = data.createdAt();
-        this.formaPagamento = data.formaPagamento();
-        this.status = data.status();
-    }
 }
