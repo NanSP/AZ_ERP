@@ -1,6 +1,5 @@
 package com.example.backend.pp.mrp;
 
-import com.example.backend.core.produtos.Produtos;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,7 +7,7 @@ import java.time.LocalDateTime;
 public record MrpResponseDTO
         (
                 Integer id,
-                Produtos produtoId,
+                Integer produto,
                 LocalDate periodo,
                 BigDecimal demandaPrevista,
                 BigDecimal estoqueAtual,
@@ -22,7 +21,7 @@ public record MrpResponseDTO
         public MrpResponseDTO(Mrp mrp) {
             this(
                     mrp.getId(),
-                    mrp.getProdutoId(),
+                    mrp.getProduto() != null ? mrp.getProduto().getId() : null,
                     mrp.getPeriodo(),
                     mrp.getDemandaPrevista(),
                     mrp.getEstoqueAtual(),

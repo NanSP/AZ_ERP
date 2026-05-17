@@ -1,72 +1,106 @@
 package com.example.backend.pp.mrp;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.produtos.Produtos;
+import com.example.backend.core.produtos.ProdutosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/pp/mrp")
 public class MrpController {
 
-    @Autowired
-    private MrpRepository repository;
+    private final MrpRepository repository;
+    private final ProdutosRepository produtosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public MrpController(
+            MrpRepository repository,
+            ProdutosRepository produtosRepository
+    ) {
+        this.repository = repository;
+        this.produtosRepository = produtosRepository;
+    }
+
     @GetMapping
-    public List<MrpResponseDTO> getAll(){
-
-        List<MrpResponseDTO> mrpList = repository.findAll().stream().map(MrpResponseDTO::new).toList();
-        return mrpList;
+    public List<MrpResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(MrpResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Mrp> mrp = repository.findById(id);
-        if(mrp.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        MrpResponseDTO MrpDTO = new MrpResponseDTO(mrp.get());
-        return  ResponseEntity.ok(MrpDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new MrpResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveMrp(@RequestBody MrpRequestDTO data){
+    public ResponseEntity<?> saveMrp(@RequestBody MrpRequestDTO data) {
+        try {
+            Produtos produto = data.produto() != null
+                    ? produtosRepository.findById(data.produto())
+                    .orElseThrow(() -> new RuntimeException("Produto nao encontrado"))
+                    : null;
 
-        Mrp mrpData = new Mrp(data);
-        repository.save(mrpData);
-        return;
+            Mrp entity = new Mrp();
+            entity.setProduto(produto);
+            entity.setPeriodo(data.periodo());
+            entity.setDemandaPrevista(data.demandaPrevista());
+            entity.setEstoqueAtual(data.estoqueAtual());
+            entity.setEstoqueSeguranca(data.estoqueSeguranca());
+            entity.setNecessidadeCompra(data.necessidadeCompra());
+            entity.setNecessidadeProducao(data.necessidadeProducao());
+            entity.setDataNecessidade(data.dataNecessidade());
+            entity.setCreatedAt(data.createdAt());
+
+            Mrp saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MrpResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMrp(@PathVariable(value = "id") Integer id, @RequestBody MrpRequestDTO upData){
+    public ResponseEntity<?> updateMrp(@PathVariable Integer id, @RequestBody MrpRequestDTO data) {
+        try {
+            Mrp entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("MRP nao encontrado"));
 
-        Optional<Mrp> mrp = repository.findById(id);
-        if(mrp.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Produtos produto = data.produto() != null
+                    ? produtosRepository.findById(data.produto())
+                    .orElseThrow(() -> new RuntimeException("Produto nao encontrado"))
+                    : null;
+
+            entity.setProduto(produto);
+            entity.setPeriodo(data.periodo());
+            entity.setDemandaPrevista(data.demandaPrevista());
+            entity.setEstoqueAtual(data.estoqueAtual());
+            entity.setEstoqueSeguranca(data.estoqueSeguranca());
+            entity.setNecessidadeCompra(data.necessidadeCompra());
+            entity.setNecessidadeProducao(data.necessidadeProducao());
+            entity.setDataNecessidade(data.dataNecessidade());
+            entity.setCreatedAt(data.createdAt());
+
+            Mrp updated = repository.save(entity);
+            return ResponseEntity.ok(new MrpResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Mrp mrpModel = mrp.get();
-        BeanUtils.copyProperties(upData, mrpModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(mrpModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMrp(@PathVariable(value = "id") Integer id){
-
-        Optional<Mrp> mrp = repository.findById(id);
-        if(mrp.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(mrp.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Cliente deleted");
+    public ResponseEntity<?> deleteMrp(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("MRP deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
