@@ -1,13 +1,12 @@
 package com.example.backend.sd.clientes;
 
-import com.example.backend.core.parceiros.Parceiros;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record ClientesResponseDTO
         (
                 Integer id,
-                Parceiros parceiroId,
+                Integer parceiro,
                 String classificacao,
                 String origem,
                 String website,
@@ -20,7 +19,7 @@ public record ClientesResponseDTO
             this
                     (
                             clientes.getId(),
-                            clientes.getParceiroId(),
+                            clientes.getParceiro() != null ? clientes.getParceiro().getId() : null,
                             clientes.getClassificacao(),
                             clientes.getOrigem(),
                             clientes.getWebsite(),

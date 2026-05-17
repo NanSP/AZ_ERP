@@ -7,7 +7,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Table(name = "compras", schema = "crm")
+@Table(name = "clientes", schema = "crm")
 @Entity
 @Getter
 @Setter
@@ -21,11 +21,11 @@ public class Clientes {
 
     @ManyToOne
     @JoinColumn(name = "parceiro_id")
-    private Parceiros parceiroId;
+    private Parceiros parceiro;
     private String classificacao;
     private String origem;
     private String website;
-    @Column(name = "faturamento_anual", precision = 10, scale = 2)
+    @Column(name = "faturamento_anual", precision = 15, scale = 2)
     private BigDecimal faturamentoAnual;
     @Column(name = "numero_funcionarios")
     private Integer numeroFuncionarios;
@@ -33,13 +33,4 @@ public class Clientes {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Clientes(ClientesRequestDTO data) {
-        this.parceiroId = data.parceiroId();
-        this.classificacao = data.classificacao();
-        this.origem = data.origem();
-        this.website = data.website();
-        this.faturamentoAnual = data.faturamentoAnual();
-        this.numeroFuncionarios = data.numeroFuncionarios();
-        this.createdAt = data.createdAt();
-    }
 }

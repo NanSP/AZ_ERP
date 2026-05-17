@@ -1,73 +1,102 @@
 package com.example.backend.sd.clientes;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.parceiros.Parceiros;
+import com.example.backend.core.parceiros.ParceirosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("clientes")
+@RequestMapping("/sd/clientes")
 public class ClientesController {
 
-    @Autowired
-    private ClientesRepository repository;
+    private final ClientesRepository repository;
+    private final ParceirosRepository parceirosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ClientesController(
+            ClientesRepository repository,
+            ParceirosRepository parceirosRepository
+    ) {
+        this.repository = repository;
+        this.parceirosRepository = parceirosRepository;
+    }
+
     @GetMapping
-    public List<ClientesResponseDTO> getAll(){
-
-        List<ClientesResponseDTO> clientesList = repository.findAll().stream().map(ClientesResponseDTO::new).toList();
-        return clientesList;
+    public List<ClientesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ClientesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Clientes> clientes = repository.findById(id);
-        if(clientes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ClientesResponseDTO clientesDTO = new ClientesResponseDTO(clientes.get());
-        return  ResponseEntity.ok(clientesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ClientesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveClientes(@RequestBody ClientesRequestDTO data){
+    public ResponseEntity<?> saveClientes(@RequestBody ClientesRequestDTO data) {
+        try {
+            Parceiros parceiro = data.parceiro() != null
+                    ? parceirosRepository.findById(data.parceiro())
+                    .orElseThrow(() -> new RuntimeException("Parceiro nao encontrado"))
+                    : null;
 
-        Clientes clientesData = new Clientes(data);
-        repository.save(clientesData);
-        return;
+            Clientes entity = new Clientes();
+            entity.setParceiro(parceiro);
+            entity.setClassificacao(data.classificacao());
+            entity.setOrigem(data.origem());
+            entity.setWebsite(data.website());
+            entity.setFaturamentoAnual(data.faturamentoAnual());
+            entity.setNumeroFuncionarios(data.numeroFuncionarios());
+            entity.setCreatedAt(data.createdAt());
+
+            Clientes saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ClientesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateClientes(@PathVariable(value = "id") Integer id, @RequestBody ClientesRequestDTO upData){
+    public ResponseEntity<?> updateClientes(@PathVariable Integer id, @RequestBody ClientesRequestDTO data) {
+        try {
+            Clientes entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"));
 
-        Optional<Clientes> clientes = repository.findById(id);
-        if(clientes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Parceiros parceiro = data.parceiro() != null
+                    ? parceirosRepository.findById(data.parceiro())
+                    .orElseThrow(() -> new RuntimeException("Parceiro nao encontrado"))
+                    : null;
+
+            entity.setParceiro(parceiro);
+            entity.setClassificacao(data.classificacao());
+            entity.setOrigem(data.origem());
+            entity.setWebsite(data.website());
+            entity.setFaturamentoAnual(data.faturamentoAnual());
+            entity.setNumeroFuncionarios(data.numeroFuncionarios());
+            entity.setCreatedAt(data.createdAt());
+
+            Clientes updated = repository.save(entity);
+            return ResponseEntity.ok(new ClientesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Clientes clientesModel = clientes.get();
-        BeanUtils.copyProperties(upData, clientesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(clientesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteClientes(@PathVariable(value = "id") Integer id){
-
-        Optional<Clientes> clientes = repository.findById(id);
-        if(clientes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(clientes.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Cliente deleted");
+    public ResponseEntity<?> deleteClientes(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Cliente deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
