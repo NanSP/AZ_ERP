@@ -1,7 +1,5 @@
 package com.example.backend.grc.riscos;
 
-import com.example.backend.sys.usuarios.Usuarios;
-
 import java.time.LocalDateTime;
 
 public record RiscosResponseDTO
@@ -14,7 +12,7 @@ public record RiscosResponseDTO
                 Integer probabilidade,
                 Integer impacto,
                 String nivelRisco,
-                Usuarios responsavelId,
+                Integer responsavel,
                 String planoMitigacao,
                 LocalDateTime createdAt
         ) {
@@ -29,7 +27,7 @@ public record RiscosResponseDTO
                         riscos.getProbabilidade(),
                         riscos.getImpacto(),
                         riscos.getNivelRisco(),
-                        riscos.getResponsavelId(),
+                        riscos.getResponsavel() != null ? riscos.getResponsavel().getId() : null,
                         riscos.getPlanoMitigacao(),
                         riscos.getCreatedAt()
                 );

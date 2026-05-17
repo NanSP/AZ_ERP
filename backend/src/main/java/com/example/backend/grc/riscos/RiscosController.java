@@ -1,73 +1,108 @@
 package com.example.backend.grc.riscos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/grc/riscos")
 public class RiscosController {
 
-    @Autowired
-    private RiscosRepository repository;
+    private final RiscosRepository repository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public RiscosController(
+            RiscosRepository repository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<RiscosResponseDTO> getAll(){
-
-        List<RiscosResponseDTO> riscosList = repository.findAll().stream().map(RiscosResponseDTO::new).toList();
-        return riscosList;
+    public List<RiscosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(RiscosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Riscos> riscos = repository.findById(id);
-        if(riscos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        RiscosResponseDTO riscosDTO = new RiscosResponseDTO(riscos.get());
-        return  ResponseEntity.ok(riscosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new RiscosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody RiscosRequestDTO data){
+    public ResponseEntity<?> saveRiscos(@RequestBody RiscosRequestDTO data) {
+        try {
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
 
-        Riscos riscosData = new Riscos(data);
-        repository.save(riscosData);
-        return;
+            Riscos entity = new Riscos();
+            entity.setCodigo(data.codigo());
+            entity.setTitulo(data.titulo());
+            entity.setDescricao(data.descricao());
+            entity.setCategoria(data.categoria());
+            entity.setProbabilidade(data.probabilidade());
+            entity.setImpacto(data.impacto());
+            entity.setNivelRisco(data.nivelRisco());
+            entity.setResponsavel(responsavel);
+            entity.setPlanoMitigacao(data.planoMitigacao());
+            entity.setCreatedAt(data.createdAt());
+
+            Riscos saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new RiscosResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRiscos(@PathVariable(value = "id") Integer id, @RequestBody RiscosRequestDTO upData){
+    public ResponseEntity<?> updateRiscos(@PathVariable Integer id, @RequestBody RiscosRequestDTO data) {
+        try {
+            Riscos entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Risco nao encontrado"));
 
-        Optional<Riscos> riscos = repository.findById(id);
-        if(riscos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
+
+            entity.setCodigo(data.codigo());
+            entity.setTitulo(data.titulo());
+            entity.setDescricao(data.descricao());
+            entity.setCategoria(data.categoria());
+            entity.setProbabilidade(data.probabilidade());
+            entity.setImpacto(data.impacto());
+            entity.setNivelRisco(data.nivelRisco());
+            entity.setResponsavel(responsavel);
+            entity.setPlanoMitigacao(data.planoMitigacao());
+            entity.setCreatedAt(data.createdAt());
+
+            Riscos updated = repository.save(entity);
+            return ResponseEntity.ok(new RiscosResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Riscos riscosModel = riscos.get();
-        BeanUtils.copyProperties(upData, riscosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(riscosModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRiscos(@PathVariable(value = "id") Integer id){
-
-        Optional<Riscos> riscos = repository.findById(id);
-        if(riscos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(riscos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Riscos deleted");
+    public ResponseEntity<?> deleteRiscos(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Risco deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

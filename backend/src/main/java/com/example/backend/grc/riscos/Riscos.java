@@ -31,23 +31,10 @@ public class Riscos {
 
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
-    private Usuarios responsavelId;
+    private Usuarios responsavel;
     @Column(name = "plano_mitigacao")
     private String planoMitigacao;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Riscos(RiscosRequestDTO data) {
-        this.codigo = data.codigo();
-        this.titulo = data.titulo();
-        this.descricao = data.descricao();
-        this.probabilidade = data.probabilidade();
-        this.categoria = data.categoria();
-        this.impacto = data.impacto();
-        this.nivelRisco = data.nivelRisco();
-        this.responsavelId = data.responsavelId();
-        this.planoMitigacao = data.planoMitigacao();
-        this.createdAt = data.createdAt();
-    }
 }
