@@ -1,17 +1,15 @@
 package com.example.backend.sd.contratos;
 
-import com.example.backend.core.parceiros.Parceiros;
-
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record ContratosRequestDTO
         (
-                Parceiros clienteId,
+                Integer cliente,
                 String numeroContrato,
                 String objeto,
-                BigInteger valorTotal,
+                BigDecimal valorTotal,
                 LocalDate dataInicio,
                 LocalDate dataFim,
                 String status,

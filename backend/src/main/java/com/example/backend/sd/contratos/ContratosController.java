@@ -1,73 +1,104 @@
 package com.example.backend.sd.contratos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.parceiros.Parceiros;
+import com.example.backend.core.parceiros.ParceirosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("contratos")
+@RequestMapping("/sd/contratos")
 public class ContratosController {
 
-    @Autowired
-    private ContratosRepository repository;
+    private final ContratosRepository repository;
+    private final ParceirosRepository parceirosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ContratosController(
+            ContratosRepository repository,
+            ParceirosRepository parceirosRepository
+    ) {
+        this.repository = repository;
+        this.parceirosRepository = parceirosRepository;
+    }
+
     @GetMapping
-    public List<ContratosResponseDTO> getAll(){
-
-        List<ContratosResponseDTO> contratosList = repository.findAll().stream().map(ContratosResponseDTO::new).toList();
-        return contratosList;
+    public List<ContratosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ContratosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Contratos> contratos = repository.findById(id);
-        if(contratos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ContratosResponseDTO contratosDTO = new ContratosResponseDTO(contratos.get());
-        return  ResponseEntity.ok(contratosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ContratosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveContratos(@RequestBody ContratosRequestDTO data){
+    public ResponseEntity<?> saveContratos(@RequestBody ContratosRequestDTO data) {
+        try {
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
 
-        Contratos contratosData = new Contratos(data);
-        repository.save(contratosData);
-        return;
+            Contratos entity = new Contratos();
+            entity.setCliente(cliente);
+            entity.setNumeroContrato(data.numeroContrato());
+            entity.setObjeto(data.objeto());
+            entity.setValorTotal(data.valorTotal());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setStatus(data.status());
+            entity.setCreatedAt(data.createdAt());
+
+            Contratos saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ContratosResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContratos(@PathVariable(value = "id") Integer id, @RequestBody ContratosRequestDTO upData){
+    public ResponseEntity<?> updateContratos(@PathVariable Integer id, @RequestBody ContratosRequestDTO data) {
+        try {
+            Contratos entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Contrato nao encontrado"));
 
-        Optional<Contratos> contratos = repository.findById(id);
-        if(contratos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
+
+            entity.setCliente(cliente);
+            entity.setNumeroContrato(data.numeroContrato());
+            entity.setObjeto(data.objeto());
+            entity.setValorTotal(data.valorTotal());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setStatus(data.status());
+            entity.setCreatedAt(data.createdAt());
+
+            Contratos updated = repository.save(entity);
+            return ResponseEntity.ok(new ContratosResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Contratos contratosModel = contratos.get();
-        BeanUtils.copyProperties(upData, contratosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(contratosModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContratos(@PathVariable(value = "id") Integer id){
-
-        Optional<Contratos> contratos = repository.findById(id);
-        if(contratos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(contratos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Fatura deleted");
+    public ResponseEntity<?> deleteContratos(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Contrato deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
