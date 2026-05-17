@@ -1,13 +1,11 @@
 package com.example.backend.rh.beneficios;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record BeneficiosResponseDTO(
         Integer id,
-        Colaboradores colaborador,
+        Integer colaborador,
         String tipoBeneficio,
         BigDecimal valor,
         LocalDate dataInicio,
@@ -17,7 +15,7 @@ public record BeneficiosResponseDTO(
     public BeneficiosResponseDTO(Beneficios beneficios){
         this(
                 beneficios.getId(),
-                beneficios.getColaboradorId(),
+                beneficios.getColaborador() != null ? beneficios.getColaborador().getId() : null,
                 beneficios.getTipoBeneficio(),
                 beneficios.getValor(),
                 beneficios.getDataInicio(),

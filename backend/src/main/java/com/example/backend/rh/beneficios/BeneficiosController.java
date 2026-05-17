@@ -1,73 +1,100 @@
 package com.example.backend.rh.beneficios;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.rh.colaboradores.Colaboradores;
+import com.example.backend.rh.colaboradores.ColaboradoresRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/rh/beneficios")
 public class BeneficiosController {
 
-    @Autowired
-    private BeneficiosRepository repository;
+    private final BeneficiosRepository repository;
+    private final ColaboradoresRepository colaboradoresRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public BeneficiosController(
+            BeneficiosRepository repository,
+            ColaboradoresRepository colaboradoresRepository
+    ) {
+        this.repository = repository;
+        this.colaboradoresRepository = colaboradoresRepository;
+    }
+
     @GetMapping
-    public List<BeneficiosResponseDTO> getAll(){
-
-        List<BeneficiosResponseDTO> beneficiosList = repository.findAll().stream().map(BeneficiosResponseDTO::new).toList();
-        return beneficiosList;
+    public List<BeneficiosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(BeneficiosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Beneficios> beneficios = repository.findById(id);
-        if(beneficios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        BeneficiosResponseDTO beneficiosDTO = new BeneficiosResponseDTO(beneficios.get());
-        return  ResponseEntity.ok(beneficiosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new BeneficiosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveBeneficio(@RequestBody BeneficiosRequestDTO data){
+    public ResponseEntity<?> saveBeneficio(@RequestBody BeneficiosRequestDTO data) {
+        try {
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
 
-        Beneficios beneficioData = new Beneficios(data);
-        repository.save(beneficioData);
-        return;
+            Beneficios entity = new Beneficios();
+            entity.setColaborador(colaborador);
+            entity.setTipoBeneficio(data.tipoBeneficio());
+            entity.setValor(data.valor());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setAtivo(data.ativo());
+
+            Beneficios saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new BeneficiosResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBeneficio(@PathVariable(value = "id") Integer id, @RequestBody BeneficiosRequestDTO upData){
+    public ResponseEntity<?> updateBeneficio(@PathVariable Integer id, @RequestBody BeneficiosRequestDTO data) {
+        try {
+            Beneficios entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Beneficio nao encontrado"));
 
-        Optional<Beneficios> beneficios = repository.findById(id);
-        if(beneficios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
+
+            entity.setColaborador(colaborador);
+            entity.setTipoBeneficio(data.tipoBeneficio());
+            entity.setValor(data.valor());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setAtivo(data.ativo());
+
+            Beneficios updated = repository.save(entity);
+            return ResponseEntity.ok(new BeneficiosResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Beneficios beneficioModel = beneficios.get();
-        BeanUtils.copyProperties(upData, beneficioModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(beneficioModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBeneficio(@PathVariable(value = "id") Integer id){
-
-        Optional<Beneficios> beneficios = repository.findById(id);
-        if(beneficios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(beneficios.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Beneficio deleted");
+    public ResponseEntity<?> deleteBeneficio(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Beneficio deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

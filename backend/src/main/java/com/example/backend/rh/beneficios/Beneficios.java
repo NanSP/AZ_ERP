@@ -21,12 +21,12 @@ public class Beneficios {
 
     @ManyToOne
     @JoinColumn(name = "colaborador_id")
-    private Colaboradores colaboradorId;
+    private Colaboradores colaborador;
 
     @Column(name = "tipo_beneficio")
     private String tipoBeneficio;
 
-    @Column(precision = 5, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal valor;
     @Column(name = "data_inicio")
     private LocalDate dataInicio;
@@ -35,12 +35,4 @@ public class Beneficios {
     @Column(columnDefinition = "boolean default true")
     private Boolean ativo;
 
-    public Beneficios(BeneficiosRequestDTO data){
-        this.colaboradorId = data.colaboradorId();
-        this.tipoBeneficio = data.tipoBeneficio();
-        this.valor = data.valor();
-        this.dataInicio = data.dataInicio();
-        this.dataFim = data.dataFim();
-        this.ativo = data.ativo();
-    }
 }
