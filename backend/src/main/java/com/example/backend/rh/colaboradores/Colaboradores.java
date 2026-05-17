@@ -40,7 +40,7 @@ public class Colaboradores {
     private LocalDate dataDemissao;
     private String cargo;
     private String departamento;
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal salario;
     @Column(name = "tipo_contrato")
     private String tipoContrato;

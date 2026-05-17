@@ -1,73 +1,82 @@
 package com.example.backend.rh.colaboradores;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/rh/colaboradores")
 public class ColaboradoresController {
 
-    @Autowired
-    private ColaboradoresRepository repository;
+    private final ColaboradoresRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ColaboradoresController(ColaboradoresRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<ColaboradoresResponseDTO> getAll(){
-
-        List<ColaboradoresResponseDTO> colaboradoresList = repository.findAll().stream().map(ColaboradoresResponseDTO::new).toList();
-        return colaboradoresList;
+    public List<ColaboradoresResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ColaboradoresResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Colaboradores> colaboradores = repository.findById(id);
-        if(colaboradores.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ColaboradoresResponseDTO colaboradoresDTO = new ColaboradoresResponseDTO(colaboradores.get());
-        return  ResponseEntity.ok(colaboradoresDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ColaboradoresResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveColaborador(@RequestBody ColaboradoresRequestDTO data){
-
-        Colaboradores colaboradoresData = new Colaboradores(data);
-        repository.save(colaboradoresData);
-        return;
+    public ResponseEntity<?> saveColaborador(@RequestBody ColaboradoresRequestDTO data) {
+        Colaboradores entity = new Colaboradores(data);
+        Colaboradores saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ColaboradoresResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateColaborador(@PathVariable(value = "id") Integer id, @RequestBody ColaboradoresRequestDTO upData){
+    public ResponseEntity<?> updateColaborador(@PathVariable Integer id, @RequestBody ColaboradoresRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setCodigo(data.codigo());
+                    entity.setNome(data.nome());
+                    entity.setCpf(data.cpf());
+                    entity.setRg(data.rg());
+                    entity.setDataNascimento(data.dataNascimento());
+                    entity.setSexo(data.sexo());
+                    entity.setEstadoCivil(data.estadoCivil());
+                    entity.setNacionalidade(data.nacionalidade());
+                    entity.setEmailPessoal(data.emailPessoal());
+                    entity.setEmailCorporativo(data.emailCorporativo());
+                    entity.setTelefone(data.telefone());
+                    entity.setCelular(data.celular());
+                    entity.setDataAdmissao(data.dataAdmissao());
+                    entity.setDataDemissao(data.dataDemissao());
+                    entity.setCargo(data.cargo());
+                    entity.setDepartamento(data.departamento());
+                    entity.setSalario(data.salario());
+                    entity.setTipoContrato(data.tipoContrato());
+                    entity.setJornadaSemanal(data.jornadaSemanal());
+                    entity.setSituacao(data.situacao());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Colaboradores> colaboradores = repository.findById(id);
-        if(colaboradores.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Colaboradores colaboradorModel = colaboradores.get();
-        BeanUtils.copyProperties(upData, colaboradorModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(colaboradorModel));
+                    Colaboradores updated = repository.save(entity);
+                    return ResponseEntity.ok(new ColaboradoresResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteColaborador(@PathVariable(value = "id") Integer id){
-
-        Optional<Colaboradores> colaboradores = repository.findById(id);
-        if(colaboradores.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(colaboradores.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Colaborador deleted");
+    public ResponseEntity<?> deleteColaborador(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Colaborador deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
