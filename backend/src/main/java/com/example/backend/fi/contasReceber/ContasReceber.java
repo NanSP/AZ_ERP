@@ -25,22 +25,22 @@ public class ContasReceber {
 
     @ManyToOne
     @JoinColumn(name = "empresa_id")
-    private Empresas empresaId;
+    private Empresas empresa;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private Parceiros clienteId;
+    private Parceiros cliente;
 
     @ManyToOne
     @JoinColumn(name = "centro_custo_id")
-    private CentrosCusto centroCustoId;
+    private CentrosCusto centroCusto;
 
     @Column(name = "numero_documento")
     private String numeroDocumento;
     private String descricao;
-    @Column(name = "valor_original", precision = 10, scale = 2)
+    @Column(name = "valor_original", precision = 15, scale = 2)
     private BigDecimal valorOriginal;
-    @Column(name = "valor_recebido", precision = 10, scale = 2)
+    @Column(name = "valor_recebido", precision = 15, scale = 2)
     private BigDecimal valorRecebido;
     @Column(name = "data_emissao")
     private LocalDate dataEmissao;
@@ -53,20 +53,4 @@ public class ContasReceber {
     private String formaPagamento;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public ContasReceber(ContasReceberRequestDTO data){
-        this.empresaId = data.empresaId();
-        this.clienteId = data.clienteId();
-        this.numeroDocumento = data.numeroDocumento();
-        this.centroCustoId = data.centroCustoId();
-        this.descricao = data.descricao();
-        this.valorOriginal = data.valorOriginal();
-        this.valorRecebido = data.valorRecebido();
-        this.dataEmissao = data.dataEmissao();
-        this.dataVencimento = data.dataVencimento();
-        this.dataRecebimento = data.dataRecebimento();
-        this.createdAt = data.createdAt();
-        this.formaPagamento = data.formaPagamento();
-        this.status = data.status();
-    }
 }

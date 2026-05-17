@@ -1,9 +1,5 @@
 package com.example.backend.fi.contasReceber;
 
-import com.example.backend.core.empresas.Empresas;
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.fi.centrosCusto.CentrosCusto;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,9 +7,9 @@ import java.time.LocalDateTime;
 public record ContasReceberResponseDTO
         (
                 Integer id,
-                Empresas empresaId,
-                Parceiros clienteId,
-                CentrosCusto centroCustoId,
+                Integer empresaId,
+                Integer clienteId,
+                Integer centroCustoId,
                 String numeroDocumento,
                 String descricao,
                 BigDecimal valorOriginal,
@@ -30,9 +26,9 @@ public record ContasReceberResponseDTO
             this
                     (
                             contasReceber.getId(),
-                            contasReceber.getEmpresaId(),
-                            contasReceber.getClienteId(),
-                            contasReceber.getCentroCustoId(),
+                            contasReceber.getEmpresa() != null ? contasReceber.getEmpresa().getId() : null,
+                            contasReceber.getCliente() != null ? contasReceber.getCliente().getId() : null,
+                            contasReceber.getCentroCusto() != null ? contasReceber.getCentroCusto().getId() : null,
                             contasReceber.getNumeroDocumento(),
                             contasReceber.getDescricao(),
                             contasReceber.getValorOriginal(),

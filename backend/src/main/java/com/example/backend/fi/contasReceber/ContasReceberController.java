@@ -1,73 +1,144 @@
 package com.example.backend.fi.contasReceber;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.empresas.Empresas;
+import com.example.backend.core.empresas.EmpresasRepository;
+import com.example.backend.core.parceiros.Parceiros;
+import com.example.backend.core.parceiros.ParceirosRepository;
+import com.example.backend.fi.centrosCusto.CentrosCusto;
+import com.example.backend.fi.centrosCusto.CentrosCustoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/fi/contasReceber")
 public class ContasReceberController {
 
-    @Autowired
-    private ContasReceberRepository repository;
+    private final ContasReceberRepository repository;
+    private final EmpresasRepository empresasRepository;
+    private final ParceirosRepository parceirosRepository;
+    private final CentrosCustoRepository centrosCustoRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ContasReceberController(
+            ContasReceberRepository repository,
+            EmpresasRepository empresasRepository,
+            ParceirosRepository parceirosRepository,
+            CentrosCustoRepository centrosCustoRepository
+    ) {
+        this.repository = repository;
+        this.empresasRepository = empresasRepository;
+        this.parceirosRepository = parceirosRepository;
+        this.centrosCustoRepository = centrosCustoRepository;
+    }
+
     @GetMapping
-    public List<ContasReceberResponseDTO> getAll(){
-
-        List<ContasReceberResponseDTO> contasReceberList = repository.findAll().stream().map(ContasReceberResponseDTO::new).toList();
-        return contasReceberList;
+    public List<ContasReceberResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ContasReceberResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<ContasReceber> contasReceber = repository.findById(id);
-        if(contasReceber.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ContasReceberResponseDTO contasPagarDTO = new ContasReceberResponseDTO(contasReceber.get());
-        return  ResponseEntity.ok(contasPagarDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ContasReceberResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveContasReceber(@RequestBody ContasReceberRequestDTO data){
+    public ResponseEntity<?> saveContasReceber(@RequestBody ContasReceberRequestDTO data) {
+        try {
+            Empresas empresa = data.empresa() != null
+                    ? empresasRepository.findById(data.empresa())
+                    .orElseThrow(() -> new RuntimeException("Empresa nao encontrada"))
+                    : null;
 
-        ContasReceber contasReceberData = new ContasReceber(data);
-        repository.save(contasReceberData);
-        return;
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
+
+            CentrosCusto centroCusto = data.centroCusto() != null
+                    ? centrosCustoRepository.findById(data.centroCusto())
+                    .orElseThrow(() -> new RuntimeException("Centro de custo nao encontrado"))
+                    : null;
+
+            ContasReceber entity = new ContasReceber();
+            entity.setEmpresa(empresa);
+            entity.setCliente(cliente);
+            entity.setCentroCusto(centroCusto);
+            entity.setNumeroDocumento(data.numeroDocumento());
+            entity.setDescricao(data.descricao());
+            entity.setValorOriginal(data.valorOriginal());
+            entity.setValorRecebido(data.valorRecebido());
+            entity.setDataEmissao(data.dataEmissao());
+            entity.setDataVencimento(data.dataVencimento());
+            entity.setDataRecebimento(data.dataRecebimento());
+            entity.setStatus(data.status());
+            entity.setFormaPagamento(data.formaPagamento());
+            entity.setCreatedAt(data.createdAt());
+
+            ContasReceber saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ContasReceberResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContasReceber(@PathVariable(value = "id") Integer id, @RequestBody ContasReceberRequestDTO upData){
+    public ResponseEntity<?> updateContasReceber(@PathVariable Integer id, @RequestBody ContasReceberRequestDTO data) {
+        try {
+            ContasReceber entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Conta a receber nao encontrada"));
 
-        Optional<ContasReceber> contasReceber = repository.findById(id);
-        if(contasReceber.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Empresas empresa = data.empresa() != null
+                    ? empresasRepository.findById(data.empresa())
+                    .orElseThrow(() -> new RuntimeException("Empresa nao encontrada"))
+                    : null;
+
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
+
+            CentrosCusto centroCusto = data.centroCusto() != null
+                    ? centrosCustoRepository.findById(data.centroCusto())
+                    .orElseThrow(() -> new RuntimeException("Centro de custo nao encontrado"))
+                    : null;
+
+            entity.setEmpresa(empresa);
+            entity.setCliente(cliente);
+            entity.setCentroCusto(centroCusto);
+            entity.setNumeroDocumento(data.numeroDocumento());
+            entity.setDescricao(data.descricao());
+            entity.setValorOriginal(data.valorOriginal());
+            entity.setValorRecebido(data.valorRecebido());
+            entity.setDataEmissao(data.dataEmissao());
+            entity.setDataVencimento(data.dataVencimento());
+            entity.setDataRecebimento(data.dataRecebimento());
+            entity.setStatus(data.status());
+            entity.setFormaPagamento(data.formaPagamento());
+            entity.setCreatedAt(data.createdAt());
+
+            ContasReceber updated = repository.save(entity);
+            return ResponseEntity.ok(new ContasReceberResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        ContasReceber contasReceberModel = contasReceber.get();
-        BeanUtils.copyProperties(upData, contasReceberModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(contasReceberModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContasReceber(@PathVariable(value = "id") Integer id){
-
-        Optional<ContasReceber> contasReceber = repository.findById(id);
-        if(contasReceber.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(contasReceber.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Contas a Receber deleted");
+    public ResponseEntity<?> deleteContasReceber(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Contas a Receber deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
