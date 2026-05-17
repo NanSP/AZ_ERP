@@ -1,13 +1,11 @@
 package com.example.backend.portal.dispositivos;
 
-import com.example.backend.sys.usuarios.Usuarios;
-
 import java.time.LocalDateTime;
 
 public record DispositivosResponseDTO
         (
                 Integer id,
-                Usuarios usuarioId,
+                Integer usuario,
                 String deviceId,
                 String deviceModel,
                 String devicePlatform,
@@ -20,7 +18,7 @@ public record DispositivosResponseDTO
         this
                 (
                         dispositivos.getId(),
-                        dispositivos.getUsuarioId(),
+                        dispositivos.getUsuario() != null ? dispositivos.getUsuario().getId() : null,
                         dispositivos.getDeviceId(),
                         dispositivos.getDeviceModel(),
                         dispositivos.getDevicePlatform(),

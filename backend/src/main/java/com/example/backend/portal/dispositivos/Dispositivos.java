@@ -21,7 +21,7 @@ public class Dispositivos {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuarios usuarioId;
+    private Usuarios usuario;
     @Column(name = "device_id")
     private String deviceId;
     @Column(name = "device_model")
@@ -37,14 +37,4 @@ public class Dispositivos {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Dispositivos(DispositivosRequestDTO data) {
-        this.usuarioId = data.usuarioId();
-        this.deviceId = data.deviceId();
-        this.deviceModel = data.deviceModel();
-        this.devicePlatform = data.devicePlatform();
-        this.pushToken = data.pushToken();
-        this.ultimoAcesso = data.ultimoAcesso();
-        this.ativo = data.ativo();
-        this.createdAt = data.createdAt();
-    }
 }
