@@ -1,16 +1,13 @@
 package com.example.backend.sd.pedidoItens;
 
-import com.example.backend.core.produtos.Produtos;
-import com.example.backend.sd.pedidos.Pedidos;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record PedidoItensResponseDTO
         (
                 Integer id,
-                Pedidos pedidoId,
-                Produtos produtoId,
+                Integer pedido,
+                Integer produto,
                 BigDecimal quantidade,
                 BigDecimal valorUnitario,
                 BigDecimal valorTotal,
@@ -22,8 +19,8 @@ public record PedidoItensResponseDTO
             this
                     (
                             pedidoItens.getId(),
-                            pedidoItens.getPedidoId(),
-                            pedidoItens.getProdutoId(),
+                            pedidoItens.getPedido() != null ? pedidoItens.getPedido().getId() : null,
+                            pedidoItens.getProduto() != null ? pedidoItens.getProduto().getId() : null,
                             pedidoItens.getQuantidade(),
                             pedidoItens.getValorUnitario(),
                             pedidoItens.getValorTotal(),

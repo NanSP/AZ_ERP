@@ -8,7 +8,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Table(name = "pedidoItens", schema = "vendas")
+@Table(name = "pedido_itens", schema = "vendas")
 @Entity
 @Getter
 @Setter
@@ -23,30 +23,21 @@ public class PedidoItens {
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")
-    private Pedidos pedidoId;
+    private Pedidos pedido;
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
-    private Produtos produtoId;
-    @Column(precision = 10, scale = 4)
+    private Produtos produto;
+    @Column(precision = 15, scale = 4)
     private BigDecimal quantidade;
-    @Column(name ="valor_unitario",precision = 10, scale = 4)
+    @Column(name ="valor_unitario",precision = 15, scale = 4)
     private BigDecimal valorUnitario;
-    @Column(name ="valor_total",precision = 10, scale = 4)
+    @Column(name ="valor_total",precision = 15, scale = 2)
     private BigDecimal valorTotal;
-    @Column(precision = 10, scale = 4)
+    @Column(precision = 15, scale = 2)
     private BigDecimal desconto;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public PedidoItens(PedidoItensRequestDTO data) {
-        this.pedidoId = data.pedidoId();
-        this.produtoId = data.produtoId();
-        this.quantidade = data.quantidade();
-        this.valorUnitario = data.valorUnitario();
-        this.valorTotal = data.valorTotal();
-        this.desconto = data.desconto();
-        this.createdAt = data.createdAt();
-    }
 }
