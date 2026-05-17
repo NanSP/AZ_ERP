@@ -1,72 +1,121 @@
 package com.example.backend.ps.recursosAlocados;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.ps.projetos.Projetos;
+import com.example.backend.ps.projetos.ProjetosRepository;
+import com.example.backend.ps.tarefas.Tarefas;
+import com.example.backend.ps.tarefas.TarefasRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/ps/recursosAlocados")
 public class RecursosAlocadosController {
 
-    @Autowired
-    private RecursosAlocadosRepository repository;
+    private final RecursosAlocadosRepository repository;
+    private final ProjetosRepository projetosRepository;
+    private final TarefasRepository tarefasRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public RecursosAlocadosController(
+            RecursosAlocadosRepository repository,
+            ProjetosRepository projetosRepository,
+            TarefasRepository tarefasRepository
+    ) {
+        this.repository = repository;
+        this.projetosRepository = projetosRepository;
+        this.tarefasRepository = tarefasRepository;
+    }
+
     @GetMapping
-    public List<RecursosAlocadosResponseDTO> getAll(){
-
-        List<RecursosAlocadosResponseDTO> recursosAlocadosList = repository.findAll().stream().map(RecursosAlocadosResponseDTO::new).toList();
-        return recursosAlocadosList;
+    public List<RecursosAlocadosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(RecursosAlocadosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<RecursosAlocados> recursosAlocados = repository.findById(id);
-        if(recursosAlocados.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        RecursosAlocadosResponseDTO recursosAlocadosDTO = new RecursosAlocadosResponseDTO(recursosAlocados.get());
-        return  ResponseEntity.ok(recursosAlocadosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new RecursosAlocadosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveRecursosAlocados(@RequestBody RecursosAlocadosRequestDTO data){
+    public ResponseEntity<?> saveRecursosAlocados(@RequestBody RecursosAlocadosRequestDTO data) {
+        try {
+            Projetos projeto = data.projeto() != null
+                    ? projetosRepository.findById(data.projeto())
+                    .orElseThrow(() -> new RuntimeException("Projeto nao encontrado"))
+                    : null;
 
-        RecursosAlocados recursosAlocadosData = new RecursosAlocados(data);
-        repository.save(recursosAlocadosData);
-        return;
+            Tarefas tarefa = data.tarefa() != null
+                    ? tarefasRepository.findById(data.tarefa())
+                    .orElseThrow(() -> new RuntimeException("Tarefa nao encontrada"))
+                    : null;
+
+            RecursosAlocados entity = new RecursosAlocados();
+            entity.setProjeto(projeto);
+            entity.setTarefa(tarefa);
+            entity.setTipoRecurso(data.tipoRecurso());
+            entity.setRecursoId(data.recursoId());
+            entity.setQuantidade(data.quantidade());
+            entity.setValorUnitario(data.valorUnitario());
+            entity.setValorTotal(data.valorTotal());
+            entity.setDataAlocacao(data.dataAlocacao());
+            entity.setCreatedAt(data.createdAt());
+
+            RecursosAlocados saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new RecursosAlocadosResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRecursosAlocados(@PathVariable(value = "id") Integer id, @RequestBody RecursosAlocadosRequestDTO upData){
+    public ResponseEntity<?> updateRecursosAlocados(@PathVariable Integer id, @RequestBody RecursosAlocadosRequestDTO data) {
+        try {
+            RecursosAlocados entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Recurso alocado nao encontrado"));
 
-        Optional<RecursosAlocados> recursosAlocados = repository.findById(id);
-        if(recursosAlocados.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Projetos projeto = data.projeto() != null
+                    ? projetosRepository.findById(data.projeto())
+                    .orElseThrow(() -> new RuntimeException("Projeto nao encontrado"))
+                    : null;
+
+            Tarefas tarefa = data.tarefa() != null
+                    ? tarefasRepository.findById(data.tarefa())
+                    .orElseThrow(() -> new RuntimeException("Tarefa nao encontrada"))
+                    : null;
+
+            entity.setProjeto(projeto);
+            entity.setTarefa(tarefa);
+            entity.setTipoRecurso(data.tipoRecurso());
+            entity.setRecursoId(data.recursoId());
+            entity.setQuantidade(data.quantidade());
+            entity.setValorUnitario(data.valorUnitario());
+            entity.setValorTotal(data.valorTotal());
+            entity.setDataAlocacao(data.dataAlocacao());
+            entity.setCreatedAt(data.createdAt());
+
+            RecursosAlocados updated = repository.save(entity);
+            return ResponseEntity.ok(new RecursosAlocadosResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        RecursosAlocados recursosAlocadosModel = recursosAlocados.get();
-        BeanUtils.copyProperties(upData, recursosAlocadosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(recursosAlocadosModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRecursosAlocados(@PathVariable(value = "id") Integer id){
-
-        Optional<RecursosAlocados> recursosAlocados = repository.findById(id);
-        if(recursosAlocados.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(recursosAlocados.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("RecursosAlocados deleted");
+    public ResponseEntity<?> deleteRecursosAlocados(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Recurso alocado deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

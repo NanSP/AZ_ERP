@@ -24,20 +24,20 @@ public class RecursosAlocados {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id")
-    private Projetos projetoId;
+    private Projetos projeto;
 
     @ManyToOne
     @JoinColumn(name = "tarefa_id")
-    private Tarefas tarefaId;
+    private Tarefas tarefa;
     @Column(name = "tipo_recurso")
     private String tipoRecurso;
     @Column(name = "recurso_id")
     private Integer recursoId;
-    @Column(precision = 10, scale = 4)
+    @Column(precision = 15, scale = 4)
     private BigDecimal quantidade;
-    @Column(name = "valor_unitario",precision = 10, scale = 4)
+    @Column(name = "valor_unitario",precision = 15, scale = 4)
     private BigDecimal valorUnitario;
-    @Column(name = "valor_total",precision = 10, scale = 4)
+    @Column(name = "valor_total",precision = 15, scale = 2)
     private BigDecimal valorTotal;
     @Column(name = "data_alocacao")
     private LocalDate dataAlocacao;
@@ -45,15 +45,4 @@ public class RecursosAlocados {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public RecursosAlocados(RecursosAlocadosRequestDTO data) {
-        this.projetoId = data.projetoId();
-        this.tarefaId = data.tarefaId();
-        this.tipoRecurso = data.tipoRecurso();
-        this.recursoId = data.recursoId();
-        this.quantidade = data.quantidade();
-        this.valorUnitario = data.valorUnitario();
-        this.valorTotal = data.valorTotal();
-        this.dataAlocacao = data.dataAlocacao();
-        this.createdAt = data.createdAt();
-    }
 }

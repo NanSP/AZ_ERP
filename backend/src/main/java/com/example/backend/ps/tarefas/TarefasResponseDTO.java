@@ -11,12 +11,11 @@ import java.util.List;
 public record TarefasResponseDTO
         (
                 Integer id,
-                Projetos projetoId,
-                Tarefas tarefaPaiId,
-                List<Tarefas> subtarefas,
+                Integer projeto,
+                Integer tarefaPai,
                 String titulo,
                 String descricao,
-                Usuarios responsavelId,
+                Integer responsavel,
                 LocalDate dataInicio,
                 LocalDate dataFim,
                 BigDecimal horasEstimadas,
@@ -29,12 +28,11 @@ public record TarefasResponseDTO
     public TarefasResponseDTO(Tarefas tarefas) {
         this(
                 tarefas.getId(),
-                tarefas.getProjetoId(),
-                tarefas.getTarefaPaiId(),
-                tarefas.getSubtarefas(),
+                tarefas.getProjeto() != null ? tarefas.getProjeto().getId() : null,
+                tarefas.getTarefaPai() != null ? tarefas.getTarefaPai().getId() : null,
                 tarefas.getTitulo(),
                 tarefas.getDescricao(),
-                tarefas.getResponsavelId(),
+                tarefas.getResponsavel() != null ? tarefas.getResponsavel().getId() : null,
                 tarefas.getDataInicio(),
                 tarefas.getDataFim(),
                 tarefas.getHorasEstimadas(),

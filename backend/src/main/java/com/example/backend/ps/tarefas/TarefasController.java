@@ -1,72 +1,139 @@
 package com.example.backend.ps.tarefas;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.ps.projetos.Projetos;
+import com.example.backend.ps.projetos.ProjetosRepository;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/ps/tarefas")
 public class TarefasController {
 
-    @Autowired
-    private TarefasRepository repository;
+    private final TarefasRepository repository;
+    private final ProjetosRepository projetosRepository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public TarefasController(
+            TarefasRepository repository,
+            ProjetosRepository projetosRepository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.projetosRepository = projetosRepository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<TarefasResponseDTO> getAll(){
-
-        List<TarefasResponseDTO> tarefasList = repository.findAll().stream().map(TarefasResponseDTO::new).toList();
-        return tarefasList;
+    public List<TarefasResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(TarefasResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Tarefas> tarefas = repository.findById(id);
-        if(tarefas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        TarefasResponseDTO tarefasDTO = new TarefasResponseDTO(tarefas.get());
-        return  ResponseEntity.ok(tarefasDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new TarefasResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveTarefas(@RequestBody TarefasRequestDTO data){
+    public ResponseEntity<?> saveTarefas(@RequestBody TarefasRequestDTO data) {
+        try {
+            Projetos projeto = data.projeto() != null
+                    ? projetosRepository.findById(data.projeto())
+                    .orElseThrow(() -> new RuntimeException("Projeto nao encontrado"))
+                    : null;
 
-        Tarefas tarefasData = new Tarefas(data);
-        repository.save(tarefasData);
-        return;
+            Tarefas tarefaPai = data.tarefaPai() != null
+                    ? repository.findById(data.tarefaPai())
+                    .orElseThrow(() -> new RuntimeException("Tarefa pai nao encontrada"))
+                    : null;
+
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
+
+            Tarefas entity = new Tarefas();
+            entity.setProjeto(projeto);
+            entity.setTarefaPai(tarefaPai);
+            entity.setTitulo(data.titulo());
+            entity.setDescricao(data.descricao());
+            entity.setResponsavel(responsavel);
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setHorasEstimadas(data.horasEstimadas());
+            entity.setHorasRealizadas(data.horasRealizadas());
+            entity.setPercentualConcluido(data.percentualConcluido());
+            entity.setStatus(data.status());
+            entity.setPrioridade(data.prioridade());
+            entity.setCreatedAt(data.createdAt());
+
+            Tarefas saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new TarefasResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTarefas(@PathVariable(value = "id") Integer id, @RequestBody TarefasRequestDTO upData){
+    public ResponseEntity<?> updateTarefas(@PathVariable Integer id, @RequestBody TarefasRequestDTO data) {
+        try {
+            Tarefas entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Tarefa nao encontrada"));
 
-        Optional<Tarefas> tarefas = repository.findById(id);
-        if(tarefas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Projetos projeto = data.projeto() != null
+                    ? projetosRepository.findById(data.projeto())
+                    .orElseThrow(() -> new RuntimeException("Projeto nao encontrado"))
+                    : null;
+
+            Tarefas tarefaPai = data.tarefaPai() != null
+                    ? repository.findById(data.tarefaPai())
+                    .orElseThrow(() -> new RuntimeException("Tarefa pai nao encontrada"))
+                    : null;
+
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
+
+            entity.setProjeto(projeto);
+            entity.setTarefaPai(tarefaPai);
+            entity.setTitulo(data.titulo());
+            entity.setDescricao(data.descricao());
+            entity.setResponsavel(responsavel);
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setHorasEstimadas(data.horasEstimadas());
+            entity.setHorasRealizadas(data.horasRealizadas());
+            entity.setPercentualConcluido(data.percentualConcluido());
+            entity.setStatus(data.status());
+            entity.setPrioridade(data.prioridade());
+            entity.setCreatedAt(data.createdAt());
+
+            Tarefas updated = repository.save(entity);
+            return ResponseEntity.ok(new TarefasResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Tarefas tarefasModel = tarefas.get();
-        BeanUtils.copyProperties(upData, tarefasModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(tarefasModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTarefas(@PathVariable(value = "id") Integer id){
-
-        Optional<Tarefas> tarefas = repository.findById(id);
-        if(tarefas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(tarefas.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Tarefas deleted");
+    public ResponseEntity<?> deleteTarefas(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Tarefa deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

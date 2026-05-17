@@ -26,13 +26,13 @@ public class Tarefas {
 
     @ManyToOne
     @JoinColumn(name = "projeto_id")
-    private Projetos projetoId;
+    private Projetos projeto;
 
     @ManyToOne
     @JoinColumn(name = "tarefa_pai_id")
-    private Tarefas tarefaPaiId;
+    private Tarefas tarefaPai;
 
-    @OneToMany(mappedBy = "tarefaPaiId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "tarefaPai", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefas> subtarefas = new ArrayList<>();
 
 
@@ -41,7 +41,7 @@ public class Tarefas {
 
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
-    private Usuarios responsavelId;
+    private Usuarios responsavel;
 
     @Column(name = "data_inicio")
     private LocalDate dataInicio;
@@ -58,21 +58,4 @@ public class Tarefas {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Tarefas(TarefasRequestDTO data) {
-        this.projetoId = data.projetoId();
-        this.tarefaPaiId = data.tarefaPaiId();
-        this.subtarefas = data.subtarefas();
-        this.titulo = data.titulo();
-        this.descricao = data.descricao();
-        this.responsavelId = data.responsavelId();
-        this.dataInicio = data.dataInicio();
-        this.dataFim = data.dataFim();
-        this.horasEstimadas = data.horasEstimadas();
-        this.horasRealizadas = data.horasRealizadas();
-        this.percentualConcluido = data.percentualConcluido();
-        this.status = data.status();
-        this.createdAt = data.createdAt();
-        this.prioridade = data.prioridade();
-    }
 }
