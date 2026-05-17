@@ -1,6 +1,5 @@
 package com.example.backend.rh.controleDePonto;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,7 +8,7 @@ import java.time.LocalTime;
 public record ControleDePontoResponseDTO
         (
                 Integer id,
-                Colaboradores colaborador,
+                Integer colaborador,
                 LocalDate data,
                 LocalTime horaEntrada,
                 LocalTime horaSaidaAlmoco,
@@ -25,7 +24,7 @@ public record ControleDePontoResponseDTO
             this
                     (
                             controleDePonto.getId(),
-                            controleDePonto.getColaboradorId(),
+                            controleDePonto.getColaborador() != null ? controleDePonto.getColaborador().getId() : null,
                             controleDePonto.getData(),
                             controleDePonto.getHoraEntrada(),
                             controleDePonto.getHoraSaidaAlmoco(),

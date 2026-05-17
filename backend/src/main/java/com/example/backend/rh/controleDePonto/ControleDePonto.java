@@ -23,7 +23,7 @@ public class ControleDePonto {
 
     @ManyToOne
     @JoinColumn(name = "colaborador_id")
-    private Colaboradores colaboradorId;
+    private Colaboradores colaborador;
 
     private LocalDate data;
     @Column(name = "hora_entrada")
@@ -42,16 +42,4 @@ public class ControleDePonto {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public ControleDePonto(ControleDePontoRequestDTO data){
-        this.colaboradorId = data.colaboradorId();
-        this.data = data.data();
-        this.horaEntrada = data.horaEntrada();
-        this.horaSaidaAlmoco = data.horaSaidaAlmoco();
-        this.horaRetornoAlmoco = data.horaRetornoAlmoco();
-        this.horaSaida = data.horaSaida();
-        this.horasTrabalhadas = data.horasTrabalhadas();
-        this.horasExtras = data.horasExtras();
-        this.atrasos = data.atrasos();
-        this.createdAt = data.createdAt();
-    }
 }

@@ -1,72 +1,108 @@
 package com.example.backend.rh.controleDePonto;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.rh.colaboradores.Colaboradores;
+import com.example.backend.rh.colaboradores.ColaboradoresRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/rh/controleDePonto")
 public class ControleDePontoController {
 
-    @Autowired
-    private ControleDePontoRepository repository;
+    private final ControleDePontoRepository repository;
+    private final ColaboradoresRepository colaboradoresRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ControleDePontoController(
+            ControleDePontoRepository repository,
+            ColaboradoresRepository colaboradoresRepository
+    ) {
+        this.repository = repository;
+        this.colaboradoresRepository = colaboradoresRepository;
+    }
+
     @GetMapping
-    public List<ControleDePontoResponseDTO> getAll(){
-
-        List<ControleDePontoResponseDTO> controleDePontoList = repository.findAll().stream().map(ControleDePontoResponseDTO::new).toList();
-        return controleDePontoList;
+    public List<ControleDePontoResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ControleDePontoResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<ControleDePonto> controleDePonto = repository.findById(id);
-        if(controleDePonto.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ControleDePontoResponseDTO controleDePontoDTO = new ControleDePontoResponseDTO(controleDePonto.get());
-        return  ResponseEntity.ok(controleDePontoDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ControleDePontoResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveControleDePonto(@RequestBody ControleDePontoRequestDTO data){
+    public ResponseEntity<?> saveControleDePonto(@RequestBody ControleDePontoRequestDTO data) {
+        try {
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
 
-        ControleDePonto controleDePontoData = new ControleDePonto(data);
-        repository.save(controleDePontoData);
-        return;
+            ControleDePonto entity = new ControleDePonto();
+            entity.setColaborador(colaborador);
+            entity.setData(data.data());
+            entity.setHoraEntrada(data.horaEntrada());
+            entity.setHoraSaidaAlmoco(data.horaSaidaAlmoco());
+            entity.setHoraRetornoAlmoco(data.horaRetornoAlmoco());
+            entity.setHoraSaida(data.horaSaida());
+            entity.setHorasTrabalhadas(data.horasTrabalhadas());
+            entity.setHorasExtras(data.horasExtras());
+            entity.setAtrasos(data.atrasos());
+            entity.setCreatedAt(data.createdAt());
+
+            ControleDePonto saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ControleDePontoResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateControleDePonto(@PathVariable(value = "id") Integer id, @RequestBody ControleDePontoRequestDTO upData){
+    public ResponseEntity<?> updateControleDePonto(@PathVariable Integer id, @RequestBody ControleDePontoRequestDTO data) {
+        try {
+            ControleDePonto entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Controle de ponto nao encontrado"));
 
-        Optional<ControleDePonto> controleDePonto = repository.findById(id);
-        if(controleDePonto.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
+
+            entity.setColaborador(colaborador);
+            entity.setData(data.data());
+            entity.setHoraEntrada(data.horaEntrada());
+            entity.setHoraSaidaAlmoco(data.horaSaidaAlmoco());
+            entity.setHoraRetornoAlmoco(data.horaRetornoAlmoco());
+            entity.setHoraSaida(data.horaSaida());
+            entity.setHorasTrabalhadas(data.horasTrabalhadas());
+            entity.setHorasExtras(data.horasExtras());
+            entity.setAtrasos(data.atrasos());
+            entity.setCreatedAt(data.createdAt());
+
+            ControleDePonto updated = repository.save(entity);
+            return ResponseEntity.ok(new ControleDePontoResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        ControleDePonto controleDePontoModel = controleDePonto.get();
-        BeanUtils.copyProperties(upData, controleDePontoModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(controleDePontoModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteControleDePonto(@PathVariable(value = "id") Integer id){
-
-        Optional<ControleDePonto> controleDePonto = repository.findById(id);
-        if(controleDePonto.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(controleDePonto.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Ponto deleted");
+    public ResponseEntity<?> deleteControleDePonto(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Ponto deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

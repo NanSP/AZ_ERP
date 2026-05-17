@@ -1,7 +1,5 @@
 package com.example.backend.rh.controleDePonto;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,7 +7,7 @@ import java.time.LocalTime;
 
 public record ControleDePontoRequestDTO
         (
-                Colaboradores colaboradorId,
+                Integer colaborador,
                 LocalDate data,
                 LocalTime horaEntrada,
                 LocalTime horaSaidaAlmoco,
