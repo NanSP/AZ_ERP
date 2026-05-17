@@ -1,8 +1,5 @@
 package com.example.backend.fiscal.documentos;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.sd.pedidos.Pedidos;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -14,8 +11,8 @@ public record DocumentosResponseDTO
                 String serie,
                 String chaveAcesso,
                 LocalDateTime dataEmissao,
-                Pedidos pedidoId,
-                Parceiros clienteId,
+                Integer pedido,
+                Integer cliente,
                 BigDecimal valorTotal,
                 String status,
                 String xml_file,
@@ -30,8 +27,8 @@ public record DocumentosResponseDTO
                         documentos.getSerie(),
                         documentos.getChaveAcesso(),
                         documentos.getDataEmissao(),
-                        documentos.getPedidoId(),
-                        documentos.getClienteId(),
+                        documentos.getPedido() != null ? documentos.getPedido().getId() : null,
+                        documentos.getCliente() != null ? documentos.getCliente().getId() : null,
                         documentos.getValorTotal(),
                         documentos.getStatus(),
                         documentos.getXml_file(),

@@ -1,73 +1,125 @@
 package com.example.backend.fiscal.documentos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.parceiros.Parceiros;
+import com.example.backend.core.parceiros.ParceirosRepository;
+import com.example.backend.sd.pedidos.Pedidos;
+import com.example.backend.sd.pedidos.PedidosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/fiscal/documentos")
 public class DocumentosController {
 
-    @Autowired
-    private DocumentosRepository repository;
+    private final DocumentosRepository repository;
+    private final PedidosRepository pedidosRepository;
+    private final ParceirosRepository parceirosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public DocumentosController(
+            DocumentosRepository repository,
+            PedidosRepository pedidosRepository,
+            ParceirosRepository parceirosRepository
+    ) {
+        this.repository = repository;
+        this.pedidosRepository = pedidosRepository;
+        this.parceirosRepository = parceirosRepository;
+    }
+
     @GetMapping
-    public List<DocumentosResponseDTO> getAll(){
-
-        List<DocumentosResponseDTO> documentosList = repository.findAll().stream().map(DocumentosResponseDTO::new).toList();
-        return documentosList;
+    public List<DocumentosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(DocumentosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Documentos> documentos = repository.findById(id);
-        if(documentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        DocumentosResponseDTO documentosDTO = new DocumentosResponseDTO(documentos.get());
-        return  ResponseEntity.ok(documentosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new DocumentosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody DocumentosRequestDTO data){
+    public ResponseEntity<?> saveDocumentos(@RequestBody DocumentosRequestDTO data) {
+        try {
+            Pedidos pedido = data.pedido() != null
+                    ? pedidosRepository.findById(data.pedido())
+                    .orElseThrow(() -> new RuntimeException("Pedido nao encontrado"))
+                    : null;
 
-        Documentos documentosData = new Documentos(data);
-        repository.save(documentosData);
-        return;
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
+
+            Documentos entity = new Documentos();
+            entity.setTipoDocumento(data.tipoDocumento());
+            entity.setNumero(data.numero());
+            entity.setSerie(data.serie());
+            entity.setChaveAcesso(data.chaveAcesso());
+            entity.setDataEmissao(data.dataEmissao());
+            entity.setPedido(pedido);
+            entity.setCliente(cliente);
+            entity.setValorTotal(data.valorTotal());
+            entity.setStatus(data.status());
+            entity.setXml_file(data.xml_file());
+            entity.setCreatedAt(data.createdAt());
+
+            Documentos saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new DocumentosResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDocumentos(@PathVariable(value = "id") Integer id, @RequestBody DocumentosRequestDTO upData){
+    public ResponseEntity<?> updateDocumentos(@PathVariable Integer id, @RequestBody DocumentosRequestDTO data) {
+        try {
+            Documentos entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Documento nao encontrado"));
 
-        Optional<Documentos> documentos = repository.findById(id);
-        if(documentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Pedidos pedido = data.pedido() != null
+                    ? pedidosRepository.findById(data.pedido())
+                    .orElseThrow(() -> new RuntimeException("Pedido nao encontrado"))
+                    : null;
+
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
+
+            entity.setTipoDocumento(data.tipoDocumento());
+            entity.setNumero(data.numero());
+            entity.setSerie(data.serie());
+            entity.setChaveAcesso(data.chaveAcesso());
+            entity.setDataEmissao(data.dataEmissao());
+            entity.setPedido(pedido);
+            entity.setCliente(cliente);
+            entity.setValorTotal(data.valorTotal());
+            entity.setStatus(data.status());
+            entity.setXml_file(data.xml_file());
+            entity.setCreatedAt(data.createdAt());
+
+            Documentos updated = repository.save(entity);
+            return ResponseEntity.ok(new DocumentosResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Documentos documentosModel = documentos.get();
-        BeanUtils.copyProperties(upData, documentosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(documentosModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDocumentos(@PathVariable(value = "id") Integer id){
-
-        Optional<Documentos> documentos = repository.findById(id);
-        if(documentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(documentos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Documentos deleted");
+    public ResponseEntity<?> deleteDocumentos(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Documento deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

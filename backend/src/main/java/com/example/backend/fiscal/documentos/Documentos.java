@@ -32,13 +32,13 @@ public class Documentos {
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")
-    private Pedidos pedidoId;
+    private Pedidos pedido;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private Parceiros clienteId;
+    private Parceiros cliente;
 
-    @Column(name = "valor_total", precision = 10, scale = 2)
+    @Column(name = "valor_total", precision = 15, scale = 2)
     private BigDecimal valorTotal;
     private String status;
     private String xml_file;
@@ -46,17 +46,4 @@ public class Documentos {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Documentos(DocumentosRequestDTO data) {
-        this.tipoDocumento = data.tipoDocumento();
-        this.numero = data.numero();
-        this.serie = data.serie();
-        this.chaveAcesso = data.chaveAcesso();
-        this.dataEmissao = data.dataEmissao();
-        this.pedidoId = data.pedidoId();
-        this.clienteId = data.clienteId();
-        this.valorTotal = data.valorTotal();
-        this.status = data.status();
-        this.xml_file = data.xml_file();
-        this.createdAt = data.createdAt();
-    }
 }
