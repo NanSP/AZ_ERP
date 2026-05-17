@@ -1,7 +1,5 @@
 package com.example.backend.grc.auditorias;
 
-import com.example.backend.sys.usuarios.Usuarios;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -13,7 +11,7 @@ public record AuditoriasResponseDTO
                 String escopo,
                 LocalDate dataInicio,
                 LocalDate dataFim,
-                Usuarios responsavelId,
+                Integer responsavel,
                 String status,
                 LocalDateTime createdAt
         ) {
@@ -26,7 +24,7 @@ public record AuditoriasResponseDTO
                         auditorias.getEscopo(),
                         auditorias.getDataInicio(),
                         auditorias.getDataFim(),
-                        auditorias.getResponsavelId(),
+                        auditorias.getResponsavel() != null ? auditorias.getResponsavel().getId() : null,
                         auditorias.getStatus(),
                         auditorias.getCreatedAt()
                 );

@@ -1,73 +1,104 @@
 package com.example.backend.grc.auditorias;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/grc/auditorias")
 public class AuditoriasController {
 
-    @Autowired
-    private AuditoriasRepository repository;
+    private final AuditoriasRepository repository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public AuditoriasController(
+            AuditoriasRepository repository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<AuditoriasResponseDTO> getAll(){
-
-        List<AuditoriasResponseDTO> auditoriasList = repository.findAll().stream().map(AuditoriasResponseDTO::new).toList();
-        return auditoriasList;
+    public List<AuditoriasResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(AuditoriasResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Auditorias> auditorias = repository.findById(id);
-        if(auditorias.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        AuditoriasResponseDTO auditoriasDTO = new AuditoriasResponseDTO(auditorias.get());
-        return  ResponseEntity.ok(auditoriasDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new AuditoriasResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody AuditoriasRequestDTO data){
+    public ResponseEntity<?> saveAuditorias(@RequestBody AuditoriasRequestDTO data) {
+        try {
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
 
-        Auditorias auditoriasData = new Auditorias(data);
-        repository.save(auditoriasData);
-        return;
+            Auditorias entity = new Auditorias();
+            entity.setTitulo(data.titulo());
+            entity.setTipoAuditoria(data.tipoAuditoria());
+            entity.setEscopo(data.escopo());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setResponsavel(responsavel);
+            entity.setStatus(data.status());
+            entity.setCreatedAt(data.createdAt());
+
+            Auditorias saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new AuditoriasResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateAuditorias(@PathVariable(value = "id") Integer id, @RequestBody AuditoriasRequestDTO upData){
+    public ResponseEntity<?> updateAuditorias(@PathVariable Integer id, @RequestBody AuditoriasRequestDTO data) {
+        try {
+            Auditorias entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Auditoria nao encontrada"));
 
-        Optional<Auditorias> auditorias = repository.findById(id);
-        if(auditorias.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
+
+            entity.setTitulo(data.titulo());
+            entity.setTipoAuditoria(data.tipoAuditoria());
+            entity.setEscopo(data.escopo());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setResponsavel(responsavel);
+            entity.setStatus(data.status());
+            entity.setCreatedAt(data.createdAt());
+
+            Auditorias updated = repository.save(entity);
+            return ResponseEntity.ok(new AuditoriasResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Auditorias auditoriasModel = auditorias.get();
-        BeanUtils.copyProperties(upData, auditoriasModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(auditoriasModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAuditorias(@PathVariable(value = "id") Integer id){
-
-        Optional<Auditorias> auditorias = repository.findById(id);
-        if(auditorias.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(auditorias.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Auditorias deleted");
+    public ResponseEntity<?> deleteAuditorias(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Auditoria deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

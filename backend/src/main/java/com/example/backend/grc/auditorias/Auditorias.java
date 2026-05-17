@@ -7,7 +7,7 @@ import com.example.backend.sys.usuarios.Usuarios;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Table(name = "dashboards", schema = "grc")
+@Table(name = "auditorias", schema = "grc")
 @Entity
 @Getter
 @Setter
@@ -31,20 +31,9 @@ public class Auditorias {
 
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
-    private Usuarios responsavelId;
+    private Usuarios responsavel;
     private String status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Auditorias(AuditoriasRequestDTO data) {
-        this.titulo = data.titulo();
-        this.tipoAuditoria = data.tipoAuditoria();
-        this.escopo = data.escopo();
-        this.dataInicio = data.dataInicio();
-        this.dataFim = data.dataFim();
-        this.responsavelId = data.responsavelId();
-        this.status = data.status();
-        this.createdAt = data.createdAt();
-    }
 }
