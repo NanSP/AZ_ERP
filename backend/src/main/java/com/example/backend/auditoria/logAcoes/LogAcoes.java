@@ -21,11 +21,11 @@ public class LogAcoes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuarios usuarioId;
+    private Usuarios usuario;
     private String modulo;
     private String acao;
     private String tabela;
@@ -48,18 +48,5 @@ public class LogAcoes {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public LogAcoes(LogAcoesRequestDTO data) {
-        this.usuarioId = data.usuarioId();
-        this.modulo = data.modulo();
-        this.acao = data.acao();
-        this.tabela = data.tabela();
-        this.registroId = data.registroId();
-        this.dadosNovos = data.dadosNovos();
-        this.dadosAntigos = data.dadosAntigos();
-        this.ipAddress = data.ipAddress();
-        this.userAgent = data.userAgent();
-        this.createdAt = data.createdAt();
-    }
 
 }

@@ -1,73 +1,108 @@
 package com.example.backend.auditoria.logAcoes;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/auditoria/logAcoes")
 public class LogAcoesController {
 
-    @Autowired
-    private LogAcoesRepository repository;
+    private final LogAcoesRepository repository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public LogAcoesController(
+            LogAcoesRepository repository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<LogAcoesResponseDTO> getAll(){
-
-        List<LogAcoesResponseDTO> logAcoesList = repository.findAll().stream().map(LogAcoesResponseDTO::new).toList();
-        return logAcoesList;
+    public List<LogAcoesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(LogAcoesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<LogAcoes> logAcoes = repository.findById(id);
-        if(logAcoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        LogAcoesResponseDTO logAcoesDTO = new LogAcoesResponseDTO(logAcoes.get());
-        return  ResponseEntity.ok(logAcoesDTO);
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new LogAcoesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody LogAcoesRequestDTO data){
+    public ResponseEntity<?> saveLogAcoes(@RequestBody LogAcoesRequestDTO data) {
+        try {
+            Usuarios usuario = data.usuario() != null
+                    ? usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
+                    : null;
 
-        LogAcoes logAcoesData = new LogAcoes(data);
-        repository.save(logAcoesData);
-        return;
+            LogAcoes entity = new LogAcoes();
+            entity.setUsuario(usuario);
+            entity.setModulo(data.modulo());
+            entity.setAcao(data.acao());
+            entity.setTabela(data.tabela());
+            entity.setRegistroId(data.registroId());
+            entity.setDadosAntigos(data.dadosAntigos());
+            entity.setDadosNovos(data.dadosNovos());
+            entity.setIpAddress(data.ipAddress());
+            entity.setUserAgent(data.userAgent());
+            entity.setCreatedAt(data.createdAt());
+
+            LogAcoes saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new LogAcoesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateLogAcoes(@PathVariable(value = "id") Integer id, @RequestBody LogAcoesRequestDTO upData){
+    public ResponseEntity<?> updateLogAcoes(@PathVariable Long id, @RequestBody LogAcoesRequestDTO data) {
+        try {
+            LogAcoes entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Log de acao nao encontrado"));
 
-        Optional<LogAcoes> logAcoes = repository.findById(id);
-        if(logAcoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Usuarios usuario = data.usuario() != null
+                    ? usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
+                    : null;
+
+            entity.setUsuario(usuario);
+            entity.setModulo(data.modulo());
+            entity.setAcao(data.acao());
+            entity.setTabela(data.tabela());
+            entity.setRegistroId(data.registroId());
+            entity.setDadosAntigos(data.dadosAntigos());
+            entity.setDadosNovos(data.dadosNovos());
+            entity.setIpAddress(data.ipAddress());
+            entity.setUserAgent(data.userAgent());
+            entity.setCreatedAt(data.createdAt());
+
+            LogAcoes updated = repository.save(entity);
+            return ResponseEntity.ok(new LogAcoesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        LogAcoes logAcoesModel = logAcoes.get();
-        BeanUtils.copyProperties(upData, logAcoesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(logAcoesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteLogAcoes(@PathVariable(value = "id") Integer id){
-
-        Optional<LogAcoes> logAcoes = repository.findById(id);
-        if(logAcoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(logAcoes.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("LogAcoes deleted");
+    public ResponseEntity<?> deleteLogAcoes(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Log de acao deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

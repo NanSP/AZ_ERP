@@ -21,7 +21,7 @@ public class LogErros {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "erro_codigo")
     private Integer erroCodigo;
@@ -30,7 +30,7 @@ public class LogErros {
     private String modulo;
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuarios usuarioId;
+    private Usuarios usuario;
 
     private String url;
 
@@ -45,14 +45,4 @@ public class LogErros {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public LogErros(LogErrosRequestDTO data) {
-        this.erroCodigo = data.erroCodigo();
-        this.erroMensagem = data.erroMensagem();
-        this.usuarioId = data.usuarioId();
-        this.modulo = data.modulo();
-        this.url = data.url();
-        this.parametros = data.parametros();
-        this.ipAddress = data.ipAddress();
-        this.createdAt = data.createdAt();
-    }
 }

@@ -1,18 +1,16 @@
 package com.example.backend.auditoria.logErros;
 
-import com.example.backend.sys.usuarios.Usuarios;
-
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 public record LogErrosResponseDTO
         (
-                Integer id,
+                Long id,
                 Integer erroCodigo,
                 String erroMensagem,
                 String modulo,
-                Usuarios usuarioId,
+                Integer usuario,
                 String url,
                 Map<String, Object> parametros,
                 InetAddress ipAddress,
@@ -25,7 +23,7 @@ public record LogErrosResponseDTO
                         logErros.getErroCodigo(),
                         logErros.getErroMensagem(),
                         logErros.getModulo(),
-                        logErros.getUsuarioId(),
+                        logErros.getUsuario() != null ? logErros.getUsuario().getId() : null,
                         logErros.getUrl(),
                         logErros.getParametros(),
                         logErros.getIpAddress(),
