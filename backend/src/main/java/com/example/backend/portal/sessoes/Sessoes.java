@@ -9,7 +9,7 @@ import com.example.backend.sys.usuarios.Usuarios;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 
-@Table(name = "sessoes", schema = "com/example/backend/portal")
+@Table(name = "sessoes", schema = "portal")
 @Entity
 @Getter
 @Setter
@@ -24,7 +24,7 @@ public class Sessoes {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuarios usuarioId;
+    private Usuarios usuario;
     @Column(name = "token_sessao")
     private String tokenSessao;
     @JdbcTypeCode(SqlTypes.INET)
@@ -38,13 +38,4 @@ public class Sessoes {
     private LocalDateTime dataLogout;
     private LocalDateTime expiracao;
 
-    public Sessoes(SessoesRequestDTO data) {
-        this.usuarioId = data.usuarioId();
-        this.tokenSessao = data.tokenSessao();
-        this.ipAddress = data.ipAddress();
-        this.dataLogin = data.dataLogin();
-        this.userAgent = data.userAgent();
-        this.dataLogout = data.dataLogout();
-        this.expiracao = data.expiracao();
-    }
 }

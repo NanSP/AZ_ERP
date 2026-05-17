@@ -1,14 +1,12 @@
 package com.example.backend.portal.sessoes;
 
-import com.example.backend.sys.usuarios.Usuarios;
-
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 
 public record SessoesResponseDTO
         (
                 Integer id,
-                Usuarios usuarioId,
+                Integer usuario,
                 String tokenSessao,
                 InetAddress ipAddress,
                 String userAgent,
@@ -20,7 +18,7 @@ public record SessoesResponseDTO
         this
                 (
                         sessoes.getId(),
-                        sessoes.getUsuarioId(),
+                        sessoes.getUsuario() != null ? sessoes.getUsuario().getId() : null,
                         sessoes.getTokenSessao(),
                         sessoes.getIpAddress(),
                         sessoes.getUserAgent(),

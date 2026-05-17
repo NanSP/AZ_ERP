@@ -1,73 +1,102 @@
 package com.example.backend.portal.sessoes;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/portal/sessoes")
 public class SessoesController {
 
-    @Autowired
-    private SessoesRepository repository;
+    private final SessoesRepository repository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public SessoesController(
+            SessoesRepository repository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<SessoesResponseDTO> getAll(){
-
-        List<SessoesResponseDTO> sessoesList = repository.findAll().stream().map(SessoesResponseDTO::new).toList();
-        return sessoesList;
+    public List<SessoesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(SessoesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Sessoes> sessoes = repository.findById(id);
-        if(sessoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        SessoesResponseDTO sessoesDTO = new SessoesResponseDTO(sessoes.get());
-        return  ResponseEntity.ok(sessoesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new SessoesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody SessoesRequestDTO data){
+    public ResponseEntity<?> saveSessoes(@RequestBody SessoesRequestDTO data) {
+        try {
+            Usuarios usuario = data.usuario() != null
+                    ? usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
+                    : null;
 
-        Sessoes sessoesData = new Sessoes(data);
-        repository.save(sessoesData);
-        return;
+            Sessoes entity = new Sessoes();
+            entity.setUsuario(usuario);
+            entity.setTokenSessao(data.tokenSessao());
+            entity.setIpAddress(data.ipAddress());
+            entity.setUserAgent(data.userAgent());
+            entity.setDataLogin(data.dataLogin());
+            entity.setDataLogout(data.dataLogout());
+            entity.setExpiracao(data.expiracao());
+
+            Sessoes saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new SessoesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSessoes(@PathVariable(value = "id") Integer id, @RequestBody SessoesRequestDTO upData){
+    public ResponseEntity<?> updateSessoes(@PathVariable Integer id, @RequestBody SessoesRequestDTO data) {
+        try {
+            Sessoes entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Sessao nao encontrada"));
 
-        Optional<Sessoes> sessoes = repository.findById(id);
-        if(sessoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Usuarios usuario = data.usuario() != null
+                    ? usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
+                    : null;
+
+            entity.setUsuario(usuario);
+            entity.setTokenSessao(data.tokenSessao());
+            entity.setIpAddress(data.ipAddress());
+            entity.setUserAgent(data.userAgent());
+            entity.setDataLogin(data.dataLogin());
+            entity.setDataLogout(data.dataLogout());
+            entity.setExpiracao(data.expiracao());
+
+            Sessoes updated = repository.save(entity);
+            return ResponseEntity.ok(new SessoesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Sessoes sessoesModel = sessoes.get();
-        BeanUtils.copyProperties(upData, sessoesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(sessoesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSessoes(@PathVariable(value = "id") Integer id){
-
-        Optional<Sessoes> sessoes = repository.findById(id);
-        if(sessoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(sessoes.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Sessoes deleted");
+    public ResponseEntity<?> deleteSessoes(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Sessao deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
