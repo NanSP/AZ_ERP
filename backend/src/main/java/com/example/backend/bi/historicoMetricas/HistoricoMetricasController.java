@@ -1,73 +1,96 @@
 package com.example.backend.bi.historicoMetricas;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.bi.metricas.Metricas;
+import com.example.backend.bi.metricas.MetricasRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/bi/historicoMetricas")
 public class HistoricoMetricasController {
 
-    @Autowired
-    private HistoricoMetricasRepository repository;
+    private final HistoricoMetricasRepository repository;
+    private final MetricasRepository metricasRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public HistoricoMetricasController(
+            HistoricoMetricasRepository repository,
+            MetricasRepository metricasRepository
+    ) {
+        this.repository = repository;
+        this.metricasRepository = metricasRepository;
+    }
+
     @GetMapping
-    public List<HistoricoMetricasResponseDTO> getAll(){
-
-        List<HistoricoMetricasResponseDTO> historicoMetricasList = repository.findAll().stream().map(HistoricoMetricasResponseDTO::new).toList();
-        return historicoMetricasList;
+    public List<HistoricoMetricasResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(HistoricoMetricasResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<HistoricoMetricas> historicoMetricas = repository.findById(id);
-        if(historicoMetricas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        HistoricoMetricasResponseDTO historicoMetricasDTO = new HistoricoMetricasResponseDTO(historicoMetricas.get());
-        return  ResponseEntity.ok(historicoMetricasDTO);
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new HistoricoMetricasResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody HistoricoMetricasRequestDTO data){
+    public ResponseEntity<?> saveHistoricoMetricas(@RequestBody HistoricoMetricasRequestDTO data) {
+        try {
+            Metricas metrica = data.metrica() != null
+                    ? metricasRepository.findById(data.metrica())
+                    .orElseThrow(() -> new RuntimeException("Metrica nao encontrada"))
+                    : null;
 
-        HistoricoMetricas historicoMetricasData = new HistoricoMetricas(data);
-        repository.save(historicoMetricasData);
-        return;
+            HistoricoMetricas entity = new HistoricoMetricas();
+            entity.setMetrica(metrica);
+            entity.setPeriodo(data.periodo());
+            entity.setValorApurado(data.valorApurado());
+            entity.setCreatedAt(data.createdAt());
+
+            HistoricoMetricas saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new HistoricoMetricasResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHistoricoMetricas(@PathVariable(value = "id") Integer id, @RequestBody HistoricoMetricasRequestDTO upData){
+    public ResponseEntity<?> updateHistoricoMetricas(@PathVariable Long id, @RequestBody HistoricoMetricasRequestDTO data) {
+        try {
+            HistoricoMetricas entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Historico de metrica nao encontrado"));
 
-        Optional<HistoricoMetricas> historicoMetricas = repository.findById(id);
-        if(historicoMetricas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Metricas metrica = data.metrica() != null
+                    ? metricasRepository.findById(data.metrica())
+                    .orElseThrow(() -> new RuntimeException("Metrica nao encontrada"))
+                    : null;
+
+            entity.setMetrica(metrica);
+            entity.setPeriodo(data.periodo());
+            entity.setValorApurado(data.valorApurado());
+            entity.setCreatedAt(data.createdAt());
+
+            HistoricoMetricas updated = repository.save(entity);
+            return ResponseEntity.ok(new HistoricoMetricasResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        HistoricoMetricas historicoMetricasModel = historicoMetricas.get();
-        BeanUtils.copyProperties(upData, historicoMetricasModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(historicoMetricasModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteHistoricoMetricas(@PathVariable(value = "id") Integer id){
-
-        Optional<HistoricoMetricas> historicoMetricas = repository.findById(id);
-        if(historicoMetricas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(historicoMetricas.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("HistoricoMetricas deleted");
+    public ResponseEntity<?> deleteHistoricoMetricas(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Historico de metrica deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

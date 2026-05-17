@@ -1,14 +1,13 @@
 package com.example.backend.bi.historicoMetricas;
 
-import com.example.backend.bi.metricas.Metricas;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record HistoricoMetricasResponseDTO
         (
-                Integer id,
-                Metricas metricaId,
+                Long id,
+                Integer metrica,
                 LocalDate periodo,
                 BigDecimal valorApurado,
                 LocalDateTime createdAt
@@ -17,7 +16,7 @@ public record HistoricoMetricasResponseDTO
         this
                 (
                         historicoMetricas.getId(),
-                        historicoMetricas.getMetricaId(),
+                        historicoMetricas.getMetrica() != null ? historicoMetricas.getMetrica().getId() : null,
                         historicoMetricas.getPeriodo(),
                         historicoMetricas.getValorApurado(),
                         historicoMetricas.getCreatedAt()

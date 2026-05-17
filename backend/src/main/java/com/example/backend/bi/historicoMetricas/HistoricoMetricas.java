@@ -19,23 +19,16 @@ public class HistoricoMetricas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "metrica_id")
-    private Metricas metricaId;
+    private Metricas metrica;
 
     private LocalDate periodo;
-    @Column(name = "valor_apurado", precision = 10, scale = 2)
+    @Column(name = "valor_apurado", precision = 15, scale = 2)
     private BigDecimal valorApurado;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public HistoricoMetricas(HistoricoMetricasRequestDTO data) {
-        this.metricaId = data.metricaId();
-        this.periodo = data.periodo();
-        this.valorApurado = data.valorApurado();
-        this.createdAt = data.createdAt();
-    }
 }
