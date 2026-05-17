@@ -25,7 +25,7 @@ public class Metricas {
     private String formula;
     @Column(name = "unidade_medida")
     private String unidadeMedida;
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal meta;
 
     @Column(name = "created_at")
