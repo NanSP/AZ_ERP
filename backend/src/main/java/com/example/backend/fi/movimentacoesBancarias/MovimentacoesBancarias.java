@@ -23,7 +23,7 @@ public class MovimentacoesBancarias {
     private Integer contaBancariaId;
     @Column(name = "tipo_movimento")
     private String tipoMovimento;
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal valor;
     @Column(name = "data_movimento")
     private LocalDate dataMovimento;
