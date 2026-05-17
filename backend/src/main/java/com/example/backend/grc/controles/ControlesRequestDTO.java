@@ -1,7 +1,5 @@
 package com.example.backend.grc.controles;
 
-import com.example.backend.sys.usuarios.Usuarios;
-
 import java.time.LocalDateTime;
 
 public record ControlesRequestDTO
@@ -10,7 +8,7 @@ public record ControlesRequestDTO
                 String descricao,
                 String tipoControle,
                 String frequencia,
-                Usuarios responsavelId,
+                Integer responsavel,
                 Boolean efetivo,
                 LocalDateTime createdAt
         ) {

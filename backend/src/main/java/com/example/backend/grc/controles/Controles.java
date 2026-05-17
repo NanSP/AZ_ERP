@@ -26,20 +26,10 @@ public class Controles {
     private String frequencia;
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
-    private Usuarios responsavelId;
+    private Usuarios responsavel;
 
     private Boolean efetivo;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Controles(ControlesRequestDTO data) {
-        this.codigo = data.codigo();
-        this.descricao = data.descricao();
-        this.tipoControle = data.tipoControle();
-        this.frequencia = data.frequencia();
-        this.responsavelId = data.responsavelId();
-        this.efetivo = data.efetivo();
-        this.createdAt = data.createdAt();
-    }
 }

@@ -1,73 +1,102 @@
 package com.example.backend.grc.controles;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/grc/controles")
 public class ControlesController {
 
-    @Autowired
-    private ControlesRepository repository;
+    private final ControlesRepository repository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ControlesController(
+            ControlesRepository repository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<ControlesResponseDTO> getAll(){
-
-        List<ControlesResponseDTO> controlesList = repository.findAll().stream().map(ControlesResponseDTO::new).toList();
-        return controlesList;
+    public List<ControlesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ControlesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Controles> controles = repository.findById(id);
-        if(controles.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ControlesResponseDTO controlesDTO = new ControlesResponseDTO(controles.get());
-        return  ResponseEntity.ok(controlesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ControlesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody ControlesRequestDTO data){
+    public ResponseEntity<?> saveControles(@RequestBody ControlesRequestDTO data) {
+        try {
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
 
-        Controles controlesData = new Controles(data);
-        repository.save(controlesData);
-        return;
+            Controles entity = new Controles();
+            entity.setCodigo(data.codigo());
+            entity.setDescricao(data.descricao());
+            entity.setTipoControle(data.tipoControle());
+            entity.setFrequencia(data.frequencia());
+            entity.setResponsavel(responsavel);
+            entity.setEfetivo(data.efetivo());
+            entity.setCreatedAt(data.createdAt());
+
+            Controles saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ControlesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateControles(@PathVariable(value = "id") Integer id, @RequestBody ControlesRequestDTO upData){
+    public ResponseEntity<?> updateControles(@PathVariable Integer id, @RequestBody ControlesRequestDTO data) {
+        try {
+            Controles entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Controle nao encontrado"));
 
-        Optional<Controles> controles = repository.findById(id);
-        if(controles.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
+
+            entity.setCodigo(data.codigo());
+            entity.setDescricao(data.descricao());
+            entity.setTipoControle(data.tipoControle());
+            entity.setFrequencia(data.frequencia());
+            entity.setResponsavel(responsavel);
+            entity.setEfetivo(data.efetivo());
+            entity.setCreatedAt(data.createdAt());
+
+            Controles updated = repository.save(entity);
+            return ResponseEntity.ok(new ControlesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Controles controlesModel = controles.get();
-        BeanUtils.copyProperties(upData, controlesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(controlesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteControles(@PathVariable(value = "id") Integer id){
-
-        Optional<Controles> controles = repository.findById(id);
-        if(controles.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(controles.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Controles deleted");
+    public ResponseEntity<?> deleteControles(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Controle deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
