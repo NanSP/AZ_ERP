@@ -1,72 +1,108 @@
 package com.example.backend.sd.pedidos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.parceiros.Parceiros;
+import com.example.backend.core.parceiros.ParceirosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("pedidos")
+@RequestMapping("/sd/pedidos")
 public class PedidosController {
 
-    @Autowired
-    private PedidosRepository repository;
+    private final PedidosRepository repository;
+    private final ParceirosRepository parceirosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public PedidosController(
+            PedidosRepository repository,
+            ParceirosRepository parceirosRepository
+    ) {
+        this.repository = repository;
+        this.parceirosRepository = parceirosRepository;
+    }
+
     @GetMapping
-    public List<PedidosResponseDTO> getAll(){
-
-        List<PedidosResponseDTO> pedidosList = repository.findAll().stream().map(PedidosResponseDTO::new).toList();
-        return pedidosList;
+    public List<PedidosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(PedidosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Pedidos> pedidos = repository.findById(id);
-        if(pedidos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        PedidosResponseDTO pedidosDTO = new PedidosResponseDTO(pedidos.get());
-        return  ResponseEntity.ok(pedidosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new PedidosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void savePedidos(@RequestBody PedidosRequestDTO data){
+    public ResponseEntity<?> savePedidos(@RequestBody PedidosRequestDTO data) {
+        try {
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
 
-        Pedidos pedidosData = new Pedidos(data);
-        repository.save(pedidosData);
-        return;
+            Pedidos entity = new Pedidos();
+            entity.setCliente(cliente);
+            entity.setNumeroPedido(data.numeroPedido());
+            entity.setDataPedido(data.dataPedido());
+            entity.setDataEntrega(data.dataEntrega());
+            entity.setValorTotal(data.valorTotal());
+            entity.setDescontoTotal(data.descontoTotal());
+            entity.setCondicoesPagamento(data.condicoesPagamento());
+            entity.setStatus(data.status());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            Pedidos saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new PedidosResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOportunidades(@PathVariable(value = "id") Integer id, @RequestBody PedidosRequestDTO upData){
+    public ResponseEntity<?> updatePedidos(@PathVariable Integer id, @RequestBody PedidosRequestDTO data) {
+        try {
+            Pedidos entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Pedido nao encontrado"));
 
-        Optional<Pedidos> pedidos = repository.findById(id);
-        if(pedidos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Parceiros cliente = data.cliente() != null
+                    ? parceirosRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
+
+            entity.setCliente(cliente);
+            entity.setNumeroPedido(data.numeroPedido());
+            entity.setDataPedido(data.dataPedido());
+            entity.setDataEntrega(data.dataEntrega());
+            entity.setValorTotal(data.valorTotal());
+            entity.setDescontoTotal(data.descontoTotal());
+            entity.setCondicoesPagamento(data.condicoesPagamento());
+            entity.setStatus(data.status());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            Pedidos updated = repository.save(entity);
+            return ResponseEntity.ok(new PedidosResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Pedidos oportunidadesModel = pedidos.get();
-        BeanUtils.copyProperties(upData, oportunidadesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(oportunidadesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePedidos(@PathVariable(value = "id") Integer id){
-
-        Optional<Pedidos> pedidos = repository.findById(id);
-        if(pedidos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(pedidos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Pedido deleted");
+    public ResponseEntity<?> deletePedidos(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Pedido deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

@@ -1,15 +1,11 @@
 package com.example.backend.sd.pedidos;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.sd.pedidoItens.PedidoItens;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record PedidosRequestDTO
-        (Parceiros clienteId,
+        (Integer cliente,
          String numeroPedido,
          LocalDate dataPedido,
          LocalDate dataEntrega,
@@ -18,6 +14,5 @@ public record PedidosRequestDTO
          String condicoesPagamento,
          String status,
          String observacoes,
-         List<PedidoItens> itens,
          LocalDateTime createdAt) {
 }
