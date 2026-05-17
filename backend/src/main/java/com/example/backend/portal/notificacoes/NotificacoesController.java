@@ -1,73 +1,102 @@
 package com.example.backend.portal.notificacoes;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/portal/notificacoes")
 public class NotificacoesController {
 
-    @Autowired
-    private NotificacoesRepository repository;
+    private final NotificacoesRepository repository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public NotificacoesController(
+            NotificacoesRepository repository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<NotificacoesResponseDTO> getAll(){
-
-        List<NotificacoesResponseDTO> notificacoesList = repository.findAll().stream().map(NotificacoesResponseDTO::new).toList();
-        return notificacoesList;
+    public List<NotificacoesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(NotificacoesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Notificacoes> notificacoes = repository.findById(id);
-        if(notificacoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        NotificacoesResponseDTO notificacoesDTO = new NotificacoesResponseDTO(notificacoes.get());
-        return  ResponseEntity.ok(notificacoesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new NotificacoesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody NotificacoesRequestDTO data){
+    public ResponseEntity<?> saveNotificacoes(@RequestBody NotificacoesRequestDTO data) {
+        try {
+            Usuarios usuario = data.usuario() != null
+                    ? usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
+                    : null;
 
-        Notificacoes notificacoesData = new Notificacoes(data);
-        repository.save(notificacoesData);
-        return;
+            Notificacoes entity = new Notificacoes();
+            entity.setUsuario(usuario);
+            entity.setTitulo(data.titulo());
+            entity.setMensagem(data.mensagem());
+            entity.setTipo(data.tipo());
+            entity.setLida(data.lida());
+            entity.setDataLeitura(data.dataLeitura());
+            entity.setCreatedAt(data.createdAt());
+
+            Notificacoes saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new NotificacoesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateNotificacoes(@PathVariable(value = "id") Integer id, @RequestBody NotificacoesRequestDTO upData){
+    public ResponseEntity<?> updateNotificacoes(@PathVariable Integer id, @RequestBody NotificacoesRequestDTO data) {
+        try {
+            Notificacoes entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Notificacao nao encontrada"));
 
-        Optional<Notificacoes> notificacoes = repository.findById(id);
-        if(notificacoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Usuarios usuario = data.usuario() != null
+                    ? usuariosRepository.findById(data.usuario())
+                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
+                    : null;
+
+            entity.setUsuario(usuario);
+            entity.setTitulo(data.titulo());
+            entity.setMensagem(data.mensagem());
+            entity.setTipo(data.tipo());
+            entity.setLida(data.lida());
+            entity.setDataLeitura(data.dataLeitura());
+            entity.setCreatedAt(data.createdAt());
+
+            Notificacoes updated = repository.save(entity);
+            return ResponseEntity.ok(new NotificacoesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Notificacoes notificacoesModel = notificacoes.get();
-        BeanUtils.copyProperties(upData, notificacoesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(notificacoesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteNotificacoes(@PathVariable(value = "id") Integer id){
-
-        Optional<Notificacoes> notificacoes = repository.findById(id);
-        if(notificacoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(notificacoes.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Notificacoes deleted");
+    public ResponseEntity<?> deleteNotificacoes(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Notificacao deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

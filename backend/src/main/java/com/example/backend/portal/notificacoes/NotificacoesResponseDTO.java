@@ -1,13 +1,11 @@
 package com.example.backend.portal.notificacoes;
 
-import com.example.backend.sys.usuarios.Usuarios;
-
 import java.time.LocalDateTime;
 
 public record NotificacoesResponseDTO
         (
                 Integer id,
-                Usuarios usuarioId,
+                Integer usuario,
                 String titulo,
                 String mensagem,
                 String tipo,
@@ -19,7 +17,7 @@ public record NotificacoesResponseDTO
         this
                 (
                         notificacoes.getId(),
-                        notificacoes.getUsuarioId(),
+                        notificacoes.getUsuario() != null ? notificacoes.getUsuario().getId() : null,
                         notificacoes.getTitulo(),
                         notificacoes.getMensagem(),
                         notificacoes.getTipo(),

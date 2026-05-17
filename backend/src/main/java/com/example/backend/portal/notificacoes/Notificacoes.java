@@ -6,7 +6,7 @@ import com.example.backend.sys.usuarios.Usuarios;
 
 import java.time.LocalDateTime;
 
-@Table(name = "notificacoes", schema = "com/example/backend/portal")
+@Table(name = "notificacoes", schema = "portal")
 @Entity
 @Getter
 @Setter
@@ -21,7 +21,7 @@ public class Notificacoes {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    private Usuarios usuarioId;
+    private Usuarios usuario;
     private String titulo;
     private String mensagem;
     private String tipo;
@@ -31,13 +31,4 @@ public class Notificacoes {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Notificacoes(NotificacoesRequestDTO data) {
-        this.usuarioId = data.usuarioId();
-        this.titulo = data.titulo();
-        this.mensagem = data.mensagem();
-        this.tipo = data.tipo();
-        this.lida = data.lida();
-        this.dataLeitura = data.dataLeitura();
-        this.createdAt = data.createdAt();
-    }
 }
