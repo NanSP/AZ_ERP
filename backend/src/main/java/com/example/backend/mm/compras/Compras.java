@@ -23,19 +23,19 @@ public class Compras {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(mappedBy = "compraId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "compras", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CompraItens> itens = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id")
-    private Parceiros fornecedorId;
+    private Parceiros fornecedor;
     @Column(name = "data_pedido")
     private LocalDate dataPedido;
     @Column(name = "data_prevista_entrega")
     private LocalDate dataPrevistaEntrega;
     @Column(name = "data_entrega")
     private LocalDate dataEntrega;
-    @Column(name = "valor_total", precision = 10, scale = 2)
+    @Column(name = "valor_total", precision = 15, scale = 2)
     private BigDecimal valorTotal;
     @Column(name = "condicoes_pagamento")
     private String condicoesPagamento;
@@ -45,16 +45,4 @@ public class Compras {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-
-    public Compras(ComprasRequestDTO data) {
-        this.itens = data.itens();
-        this.dataPedido = data.dataPedido();
-        this.dataPrevistaEntrega = data.dataPrevistaEntrega();
-        this.dataEntrega = data.dataEntrega();
-        this.valorTotal = data.valorTotal();
-        this.condicoesPagamento = data.condicoesPagamento();
-        this.observacoes = data.observacoes();
-        this.status = data.status();
-        this.createdAt = data.createdAt();
-    }
 }

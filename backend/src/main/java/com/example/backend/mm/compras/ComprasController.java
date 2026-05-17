@@ -1,73 +1,106 @@
 package com.example.backend.mm.compras;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.parceiros.Parceiros;
+import com.example.backend.core.parceiros.ParceirosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/mm/compras")
 public class ComprasController {
 
-    @Autowired
-    private ComprasRepository repository;
+    private final ComprasRepository repository;
+    private final ParceirosRepository parceirosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ComprasController(
+            ComprasRepository repository,
+            ParceirosRepository parceirosRepository
+    ) {
+        this.repository = repository;
+        this.parceirosRepository = parceirosRepository;
+    }
+
     @GetMapping
-    public List<ComprasResponseDTO> getAll(){
-
-        List<ComprasResponseDTO> comprasList = repository.findAll().stream().map(ComprasResponseDTO::new).toList();
-        return comprasList;
+    public List<ComprasResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ComprasResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Compras> compras = repository.findById(id);
-        if(compras.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ComprasResponseDTO comprasDTO = new ComprasResponseDTO(compras.get());
-        return  ResponseEntity.ok(comprasDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ComprasResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody ComprasRequestDTO data){
+    public ResponseEntity<?> saveCompras(@RequestBody ComprasRequestDTO data) {
+        try {
+            Parceiros fornecedor = data.fornecedor() != null
+                    ? parceirosRepository.findById(data.fornecedor())
+                    .orElseThrow(() -> new RuntimeException("Fornecedor nao encontrado"))
+                    : null;
 
-        Compras comprasData = new Compras(data);
-        repository.save(comprasData);
-        return;
+            Compras entity = new Compras();
+            entity.setFornecedor(fornecedor);
+            entity.setDataPedido(data.dataPedido());
+            entity.setDataPrevistaEntrega(data.dataPrevistaEntrega());
+            entity.setDataEntrega(data.dataEntrega());
+            entity.setValorTotal(data.valorTotal());
+            entity.setCondicoesPagamento(data.condicoesPagamento());
+            entity.setStatus(data.status());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            Compras saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ComprasResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCompras(@PathVariable(value = "id") Integer id, @RequestBody ComprasRequestDTO upData){
+    public ResponseEntity<?> updateCompras(@PathVariable Integer id, @RequestBody ComprasRequestDTO data) {
+        try {
+            Compras entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Compra nao encontrada"));
 
-        Optional<Compras> compras = repository.findById(id);
-        if(compras.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Parceiros fornecedor = data.fornecedor() != null
+                    ? parceirosRepository.findById(data.fornecedor())
+                    .orElseThrow(() -> new RuntimeException("Fornecedor nao encontrado"))
+                    : null;
+
+            entity.setFornecedor(fornecedor);
+            entity.setDataPedido(data.dataPedido());
+            entity.setDataPrevistaEntrega(data.dataPrevistaEntrega());
+            entity.setDataEntrega(data.dataEntrega());
+            entity.setValorTotal(data.valorTotal());
+            entity.setCondicoesPagamento(data.condicoesPagamento());
+            entity.setStatus(data.status());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            Compras updated = repository.save(entity);
+            return ResponseEntity.ok(new ComprasResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Compras comprasModel = compras.get();
-        BeanUtils.copyProperties(upData, comprasModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(comprasModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCompras(@PathVariable(value = "id") Integer id){
-
-        Optional<Compras> compras = repository.findById(id);
-        if(compras.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(compras.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Compra deleted");
+    public ResponseEntity<?> deleteCompras(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Compra deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

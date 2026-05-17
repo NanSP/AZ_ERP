@@ -1,18 +1,13 @@
 package com.example.backend.mm.compras;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.mm.compraItens.CompraItens;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record ComprasResponseDTO
         (
                 Integer id,
-                List<CompraItens> itens,
-                Parceiros fornecedorId,
+                Integer fornecedorId,
                 LocalDate dataPedido,
                 LocalDate dataPrevistaEntrega,
                 LocalDate dataEntrega,
@@ -27,8 +22,7 @@ public record ComprasResponseDTO
             this
                     (
                             compras.getId(),
-                            compras.getItens(),
-                            compras.getFornecedorId(),
+                            compras.getFornecedor() != null ? compras.getFornecedor().getId() : null,
                             compras.getDataPedido(),
                             compras.getDataPrevistaEntrega(),
                             compras.getDataEntrega(),

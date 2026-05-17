@@ -22,30 +22,20 @@ public class CompraItens {
 
     @ManyToOne
     @JoinColumn(name = "compra_id")
-    private Compras compraId;
+    private Compras compras;
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
-    private Produtos produtoId;
-    @Column(precision = 10, scale = 4)
+    private Produtos produtos;
+    @Column(precision = 15, scale = 4)
     private BigDecimal quantidade;
-    @Column(name = "valor_unitario", precision = 10, scale = 4)
+    @Column(name = "valor_unitario", precision = 15, scale = 4)
     private BigDecimal valorUnitario;
-    @Column(name = "valor_total", precision = 10, scale = 4)
+    @Column(name = "valor_total", precision = 15, scale = 2)
     private BigDecimal valorTotal;
-    @Column(name = "quantidade_recebida", precision = 10, scale = 4)
+    @Column(name = "quantidade_recebida", precision = 15, scale = 4)
     private BigDecimal quantidadeRecebida;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public CompraItens(CompraItensRequestDTO data) {
-        this.compraId = data.compraId();
-        this.produtoId = data.produtoId();
-        this.quantidade = data.quantidade();
-        this.valorUnitario = data.valorUnitario();
-        this.valorTotal = data.valorTotal();
-        this.quantidadeRecebida = data.quantidadeRecebida();
-        this.createdAt = data.createdAt();
-    }
 }
