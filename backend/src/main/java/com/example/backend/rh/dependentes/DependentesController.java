@@ -1,72 +1,100 @@
 package com.example.backend.rh.dependentes;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.rh.colaboradores.Colaboradores;
+import com.example.backend.rh.colaboradores.ColaboradoresRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/rh/dependentes")
 public class DependentesController {
 
-    @Autowired
-    private DependentesRepository repository;
+    private final DependentesRepository repository;
+    private final ColaboradoresRepository colaboradoresRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public DependentesController(
+            DependentesRepository repository,
+            ColaboradoresRepository colaboradoresRepository
+    ) {
+        this.repository = repository;
+        this.colaboradoresRepository = colaboradoresRepository;
+    }
+
     @GetMapping
-    public List<DependentesResponseDTO> getAll(){
-
-        List<DependentesResponseDTO> dependentesList = repository.findAll().stream().map(DependentesResponseDTO::new).toList();
-        return dependentesList;
+    public List<DependentesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(DependentesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Dependentes> dependentes = repository.findById(id);
-        if(dependentes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        DependentesResponseDTO dependentesDTO = new DependentesResponseDTO(dependentes.get());
-        return  ResponseEntity.ok(dependentesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new DependentesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveDependente(@RequestBody DependentesRequestDTO data){
+    public ResponseEntity<?> saveDependente(@RequestBody DependentesRequestDTO data) {
+        try {
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
 
-        Dependentes dependentesData = new Dependentes(data);
-        repository.save(dependentesData);
-        return;
+            Dependentes entity = new Dependentes();
+            entity.setColaborador(colaborador);
+            entity.setNome(data.nome());
+            entity.setDataNascimento(data.dataNascimento());
+            entity.setParentesco(data.parentesco());
+            entity.setCpf(data.cpf());
+            entity.setCreatedAt(data.createdAt());
+
+            Dependentes saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new DependentesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDependente(@PathVariable(value = "id") Integer id, @RequestBody DependentesRequestDTO upData){
+    public ResponseEntity<?> updateDependente(@PathVariable Integer id, @RequestBody DependentesRequestDTO data) {
+        try {
+            Dependentes entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Dependente nao encontrado"));
 
-        Optional<Dependentes> dependentes = repository.findById(id);
-        if(dependentes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
+
+            entity.setColaborador(colaborador);
+            entity.setNome(data.nome());
+            entity.setDataNascimento(data.dataNascimento());
+            entity.setParentesco(data.parentesco());
+            entity.setCpf(data.cpf());
+            entity.setCreatedAt(data.createdAt());
+
+            Dependentes updated = repository.save(entity);
+            return ResponseEntity.ok(new DependentesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Dependentes dependentesModel = dependentes.get();
-        BeanUtils.copyProperties(upData, dependentesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(dependentesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDependente(@PathVariable(value = "id") Integer id){
-
-        Optional<Dependentes> dependentes = repository.findById(id);
-        if(dependentes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(dependentes.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Dependente deleted");
+    public ResponseEntity<?> deleteDependente(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Dependente deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

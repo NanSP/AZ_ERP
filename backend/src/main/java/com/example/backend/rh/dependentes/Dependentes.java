@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Table(name = "dependetes", schema = "rh")
+@Table(name = "dependentes", schema = "rh")
 @Entity
 @Getter
 @Setter
@@ -22,7 +22,7 @@ public class Dependentes {
 
     @ManyToOne
     @JoinColumn(name = "colaborador_id")
-    private Colaboradores colaboradorId;
+    private Colaboradores colaborador;
 
     private String nome;
     @Column(name = "data_nascimento")
@@ -32,12 +32,4 @@ public class Dependentes {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Dependentes(DependentesRequestDTO data){
-        this.colaboradorId = data.colaboradorId();
-        this.nome = data.nome();
-        this.dataNascimento = data.dataNascimento();
-        this.parentesco = data.parentesco();
-        this.cpf = data.cpf();
-        this.createdAt = data.createdAt();
-    }
 }

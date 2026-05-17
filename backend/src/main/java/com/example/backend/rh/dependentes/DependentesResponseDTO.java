@@ -1,14 +1,12 @@
 package com.example.backend.rh.dependentes;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record DependentesResponseDTO
         (
                 Integer id,
-                Colaboradores colaboradorId,
+                Integer colaborador,
                 String nome,
                 LocalDate dataNascimento,
                 String parentesco,
@@ -20,7 +18,7 @@ public record DependentesResponseDTO
             this
                     (
                        dependentes.getId(),
-                       dependentes.getColaboradorId(),
+                       dependentes.getColaborador() != null ? dependentes.getColaborador().getId() : null,
                        dependentes.getNome(),
                        dependentes.getDataNascimento(),
                        dependentes.getParentesco(),
