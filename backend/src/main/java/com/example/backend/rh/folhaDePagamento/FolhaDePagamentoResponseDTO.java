@@ -1,7 +1,5 @@
 package com.example.backend.rh.folhaDePagamento;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,7 +7,7 @@ import java.time.LocalDateTime;
 public record FolhaDePagamentoResponseDTO
         (
                 Integer id,
-                Colaboradores colaboradorId,
+                Integer colaborador,
                 LocalDate competencia,
                 BigDecimal salarioBase,
                 BigDecimal horasNormais,
@@ -25,7 +23,7 @@ public record FolhaDePagamentoResponseDTO
         public FolhaDePagamentoResponseDTO(FolhaDePagamento folhaDePagamento){
             this(
                     folhaDePagamento.getId(),
-                    folhaDePagamento.getColaboradorId(),
+                    folhaDePagamento.getColaborador() != null ? folhaDePagamento.getColaborador().getId() : null,
                     folhaDePagamento.getCompetencia(),
                     folhaDePagamento.getSalarioBase(),
                     folhaDePagamento.getHorasNormais(),

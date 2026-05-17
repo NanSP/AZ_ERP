@@ -1,14 +1,12 @@
 package com.example.backend.rh.folhaDePagamento;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record FolhaDePagamentoRequestDTO
         (
-                Colaboradores colaboradorId,
+                Integer colaborador,
                 LocalDate competencia,
                 BigDecimal salarioBase,
                 BigDecimal horasNormais,

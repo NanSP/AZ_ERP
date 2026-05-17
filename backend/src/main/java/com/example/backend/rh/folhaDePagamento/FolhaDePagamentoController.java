@@ -1,72 +1,110 @@
 package com.example.backend.rh.folhaDePagamento;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.rh.colaboradores.Colaboradores;
+import com.example.backend.rh.colaboradores.ColaboradoresRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/rh/folhaDePagamento")
 public class FolhaDePagamentoController {
 
-    @Autowired
-    private FolhaDePagamentoRepository repository;
+    private final FolhaDePagamentoRepository repository;
+    private final ColaboradoresRepository colaboradoresRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public FolhaDePagamentoController(
+            FolhaDePagamentoRepository repository,
+            ColaboradoresRepository colaboradoresRepository
+    ) {
+        this.repository = repository;
+        this.colaboradoresRepository = colaboradoresRepository;
+    }
+
     @GetMapping
-    public List<FolhaDePagamentoResponseDTO> getAll(){
-
-        List<FolhaDePagamentoResponseDTO> folhaDePagamentoList = repository.findAll().stream().map(FolhaDePagamentoResponseDTO::new).toList();
-        return folhaDePagamentoList;
+    public List<FolhaDePagamentoResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(FolhaDePagamentoResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<FolhaDePagamento> folhaDePagamento = repository.findById(id);
-        if(folhaDePagamento.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        FolhaDePagamentoResponseDTO folhaDePagamentoDTO = new FolhaDePagamentoResponseDTO(folhaDePagamento.get());
-        return  ResponseEntity.ok(folhaDePagamentoDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new FolhaDePagamentoResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveFolhaDePagamento(@RequestBody FolhaDePagamentoRequestDTO data){
+    public ResponseEntity<?> saveFolhaDePagamento(@RequestBody FolhaDePagamentoRequestDTO data) {
+        try {
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
 
-        FolhaDePagamento folhaDePagamentoData = new FolhaDePagamento(data);
-        repository.save(folhaDePagamentoData);
-        return;
+            FolhaDePagamento entity = new FolhaDePagamento();
+            entity.setColaborador(colaborador);
+            entity.setCompetencia(data.competencia());
+            entity.setSalarioBase(data.salarioBase());
+            entity.setHorasNormais(data.horasNormais());
+            entity.setHorasExtras(data.horasExtras());
+            entity.setAdicionais(data.adicionais());
+            entity.setDescontos(data.descontos());
+            entity.setValorLiquido(data.valorLiquido());
+            entity.setDataPagamento(data.dataPagamento());
+            entity.setStatus(data.status());
+            entity.setCreatedAt(data.createdAt());
+
+            FolhaDePagamento saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new FolhaDePagamentoResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateFolhaDePagamento(@PathVariable(value = "id") Integer id, @RequestBody FolhaDePagamentoRequestDTO upData){
+    public ResponseEntity<?> updateFolhaDePagamento(@PathVariable Integer id, @RequestBody FolhaDePagamentoRequestDTO data) {
+        try {
+            FolhaDePagamento entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Folha de pagamento nao encontrada"));
 
-        Optional<FolhaDePagamento> folhaDePagamento = repository.findById(id);
-        if(folhaDePagamento.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Colaboradores colaborador = data.colaborador() != null
+                    ? colaboradoresRepository.findById(data.colaborador())
+                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
+                    : null;
+
+            entity.setColaborador(colaborador);
+            entity.setCompetencia(data.competencia());
+            entity.setSalarioBase(data.salarioBase());
+            entity.setHorasNormais(data.horasNormais());
+            entity.setHorasExtras(data.horasExtras());
+            entity.setAdicionais(data.adicionais());
+            entity.setDescontos(data.descontos());
+            entity.setValorLiquido(data.valorLiquido());
+            entity.setDataPagamento(data.dataPagamento());
+            entity.setStatus(data.status());
+            entity.setCreatedAt(data.createdAt());
+
+            FolhaDePagamento updated = repository.save(entity);
+            return ResponseEntity.ok(new FolhaDePagamentoResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        FolhaDePagamento folhaDePagamentoModel = folhaDePagamento.get();
-        BeanUtils.copyProperties(upData, folhaDePagamentoModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(folhaDePagamentoModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFolhaDePagamento(@PathVariable(value = "id") Integer id){
-
-        Optional<FolhaDePagamento> folhaDePagamento = repository.findById(id);
-        if(folhaDePagamento.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(folhaDePagamento.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Pagamento deleted");
+    public ResponseEntity<?> deleteFolhaDePagamento(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Pagamento deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

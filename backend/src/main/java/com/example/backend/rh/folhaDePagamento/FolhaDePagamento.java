@@ -22,20 +22,20 @@ public class FolhaDePagamento {
 
     @ManyToOne
     @JoinColumn(name = "colaborador_id")
-    private Colaboradores colaboradorId;
+    private Colaboradores colaborador;
 
     private LocalDate competencia;
-    @Column(name = "salario_base", precision = 10, scale = 2)
+    @Column(name = "salario_base", precision = 15, scale = 2)
     private BigDecimal salarioBase;
     @Column(name = "horas_normais", precision = 10, scale = 2)
     private BigDecimal horasNormais;
     @Column(name = "horas_extras", precision = 10, scale = 2)
     private BigDecimal horasExtras;
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal adicionais;
-    @Column(precision = 10, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal descontos;
-    @Column(name = "valor_liquido", precision = 10, scale = 2)
+    @Column(name = "valor_liquido", precision = 15, scale = 2)
     private BigDecimal valorLiquido;
     @Column(name = "data_pagamento")
     private LocalDate dataPagamento;
@@ -43,17 +43,4 @@ public class FolhaDePagamento {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public FolhaDePagamento(FolhaDePagamentoRequestDTO data){
-        this.colaboradorId = data.colaboradorId();
-        this.competencia = data.competencia();
-        this.salarioBase = data.salarioBase();
-        this.horasNormais = data.horasNormais();
-        this.horasExtras = data.horasExtras();
-        this.adicionais = data.adicionais();
-        this.descontos = data.descontos();
-        this.valorLiquido = data.valorLiquido();
-        this.dataPagamento = data.dataPagamento();
-        this.status = data.status();
-        this.createdAt = data.createdAt();
-    }
 }
