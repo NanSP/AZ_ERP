@@ -1,8 +1,5 @@
 package com.example.backend.sd.oportunidades;
 
-import com.example.backend.sys.usuarios.Usuarios;
-import com.example.backend.sd.clientes.Clientes;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,7 +7,7 @@ import java.time.LocalDateTime;
 public record OportunidadesResponseDTO
         (
                 Integer id,
-                Clientes clienteId,
+                Integer cliente,
                 String titulo,
                 String descricao,
                 BigDecimal valorEstimado,
@@ -18,7 +15,7 @@ public record OportunidadesResponseDTO
                 String estagio,
                 LocalDate dataPrevistaFechamento,
                 String motivoPerda,
-                Usuarios responsavelId,
+                Integer responsavel,
                 LocalDateTime createdAt
         )
     {
@@ -26,7 +23,7 @@ public record OportunidadesResponseDTO
             this
                     (
                             oportunidades.getId(),
-                            oportunidades.getClienteId(),
+                            oportunidades.getCliente() != null ? oportunidades.getCliente().getId() : null,
                             oportunidades.getTitulo(),
                             oportunidades.getDescricao(),
                             oportunidades.getValorEstimado(),
@@ -34,7 +31,7 @@ public record OportunidadesResponseDTO
                             oportunidades.getEstagio(),
                             oportunidades.getDataPrevistaFechamento(),
                             oportunidades.getMotivoPerda(),
-                            oportunidades.getResponsavelId(),
+                            oportunidades.getResponsavel() != null ? oportunidades.getResponsavel().getId() : null,
                             oportunidades.getCreatedAt()
                     );
         }

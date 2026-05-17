@@ -1,72 +1,123 @@
 package com.example.backend.sd.oportunidades;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.sd.clientes.Clientes;
+import com.example.backend.sd.clientes.ClientesRepository;
+import com.example.backend.sys.usuarios.Usuarios;
+import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("oportunidades")
+@RequestMapping("/sd/oportunidades")
 public class OportunidadesController {
 
-    @Autowired
-    private OportunidadesRepository repository;
+    private final OportunidadesRepository repository;
+    private final ClientesRepository clientesRepository;
+    private final UsuariosRepository usuariosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public OportunidadesController(
+            OportunidadesRepository repository,
+            ClientesRepository clientesRepository,
+            UsuariosRepository usuariosRepository
+    ) {
+        this.repository = repository;
+        this.clientesRepository = clientesRepository;
+        this.usuariosRepository = usuariosRepository;
+    }
+
     @GetMapping
-    public List<OportunidadesResponseDTO> getAll(){
-
-        List<OportunidadesResponseDTO> oportunidadesList = repository.findAll().stream().map(OportunidadesResponseDTO::new).toList();
-        return oportunidadesList;
+    public List<OportunidadesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(OportunidadesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Oportunidades> oportunidades = repository.findById(id);
-        if(oportunidades.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        OportunidadesResponseDTO oportunidadesDTO = new OportunidadesResponseDTO(oportunidades.get());
-        return  ResponseEntity.ok(oportunidadesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new OportunidadesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveOportunidades(@RequestBody OportunidadesRequestDTO data){
+    public ResponseEntity<?> saveOportunidades(@RequestBody OportunidadesRequestDTO data) {
+        try {
+            Clientes cliente = data.cliente() != null
+                    ? clientesRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
 
-        Oportunidades oportunidadesData = new Oportunidades(data);
-        repository.save(oportunidadesData);
-        return;
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
+
+            Oportunidades entity = new Oportunidades();
+            entity.setCliente(cliente);
+            entity.setTitulo(data.titulo());
+            entity.setDescricao(data.descricao());
+            entity.setValorEstimado(data.valorEstimado());
+            entity.setProbabilidade(data.probabilidade());
+            entity.setEstagio(data.estagio());
+            entity.setDataPrevistaFechamento(data.dataPrevistaFechamento());
+            entity.setMotivoPerda(data.motivoPerda());
+            entity.setResponsavel(responsavel);
+            entity.setCreatedAt(data.createdAt());
+
+            Oportunidades saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new OportunidadesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOportunidades(@PathVariable(value = "id") Integer id, @RequestBody OportunidadesRequestDTO upData){
+    public ResponseEntity<?> updateOportunidades(@PathVariable Integer id, @RequestBody OportunidadesRequestDTO data) {
+        try {
+            Oportunidades entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Oportunidade nao encontrada"));
 
-        Optional<Oportunidades> oportunidades = repository.findById(id);
-        if(oportunidades.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Clientes cliente = data.cliente() != null
+                    ? clientesRepository.findById(data.cliente())
+                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
+                    : null;
+
+            Usuarios responsavel = data.responsavel() != null
+                    ? usuariosRepository.findById(data.responsavel())
+                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
+                    : null;
+
+            entity.setCliente(cliente);
+            entity.setTitulo(data.titulo());
+            entity.setDescricao(data.descricao());
+            entity.setValorEstimado(data.valorEstimado());
+            entity.setProbabilidade(data.probabilidade());
+            entity.setEstagio(data.estagio());
+            entity.setDataPrevistaFechamento(data.dataPrevistaFechamento());
+            entity.setMotivoPerda(data.motivoPerda());
+            entity.setResponsavel(responsavel);
+            entity.setCreatedAt(data.createdAt());
+
+            Oportunidades updated = repository.save(entity);
+            return ResponseEntity.ok(new OportunidadesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Oportunidades oportunidadesModel = oportunidades.get();
-        BeanUtils.copyProperties(upData, oportunidadesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(oportunidadesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOportunidades(@PathVariable(value = "id") Integer id){
-
-        Optional<Oportunidades> oportunidades = repository.findById(id);
-        if(oportunidades.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(oportunidades.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Oportunidade deleted");
+    public ResponseEntity<?> deleteOportunidades(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Oportunidade deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

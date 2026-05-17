@@ -23,10 +23,10 @@ public class Oportunidades {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private Clientes clienteId;
+    private Clientes cliente;
     private String titulo;
     private String descricao;
-    @Column(name = "valor_estimado", precision = 10, scale = 2)
+    @Column(name = "valor_estimado", precision = 15, scale = 2)
     private BigDecimal valorEstimado;
     private Integer probabilidade;
     private String estagio;
@@ -36,21 +36,9 @@ public class Oportunidades {
     private String motivoPerda;
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
-    private Usuarios responsavelId;
+    private Usuarios responsavel;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Oportunidades(OportunidadesRequestDTO data) {
-        this.clienteId = data.clienteId();
-        this.titulo = data.titulo();
-        this.descricao = data.descricao();
-        this.valorEstimado = data.valorEstimado();
-        this.estagio = data.estagio();
-        this.probabilidade = data.probabilidade();
-        this.dataPrevistaFechamento = data.dataPrevistaFechamento();
-        this.motivoPerda = data.motivoPerda();
-        this.responsavelId = data.responsavelId();
-        this.createdAt = data.createdAt();
-    }
 }

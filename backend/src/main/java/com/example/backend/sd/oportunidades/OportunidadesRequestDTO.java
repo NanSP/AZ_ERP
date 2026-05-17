@@ -1,15 +1,12 @@
 package com.example.backend.sd.oportunidades;
 
-import com.example.backend.sys.usuarios.Usuarios;
-import com.example.backend.sd.clientes.Clientes;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record OportunidadesRequestDTO
         (
-                Clientes clienteId,
+                Integer cliente,
                 String titulo,
                 String descricao,
                 BigDecimal valorEstimado,
@@ -17,7 +14,7 @@ public record OportunidadesRequestDTO
                 String estagio,
                 LocalDate dataPrevistaFechamento,
                 String motivoPerda,
-                Usuarios responsavelId,
+                Integer responsavel,
                 LocalDateTime createdAt
         ) {
 }
