@@ -38,10 +38,10 @@ public class Parceiros {
     private Integer diasPrazo;
     private String observacoes;
 
-    @OneToMany(mappedBy = "fornecedorId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fornecedor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ContasPagar> contasAPagar = new ArrayList<>();
 
-    @OneToMany(mappedBy = "clienteId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ContasReceber> contasAReceber = new ArrayList<>();
 
     @Column(name = "created_at")
