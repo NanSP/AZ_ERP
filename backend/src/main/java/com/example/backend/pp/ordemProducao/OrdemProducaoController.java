@@ -1,72 +1,112 @@
 package com.example.backend.pp.ordemProducao;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.produtos.Produtos;
+import com.example.backend.core.produtos.ProdutosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/pp/ordemProducao")
 public class OrdemProducaoController {
 
-    @Autowired
-    private OrdemProducaoRepository repository;
+    private final OrdemProducaoRepository repository;
+    private final ProdutosRepository produtosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public OrdemProducaoController(
+            OrdemProducaoRepository repository,
+            ProdutosRepository produtosRepository
+    ) {
+        this.repository = repository;
+        this.produtosRepository = produtosRepository;
+    }
+
     @GetMapping
-    public List<OrdemProducaoResponseDTO> getAll(){
-
-        List<OrdemProducaoResponseDTO> ordemProducaoList = repository.findAll().stream().map(OrdemProducaoResponseDTO::new).toList();
-        return ordemProducaoList;
+    public List<OrdemProducaoResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(OrdemProducaoResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<OrdemProducao> ordemProducao = repository.findById(id);
-        if(ordemProducao.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        OrdemProducaoResponseDTO ordemProducaoDTO = new OrdemProducaoResponseDTO(ordemProducao.get());
-        return  ResponseEntity.ok(ordemProducaoDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new OrdemProducaoResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveOrdemProducao(@RequestBody OrdemProducaoRequestDTO data){
+    public ResponseEntity<?> saveOrdemProducao(@RequestBody OrdemProducaoRequestDTO data) {
+        try {
+            Produtos produto = data.produto() != null
+                    ? produtosRepository.findById(data.produto())
+                    .orElseThrow(() -> new RuntimeException("Produto nao encontrado"))
+                    : null;
 
-        OrdemProducao ordemProducaoData = new OrdemProducao(data);
-        repository.save(ordemProducaoData);
-        return;
+            OrdemProducao entity = new OrdemProducao();
+            entity.setNumeroOp(data.numeroOp());
+            entity.setProduto(produto);
+            entity.setQuantidadePlanejada(data.quantidadePlanejada());
+            entity.setQuantidadeProduzida(data.quantidadeProduzida());
+            entity.setDataEmissao(data.dataEmissao());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setDataPrevista(data.dataPrevista());
+            entity.setStatus(data.status());
+            entity.setPrioridade(data.prioridade());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            OrdemProducao saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new OrdemProducaoResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOrdemProducao(@PathVariable(value = "id") Integer id, @RequestBody OrdemProducaoRequestDTO upData){
+    public ResponseEntity<?> updateOrdemProducao(@PathVariable Integer id, @RequestBody OrdemProducaoRequestDTO data) {
+        try {
+            OrdemProducao entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Ordem de producao nao encontrada"));
 
-        Optional<OrdemProducao> ordemProducao = repository.findById(id);
-        if(ordemProducao.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Produtos produto = data.produto() != null
+                    ? produtosRepository.findById(data.produto())
+                    .orElseThrow(() -> new RuntimeException("Produto nao encontrado"))
+                    : null;
+
+            entity.setNumeroOp(data.numeroOp());
+            entity.setProduto(produto);
+            entity.setQuantidadePlanejada(data.quantidadePlanejada());
+            entity.setQuantidadeProduzida(data.quantidadeProduzida());
+            entity.setDataEmissao(data.dataEmissao());
+            entity.setDataInicio(data.dataInicio());
+            entity.setDataFim(data.dataFim());
+            entity.setDataPrevista(data.dataPrevista());
+            entity.setStatus(data.status());
+            entity.setPrioridade(data.prioridade());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            OrdemProducao updated = repository.save(entity);
+            return ResponseEntity.ok(new OrdemProducaoResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        OrdemProducao ordemProducaoModel = ordemProducao.get();
-        BeanUtils.copyProperties(upData, ordemProducaoModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(ordemProducaoModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrdemProducao(@PathVariable(value = "id") Integer id){
-
-        Optional<OrdemProducao> ordemProducao = repository.findById(id);
-        if(ordemProducao.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(ordemProducao.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Ordem Producao deleted");
+    public ResponseEntity<?> deleteOrdemProducao(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Ordem Producao deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

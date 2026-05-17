@@ -1,6 +1,5 @@
 package com.example.backend.pp.ordemProducao;
 
-import com.example.backend.core.produtos.Produtos;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,8 +8,8 @@ public record OrdemProducaoResponseDTO
         (
                 Integer id,
                 String numeroOp,
-                Produtos produtoId,
-                BigDecimal quantidaePlanejada,
+                Integer produto,
+                BigDecimal quantidadePlanejada,
                 BigDecimal quantidadeProduzida,
                 LocalDate dataEmissao,
                 LocalDate dataInicio,
@@ -26,7 +25,7 @@ public record OrdemProducaoResponseDTO
             this(
                     ordemProducao.getId(),
                     ordemProducao.getNumeroOp(),
-                    ordemProducao.getProdutoId(),
+                    ordemProducao.getProduto() != null ? ordemProducao.getProduto().getId() : null,
                     ordemProducao.getQuantidadePlanejada(),
                     ordemProducao.getQuantidadeProduzida(),
                     ordemProducao.getDataEmissao(),

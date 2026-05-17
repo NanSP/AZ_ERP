@@ -25,10 +25,10 @@ public class OrdemProducao {
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
-    private Produtos produtoId;
-    @Column(name = "quantidade_planejada",precision = 10, scale = 4)
+    private Produtos produto;
+    @Column(name = "quantidade_planejada",precision = 15, scale = 4)
     private BigDecimal quantidadePlanejada;
-    @Column(name = "quantidade_produzida",precision = 10, scale = 4)
+    @Column(name = "quantidade_produzida",precision = 15, scale = 4)
     private BigDecimal quantidadeProduzida;
     @Column(name = "data_emissao")
     private LocalDate dataEmissao;
@@ -45,18 +45,4 @@ public class OrdemProducao {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public OrdemProducao(OrdemProducaoRequestDTO data) {
-        this.numeroOp = data.numeroOp();
-        this.produtoId = data.produtoId();
-        this.quantidadePlanejada = data.quantidadePlanejada();
-        this.quantidadeProduzida = data.quantidadeProduzida();
-        this.dataInicio = data.dataInicio();
-        this.dataEmissao = data.dataEmissao();
-        this.dataFim = data.dataFim();
-        this.dataPrevista = data.dataPrevista();
-        this.status = data.status();
-        this.observacoes = data.observacoes();
-        this.prioridade = data.prioridade();
-        this.createdAt = data.createdAt();
-    }
 }
