@@ -8,7 +8,7 @@ import com.example.backend.rh.colaboradores.Colaboradores;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Table(name = "naoConformidade", schema = "qualidade")
+@Table(name = "nao_conformidades", schema = "qualidade")
 @Entity
 @Getter
 @Setter
@@ -22,7 +22,7 @@ public class NaoConformidade {
 
     @ManyToOne
     @JoinColumn(name = "inspecao_id")
-    private Inspecoes inspecaoId;
+    private Inspecoes inspecao;
     @Column(name = "tipo_nao_conformidade")
     private String tipoNaoConformidade;
     private String descricao;
@@ -34,7 +34,7 @@ public class NaoConformidade {
     private String acaoCorretiva;
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
-    private Colaboradores responsavelId;
+    private Colaboradores responsavel;
     @Column(name = "data_identificacao")
     private LocalDate dataIdentificacao;
     @Column(name = "data_resolucao")
@@ -44,17 +44,4 @@ public class NaoConformidade {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public NaoConformidade(NaoConformidadeRequestDTO data) {
-        this.inspecaoId = data.inspecaoId();
-        this.tipoNaoConformidade = data.tipoNaoConformidade();
-        this.descricao = data.descricao();
-        this.causaRaiz = data.causaRaiz();
-        this.acaoImediata = data.acaoImediata();
-        this.acaoCorretiva = data.acaoCorretiva();
-        this.responsavelId = data.responsavelId();
-        this.dataIdentificacao = data.dataIdentificacao();
-        this.dataResolucao = data.dataResolucao();
-        this.status = data.status();
-        this.createdAt = data.createdAt();
-    }
 }

@@ -1,20 +1,17 @@
 package com.example.backend.qm.naoConformidade;
 
-import com.example.backend.qm.inspecoes.Inspecoes;
-import com.example.backend.rh.colaboradores.Colaboradores;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record NaoConformidadeRequestDTO
         (
-                Inspecoes inspecaoId,
+                Integer inspecao,
                 String tipoNaoConformidade,
                 String descricao,
                 String causaRaiz,
                 String acaoImediata,
                 String acaoCorretiva,
-                Colaboradores responsavelId,
+                Integer responsavel,
                 LocalDate dataIdentificacao,
                 LocalDate dataResolucao,
                 String status,
