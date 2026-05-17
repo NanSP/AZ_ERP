@@ -21,35 +21,24 @@ public class Bom {
 
     @ManyToOne
     @JoinColumn(name = "produto_pai_id")
-    private Produtos produtoPaiId;
+    private Produtos produtoPai;
 
     @ManyToOne
     @JoinColumn(name = "componente_id")
-    private Produtos componenteId;
-    @Column(precision = 10, scale = 4)
+    private Produtos componente;
+    @Column(precision = 15, scale = 4)
     private BigDecimal quantidade;
     @Column(name = "unidade_medida")
     private String unidadeMedida;
     private Integer nivel;
-    @Column(name = "tempo_preparacao",precision = 10, scale = 4)
+    @Column(name = "tempo_preparacao",precision = 10, scale = 2)
     private BigDecimal tempoPreparacao;
-    @Column(name = "tempo_producao",precision = 10, scale = 4)
+    @Column(name = "tempo_producao",precision = 10, scale = 2)
     private BigDecimal tempoProducao;
     @Column(name = "roteiro_id")
-    private Integer roteiroId;
+    private Integer roteiro;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Bom(BomRequestDTO data) {
-        this.produtoPaiId = data.produtoPaiId();
-        this.componenteId = data.componenteId();
-        this.quantidade = data.quantidade();
-        this.unidadeMedida = data.unidadeMedida();
-        this.nivel = data.nivel();
-        this.tempoPreparacao = data.tempoPreparacao();
-        this.tempoProducao = data.tempoProducao();
-        this.roteiroId = data.roteiroId();
-        this.createdAt = data.createdAt();
-    }
 }

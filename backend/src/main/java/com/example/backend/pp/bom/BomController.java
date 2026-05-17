@@ -1,72 +1,116 @@
 package com.example.backend.pp.bom;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.core.produtos.Produtos;
+import com.example.backend.core.produtos.ProdutosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/pp/bom")
 public class BomController {
 
-    @Autowired
-    private BomRepository repository;
+    private final BomRepository repository;
+    private final ProdutosRepository produtosRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public BomController(
+            BomRepository repository,
+            ProdutosRepository produtosRepository
+    ) {
+        this.repository = repository;
+        this.produtosRepository = produtosRepository;
+    }
+
     @GetMapping
-    public List<BomResponseDTO> getAll(){
-
-        List<BomResponseDTO> bomList = repository.findAll().stream().map(BomResponseDTO::new).toList();
-        return bomList;
+    public List<BomResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(BomResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Bom> bom = repository.findById(id);
-        if(bom.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        BomResponseDTO bomDTO = new BomResponseDTO(bom.get());
-        return  ResponseEntity.ok(bomDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new BomResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveBom(@RequestBody BomRequestDTO data){
+    public ResponseEntity<?> saveBom(@RequestBody BomRequestDTO data) {
+        try {
+            Produtos produtoPai = data.produtoPai() != null
+                    ? produtosRepository.findById(data.produtoPai())
+                    .orElseThrow(() -> new RuntimeException("Produto pai nao encontrado"))
+                    : null;
 
-        Bom bomData = new Bom(data);
-        repository.save(bomData);
-        return;
+            Produtos componente = data.componente() != null
+                    ? produtosRepository.findById(data.componente())
+                    .orElseThrow(() -> new RuntimeException("Componente nao encontrado"))
+                    : null;
+
+            Bom entity = new Bom();
+            entity.setProdutoPai(produtoPai);
+            entity.setComponente(componente);
+            entity.setQuantidade(data.quantidade());
+            entity.setUnidadeMedida(data.unidadeMedida());
+            entity.setNivel(data.nivel());
+            entity.setTempoPreparacao(data.tempoPreparacao());
+            entity.setTempoProducao(data.tempoProducao());
+            entity.setRoteiro(data.roteiro());
+            entity.setCreatedAt(data.createdAt());
+
+            Bom saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new BomResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBom(@PathVariable(value = "id") Integer id, @RequestBody BomRequestDTO upData){
+    public ResponseEntity<?> updateBom(@PathVariable Integer id, @RequestBody BomRequestDTO data) {
+        try {
+            Bom entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("BOM nao encontrado"));
 
-        Optional<Bom> bom = repository.findById(id);
-        if(bom.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            Produtos produtoPai = data.produtoPai() != null
+                    ? produtosRepository.findById(data.produtoPai())
+                    .orElseThrow(() -> new RuntimeException("Produto pai nao encontrado"))
+                    : null;
+
+            Produtos componente = data.componente() != null
+                    ? produtosRepository.findById(data.componente())
+                    .orElseThrow(() -> new RuntimeException("Componente nao encontrado"))
+                    : null;
+
+            entity.setProdutoPai(produtoPai);
+            entity.setComponente(componente);
+            entity.setQuantidade(data.quantidade());
+            entity.setUnidadeMedida(data.unidadeMedida());
+            entity.setNivel(data.nivel());
+            entity.setTempoPreparacao(data.tempoPreparacao());
+            entity.setTempoProducao(data.tempoProducao());
+            entity.setRoteiro(data.roteiro());
+            entity.setCreatedAt(data.createdAt());
+
+            Bom updated = repository.save(entity);
+            return ResponseEntity.ok(new BomResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Bom bomModel = bom.get();
-        BeanUtils.copyProperties(upData, bomModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(bomModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBom(@PathVariable(value = "id") Integer id){
-
-        Optional<Bom> bom = repository.findById(id);
-        if(bom.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(bom.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("BOM deleted");
+    public ResponseEntity<?> deleteBom(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("BOM deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

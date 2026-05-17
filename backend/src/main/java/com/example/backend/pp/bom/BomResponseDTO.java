@@ -1,34 +1,33 @@
 package com.example.backend.pp.bom;
 
-import com.example.backend.core.produtos.Produtos;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record BomResponseDTO
         (
                 Integer id,
-                Produtos produtoPaiId,
-                Produtos componenteId,
+                Integer produtoPai,
+                Integer componente,
                 BigDecimal quantidade,
                 String unidadeMedida,
                 Integer nivel,
                 BigDecimal tempoPreparacao,
                 BigDecimal tempoProducao,
-                Integer roteiroId,
+                Integer roteiro,
                 LocalDateTime createdAt
         )
     {
         public BomResponseDTO(Bom bom) {
             this(
                     bom.getId(),
-                    bom.getProdutoPaiId(),
-                    bom.getComponenteId(),
+                    bom.getProdutoPai() != null ? bom.getProdutoPai().getId() : null,
+                    bom.getComponente() != null ? bom.getComponente().getId() : null,
                     bom.getQuantidade(),
                     bom.getUnidadeMedida(),
                     bom.getNivel(),
                     bom.getTempoPreparacao(),
                     bom.getTempoProducao(),
-                    bom.getRoteiroId(),
+                    bom.getRoteiro(),
                     bom.getCreatedAt()
             );
         }
