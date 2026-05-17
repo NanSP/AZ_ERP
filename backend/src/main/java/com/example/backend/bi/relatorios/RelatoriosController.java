@@ -1,73 +1,67 @@
 package com.example.backend.bi.relatorios;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/bi/relatorios")
 public class RelatoriosController {
 
-    @Autowired
-    private RelatoriosRepository repository;
+    private final RelatoriosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public RelatoriosController(RelatoriosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<RelatoriosResponseDTO> getAll(){
-
-        List<RelatoriosResponseDTO> relatoriosList = repository.findAll().stream().map(RelatoriosResponseDTO::new).toList();
-        return relatoriosList;
+    public List<RelatoriosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(RelatoriosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Relatorios> relatorios = repository.findById(id);
-        if(relatorios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        RelatoriosResponseDTO relatoriosDTO = new RelatoriosResponseDTO(relatorios.get());
-        return  ResponseEntity.ok(relatoriosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new RelatoriosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody RelatoriosRequestDTO data){
-
-        Relatorios relatoriosData = new Relatorios(data);
-        repository.save(relatoriosData);
-        return;
+    public ResponseEntity<?> saveRelatorios(@RequestBody RelatoriosRequestDTO data) {
+        Relatorios entity = new Relatorios(data);
+        Relatorios saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new RelatoriosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRelatorios(@PathVariable(value = "id") Integer id, @RequestBody RelatoriosRequestDTO upData){
+    public ResponseEntity<?> updateRelatorios(@PathVariable Integer id, @RequestBody RelatoriosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setNome(data.nome());
+                    entity.setDescricao(data.descricao());
+                    entity.setTipoRelatorio(data.tipoRelatorio());
+                    entity.setQuerySql(data.querySql());
+                    entity.setParametros(data.parametros());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Relatorios> relatorios = repository.findById(id);
-        if(relatorios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Relatorios relatoriosModel = relatorios.get();
-        BeanUtils.copyProperties(upData, relatoriosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(relatoriosModel));
+                    Relatorios updated = repository.save(entity);
+                    return ResponseEntity.ok(new RelatoriosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRelatorios(@PathVariable(value = "id") Integer id){
-
-        Optional<Relatorios> relatorios = repository.findById(id);
-        if(relatorios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(relatorios.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Relatorios deleted");
+    public ResponseEntity<?> deleteRelatorios(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Relatorio deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

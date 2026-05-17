@@ -1,73 +1,66 @@
 package com.example.backend.bi.dashboards;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/bi/dashboards")
 public class DashboardsController {
 
-    @Autowired
-    private DashboardsRepository repository;
+    private final DashboardsRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public DashboardsController(DashboardsRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<DashboardsResponseDTO> getAll(){
-
-        List<DashboardsResponseDTO> dashboardsList = repository.findAll().stream().map(DashboardsResponseDTO::new).toList();
-        return dashboardsList;
+    public List<DashboardsResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(DashboardsResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Dashboards> dashboards = repository.findById(id);
-        if(dashboards.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        DashboardsResponseDTO dashboardsDTO = new DashboardsResponseDTO(dashboards.get());
-        return  ResponseEntity.ok(dashboardsDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new DashboardsResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody DashboardsRequestDTO data){
-
-        Dashboards dashboardsData = new Dashboards(data);
-        repository.save(dashboardsData);
-        return;
+    public ResponseEntity<?> saveDashboards(@RequestBody DashboardsRequestDTO data) {
+        Dashboards entity = new Dashboards(data);
+        Dashboards saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new DashboardsResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDashboards(@PathVariable(value = "id") Integer id, @RequestBody DashboardsRequestDTO upData){
+    public ResponseEntity<?> updateDashboards(@PathVariable Integer id, @RequestBody DashboardsRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setNome(data.nome());
+                    entity.setDescricao(data.descricao());
+                    entity.setLayout(data.layout());
+                    entity.setConfiguracoes(data.configuracoes());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Dashboards> dashboards = repository.findById(id);
-        if(dashboards.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Dashboards dashboardsModel = dashboards.get();
-        BeanUtils.copyProperties(upData, dashboardsModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(dashboardsModel));
+                    Dashboards updated = repository.save(entity);
+                    return ResponseEntity.ok(new DashboardsResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDashboards(@PathVariable(value = "id") Integer id){
-
-        Optional<Dashboards> dashboards = repository.findById(id);
-        if(dashboards.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(dashboards.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Dashboards deleted");
+    public ResponseEntity<?> deleteDashboards(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Dashboard deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
