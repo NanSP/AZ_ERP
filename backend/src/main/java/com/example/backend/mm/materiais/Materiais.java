@@ -20,7 +20,7 @@ public class Materiais {
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
-    private Produtos produtoId;
+    private Produtos produto;
     @Column(name = "tipo_material")
     private String tipoMaterial;
     private String categoria;
@@ -36,16 +36,4 @@ public class Materiais {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Materiais(MateriaisRequestDTO data){
-        this.produtoId = data.produtoId();
-        this.tipoMaterial = data.tipoMaterial();
-        this.subcategoria = data.subcategoria();
-        this.categoria = data.categoria();
-        this.marca = data.marca();
-        this.modelo = data.modelo();
-        this.especificacoesTecnicas = data.especificacoesTecnicas();
-        this.condicaoArmazenamento = data.condicaoArmazenamento();
-        this.classePerigo = data.classePerigo();
-        this.createdAt = data.createdAt();
-    }
 }

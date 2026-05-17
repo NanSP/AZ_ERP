@@ -1,13 +1,11 @@
 package com.example.backend.mm.materiais;
 
-import com.example.backend.core.produtos.Produtos;
-
 import java.time.LocalDateTime;
 
 public record MateriaisResponseDTO
         (
                 Integer id,
-                Produtos produtoId,
+                Integer produto,
                 String tipoMaterial,
                 String categoria,
                 String subcategoria,
@@ -23,7 +21,7 @@ public record MateriaisResponseDTO
             this
                     (
                             materiais.getId(),
-                            materiais.getProdutoId(),
+                            materiais.getProduto() != null ? materiais.getProduto().getId() : null,
                             materiais.getTipoMaterial(),
                             materiais.getCategoria(),
                             materiais.getSubcategoria(),
