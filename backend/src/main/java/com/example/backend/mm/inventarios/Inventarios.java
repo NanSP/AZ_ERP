@@ -29,12 +29,4 @@ public class Inventarios {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Inventarios(InventariosRequestDTO data) {
-        this.dataInicio = data.dataInicio();
-        this.tipoInventario = data.tipoInventario();
-        this.dataFim = data.dataFim();
-        this.status = data.status();
-        this.observacoes = data.observacoes();
-        this.createdAt = data.createdAt();
-    }
 }

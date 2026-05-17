@@ -1,72 +1,74 @@
 package com.example.backend.mm.inventarios;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/mm/inventarios")
 public class InventariosController {
 
-    @Autowired
-    private InventariosRepository repository;
+    private final InventariosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public InventariosController(InventariosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<InventariosResponseDTO> getAll(){
-
-        List<InventariosResponseDTO> inventariosList = repository.findAll().stream().map(InventariosResponseDTO::new).toList();
-        return inventariosList;
+    public List<InventariosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(InventariosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Inventarios> inventarios = repository.findById(id);
-        if(inventarios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        InventariosResponseDTO inventariosDTO = new InventariosResponseDTO(inventarios.get());
-        return  ResponseEntity.ok(inventariosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new InventariosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveInventarios(@RequestBody InventariosRequestDTO data){
+    public ResponseEntity<?> saveInventarios(@RequestBody InventariosRequestDTO data) {
+        Inventarios entity = new Inventarios();
+        entity.setDataInicio(data.dataInicio());
+        entity.setDataFim(data.dataFim());
+        entity.setTipoInventario(data.tipoInventario());
+        entity.setStatus(data.status());
+        entity.setObservacoes(data.observacoes());
+        entity.setCreatedAt(data.createdAt());
 
-        Inventarios inventariosData = new Inventarios(data);
-        repository.save(inventariosData);
-        return;
+        Inventarios saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new InventariosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateInventarios(@PathVariable(value = "id") Integer id, @RequestBody InventariosRequestDTO upData){
+    public ResponseEntity<?> updateInventarios(@PathVariable Integer id, @RequestBody InventariosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setDataInicio(data.dataInicio());
+                    entity.setDataFim(data.dataFim());
+                    entity.setTipoInventario(data.tipoInventario());
+                    entity.setStatus(data.status());
+                    entity.setObservacoes(data.observacoes());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Inventarios> inventarios = repository.findById(id);
-        if(inventarios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Inventarios inventariosModel = inventarios.get();
-        BeanUtils.copyProperties(upData, inventariosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(inventariosModel));
+                    Inventarios updated = repository.save(entity);
+                    return ResponseEntity.ok(new InventariosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteInventarios(@PathVariable(value = "id") Integer id){
-
-        Optional<Inventarios> inventarios = repository.findById(id);
-        if(inventarios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(inventarios.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Inventarios deleted");
+    public ResponseEntity<?> deleteInventarios(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Inventario deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
