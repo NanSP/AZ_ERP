@@ -1,11 +1,12 @@
 package com.example.backend.fiscal.edcRegistros;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public record EdcRegistrosRequestDTO
+public record EcdRegistrosRequestDTO
         (
-                LocalDateTime periodo,
+                LocalDate periodo,
                 String registro,
                 Map<String, Object> conteudo,
                 LocalDateTime createdAt

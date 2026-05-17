@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -15,13 +16,13 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class EdcRegistros {
+public class EcdRegistros {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    private LocalDateTime periodo;
+    private LocalDate periodo;
     private String registro;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "conteudo",columnDefinition = "jsonb")
@@ -30,10 +31,4 @@ public class EdcRegistros {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public EdcRegistros(EdcRegistrosRequestDTO data) {
-        this.periodo = data.periodo();
-        this.registro = data.registro();
-        this.conteudo = data.conteudo();
-        this.createdAt = data.createdAt();
-    }
 }
