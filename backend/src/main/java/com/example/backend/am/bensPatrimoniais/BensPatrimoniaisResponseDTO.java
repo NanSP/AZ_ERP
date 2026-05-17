@@ -1,7 +1,5 @@
 package com.example.backend.am.bensPatrimoniais;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.rh.colaboradores.Colaboradores;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,8 +18,8 @@ public record BensPatrimoniaisResponseDTO
                 Integer vidaUtilAnos,
                 BigDecimal taxaDepreciacao,
                 LocalDate dataDepreciacao,
-                Parceiros fornecedorId,
-                Colaboradores responsavelId,
+                Integer fornecedor,
+                Integer responsavel,
                 String status,
                 LocalDateTime createdAt
         ) {
@@ -40,8 +38,8 @@ public record BensPatrimoniaisResponseDTO
                         bensPatrimoniais.getVidaUtilAnos(),
                         bensPatrimoniais.getTaxaDepreciacao(),
                         bensPatrimoniais.getDataDepreciacao(),
-                        bensPatrimoniais.getFornecedorId(),
-                        bensPatrimoniais.getResponsavelId(),
+                        bensPatrimoniais.getFornecedor() != null ? bensPatrimoniais.getFornecedor().getId() : null,
+                        bensPatrimoniais.getResponsavel() != null ? bensPatrimoniais.getResponsavel().getId() : null,
                         bensPatrimoniais.getStatus(),
                         bensPatrimoniais.getCreatedAt()
                 );

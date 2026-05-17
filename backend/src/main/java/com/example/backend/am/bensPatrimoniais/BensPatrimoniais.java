@@ -31,45 +31,28 @@ public class BensPatrimoniais {
     private String localizacao;
     @Column(name = "data_aquisicao")
     private LocalDate dataAquisicao;
-    @Column(name = "valor_aquisicao", precision = 10, scale = 2)
+    @Column(name = "valor_aquisicao", precision = 15, scale = 2)
     private BigDecimal valorAquisicao;
-    @Column(name = "valor_atual", precision = 10, scale = 2)
+    @Column(name = "valor_atual", precision = 15, scale = 2)
     private BigDecimal valorAtual;
     @Column(name = "vida_util_anos")
     private Integer vidaUtilAnos;
-    @Column(name = "taxa_depreciacao", precision = 10, scale = 2)
+    @Column(name = "taxa_depreciacao", precision = 5, scale = 2)
     private BigDecimal taxaDepreciacao;
     @Column(name = "data_depreciacao")
     private LocalDate dataDepreciacao;
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id")
-    private Parceiros fornecedorId;
+    private Parceiros fornecedor;
 
     @ManyToOne
     @JoinColumn(name = "responsavel_id")
-    private Colaboradores responsavelId;
+    private Colaboradores responsavel;
 
     private String status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public BensPatrimoniais(BensPatrimoniaisRequestDTO data) {
-        this.codigoPatrimonio = data.codigoPatrimonio();
-        this.nome = data.nome();
-        this.tipoAtivo = data.tipoAtivo();
-        this.descricao = data.descricao();
-        this.localizacao = data.localizacao();
-        this.dataAquisicao = data.dataAquisicao();
-        this.valorAquisicao = data.valorAquisicao();
-        this.valorAtual = data.valorAtual();
-        this.vidaUtilAnos = data.vidaUtilAnos();
-        this.taxaDepreciacao = data.taxaDepreciacao();
-        this.dataDepreciacao = data.dataDepreciacao();
-        this.fornecedorId = data.fornecedorId();
-        this.responsavelId = data.responsavelId();
-        this.status = data.status();
-        this.createdAt = data.createdAt();
-    }
 }
