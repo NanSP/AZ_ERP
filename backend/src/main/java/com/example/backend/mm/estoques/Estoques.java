@@ -27,42 +27,29 @@ public class Estoques {
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
-    private Produtos produtoId;
+    private Produtos produto;
 
     @ManyToOne
     @JoinColumn(name = "empresa_id")
-    private Empresas empresaId;
+    private Empresas empresa;
 
     private String localizacao;
     private String lote;
-    @Column(precision = 10, scale = 4)
+    @Column(precision = 15, scale = 4)
     private BigDecimal quantidade;
-    @Column(name = "quantidade_minima", precision = 10, scale = 4)
+    @Column(name = "quantidade_minima", precision = 15, scale = 4)
     private BigDecimal quantidadeMinima;
-    @Column(name = "quantidade_maxima", precision = 10, scale = 4)
+    @Column(name = "quantidade_maxima", precision = 15, scale = 4)
     private BigDecimal quantidadeMaxima;
-    @Column(name = "valor_unitario", precision = 10, scale = 4)
+    @Column(name = "valor_unitario", precision = 15, scale = 4)
     private BigDecimal valorUnitario;
     @Column(name = "data_validade")
     private LocalDate dataValidade;
 
-    @OneToMany(mappedBy = "estoqueId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "estoque", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Movimentacoes> movimentacoes = new ArrayList<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Estoques(EstoquesRequestDTO data) {
-        this.produtoId = data.produtoId();
-        this.empresaId = data.empresaId();
-        this.localizacao = data.localizacao();
-        this.lote = data.lote();
-        this.quantidade = data.quantidade();
-        this.quantidadeMinima = data.quantidadeMinima();
-        this.quantidadeMaxima = data.quantidadeMaxima();
-        this.valorUnitario = data.valorUnitario();
-        this.dataValidade = data.dataValidade();
-        this.movimentacoes = data.movimentacoes();
-        this.createdAt = data.createdAt();
-    }
 }

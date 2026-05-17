@@ -1,19 +1,14 @@
 package com.example.backend.mm.estoques;
 
-import com.example.backend.core.empresas.Empresas;
-import com.example.backend.core.produtos.Produtos;
-import com.example.backend.mm.movimentacoes.Movimentacoes;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record EstoquesResponseDTO
         (
                 Integer id,
-                Produtos produtoId,
-                Empresas empresaId,
+                Integer produto,
+                Integer empresa,
                 String localizacao,
                 String lote,
                 BigDecimal quantidade,
@@ -21,7 +16,6 @@ public record EstoquesResponseDTO
                 BigDecimal quantidadeMaxima,
                 BigDecimal valorUnitario,
                 LocalDate dataValidade,
-                List<Movimentacoes> movimentacoes,
                 LocalDateTime createdAt
         )
     {
@@ -29,8 +23,8 @@ public record EstoquesResponseDTO
             this
                     (
                             estoques.getId(),
-                            estoques.getProdutoId(),
-                            estoques.getEmpresaId(),
+                            estoques.getProduto() != null ? estoques.getProduto().getId() : null,
+                            estoques.getEmpresa() != null ? estoques.getEmpresa().getId() : null,
                             estoques.getLocalizacao(),
                             estoques.getLote(),
                             estoques.getQuantidade(),
@@ -38,7 +32,6 @@ public record EstoquesResponseDTO
                             estoques.getQuantidadeMaxima(),
                             estoques.getValorUnitario(),
                             estoques.getDataValidade(),
-                            estoques.getMovimentacoes(),
                             estoques.getCreatedAt()
                     );
         }
