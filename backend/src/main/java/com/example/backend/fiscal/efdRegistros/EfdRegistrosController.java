@@ -1,73 +1,70 @@
 package com.example.backend.fiscal.efdRegistros;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/fiscal/efdRegistros")
 public class EfdRegistrosController {
 
-    @Autowired
-    private EfdRegistrosRepository repository;
+    private final EfdRegistrosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public EfdRegistrosController(EfdRegistrosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<EfdRegistrosResponseDTO> getAll(){
-
-        List<EfdRegistrosResponseDTO> efdRegistrosList = repository.findAll().stream().map(EfdRegistrosResponseDTO::new).toList();
-        return efdRegistrosList;
+    public List<EfdRegistrosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(EfdRegistrosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<EfdRegistros> efdRegistros = repository.findById(id);
-        if(efdRegistros.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        EfdRegistrosResponseDTO efdRegistrosDTO = new EfdRegistrosResponseDTO(efdRegistros.get());
-        return  ResponseEntity.ok(efdRegistrosDTO);
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EfdRegistrosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody EfdRegistrosRequestDTO data){
+    public ResponseEntity<?> saveEfdRegistros(@RequestBody EfdRegistrosRequestDTO data) {
+        EfdRegistros entity = new EfdRegistros();
+        entity.setPeriodo(data.periodo());
+        entity.setRegistro(data.registro());
+        entity.setConteudo(data.conteudo());
+        entity.setCreatedAt(data.createdAt());
 
-        EfdRegistros efdRegistrosData = new EfdRegistros(data);
-        repository.save(efdRegistrosData);
-        return;
+        EfdRegistros saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new EfdRegistrosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEfdRegistros(@PathVariable(value = "id") Integer id, @RequestBody EfdRegistrosRequestDTO upData){
+    public ResponseEntity<?> updateEfdRegistros(@PathVariable Long id, @RequestBody EfdRegistrosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setPeriodo(data.periodo());
+                    entity.setRegistro(data.registro());
+                    entity.setConteudo(data.conteudo());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<EfdRegistros> efdRegistros = repository.findById(id);
-        if(efdRegistros.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        EfdRegistros efdRegistrosModel = efdRegistros.get();
-        BeanUtils.copyProperties(upData, efdRegistrosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(efdRegistrosModel));
+                    EfdRegistros updated = repository.save(entity);
+                    return ResponseEntity.ok(new EfdRegistrosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEfdRegistros(@PathVariable(value = "id") Integer id){
-
-        Optional<EfdRegistros> efdRegistros = repository.findById(id);
-        if(efdRegistros.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(efdRegistros.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("EfdRegistros deleted");
+    public ResponseEntity<?> deleteEfdRegistros(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("EFD registro deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

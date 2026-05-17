@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -18,9 +19,9 @@ import java.util.Map;
 public class EfdRegistros {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    private LocalDateTime periodo;
+    private LocalDate periodo;
     private String registro;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "conteudo",columnDefinition = "jsonb")
@@ -29,10 +30,4 @@ public class EfdRegistros {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public EfdRegistros(EfdRegistrosRequestDTO data) {
-        this.periodo = data.periodo();
-        this.registro = data.registro();
-        this.conteudo = data.conteudo();
-        this.createdAt = data.createdAt();
-    }
 }
