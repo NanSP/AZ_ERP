@@ -24,7 +24,7 @@ public class Projetos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(mappedBy = "projetoId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarefas> tarefas = new ArrayList<>();
 
     private String codigo;
@@ -33,11 +33,11 @@ public class Projetos {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private Parceiros clienteId;
+    private Parceiros cliente;
 
     @ManyToOne
     @JoinColumn(name = "gerente_id")
-    private Usuarios gerenteId;
+    private Usuarios gerente;
 
     @Column(name = "data_inicio")
     private LocalDate dataInicio;
@@ -48,31 +48,13 @@ public class Projetos {
     private LocalDate dataPrevistaInicio;
     @Column(name = "data_prevista_fim")
     private LocalDate dataPrevistaFim;
-    @Column(name = "orcamento_total", precision = 10, scale = 2)
+    @Column(name = "orcamento_total", precision = 15, scale = 2)
     private BigDecimal orcamentoTotal;
-    @Column(name = "orcamento_gasto", precision = 10, scale = 2)
+    @Column(name = "orcamento_gasto", precision = 15, scale = 2)
     private BigDecimal orcamentoGasto;
     private String status;
     private Integer prioridade;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Projetos(ProjetosRequestDTO data) {
-        this.tarefas = data.tarefas();
-        this.codigo = data.codigo();
-        this.nome = data.nome();
-        this.descricao = data.descricao();
-        this.clienteId = data.clienteId();
-        this.gerenteId = data.gerenteId();
-        this.dataInicio = data.dataInicio();
-        this.dataFim = data.dataFim();
-        this.dataPrevistaInicio = data.dataPrevistaInicio();
-        this.dataPrevistaFim = data.dataPrevistaFim();
-        this.orcamentoTotal = data.orcamentoTotal();
-        this.orcamentoGasto = data.orcamentoGasto();
-        this.status = data.status();
-        this.prioridade = data.prioridade();
-        this.createdAt = data.createdAt();
-    }
 }
