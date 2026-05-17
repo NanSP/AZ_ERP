@@ -25,11 +25,11 @@ public class Atendimentos {
 
     @ManyToOne
     @JoinColumn(name = "os_id")
-    private OrdensServico osId;
+    private OrdensServico os;
 
     @ManyToOne
     @JoinColumn(name = "tecnico_id")
-    private Colaboradores tecnicoId;
+    private Colaboradores tecnico;
     @Column(name = "data_hora")
     private LocalDateTime dataHora;
     private String descricao;
@@ -43,13 +43,4 @@ public class Atendimentos {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public Atendimentos(AtendimentosRequestDTO data) {
-        this.osId = data.osId();
-        this.tecnicoId = data.tecnicoId();
-        this.dataHora = data.dataHora();
-        this.descricao = data.descricao();
-        this.horasGastas = data.horasGastas();
-        this.materiaisUtilizados = data.materiaisUtilizados();
-        this.createdAt = data.createdAt();
-    }
 }
