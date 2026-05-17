@@ -1,25 +1,22 @@
 package com.example.backend.sm.ordensServico;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.core.produtos.Produtos;
-import com.example.backend.rh.colaboradores.Colaboradores;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record OrdensServicoResponseDTO
         (
                 Integer id,
                 String numeroOs,
-                Parceiros clienteId,
-                Produtos produtoId,
+                Integer cliente,
+                Integer produto,
                 String tipoServico,
                 String descricaoProblema,
                 String prioridade,
                 LocalDateTime dataAbertura,
-                LocalDateTime dataAgendamento,
+                LocalDate dataAgendamento,
                 LocalDateTime dataInicio,
                 LocalDateTime dataFim,
-                Colaboradores tecnicoId,
+                Integer tecnico,
                 String status,
                 LocalDateTime createdAt
         ) {
@@ -28,8 +25,8 @@ public record OrdensServicoResponseDTO
                 (
                         ordensServico.getId(),
                         ordensServico.getNumeroOs(),
-                        ordensServico.getClienteId(),
-                        ordensServico.getProdutoId(),
+                        ordensServico.getCliente() != null ? ordensServico.getCliente().getId() : null,
+                        ordensServico.getProduto() != null ? ordensServico.getProduto().getId() : null,
                         ordensServico.getTipoServico(),
                         ordensServico.getDescricaoProblema(),
                         ordensServico.getPrioridade(),
@@ -37,7 +34,7 @@ public record OrdensServicoResponseDTO
                         ordensServico.getDataAgendamento(),
                         ordensServico.getDataInicio(),
                         ordensServico.getDataFim(),
-                        ordensServico.getTecnicoId(),
+                        ordensServico.getTecnico() != null ? ordensServico.getTecnico().getId() : null,
                         ordensServico.getStatus(),
                         ordensServico.getCreatedAt()
                 );

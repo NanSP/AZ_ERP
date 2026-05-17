@@ -1,72 +1,66 @@
 package com.example.backend.sm.slaConfig;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("slaConfig")
+@RequestMapping("/sm/slaConfig")
 public class SlaConfigController {
 
-    @Autowired
-    private SlaConfigRepository repository;
+    private final SlaConfigRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public SlaConfigController(SlaConfigRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<SlaConfigResponseDTO> getAll(){
-
-        List<SlaConfigResponseDTO> slaConfigList = repository.findAll().stream().map(SlaConfigResponseDTO::new).toList();
-        return slaConfigList;
+    public List<SlaConfigResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(SlaConfigResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<SlaConfig> slaConfig = repository.findById(id);
-        if(slaConfig.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        SlaConfigResponseDTO slaConfigDTO = new SlaConfigResponseDTO(slaConfig.get());
-        return  ResponseEntity.ok(slaConfigDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new SlaConfigResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveSlaConfig(@RequestBody SlaConfigRequestDTO data){
-
-        SlaConfig slaConfigData = new SlaConfig(data);
-        repository.save(slaConfigData);
-        return;
+    public ResponseEntity<?> saveSlaConfig(@RequestBody SlaConfigRequestDTO data) {
+        SlaConfig entity = new SlaConfig(data);
+        SlaConfig saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new SlaConfigResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSlaConfig(@PathVariable(value = "id") Integer id, @RequestBody SlaConfigRequestDTO upData){
+    public ResponseEntity<?> updateSlaConfig(@PathVariable Integer id, @RequestBody SlaConfigRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setTipoServico(data.tipoServico());
+                    entity.setPrioridade(data.prioridade());
+                    entity.setTempoAtendimentoHoras(data.tempoAtendimentoHoras());
+                    entity.setTempoResolucaoHoras(data.tempoResolucaoHoras());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<SlaConfig> slaConfig = repository.findById(id);
-        if(slaConfig.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        SlaConfig slaConfigModel = slaConfig.get();
-        BeanUtils.copyProperties(upData, slaConfigModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(slaConfigModel));
+                    SlaConfig updated = repository.save(entity);
+                    return ResponseEntity.ok(new SlaConfigResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSlaConfig(@PathVariable(value = "id") Integer id){
-
-        Optional<SlaConfig> slaConfig = repository.findById(id);
-        if(slaConfig.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(slaConfig.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("SlaConfig deleted");
+    public ResponseEntity<?> deleteSlaConfig(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("SLA config deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import com.example.backend.rh.colaboradores.Colaboradores;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table(name = "ordens_servico", schema = "servicos")
@@ -25,11 +26,11 @@ public class OrdensServico {
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    private Parceiros clienteId;
+    private Parceiros cliente;
 
     @ManyToOne
     @JoinColumn(name = "produto_id")
-    private Produtos produtoId;
+    private Produtos produto;
 
     @Column(name = "tipo_servico")
     private String tipoServico;
@@ -39,7 +40,7 @@ public class OrdensServico {
     @Column(name = "data_abertura")
     private LocalDateTime dataAbertura;
     @Column(name = "data_agendamento")
-    private LocalDateTime dataAgendamento;
+    private LocalDate dataAgendamento;
     @Column(name = "data_inicio")
     private LocalDateTime dataInicio;
     @Column(name = "data_fim")
@@ -47,25 +48,9 @@ public class OrdensServico {
 
     @ManyToOne
     @JoinColumn(name = "tecnico_id")
-    private Colaboradores tecnicoId;
+    private Colaboradores tecnico;
     private String status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public OrdensServico(OrdensServicoRequestDTO data) {
-        this.numeroOs = data.numeroOs();
-        this.clienteId = data.clienteId();
-        this.tipoServico = data.tipoServico();
-        this.produtoId = data.produtoId();
-        this.descricaoProblema = data.descricaoProblema();
-        this.prioridade = data.prioridade();
-        this.dataAgendamento = data.dataAgendamento();
-        this.dataAbertura = data.dataAbertura();
-        this.dataInicio = data.dataInicio();
-        this.dataFim = data.dataFim();
-        this.tecnicoId = data.tecnicoId();
-        this.status = data.status();
-        this.createdAt = data.createdAt();
-    }
 }
