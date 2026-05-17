@@ -22,7 +22,7 @@ public class Consentimentos {
     private Integer id;
 
     @Column(name = "titular_id")
-    private Integer titularId;
+    private Integer titular;
     @Column(name = "tipo_titular")
     private String tipoTitular;
     private String finalidade;
@@ -37,13 +37,4 @@ public class Consentimentos {
     @Column(name = "user_agent")
     private String userAgent;
 
-    public Consentimentos(ConsentimentosRequestDTO data) {
-        this.titularId = data.titularId();
-        this.tipoTitular = data.tipoTitular();
-        this.finalidade = data.finalidade();
-        this.dataConsentimento = data.dataConsentimento();
-        this.dataRevogacao = data.dataRevogacao();
-        this.ipAddress = data.ipAddress();
-        this.userAgent = data.userAgent();
-    }
 }

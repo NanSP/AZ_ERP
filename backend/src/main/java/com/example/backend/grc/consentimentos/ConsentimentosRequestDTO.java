@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public record ConsentimentosRequestDTO
         (
-                Integer titularId,
+                Integer titular,
                 String tipoTitular,
                 String finalidade,
                 LocalDateTime dataConsentimento,

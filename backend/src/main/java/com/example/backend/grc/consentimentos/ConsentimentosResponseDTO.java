@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public record ConsentimentosResponseDTO
         (
                 Integer id,
-                Integer titularId,
+                Integer titular,
                 String tipoTitular,
                 String finalidade,
                 LocalDateTime dataConsentimento,
@@ -18,7 +18,7 @@ public record ConsentimentosResponseDTO
         this
                 (
                         consentimentos.getId(),
-                        consentimentos.getTitularId(),
+                        consentimentos.getTitular(),
                         consentimentos.getTipoTitular(),
                         consentimentos.getFinalidade(),
                         consentimentos.getDataConsentimento(),

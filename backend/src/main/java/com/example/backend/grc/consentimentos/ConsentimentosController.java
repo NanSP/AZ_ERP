@@ -1,73 +1,76 @@
 package com.example.backend.grc.consentimentos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/grc/consentimentos")
 public class ConsentimentosController {
 
-    @Autowired
-    private ConsentimentosRepository repository;
+    private final ConsentimentosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ConsentimentosController(ConsentimentosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<ConsentimentosResponseDTO> getAll(){
-
-        List<ConsentimentosResponseDTO> consentimentosList = repository.findAll().stream().map(ConsentimentosResponseDTO::new).toList();
-        return consentimentosList;
+    public List<ConsentimentosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ConsentimentosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Consentimentos> consentimentos = repository.findById(id);
-        if(consentimentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ConsentimentosResponseDTO consentimentosDTO = new ConsentimentosResponseDTO(consentimentos.get());
-        return  ResponseEntity.ok(consentimentosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ConsentimentosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody ConsentimentosRequestDTO data){
+    public ResponseEntity<?> saveConsentimentos(@RequestBody ConsentimentosRequestDTO data) {
+        Consentimentos entity = new Consentimentos();
+        entity.setTitular(data.titular());
+        entity.setTipoTitular(data.tipoTitular());
+        entity.setFinalidade(data.finalidade());
+        entity.setDataConsentimento(data.dataConsentimento());
+        entity.setDataRevogacao(data.dataRevogacao());
+        entity.setIpAddress(data.ipAddress());
+        entity.setUserAgent(data.userAgent());
 
-        Consentimentos consentimentosData = new Consentimentos(data);
-        repository.save(consentimentosData);
-        return;
+        Consentimentos saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ConsentimentosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateConsentimentos(@PathVariable(value = "id") Integer id, @RequestBody ConsentimentosRequestDTO upData){
+    public ResponseEntity<?> updateConsentimentos(@PathVariable Integer id, @RequestBody ConsentimentosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setTitular(data.titular());
+                    entity.setTipoTitular(data.tipoTitular());
+                    entity.setFinalidade(data.finalidade());
+                    entity.setDataConsentimento(data.dataConsentimento());
+                    entity.setDataRevogacao(data.dataRevogacao());
+                    entity.setIpAddress(data.ipAddress());
+                    entity.setUserAgent(data.userAgent());
 
-        Optional<Consentimentos> consentimentos = repository.findById(id);
-        if(consentimentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Consentimentos consentimentosModel = consentimentos.get();
-        BeanUtils.copyProperties(upData, consentimentosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(consentimentosModel));
+                    Consentimentos updated = repository.save(entity);
+                    return ResponseEntity.ok(new ConsentimentosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteConsentimentos(@PathVariable(value = "id") Integer id){
-
-        Optional<Consentimentos> consentimentos = repository.findById(id);
-        if(consentimentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(consentimentos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Consentimentos deleted");
+    public ResponseEntity<?> deleteConsentimentos(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Consentimento deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
