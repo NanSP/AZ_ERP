@@ -1,72 +1,123 @@
 package com.example.backend.pp.apontamentos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.pp.ordemProducao.OrdemProducao;
+import com.example.backend.pp.ordemProducao.OrdemProducaoRepository;
+import com.example.backend.rh.colaboradores.Colaboradores;
+import com.example.backend.rh.colaboradores.ColaboradoresRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/pp/apontamentos")
 public class ApontamentosController {
 
-    @Autowired
-    private ApontamentosRepository repository;
+    private final ApontamentosRepository repository;
+    private final OrdemProducaoRepository ordemProducaoRepository;
+    private final ColaboradoresRepository colaboradoresRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ApontamentosController(
+            ApontamentosRepository repository,
+            OrdemProducaoRepository ordemProducaoRepository,
+            ColaboradoresRepository colaboradoresRepository
+    ) {
+        this.repository = repository;
+        this.ordemProducaoRepository = ordemProducaoRepository;
+        this.colaboradoresRepository = colaboradoresRepository;
+    }
+
     @GetMapping
-    public List<ApontamentosResponseDTO> getAll(){
-
-        List<ApontamentosResponseDTO> apontamentosList = repository.findAll().stream().map(ApontamentosResponseDTO::new).toList();
-        return apontamentosList;
+    public List<ApontamentosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ApontamentosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Apontamentos> apontamentos = repository.findById(id);
-        if(apontamentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ApontamentosResponseDTO apontamentosDTO = new ApontamentosResponseDTO(apontamentos.get());
-        return  ResponseEntity.ok(apontamentosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ApontamentosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveApontamentos(@RequestBody ApontamentosRequestDTO data){
+    public ResponseEntity<?> saveApontamentos(@RequestBody ApontamentosRequestDTO data) {
+        try {
+            OrdemProducao op = data.op() != null
+                    ? ordemProducaoRepository.findById(data.op())
+                    .orElseThrow(() -> new RuntimeException("Ordem de producao nao encontrada"))
+                    : null;
 
-        Apontamentos apontamentosData = new Apontamentos(data);
-        repository.save(apontamentosData);
-        return;
+            Colaboradores operador = data.operador() != null
+                    ? colaboradoresRepository.findById(data.operador())
+                    .orElseThrow(() -> new RuntimeException("Operador nao encontrado"))
+                    : null;
+
+            Apontamentos entity = new Apontamentos();
+            entity.setOp(op);
+            entity.setMaquinaId(data.maquinaId());
+            entity.setOperador(operador);
+            entity.setDataHoraInicio(data.dataHoraInicio());
+            entity.setDataHoraFim(data.dataHoraFim());
+            entity.setQuantidadeProduzida(data.quantidadeProduzida());
+            entity.setQuantidadeRefugo(data.quantidadeRefugo());
+            entity.setTempoParado(data.tempoParado());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            Apontamentos saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ApontamentosResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateApontamentos(@PathVariable(value = "id") Integer id, @RequestBody ApontamentosRequestDTO upData){
+    public ResponseEntity<?> updateApontamentos(@PathVariable Integer id, @RequestBody ApontamentosRequestDTO data) {
+        try {
+            Apontamentos entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Apontamento nao encontrado"));
 
-        Optional<Apontamentos> apontamentos = repository.findById(id);
-        if(apontamentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            OrdemProducao op = data.op() != null
+                    ? ordemProducaoRepository.findById(data.op())
+                    .orElseThrow(() -> new RuntimeException("Ordem de producao nao encontrada"))
+                    : null;
+
+            Colaboradores operador = data.operador() != null
+                    ? colaboradoresRepository.findById(data.operador())
+                    .orElseThrow(() -> new RuntimeException("Operador nao encontrado"))
+                    : null;
+
+            entity.setOp(op);
+            entity.setMaquinaId(data.maquinaId());
+            entity.setOperador(operador);
+            entity.setDataHoraInicio(data.dataHoraInicio());
+            entity.setDataHoraFim(data.dataHoraFim());
+            entity.setQuantidadeProduzida(data.quantidadeProduzida());
+            entity.setQuantidadeRefugo(data.quantidadeRefugo());
+            entity.setTempoParado(data.tempoParado());
+            entity.setObservacoes(data.observacoes());
+            entity.setCreatedAt(data.createdAt());
+
+            Apontamentos updated = repository.save(entity);
+            return ResponseEntity.ok(new ApontamentosResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Apontamentos apontamentosModel = apontamentos.get();
-        BeanUtils.copyProperties(upData, apontamentosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(apontamentosModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteApontamentos(@PathVariable(value = "id") Integer id){
-
-        Optional<Apontamentos> apontamentos = repository.findById(id);
-        if(apontamentos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(apontamentos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Apontamentos deleted");
+    public ResponseEntity<?> deleteApontamentos(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Apontamento deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
