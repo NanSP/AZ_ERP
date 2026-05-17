@@ -20,7 +20,7 @@ public class EsocialEventos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "periodo_apuracao")
     private LocalDate periodoApuracao;
@@ -32,14 +32,9 @@ public class EsocialEventos {
     @Column(name = "conteudo",columnDefinition = "xml")
     private String conteudo;
 
+    private String status;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public EsocialEventos(EsocialEventosRequestDTO data) {
-        this.periodoApuracao = data.periodoApuracao();
-        this.tipoEvento = data.tipoEvento();
-        this.eventoId = data.eventoId();
-        this.conteudo = data.conteudo();
-        this.createdAt = data.createdAt();
-    }
 }

@@ -1,73 +1,74 @@
 package com.example.backend.fiscal.esocialEventos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/fiscal/esocialEventos")
 public class EsocialEventosController {
 
-    @Autowired
-    private EsocialEventosRepository repository;
+    private final EsocialEventosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public EsocialEventosController(EsocialEventosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<EsocialEventosResponseDTO> getAll(){
-
-        List<EsocialEventosResponseDTO> esocialEventosList = repository.findAll().stream().map(EsocialEventosResponseDTO::new).toList();
-        return esocialEventosList;
+    public List<EsocialEventosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(EsocialEventosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<EsocialEventos> esocialEventos = repository.findById(id);
-        if(esocialEventos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        EsocialEventosResponseDTO esocialEventosDTO = new EsocialEventosResponseDTO(esocialEventos.get());
-        return  ResponseEntity.ok(esocialEventosDTO);
+    public ResponseEntity<?> getById(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EsocialEventosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody EsocialEventosRequestDTO data){
+    public ResponseEntity<?> saveEsocialEventos(@RequestBody EsocialEventosRequestDTO data) {
+        EsocialEventos entity = new EsocialEventos();
+        entity.setPeriodoApuracao(data.periodoApuracao());
+        entity.setTipoEvento(data.tipoEvento());
+        entity.setEventoId(data.eventoId());
+        entity.setConteudo(data.conteudo());
+        entity.setStatus(data.status());
+        entity.setCreatedAt(data.createdAt());
 
-        EsocialEventos esocialEventosData = new EsocialEventos(data);
-        repository.save(esocialEventosData);
-        return;
+        EsocialEventos saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new EsocialEventosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEsocialEventos(@PathVariable(value = "id") Integer id, @RequestBody EsocialEventosRequestDTO upData){
+    public ResponseEntity<?> updateEsocialEventos(@PathVariable Long id, @RequestBody EsocialEventosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setPeriodoApuracao(data.periodoApuracao());
+                    entity.setTipoEvento(data.tipoEvento());
+                    entity.setEventoId(data.eventoId());
+                    entity.setConteudo(data.conteudo());
+                    entity.setStatus(data.status());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<EsocialEventos> esocialEventos = repository.findById(id);
-        if(esocialEventos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        EsocialEventos esocialEventosModel = esocialEventos.get();
-        BeanUtils.copyProperties(upData, esocialEventosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(esocialEventosModel));
+                    EsocialEventos updated = repository.save(entity);
+                    return ResponseEntity.ok(new EsocialEventosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEsocialEventos(@PathVariable(value = "id") Integer id){
-
-        Optional<EsocialEventos> esocialEventos = repository.findById(id);
-        if(esocialEventos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(esocialEventos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("EsocialEventos deleted");
+    public ResponseEntity<?> deleteEsocialEventos(@PathVariable Long id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("eSocial evento deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

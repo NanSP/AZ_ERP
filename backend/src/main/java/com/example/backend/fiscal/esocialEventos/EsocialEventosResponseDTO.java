@@ -5,11 +5,12 @@ import java.time.LocalDateTime;
 
 public record EsocialEventosResponseDTO
         (
-                Integer id,
+                Long id,
                 LocalDate periodoApuracao,
                 String tipoEvento,
                 String eventoId,
                 String conteudo,
+                String status,
                 LocalDateTime createdAt
         ) {
     public EsocialEventosResponseDTO(EsocialEventos esocialEventos) {
@@ -20,6 +21,7 @@ public record EsocialEventosResponseDTO
                         esocialEventos.getTipoEvento(),
                         esocialEventos.getEventoId(),
                         esocialEventos.getConteudo(),
+                        esocialEventos.getStatus(),
                         esocialEventos.getCreatedAt()
                 );
     }

@@ -9,6 +9,7 @@ public record EsocialEventosRequestDTO
                 String tipoEvento,
                 String eventoId,
                 String conteudo,
+                String status,
                 LocalDateTime createdAt
         ) {
 }
