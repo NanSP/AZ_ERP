@@ -1,73 +1,70 @@
 package com.example.backend.fi.fluxoCaixa;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/fi/fluxoCaixa")
 public class FluxoCaixaController {
 
-    @Autowired
-    private FluxoCaixaRepository repository;
+    private final FluxoCaixaRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public FluxoCaixaController(FluxoCaixaRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<FluxoCaixaResponseDTO> getAll(){
-
-        List<FluxoCaixaResponseDTO> fluxoCaixaList = repository.findAll().stream().map(FluxoCaixaResponseDTO::new).toList();
-        return fluxoCaixaList;
+    public List<FluxoCaixaResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(FluxoCaixaResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<FluxoCaixa> fluxoCaixa = repository.findById(id);
-        if(fluxoCaixa.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        FluxoCaixaResponseDTO contasPagarDTO = new FluxoCaixaResponseDTO(fluxoCaixa.get());
-        return  ResponseEntity.ok(contasPagarDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new FluxoCaixaResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveFluxoCaixa(@RequestBody FluxoCaixaRequestDTO data){
-
-        FluxoCaixa fluxoCaixaData = new FluxoCaixa(data);
-        repository.save(fluxoCaixaData);
-        return;
+    public ResponseEntity<?> saveFluxoCaixa(@RequestBody FluxoCaixaRequestDTO data) {
+        FluxoCaixa entity = new FluxoCaixa(data);
+        FluxoCaixa saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new FluxoCaixaResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateFluxoCaixa(@PathVariable(value = "id") Integer id, @RequestBody FluxoCaixaRequestDTO upData){
+    public ResponseEntity<?> updateFluxoCaixa(@PathVariable Integer id, @RequestBody FluxoCaixaRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setDataReferencia(data.dataReferencia());
+                    entity.setSaldoInicial(data.saldoInicial());
+                    entity.setEntradasPrevistas(data.entradasPrevistas());
+                    entity.setSaidasPrevistas(data.saidasPrevistas());
+                    entity.setEntradasRealizadas(data.entradasRealizadas());
+                    entity.setSaidasRealizadas(data.saidasRealizadas());
+                    entity.setSaldoFinalPrevisto(data.saldoFinalPrevisto());
+                    entity.setSaldoFinalReal(data.saldoFinalReal());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<FluxoCaixa> fluxoCaixa = repository.findById(id);
-        if(fluxoCaixa.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        FluxoCaixa fluxoCaixaModel = fluxoCaixa.get();
-        BeanUtils.copyProperties(upData, fluxoCaixaModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(fluxoCaixaModel));
+                    FluxoCaixa updated = repository.save(entity);
+                    return ResponseEntity.ok(new FluxoCaixaResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContasReceber(@PathVariable(value = "id") Integer id){
-
-        Optional<FluxoCaixa> fluxoCaixa = repository.findById(id);
-        if(fluxoCaixa.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(fluxoCaixa.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Fluxo de Caixa deleted");
+    public ResponseEntity<?> deleteFluxoCaixa(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Fluxo de Caixa deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

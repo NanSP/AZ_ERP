@@ -21,19 +21,19 @@ public class FluxoCaixa {
 
     @Column(name = "data_referencia")
     private LocalDate dataReferencia;
-    @Column(name = "saldo_inicial", precision = 10, scale = 2)
+    @Column(name = "saldo_inicial", precision = 15, scale = 2)
     private BigDecimal saldoInicial;
-    @Column(name = "entradas_previstas", precision = 10, scale = 2)
+    @Column(name = "entradas_previstas", precision = 15, scale = 2)
     private BigDecimal entradasPrevistas;
-    @Column(name = "saidas_previstas", precision = 10, scale = 2)
+    @Column(name = "saidas_previstas", precision = 15, scale = 2)
     private BigDecimal saidasPrevistas;
-    @Column(name = "entradas_realizadas", precision = 10, scale = 2)
+    @Column(name = "entradas_realizadas", precision = 15, scale = 2)
     private BigDecimal entradasRealizadas;
-    @Column(name = "saidas_realizadas", precision = 10, scale = 2)
+    @Column(name = "saidas_realizadas", precision = 15, scale = 2)
     private BigDecimal saidasRealizadas;
-    @Column(name = "saldo_final_previsto", precision = 10, scale = 2)
+    @Column(name = "saldo_final_previsto", precision = 15, scale = 2)
     private BigDecimal saldoFinalPrevisto;
-    @Column(name = "saldo_final_real", precision = 10, scale = 2)
+    @Column(name = "saldo_final_real", precision = 15, scale = 2)
     private BigDecimal saldoFinalReal;
 
     @Column(name = "created_at")
