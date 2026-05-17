@@ -1,8 +1,5 @@
 package com.example.backend.am.manutencoes;
 
-import com.example.backend.am.bensPatrimoniais.BensPatrimoniais;
-import com.example.backend.rh.colaboradores.Colaboradores;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,7 +7,7 @@ import java.time.LocalDateTime;
 public record ManutencoesResponseDTO
         (
                 Integer id,
-                BensPatrimoniais ativoId,
+                Integer ativo,
                 String tipoManutencao,
                 LocalDate dataSolicitacao,
                 LocalDate dataExecucao,
@@ -18,14 +15,14 @@ public record ManutencoesResponseDTO
                 BigDecimal custoMaoObra,
                 BigDecimal custoMaterial,
                 BigDecimal custoTotal,
-                Colaboradores tecnicoId,
+                Integer tecnico,
                 LocalDateTime createdAt
         ) {
     public ManutencoesResponseDTO(Manutencoes manutencoes) {
         this
                 (
                         manutencoes.getId(),
-                        manutencoes.getAtivoId(),
+                        manutencoes.getAtivo() != null ? manutencoes.getAtivo().getId() : null,
                         manutencoes.getTipoManutencao(),
                         manutencoes.getDataSolicitacao(),
                         manutencoes.getDataExecucao(),
@@ -33,7 +30,7 @@ public record ManutencoesResponseDTO
                         manutencoes.getCustoMaoObra(),
                         manutencoes.getCustoMaterial(),
                         manutencoes.getCustoTotal(),
-                        manutencoes.getTecnicoId(),
+                        manutencoes.getTecnico() != null ? manutencoes.getTecnico().getId() : null,
                         manutencoes.getCreatedAt()
                 );
     }

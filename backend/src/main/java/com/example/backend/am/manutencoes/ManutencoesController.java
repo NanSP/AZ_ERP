@@ -1,73 +1,123 @@
 package com.example.backend.am.manutencoes;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.am.bensPatrimoniais.BensPatrimoniais;
+import com.example.backend.am.bensPatrimoniais.BensPatrimoniaisRepository;
+import com.example.backend.rh.colaboradores.Colaboradores;
+import com.example.backend.rh.colaboradores.ColaboradoresRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("manutencoes")
+@RequestMapping("/am/manutencoes")
 public class ManutencoesController {
 
-    @Autowired
-    private ManutencoesRepository repository;
+    private final ManutencoesRepository repository;
+    private final BensPatrimoniaisRepository bensPatrimoniaisRepository;
+    private final ColaboradoresRepository colaboradoresRepository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ManutencoesController(
+            ManutencoesRepository repository,
+            BensPatrimoniaisRepository bensPatrimoniaisRepository,
+            ColaboradoresRepository colaboradoresRepository
+    ) {
+        this.repository = repository;
+        this.bensPatrimoniaisRepository = bensPatrimoniaisRepository;
+        this.colaboradoresRepository = colaboradoresRepository;
+    }
+
     @GetMapping
-    public List<ManutencoesResponseDTO> getAll(){
-
-        List<ManutencoesResponseDTO> manutencoesList = repository.findAll().stream().map(ManutencoesResponseDTO::new).toList();
-        return manutencoesList;
+    public List<ManutencoesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ManutencoesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Manutencoes> manutencoes = repository.findById(id);
-        if(manutencoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ManutencoesResponseDTO manutencoesDTO = new ManutencoesResponseDTO(manutencoes.get());
-        return  ResponseEntity.ok(manutencoesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ManutencoesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCompras(@RequestBody ManutencoesRequestDTO data){
+    public ResponseEntity<?> saveManutencoes(@RequestBody ManutencoesRequestDTO data) {
+        try {
+            BensPatrimoniais ativo = data.ativo() != null
+                    ? bensPatrimoniaisRepository.findById(data.ativo())
+                    .orElseThrow(() -> new RuntimeException("Ativo nao encontrado"))
+                    : null;
 
-        Manutencoes manutencoesData = new Manutencoes(data);
-        repository.save(manutencoesData);
-        return;
+            Colaboradores tecnico = data.tecnico() != null
+                    ? colaboradoresRepository.findById(data.tecnico())
+                    .orElseThrow(() -> new RuntimeException("Tecnico nao encontrado"))
+                    : null;
+
+            Manutencoes entity = new Manutencoes();
+            entity.setAtivo(ativo);
+            entity.setTipoManutencao(data.tipoManutencao());
+            entity.setDataSolicitacao(data.dataSolicitacao());
+            entity.setDataExecucao(data.dataExecucao());
+            entity.setDescricao(data.descricao());
+            entity.setCustoMaoObra(data.custoMaoObra());
+            entity.setCustoMaterial(data.custoMaterial());
+            entity.setCustoTotal(data.custoTotal());
+            entity.setTecnico(tecnico);
+            entity.setCreatedAt(data.createdAt());
+
+            Manutencoes saved = repository.save(entity);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ManutencoesResponseDTO(saved));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateManutencoes(@PathVariable(value = "id") Integer id, @RequestBody ManutencoesRequestDTO upData){
+    public ResponseEntity<?> updateManutencoes(@PathVariable Integer id, @RequestBody ManutencoesRequestDTO data) {
+        try {
+            Manutencoes entity = repository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Manutencao nao encontrada"));
 
-        Optional<Manutencoes> manutencoes = repository.findById(id);
-        if(manutencoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
+            BensPatrimoniais ativo = data.ativo() != null
+                    ? bensPatrimoniaisRepository.findById(data.ativo())
+                    .orElseThrow(() -> new RuntimeException("Ativo nao encontrado"))
+                    : null;
+
+            Colaboradores tecnico = data.tecnico() != null
+                    ? colaboradoresRepository.findById(data.tecnico())
+                    .orElseThrow(() -> new RuntimeException("Tecnico nao encontrado"))
+                    : null;
+
+            entity.setAtivo(ativo);
+            entity.setTipoManutencao(data.tipoManutencao());
+            entity.setDataSolicitacao(data.dataSolicitacao());
+            entity.setDataExecucao(data.dataExecucao());
+            entity.setDescricao(data.descricao());
+            entity.setCustoMaoObra(data.custoMaoObra());
+            entity.setCustoMaterial(data.custoMaterial());
+            entity.setCustoTotal(data.custoTotal());
+            entity.setTecnico(tecnico);
+            entity.setCreatedAt(data.createdAt());
+
+            Manutencoes updated = repository.save(entity);
+            return ResponseEntity.ok(new ManutencoesResponseDTO(updated));
+
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
-
-        Manutencoes manutencoesModel = manutencoes.get();
-        BeanUtils.copyProperties(upData, manutencoesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(manutencoesModel));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteManutencoes(@PathVariable(value = "id") Integer id){
-
-        Optional<Manutencoes> manutencoes = repository.findById(id);
-        if(manutencoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(manutencoes.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Manutencoes deleted");
+    public ResponseEntity<?> deleteManutencoes(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Manutencao deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
