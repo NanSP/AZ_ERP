@@ -1,72 +1,72 @@
 package com.example.backend.sys.usuarios;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/sys/usuarios")
 public class UsuariosController {
 
-    @Autowired
-    private UsuariosRepository repository;
+    private final UsuariosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public UsuariosController(UsuariosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<UsuariosResponseDTO> getAll(){
-
-        List<UsuariosResponseDTO> usuariosList = repository.findAll().stream().map(UsuariosResponseDTO::new).toList();
-        return usuariosList;
+    public List<UsuariosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(UsuariosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Usuarios> usuarios = repository.findById(id);
-        if(usuarios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        UsuariosResponseDTO usuariosDTO = new UsuariosResponseDTO(usuarios.get());
-        return  ResponseEntity.ok(usuariosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new UsuariosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveUsuarios(@RequestBody UsuariosRequestDTO data){
-
-        Usuarios usuariosData = new Usuarios(data);
-        repository.save(usuariosData);
-        return;
+    public ResponseEntity<?> saveUsuarios(@RequestBody UsuariosRequestDTO data) {
+        Usuarios entity = new Usuarios(data);
+        Usuarios saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new UsuariosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUsuarios(@PathVariable(value = "id") Integer id, @RequestBody UsuariosRequestDTO upData){
+    public ResponseEntity<?> updateUsuarios(@PathVariable Integer id, @RequestBody UsuariosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setNome(data.nome());
+                    entity.setEmail(data.email());
+                    entity.setLogin(data.login());
+                    entity.setSenhaHash(data.senhaHash());
+                    entity.setDocumento(data.documento());
+                    entity.setTipoUsuario(data.tipoUsuario());
+                    entity.setStatus(data.status());
+                    entity.setUltimoAcesso(data.ultimoAcesso());
+                    entity.setExpiracaoSenha(data.expiracaoSenha());
+                    entity.setTentativasLogin(data.tentativasLogin());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Usuarios> usuarios = repository.findById(id);
-        if(usuarios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Usuarios usuariosModel = usuarios.get();
-        BeanUtils.copyProperties(upData, usuariosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(usuariosModel));
+                    Usuarios updated = repository.save(entity);
+                    return ResponseEntity.ok(new UsuariosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUsuarios(@PathVariable(value = "id") Integer id){
-
-        Optional<Usuarios> usuarios = repository.findById(id);
-        if(usuarios.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(usuarios.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Usuario deleted");
+    public ResponseEntity<?> deleteUsuarios(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Usuario deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }

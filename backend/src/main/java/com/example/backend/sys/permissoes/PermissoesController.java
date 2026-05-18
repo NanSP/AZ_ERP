@@ -1,72 +1,67 @@
 package com.example.backend.sys.permissoes;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/sys/permissoes")
 public class PermissoesController {
 
-    @Autowired
-    private PermissoesRepository repository;
+    private final PermissoesRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public PermissoesController(PermissoesRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<PermissoesResponseDTO> getAll(){
-
-        List<PermissoesResponseDTO> permissoesList = repository.findAll().stream().map(PermissoesResponseDTO::new).toList();
-        return permissoesList;
+    public List<PermissoesResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(PermissoesResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Permissoes> permissoes = repository.findById(id);
-        if(permissoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        PermissoesResponseDTO permissoesDTO = new PermissoesResponseDTO(permissoes.get());
-        return  ResponseEntity.ok(permissoesDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new PermissoesResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void savePermissoes(@RequestBody PermissoesRequestDTO data){
-
-        Permissoes permissoesData = new Permissoes(data);
-        repository.save(permissoesData);
-        return;
+    public ResponseEntity<?> savePermissoes(@RequestBody PermissoesRequestDTO data) {
+        Permissoes entity = new Permissoes(data);
+        Permissoes saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new PermissoesResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePermissoes(@PathVariable(value = "id") Integer id, @RequestBody PermissoesRequestDTO upData){
+    public ResponseEntity<?> updatePermissoes(@PathVariable Integer id, @RequestBody PermissoesRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setNome(data.nome());
+                    entity.setDescricao(data.descricao());
+                    entity.setModulo(data.modulo());
+                    entity.setRecurso(data.recurso());
+                    entity.setAcao(data.acao());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Permissoes> permissoes = repository.findById(id);
-        if(permissoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Permissoes permissoesModel = permissoes.get();
-        BeanUtils.copyProperties(upData, permissoesModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(permissoesModel));
+                    Permissoes updated = repository.save(entity);
+                    return ResponseEntity.ok(new PermissoesResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePermissoes(@PathVariable(value = "id") Integer id){
-
-        Optional<Permissoes> permissoes = repository.findById(id);
-        if(permissoes.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(permissoes.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Permissão deleted");
+    public ResponseEntity<?> deletePermissoes(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Permissao deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
