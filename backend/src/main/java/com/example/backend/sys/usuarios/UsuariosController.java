@@ -2,6 +2,7 @@ package com.example.backend.sys.usuarios;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +12,14 @@ import java.util.List;
 public class UsuariosController {
 
     private final UsuariosRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuariosController(UsuariosRepository repository) {
+    public UsuariosController(
+            UsuariosRepository repository,
+            PasswordEncoder passwordEncoder
+    ) {
         this.repository = repository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -33,7 +39,22 @@ public class UsuariosController {
 
     @PostMapping
     public ResponseEntity<?> saveUsuarios(@RequestBody UsuariosRequestDTO data) {
-        Usuarios entity = new Usuarios(data);
+        if (data.senha() == null || data.senha().isBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha obrigatoria");
+        }
+
+        Usuarios entity = new Usuarios();
+        entity.setNome(data.nome());
+        entity.setEmail(data.email());
+        entity.setLogin(data.login());
+        entity.setSenhaHash(passwordEncoder.encode(data.senha()));
+        entity.setDocumento(data.documento());
+        entity.setTipoUsuario(data.tipoUsuario());
+        entity.setStatus(data.status());
+        entity.setUltimoAcesso(data.ultimoAcesso());
+        entity.setExpiracaoSenha(data.expiracaoSenha());
+        entity.setTentativasLogin(data.tentativasLogin());
+
         Usuarios saved = repository.save(entity);
         return ResponseEntity.status(HttpStatus.CREATED).body(new UsuariosResponseDTO(saved));
     }
@@ -45,14 +66,17 @@ public class UsuariosController {
                     entity.setNome(data.nome());
                     entity.setEmail(data.email());
                     entity.setLogin(data.login());
-                    entity.setSenhaHash(data.senhaHash());
+
+                    if (data.senha() != null && !data.senha().isBlank()) {
+                        entity.setSenhaHash(passwordEncoder.encode(data.senha()));
+                    }
+
                     entity.setDocumento(data.documento());
                     entity.setTipoUsuario(data.tipoUsuario());
                     entity.setStatus(data.status());
                     entity.setUltimoAcesso(data.ultimoAcesso());
                     entity.setExpiracaoSenha(data.expiracaoSenha());
                     entity.setTentativasLogin(data.tentativasLogin());
-                    entity.setCreatedAt(data.createdAt());
 
                     Usuarios updated = repository.save(entity);
                     return ResponseEntity.ok(new UsuariosResponseDTO(updated));

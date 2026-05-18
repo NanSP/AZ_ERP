@@ -1,5 +1,7 @@
 package com.example.backend.tenant.auth;
 
+import java.util.List;
+
 public record TenantAuthResponseDTO(
         String token,
         Long tenantId,
@@ -7,7 +9,9 @@ public record TenantAuthResponseDTO(
         Long userId,
         String login,
         String role,
-        String scope
+        String scope,
+        List<String> perfis,
+        List<String> permissoes
 ) {
 }
 

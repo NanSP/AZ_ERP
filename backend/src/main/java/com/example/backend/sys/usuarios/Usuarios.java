@@ -2,6 +2,8 @@ package com.example.backend.sys.usuarios;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -33,20 +35,8 @@ public class Usuarios {
     @Column(name = "tentativas_login")
     private Integer tentativasLogin;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Usuarios(UsuariosRequestDTO data){
-        this.nome = data.nome();
-        this.email = data.email();
-        this.login = data.login();
-        this.senhaHash = data.senhaHash();
-        this.documento = data.documento();
-        this.tipoUsuario = data.tipoUsuario();
-        this.status = data.status();
-        this.ultimoAcesso = data.ultimoAcesso();
-        this.expiracaoSenha = data.expiracaoSenha();
-        this.tentativasLogin = data.tentativasLogin();
-        this.createdAt = data.createdAt();
-    }
 }
