@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class JwtService {
@@ -36,7 +37,9 @@ public class JwtService {
             String tenantCode,
             Long userId,
             String login,
-            String role
+            String role,
+            List<String> perfis,
+            List<String> permissoes
     ) {
         Algorithm algorithm = Algorithm.HMAC256(jwtProperties.getSecret());
 
@@ -48,6 +51,8 @@ public class JwtService {
                 .withClaim("userId", userId)
                 .withClaim("role", role)
                 .withClaim("scope", "tenant")
+                .withClaim("perfis", perfis)
+                .withClaim("permissoes", permissoes)
                 .withIssuedAt(Instant.now())
                 .withExpiresAt(Instant.now().plus(jwtProperties.getExpirationHours(), ChronoUnit.HOURS))
                 .sign(algorithm);

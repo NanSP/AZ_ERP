@@ -1,5 +1,6 @@
 package com.example.backend.security;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -14,6 +15,8 @@ public class SecurityUserPrincipal {
     private final String scope;
     private final Long tenantId;
     private final String tenantCode;
+    private final List<String> perfis;
+    private final List<String> permissoes;
 
     public SecurityUserPrincipal(
             Long userId,
@@ -21,7 +24,9 @@ public class SecurityUserPrincipal {
             String role,
             String scope,
             Long tenantId,
-            String tenantCode
+            String tenantCode,
+            List<String> perfis,
+            List<String> permissoes
     ) {
         this.userId = userId;
         this.login = login;
@@ -29,6 +34,8 @@ public class SecurityUserPrincipal {
         this.scope = scope;
         this.tenantId = tenantId;
         this.tenantCode = tenantCode;
+        this.perfis = perfis != null ? perfis : List.of();
+        this.permissoes = permissoes != null ? permissoes : List.of();
     }
 
     public Long getUserId() {
@@ -55,10 +62,28 @@ public class SecurityUserPrincipal {
         return tenantCode;
     }
 
+    public List<String> getPerfis() {
+        return perfis;
+    }
+
+    public List<String> getPermissoes() {
+        return permissoes;
+    }
+
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(
-                new SimpleGrantedAuthority("ROLE_" + role),
-                new SimpleGrantedAuthority("SCOPE_" + scope.toUpperCase())
-        );
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+        authorities.add(new SimpleGrantedAuthority("SCOPE_" + scope.toUpperCase()));
+
+        for (String perfil : perfis) {
+            authorities.add(new SimpleGrantedAuthority("PERFIL_" + perfil));
+        }
+
+        for (String permissao : permissoes) {
+            authorities.add(new SimpleGrantedAuthority("PERMISSAO_" + permissao));
+        }
+
+        return authorities;
     }
 }

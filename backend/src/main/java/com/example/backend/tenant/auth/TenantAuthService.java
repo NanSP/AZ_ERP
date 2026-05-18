@@ -95,7 +95,9 @@ public class TenantAuthService {
                         connectionInfo.tenantCode(),
                         userId,
                         login,
-                        role
+                        role,
+                        perfis,
+                        permissoes
                 );
 
                 return new TenantAuthResponseDTO(

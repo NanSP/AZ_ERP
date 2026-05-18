@@ -1,5 +1,6 @@
 package com.example.backend.security;
 
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.backend.tenant.context.TenantContext;
 import jakarta.servlet.FilterChain;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -47,13 +50,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     TenantContext.setTenant(tenantCode);
                 }
 
+                List<String> perfis = readStringList(decodedJWT.getClaim("perfis"));
+                List<String> permissoes = readStringList(decodedJWT.getClaim("permissoes"));
+
                 SecurityUserPrincipal principal = new SecurityUserPrincipal(
                         decodedJWT.getClaim("userId").asLong(),
                         decodedJWT.getSubject(),
                         decodedJWT.getClaim("role").asString(),
                         scope,
                         tenantId,
-                        tenantCode
+                        tenantCode,
+                        perfis,
+                        permissoes
                 );
 
                 UsernamePasswordAuthenticationToken authentication =
@@ -79,5 +87,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } finally {
             TenantContext.clear();
         }
+    }
+
+    private List<String> readStringList(Claim claim) {
+        List<String> values = claim.asList(String.class);
+        return values != null ? values : Collections.emptyList();
     }
 }
