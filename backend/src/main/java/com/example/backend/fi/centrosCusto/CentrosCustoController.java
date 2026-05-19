@@ -1,73 +1,66 @@
 package com.example.backend.fi.centrosCusto;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/fi/centrosCusto")
 public class CentrosCustoController {
 
-    @Autowired
-    private CentrosCustoRepository repository;
+    private final CentrosCustoRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public CentrosCustoController(CentrosCustoRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<CentrosCustoResponseDTO> getAll(){
-
-        List<CentrosCustoResponseDTO> centrosCustoList = repository.findAll().stream().map(CentrosCustoResponseDTO::new).toList();
-        return centrosCustoList;
+    public List<CentrosCustoResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(CentrosCustoResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<CentrosCusto> centrosCusto = repository.findById(id);
-        if(centrosCusto.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        CentrosCustoResponseDTO centrosCustoDTO = new CentrosCustoResponseDTO(centrosCusto.get());
-        return  ResponseEntity.ok(centrosCustoDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new CentrosCustoResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveCentrosCusto(@RequestBody CentrosCustoRequestDTO data){
-
-        CentrosCusto centrosCustoData = new CentrosCusto(data);
-        repository.save(centrosCustoData);
-        return;
+    public ResponseEntity<?> saveCentrosCusto(@RequestBody CentrosCustoRequestDTO data) {
+        CentrosCusto entity = new CentrosCusto(data);
+        CentrosCusto saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CentrosCustoResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCentrosCusto(@PathVariable(value = "id") Integer id, @RequestBody CentrosCustoRequestDTO upData){
+    public ResponseEntity<?> updateCentrosCusto(@PathVariable Integer id, @RequestBody CentrosCustoRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setCodigo(data.codigo());
+                    entity.setNome(data.nome());
+                    entity.setTipo(data.tipo());
+                    entity.setResponsavel(data.responsavel());
+                    entity.setAtivo(data.ativo());
 
-        Optional<CentrosCusto> centrosCusto = repository.findById(id);
-        if(centrosCusto.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        CentrosCusto centrosCustoModel = centrosCusto.get();
-        BeanUtils.copyProperties(upData, centrosCustoModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(centrosCustoModel));
+                    CentrosCusto updated = repository.save(entity);
+                    return ResponseEntity.ok(new CentrosCustoResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCentrosCusto(@PathVariable(value = "id") Integer id){
-
-        Optional<CentrosCusto> centrosCusto = repository.findById(id);
-        if(centrosCusto.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(centrosCusto.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Centro de custo deleted");
+    public ResponseEntity<?> deleteCentrosCusto(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Centro de custo deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
