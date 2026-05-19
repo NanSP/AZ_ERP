@@ -2,7 +2,6 @@ package com.example.backend.rh.folhaDePagamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record FolhaDePagamentoRequestDTO
         (
@@ -15,7 +14,6 @@ public record FolhaDePagamentoRequestDTO
                 BigDecimal descontos,
                 BigDecimal valorLiquido,
                 LocalDate dataPagamento,
-                String status,
-                LocalDateTime createdAt
+                String status
         ) {
 }

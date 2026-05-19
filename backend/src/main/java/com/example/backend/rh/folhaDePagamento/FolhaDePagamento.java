@@ -3,6 +3,8 @@ package com.example.backend.rh.folhaDePagamento;
 import jakarta.persistence.*;
 import lombok.*;
 import com.example.backend.rh.colaboradores.Colaboradores;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,7 +42,8 @@ public class FolhaDePagamento {
     @Column(name = "data_pagamento")
     private LocalDate dataPagamento;
     private String status;
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
 }

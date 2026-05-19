@@ -57,7 +57,6 @@ public class FolhaDePagamentoController {
             entity.setValorLiquido(data.valorLiquido());
             entity.setDataPagamento(data.dataPagamento());
             entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
 
             FolhaDePagamento saved = repository.save(entity);
             return ResponseEntity.status(HttpStatus.CREATED).body(new FolhaDePagamentoResponseDTO(saved));
@@ -88,7 +87,6 @@ public class FolhaDePagamentoController {
             entity.setValorLiquido(data.valorLiquido());
             entity.setDataPagamento(data.dataPagamento());
             entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
 
             FolhaDePagamento updated = repository.save(entity);
             return ResponseEntity.ok(new FolhaDePagamentoResponseDTO(updated));
