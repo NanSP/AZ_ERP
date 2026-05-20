@@ -402,7 +402,36 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/mm/movimentacoes/**")
                         .hasAnyAuthority("PERMISSAO_mm:movimentacoes:delete")
 
-                        .requestMatchers("/sd/**").hasAnyAuthority("SCOPE_TENANT")
+                        .requestMatchers(HttpMethod.GET, "/sd/clientes/**").hasAnyAuthority("PERMISSAO_sd:clientes:read")
+                        .requestMatchers(HttpMethod.POST, "/sd/clientes/**").hasAnyAuthority("PERMISSAO_sd:clientes:create")
+                        .requestMatchers(HttpMethod.PUT, "/sd/clientes/**").hasAnyAuthority("PERMISSAO_sd:clientes:update")
+                        .requestMatchers(HttpMethod.DELETE, "/sd/clientes/**").hasAnyAuthority("PERMISSAO_sd:clientes:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/sd/oportunidades/**").hasAnyAuthority("PERMISSAO_sd:oportunidades:read")
+                        .requestMatchers(HttpMethod.POST, "/sd/oportunidades/**").hasAnyAuthority("PERMISSAO_sd:oportunidades:create")
+                        .requestMatchers(HttpMethod.PUT, "/sd/oportunidades/**").hasAnyAuthority("PERMISSAO_sd:oportunidades:update")
+                        .requestMatchers(HttpMethod.DELETE, "/sd/oportunidades/**").hasAnyAuthority("PERMISSAO_sd:oportunidades:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/sd/pedidos/**").hasAnyAuthority("PERMISSAO_sd:pedidos:read")
+                        .requestMatchers(HttpMethod.POST, "/sd/pedidos/**").hasAnyAuthority("PERMISSAO_sd:pedidos:create")
+                        .requestMatchers(HttpMethod.PUT, "/sd/pedidos/**").hasAnyAuthority("PERMISSAO_sd:pedidos:update")
+                        .requestMatchers(HttpMethod.DELETE, "/sd/pedidos/**").hasAnyAuthority("PERMISSAO_sd:pedidos:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/sd/pedidoItens/**").hasAnyAuthority("PERMISSAO_sd:pedidoItens:read")
+                        .requestMatchers(HttpMethod.POST, "/sd/pedidoItens/**").hasAnyAuthority("PERMISSAO_sd:pedidoItens:create")
+                        .requestMatchers(HttpMethod.PUT, "/sd/pedidoItens/**").hasAnyAuthority("PERMISSAO_sd:pedidoItens:update")
+                        .requestMatchers(HttpMethod.DELETE, "/sd/pedidoItens/**").hasAnyAuthority("PERMISSAO_sd:pedidoItens:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/sd/faturas/**").hasAnyAuthority("PERMISSAO_sd:faturas:read")
+                        .requestMatchers(HttpMethod.POST, "/sd/faturas/**").hasAnyAuthority("PERMISSAO_sd:faturas:create")
+                        .requestMatchers(HttpMethod.PUT, "/sd/faturas/**").hasAnyAuthority("PERMISSAO_sd:faturas:update")
+                        .requestMatchers(HttpMethod.DELETE, "/sd/faturas/**").hasAnyAuthority("PERMISSAO_sd:faturas:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/sd/contratos/**").hasAnyAuthority("PERMISSAO_sd:contratos:read")
+                        .requestMatchers(HttpMethod.POST, "/sd/contratos/**").hasAnyAuthority("PERMISSAO_sd:contratos:create")
+                        .requestMatchers(HttpMethod.PUT, "/sd/contratos/**").hasAnyAuthority("PERMISSAO_sd:contratos:update")
+                        .requestMatchers(HttpMethod.DELETE, "/sd/contratos/**").hasAnyAuthority("PERMISSAO_sd:contratos:delete")
+
                         .requestMatchers("/pp/**").hasAnyAuthority("SCOPE_TENANT")
                         .requestMatchers("/sm/**").hasAnyAuthority("SCOPE_TENANT")
                         .requestMatchers("/qm/**").hasAnyAuthority("SCOPE_TENANT")
