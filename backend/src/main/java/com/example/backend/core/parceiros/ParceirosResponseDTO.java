@@ -20,8 +20,6 @@ public record ParceirosResponseDTO
                 BigDecimal limiteCredito,
                 Integer diasPrazo,
                 String observacoes,
-                List<ContasPagar> contasAPagar,
-                List<ContasReceber> contasAReceber,
                 LocalDateTime createdAt
         )
     {
@@ -39,8 +37,6 @@ public record ParceirosResponseDTO
                             parceiros.getLimiteCredito(),
                             parceiros.getDiasPrazo(),
                             parceiros.getObservacoes(),
-                            parceiros.getContasAPagar(),
-                            parceiros.getContasAReceber(),
                             parceiros.getCreatedAt()
 
                     );
