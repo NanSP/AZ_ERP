@@ -14,13 +14,16 @@ public class FolhaDePagamentoController {
 
     private final FolhaDePagamentoRepository repository;
     private final ColaboradoresRepository colaboradoresRepository;
+    private final FolhaDePagamentoService folhaDePagamentoService;
 
     public FolhaDePagamentoController(
             FolhaDePagamentoRepository repository,
-            ColaboradoresRepository colaboradoresRepository
+            ColaboradoresRepository colaboradoresRepository,
+            FolhaDePagamentoService folhaDePagamentoService
     ) {
         this.repository = repository;
         this.colaboradoresRepository = colaboradoresRepository;
+        this.folhaDePagamentoService = folhaDePagamentoService;
     }
 
     @GetMapping
@@ -46,6 +49,8 @@ public class FolhaDePagamentoController {
                     .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
                     : null;
 
+            FolhaCalculadaDTO calculada = folhaDePagamentoService.calcular(data);
+
             FolhaDePagamento entity = new FolhaDePagamento();
             entity.setColaborador(colaborador);
             entity.setCompetencia(data.competencia());
@@ -54,7 +59,11 @@ public class FolhaDePagamentoController {
             entity.setHorasExtras(data.horasExtras());
             entity.setAdicionais(data.adicionais());
             entity.setDescontos(data.descontos());
-            entity.setValorLiquido(data.valorLiquido());
+            entity.setValorHora(calculada.valorHora());
+            entity.setValorHorasNormais(calculada.valorHorasNormais());
+            entity.setValorHorasExtras(calculada.valorHorasExtras());
+            entity.setValorBruto(calculada.valorBruto());
+            entity.setValorLiquido(calculada.valorLiquido());
             entity.setDataPagamento(data.dataPagamento());
             entity.setStatus(data.status());
 
@@ -77,6 +86,8 @@ public class FolhaDePagamentoController {
                     .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
                     : null;
 
+            FolhaCalculadaDTO calculada = folhaDePagamentoService.calcular(data);
+
             entity.setColaborador(colaborador);
             entity.setCompetencia(data.competencia());
             entity.setSalarioBase(data.salarioBase());
@@ -84,7 +95,11 @@ public class FolhaDePagamentoController {
             entity.setHorasExtras(data.horasExtras());
             entity.setAdicionais(data.adicionais());
             entity.setDescontos(data.descontos());
-            entity.setValorLiquido(data.valorLiquido());
+            entity.setValorHora(calculada.valorHora());
+            entity.setValorHorasNormais(calculada.valorHorasNormais());
+            entity.setValorHorasExtras(calculada.valorHorasExtras());
+            entity.setValorBruto(calculada.valorBruto());
+            entity.setValorLiquido(calculada.valorLiquido());
             entity.setDataPagamento(data.dataPagamento());
             entity.setStatus(data.status());
 
@@ -101,7 +116,7 @@ public class FolhaDePagamentoController {
         return repository.findById(id)
                 .<ResponseEntity<?>>map(entity -> {
                     repository.delete(entity);
-                    return ResponseEntity.ok("Pagamento deleted");
+                    return ResponseEntity.ok("Folha de pagamento deleted");
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }

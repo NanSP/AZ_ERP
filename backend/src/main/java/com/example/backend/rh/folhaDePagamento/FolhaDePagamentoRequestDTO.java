@@ -12,7 +12,6 @@ public record FolhaDePagamentoRequestDTO
                 BigDecimal horasExtras,
                 BigDecimal adicionais,
                 BigDecimal descontos,
-                BigDecimal valorLiquido,
                 LocalDate dataPagamento,
                 String status
         ) {
