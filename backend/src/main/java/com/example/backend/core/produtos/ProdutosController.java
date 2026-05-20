@@ -1,72 +1,74 @@
 package com.example.backend.core.produtos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/core/produtos")
 public class ProdutosController {
 
-    @Autowired
-    private ProdutosRepository repository;
+    private final ProdutosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ProdutosController(ProdutosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<ProdutosResponseDTO> getAll(){
-
-        List<ProdutosResponseDTO> produtosList = repository.findAll().stream().map(ProdutosResponseDTO::new).toList();
-        return produtosList;
+    public List<ProdutosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ProdutosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Produtos> produtos = repository.findById(id);
-        if(produtos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ProdutosResponseDTO produtosDTO = new ProdutosResponseDTO(produtos.get());
-        return  ResponseEntity.ok(produtosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ProdutosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveProduto(@RequestBody ProdutosRequestDTO data){
-
-        Produtos produtosData = new Produtos(data);
-        repository.save(produtosData);
-        return;
+    public ResponseEntity<?> saveProduto(@RequestBody ProdutosRequestDTO data) {
+        Produtos entity = new Produtos(data);
+        Produtos saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ProdutosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProduto(@PathVariable(value = "id") Integer id, @RequestBody ProdutosRequestDTO upData){
+    public ResponseEntity<?> updateProduto(@PathVariable Integer id, @RequestBody ProdutosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setCodigo(data.codigo());
+                    entity.setCodigoBarras(data.codigoBarras());
+                    entity.setNome(data.nome());
+                    entity.setDescricao(data.descricao());
+                    entity.setTipoItem(data.tipoItem());
+                    entity.setUnidadeMedida(data.unidadeMedida());
+                    entity.setNcm(data.ncm());
+                    entity.setCest(data.cest());
+                    entity.setPesoBruto(data.pesoBruto());
+                    entity.setPesoLiquido(data.pesoLiquido());
+                    entity.setOrigem(data.origem());
+                    entity.setSituacao(data.situacao());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Produtos> produtos = repository.findById(id);
-        if(produtos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Produtos produtosModel = produtos.get();
-        BeanUtils.copyProperties(upData, produtosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(produtosModel));
+                    Produtos updated = repository.save(entity);
+                    return ResponseEntity.ok(new ProdutosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduto(@PathVariable(value = "id") Integer id){
-
-        Optional<Produtos> produtos = repository.findById(id);
-        if(produtos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(produtos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Produto deleted");
+    public ResponseEntity<?> deleteProduto(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Produto deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
