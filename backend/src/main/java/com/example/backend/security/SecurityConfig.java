@@ -348,7 +348,36 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/bi/relatorios/**")
                         .hasAnyAuthority("PERMISSAO_bi:relatorios:delete")
 
-                        .requestMatchers("/mm/**").hasAnyAuthority("SCOPE_TENANT")
+                        .requestMatchers(HttpMethod.GET, "/mm/compras/**").hasAuthority("mm:compras:read")
+                        .requestMatchers(HttpMethod.POST, "/mm/compras/**").hasAuthority("mm:compras:create")
+                        .requestMatchers(HttpMethod.PUT, "/mm/compras/**").hasAuthority("mm:compras:update")
+                        .requestMatchers(HttpMethod.DELETE, "/mm/compras/**").hasAuthority("mm:compras:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/mm/compraItens/**").hasAuthority("mm:compraItens:read")
+                        .requestMatchers(HttpMethod.POST, "/mm/compraItens/**").hasAuthority("mm:compraItens:create")
+                        .requestMatchers(HttpMethod.PUT, "/mm/compraItens/**").hasAuthority("mm:compraItens:update")
+                        .requestMatchers(HttpMethod.DELETE, "/mm/compraItens/**").hasAuthority("mm:compraItens:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/mm/materiais/**").hasAuthority("mm:materiais:read")
+                        .requestMatchers(HttpMethod.POST, "/mm/materiais/**").hasAuthority("mm:materiais:create")
+                        .requestMatchers(HttpMethod.PUT, "/mm/materiais/**").hasAuthority("mm:materiais:update")
+                        .requestMatchers(HttpMethod.DELETE, "/mm/materiais/**").hasAuthority("mm:materiais:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/mm/inventarios/**").hasAuthority("mm:inventarios:read")
+                        .requestMatchers(HttpMethod.POST, "/mm/inventarios/**").hasAuthority("mm:inventarios:create")
+                        .requestMatchers(HttpMethod.PUT, "/mm/inventarios/**").hasAuthority("mm:inventarios:update")
+                        .requestMatchers(HttpMethod.DELETE, "/mm/inventarios/**").hasAuthority("mm:inventarios:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/mm/estoques/**").hasAuthority("mm:estoques:read")
+                        .requestMatchers(HttpMethod.POST, "/mm/estoques/**").hasAuthority("mm:estoques:create")
+                        .requestMatchers(HttpMethod.PUT, "/mm/estoques/**").hasAuthority("mm:estoques:update")
+                        .requestMatchers(HttpMethod.DELETE, "/mm/estoques/**").hasAuthority("mm:estoques:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/mm/movimentacoes/**").hasAuthority("mm:movimentacoes:read")
+                        .requestMatchers(HttpMethod.POST, "/mm/movimentacoes/**").hasAuthority("mm:movimentacoes:create")
+                        .requestMatchers(HttpMethod.PUT, "/mm/movimentacoes/**").hasAuthority("mm:movimentacoes:update")
+                        .requestMatchers(HttpMethod.DELETE, "/mm/movimentacoes/**").hasAuthority("mm:movimentacoes:delete")
+
                         .requestMatchers("/sd/**").hasAnyAuthority("SCOPE_TENANT")
                         .requestMatchers("/pp/**").hasAnyAuthority("SCOPE_TENANT")
                         .requestMatchers("/sm/**").hasAnyAuthority("SCOPE_TENANT")
