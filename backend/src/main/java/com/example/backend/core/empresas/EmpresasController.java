@@ -1,72 +1,71 @@
 package com.example.backend.core.empresas;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/core/empresas")
 public class EmpresasController {
 
-    @Autowired
-    private EmpresasRepository repository;
+    private final EmpresasRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public EmpresasController(EmpresasRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<EmpresasResponseDTO> getAll(){
-
-        List<EmpresasResponseDTO> empresasList = repository.findAll().stream().map(EmpresasResponseDTO::new).toList();
-        return empresasList;
+    public List<EmpresasResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(EmpresasResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Empresas> empresas = repository.findById(id);
-        if(empresas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        EmpresasResponseDTO empresasDTO = new EmpresasResponseDTO(empresas.get());
-        return  ResponseEntity.ok(empresasDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EmpresasResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveEmpresa(@RequestBody EmpresasRequestDTO data){
-
-        Empresas empresaData = new Empresas(data);
-        repository.save(empresaData);
-        return;
+    public ResponseEntity<?> saveEmpresa(@RequestBody EmpresasRequestDTO data) {
+        Empresas entity = new Empresas(data);
+        Empresas saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new EmpresasResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEmpresa(@PathVariable(value = "id") Integer id, @RequestBody EmpresasRequestDTO upData){
+    public ResponseEntity<?> updateEmpresa(@PathVariable Integer id, @RequestBody EmpresasRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setCodigo(data.codigo());
+                    entity.setRazaoSocial(data.razaoSocial());
+                    entity.setNomeFantasia(data.nomeFantasia());
+                    entity.setCnpj(data.cnpj());
+                    entity.setInscricaoEstadual(data.inscricaoEstadual());
+                    entity.setInscricaoMunicipal(data.inscricaoMunicipal());
+                    entity.setRegimeTributario(data.regimeTributario());
+                    entity.setDataFundacao(data.dataFundacao());
+                    entity.setSituacao(data.situacao());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Empresas> empresas = repository.findById(id);
-        if(empresas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Empresas empresasModel = empresas.get();
-        BeanUtils.copyProperties(upData, empresasModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(empresasModel));
+                    Empresas updated = repository.save(entity);
+                    return ResponseEntity.ok(new EmpresasResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEmpresa(@PathVariable(value = "id") Integer id){
-
-        Optional<Empresas> empresas = repository.findById(id);
-        if(empresas.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(empresas.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Empresa deleted");
+    public ResponseEntity<?> deleteEmpresa(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Empresa deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
