@@ -1,73 +1,72 @@
 package com.example.backend.core.parceiros;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/core/parceiros")
 public class ParceirosController {
 
-    @Autowired
-    private ParceirosRepository repository;
+    private final ParceirosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public ParceirosController(ParceirosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<ParceirosResponseDTO> getAll(){
-
-        List<ParceirosResponseDTO> parceirosList = repository.findAll().stream().map(ParceirosResponseDTO::new).toList();
-        return parceirosList;
+    public List<ParceirosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(ParceirosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Parceiros> parceiros = repository.findById(id);
-        if(parceiros.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        ParceirosResponseDTO parceirosDTO = new ParceirosResponseDTO(parceiros.get());
-        return  ResponseEntity.ok(parceirosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ParceirosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveParceiro(@RequestBody ParceirosRequestDTO data){
-
-        Parceiros parceiroData = new Parceiros(data);
-        repository.save(parceiroData);
-        return;
+    public ResponseEntity<?> saveParceiro(@RequestBody ParceirosRequestDTO data) {
+        Parceiros entity = new Parceiros(data);
+        Parceiros saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ParceirosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateParceiro(@PathVariable(value = "id") Integer id, @RequestBody ParceirosRequestDTO upData){
+    public ResponseEntity<?> updateParceiro(@PathVariable Integer id, @RequestBody ParceirosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setTipoParceiro(data.tipoParceiro());
+                    entity.setCodigo(data.codigo());
+                    entity.setNome(data.nome());
+                    entity.setNomeFantasia(data.nomeFantasia());
+                    entity.setDocumento(data.documento());
+                    entity.setTipoPessoa(data.tipoPessoa());
+                    entity.setSituacao(data.situacao());
+                    entity.setLimiteCredito(data.limiteCredito());
+                    entity.setDiasPrazo(data.diasPrazo());
+                    entity.setObservacoes(data.observacoes());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Parceiros> parceiros = repository.findById(id);
-        if(parceiros.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Parceiros parceirosModel = parceiros.get();
-        BeanUtils.copyProperties(upData, parceirosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(parceirosModel));
+                    Parceiros updated = repository.save(entity);
+                    return ResponseEntity.ok(new ParceirosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteParceiro(@PathVariable(value = "id") Integer id){
-
-        Optional<Parceiros> parceiros = repository.findById(id);
-        if(parceiros.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(parceiros.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Parceiro deleted");
+    public ResponseEntity<?> deleteParceiro(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Parceiro deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
