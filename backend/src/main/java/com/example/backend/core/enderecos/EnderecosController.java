@@ -1,73 +1,74 @@
 package com.example.backend.core.enderecos;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/core/enderecos")
 public class EnderecosController {
 
-    @Autowired
-    private EnderecosRepository repository;
+    private final EnderecosRepository repository;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public EnderecosController(EnderecosRepository repository) {
+        this.repository = repository;
+    }
+
     @GetMapping
-    public List<EnderecosResponseDTO> getAll(){
-
-        List<EnderecosResponseDTO> enderecosList = repository.findAll().stream().map(EnderecosResponseDTO::new).toList();
-        return enderecosList;
+    public List<EnderecosResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(EnderecosResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Integer id){
-
-        Optional<Enderecos> enderecos = repository.findById(id);
-        if(enderecos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        EnderecosResponseDTO enderecosDTO = new EnderecosResponseDTO(enderecos.get());
-        return  ResponseEntity.ok(enderecosDTO);
+    public ResponseEntity<?> getById(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EnderecosResponseDTO(entity)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveEndereco(@RequestBody EnderecosRequestDTO data){
-
-        Enderecos enderecoData = new Enderecos(data);
-        repository.save(enderecoData);
-        return;
+    public ResponseEntity<?> saveEndereco(@RequestBody EnderecosRequestDTO data) {
+        Enderecos entity = new Enderecos(data);
+        Enderecos saved = repository.save(entity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new EnderecosResponseDTO(saved));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEndereco(@PathVariable(value = "id") Integer id, @RequestBody EnderecosRequestDTO upData){
+    public ResponseEntity<?> updateEndereco(@PathVariable Integer id, @RequestBody EnderecosRequestDTO data) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    entity.setEntidadeTipo(data.entidadeTipo());
+                    entity.setEntidadeId(data.entidadeId());
+                    entity.setTipoEndereco(data.tipoEndereco());
+                    entity.setLogradouro(data.logradouro());
+                    entity.setNumero(data.numero());
+                    entity.setComplemento(data.complemento());
+                    entity.setBairro(data.bairro());
+                    entity.setCidade(data.cidade());
+                    entity.setUf(data.uf());
+                    entity.setCep(data.cep());
+                    entity.setPais(data.pais());
+                    entity.setPrincipal(data.principal());
+                    entity.setCreatedAt(data.createdAt());
 
-        Optional<Enderecos> enderecos = repository.findById(id);
-        if(enderecos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Enderecos enderecosModel = enderecos.get();
-        BeanUtils.copyProperties(upData, enderecosModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(enderecosModel));
+                    Enderecos updated = repository.save(entity);
+                    return ResponseEntity.ok(new EnderecosResponseDTO(updated));
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEndereco(@PathVariable(value = "id") Integer id){
-
-        Optional<Enderecos> enderecos = repository.findById(id);
-        if(enderecos.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(enderecos.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Endereço deleted");
+    public ResponseEntity<?> deleteEndereco(@PathVariable Integer id) {
+        return repository.findById(id)
+                .<ResponseEntity<?>>map(entity -> {
+                    repository.delete(entity);
+                    return ResponseEntity.ok("Endereco deleted");
+                })
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
     }
 }
