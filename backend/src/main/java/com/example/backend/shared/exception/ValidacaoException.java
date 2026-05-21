@@ -1,0 +1,7 @@
+package com.example.backend.shared.exception;
+
+public class ValidacaoException extends RuntimeException {
+    public ValidacaoException(String message) {
+        super(message);
+    }
+}

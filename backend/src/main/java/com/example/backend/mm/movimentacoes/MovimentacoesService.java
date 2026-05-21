@@ -2,12 +2,16 @@ package com.example.backend.mm.movimentacoes;
 
 import com.example.backend.mm.estoques.Estoques;
 import com.example.backend.mm.estoques.EstoquesRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
+import com.example.backend.shared.exception.RegraNegocioException;
+import com.example.backend.shared.exception.ValidacaoException;
 import com.example.backend.sys.usuarios.Usuarios;
 import com.example.backend.sys.usuarios.UsuariosRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class MovimentacoesService {
@@ -30,13 +34,13 @@ public class MovimentacoesService {
     public Movimentacoes criar(MovimentacoesRequestDTO data) {
         validar(data);
 
-        Estoques estoque = buscarEstoqueObrigatorio(data.estoque());
+        Estoques estoque = buscarEstoque(data.estoque());
         Usuarios usuario = buscarUsuario(data.usuario());
 
         aplicarMovimento(estoque, data.tipoMovimento(), data.quantidade());
 
         Movimentacoes entity = new Movimentacoes();
-        preencher(entity, data, estoque, usuario);
+        preencher(entity, data, estoque, usuario, LocalDateTime.now());
         estoquesRepository.save(estoque);
 
         return repository.save(entity);
@@ -47,16 +51,16 @@ public class MovimentacoesService {
         validar(data);
 
         Movimentacoes entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Movimentacao nao encontrada"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Movimentacao nao encontrada"));
 
         Estoques estoqueAnterior = entity.getEstoque();
         desfazerMovimento(estoqueAnterior, entity);
 
-        Estoques novoEstoque = buscarEstoqueObrigatorio(data.estoque());
+        Estoques novoEstoque = buscarEstoque(data.estoque());
         Usuarios usuario = buscarUsuario(data.usuario());
 
         aplicarMovimento(novoEstoque, data.tipoMovimento(), data.quantidade());
-        preencher(entity, data, novoEstoque, usuario);
+        preencher(entity, data, novoEstoque, usuario, entity.getCreatedAt());
 
         estoquesRepository.save(estoqueAnterior);
 
@@ -70,7 +74,7 @@ public class MovimentacoesService {
     @Transactional
     public void excluir(Integer id) {
         Movimentacoes entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Movimentacao nao encontrada"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Movimentacao nao encontrada"));
 
         Estoques estoque = entity.getEstoque();
         desfazerMovimento(estoque, entity);
@@ -83,53 +87,50 @@ public class MovimentacoesService {
             Movimentacoes entity,
             MovimentacoesRequestDTO data,
             Estoques estoque,
-            Usuarios usuario
+            Usuarios usuario,
+            LocalDateTime createdAt
     ) {
         entity.setEstoque(estoque);
         entity.setTipoMovimento(normalizarTipoMovimento(data.tipoMovimento()));
         entity.setQuantidade(data.quantidade());
         entity.setValorUnitario(data.valorUnitario());
-        entity.setValorTotal(calcularValorTotal(data.quantidade(), data.valorUnitario(), data.valorTotal()));
+        entity.setValorTotal(calcularValorTotal(data.quantidade(), data.valorUnitario()));
         entity.setDocumentoReferencia(data.documentoReferencia());
         entity.setMotivo(data.motivo());
         entity.setUsuario(usuario);
-        entity.setCreatedAt(data.createdAt());
+        entity.setCreatedAt(createdAt);
     }
 
     private void validar(MovimentacoesRequestDTO data) {
         if (data == null) {
-            throw new RuntimeException("Dados da movimentacao sao obrigatorios");
+            throw new ValidacaoException("Dados da movimentacao sao obrigatorios");
         }
 
         if (data.estoque() == null) {
-            throw new RuntimeException("Estoque e obrigatorio");
+            throw new ValidacaoException("Estoque e obrigatorio");
         }
 
         if (data.tipoMovimento() == null || data.tipoMovimento().isBlank()) {
-            throw new RuntimeException("Tipo de movimento e obrigatorio");
+            throw new ValidacaoException("Tipo de movimento e obrigatorio");
         }
 
         String tipo = normalizarTipoMovimento(data.tipoMovimento());
         if (!tipo.equals("entrada") && !tipo.equals("saida")) {
-            throw new RuntimeException("Tipo de movimento invalido");
+            throw new ValidacaoException("Tipo de movimento invalido");
         }
 
         if (data.quantidade() == null || data.quantidade().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Quantidade deve ser maior que zero");
+            throw new ValidacaoException("Quantidade deve ser maior que zero");
         }
 
-        if (data.valorUnitario() != null && data.valorUnitario().compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("Valor unitario nao pode ser negativo");
-        }
-
-        if (data.valorTotal() != null && data.valorTotal().compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("Valor total nao pode ser negativo");
+        if (data.valorUnitario() == null || data.valorUnitario().compareTo(BigDecimal.ZERO) < 0) {
+            throw new ValidacaoException("Valor unitario deve ser informado e nao pode ser negativo");
         }
     }
 
-    private Estoques buscarEstoqueObrigatorio(Integer estoqueId) {
+    private Estoques buscarEstoque(Integer estoqueId) {
         return estoquesRepository.findById(estoqueId)
-                .orElseThrow(() -> new RuntimeException("Estoque nao encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Estoque nao encontrado"));
     }
 
     private Usuarios buscarUsuario(Integer usuarioId) {
@@ -138,7 +139,7 @@ public class MovimentacoesService {
         }
 
         return usuariosRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario nao encontrado"));
     }
 
     private void aplicarMovimento(Estoques estoque, String tipoMovimento, BigDecimal quantidade) {
@@ -151,7 +152,7 @@ public class MovimentacoesService {
         }
 
         if (saldoAtual.compareTo(quantidade) < 0) {
-            throw new RuntimeException("Saldo insuficiente em estoque");
+            throw new RegraNegocioException("Saldo insuficiente em estoque");
         }
 
         estoque.setQuantidade(saldoAtual.subtract(quantidade));
@@ -164,7 +165,7 @@ public class MovimentacoesService {
 
         if (tipo.equals("entrada")) {
             if (saldoAtual.compareTo(quantidade) < 0) {
-                throw new RuntimeException("Nao foi possivel desfazer movimentacao de entrada");
+                throw new RegraNegocioException("Nao foi possivel desfazer movimentacao de entrada");
             }
             estoque.setQuantidade(saldoAtual.subtract(quantidade));
             return;
@@ -175,14 +176,9 @@ public class MovimentacoesService {
 
     private BigDecimal calcularValorTotal(
             BigDecimal quantidade,
-            BigDecimal valorUnitario,
-            BigDecimal valorTotalInformado
+            BigDecimal valorUnitario
     ) {
-        if (quantidade != null && valorUnitario != null) {
             return quantidade.multiply(valorUnitario);
-        }
-
-        return valorTotalInformado;
     }
 
     private BigDecimal nvl(BigDecimal value) {
