@@ -1,9 +1,5 @@
 package com.example.backend.mm.movimentacoes;
 
-import com.example.backend.mm.estoques.Estoques;
-import com.example.backend.mm.estoques.EstoquesRepository;
-import com.example.backend.sys.usuarios.Usuarios;
-import com.example.backend.sys.usuarios.UsuariosRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,11 +58,14 @@ public class MovimentacoesController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMovimentacoes(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Movimentacao deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+        try {
+            movimentacoesService.excluir(id);
+            return ResponseEntity.ok("Movimentacao deleted");
+        } catch (RuntimeException ex) {
+            if ("Movimentacao nao encontrada".equals(ex.getMessage())) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 }
