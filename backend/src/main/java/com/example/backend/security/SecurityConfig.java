@@ -540,7 +540,24 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/ps/recursosAlocados/**")
                         .hasAnyAuthority("PERMISSAO_ps:recursosAlocados:delete")
 
-                        .requestMatchers("/am/**").hasAnyAuthority("SCOPE_TENANT")
+                        .requestMatchers(HttpMethod.GET, "/am/bensPatrimoniais/**")
+                        .hasAnyAuthority("PERMISSAO_am:bensPatrimoniais:read")
+                        .requestMatchers(HttpMethod.POST, "/am/bensPatrimoniais/**")
+                        .hasAnyAuthority("PERMISSAO_am:bensPatrimoniais:create")
+                        .requestMatchers(HttpMethod.PUT, "/am/bensPatrimoniais/**")
+                        .hasAnyAuthority("PERMISSAO_am:bensPatrimoniais:update")
+                        .requestMatchers(HttpMethod.DELETE, "/am/bensPatrimoniais/**")
+                        .hasAnyAuthority("PERMISSAO_am:bensPatrimoniais:delete")
+
+                        .requestMatchers(HttpMethod.GET, "/am/manutencoes/**")
+                        .hasAnyAuthority("PERMISSAO_am:manutencoes:read")
+                        .requestMatchers(HttpMethod.POST, "/am/manutencoes/**")
+                        .hasAnyAuthority("PERMISSAO_am:manutencoes:create")
+                        .requestMatchers(HttpMethod.PUT, "/am/manutencoes/**")
+                        .hasAnyAuthority("PERMISSAO_am:manutencoes:update")
+                        .requestMatchers(HttpMethod.DELETE, "/am/manutencoes/**")
+                        .hasAnyAuthority("PERMISSAO_am:manutencoes:delete")
+
                         .requestMatchers("/fiscal/**").hasAnyAuthority("SCOPE_TENANT")
 
                 )
