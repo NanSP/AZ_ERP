@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @SuppressWarnings("deprecation")
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<?> handleRegraNegocio(RegraNegocioException ex) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)

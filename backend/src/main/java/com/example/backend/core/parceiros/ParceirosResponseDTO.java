@@ -1,11 +1,8 @@
 package com.example.backend.core.parceiros;
 
-import com.example.backend.fi.contasPagar.ContasPagar;
-import com.example.backend.fi.contasReceber.ContasReceber;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+
 
 public record ParceirosResponseDTO
         (

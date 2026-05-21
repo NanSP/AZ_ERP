@@ -15,7 +15,6 @@ public class FolhaDePagamentoService {
 
     public FolhaCalculadaDTO calcular(FolhaDePagamentoRequestDTO data) {
         BigDecimal salarioBase = nvl(data.salarioBase());
-        BigDecimal horasNormais = nvl(data.horasNormais());
         BigDecimal horasExtras = nvl(data.horasExtras());
         BigDecimal adicionais = nvl(data.adicionais());
         BigDecimal descontos = nvl(data.descontos());
