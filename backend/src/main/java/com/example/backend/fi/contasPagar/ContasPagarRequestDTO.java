@@ -15,7 +15,6 @@ public record ContasPagarRequestDTO
                 LocalDate dataEmissao,
                 LocalDate dataVencimento,
                 LocalDate dataPagamento,
-                String status,
                 String formaPagamento
         ) {
 }

@@ -2,7 +2,6 @@ package com.example.backend.fi.contasReceber;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record ContasReceberRequestDTO
         (
@@ -16,8 +15,6 @@ public record ContasReceberRequestDTO
                 LocalDate dataEmissao,
                 LocalDate dataVencimento,
                 LocalDate dataRecebimento,
-                String status,
-                String formaPagamento,
-                LocalDateTime createdAt
+                String formaPagamento
         ) {
 }

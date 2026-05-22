@@ -1,13 +1,7 @@
 package com.example.backend.fi.contasReceber;
 
-import com.example.backend.core.empresas.Empresas;
-import com.example.backend.core.empresas.EmpresasRepository;
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.core.parceiros.ParceirosRepository;
-import com.example.backend.fi.centrosCusto.CentrosCusto;
-import com.example.backend.fi.centrosCusto.CentrosCustoRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,20 +11,14 @@ import java.util.List;
 public class ContasReceberController {
 
     private final ContasReceberRepository repository;
-    private final EmpresasRepository empresasRepository;
-    private final ParceirosRepository parceirosRepository;
-    private final CentrosCustoRepository centrosCustoRepository;
+    private final ContasReceberService contasReceberService;
 
     public ContasReceberController(
             ContasReceberRepository repository,
-            EmpresasRepository empresasRepository,
-            ParceirosRepository parceirosRepository,
-            CentrosCustoRepository centrosCustoRepository
+            ContasReceberService contasReceberService
     ) {
         this.repository = repository;
-        this.empresasRepository = empresasRepository;
-        this.parceirosRepository = parceirosRepository;
-        this.centrosCustoRepository = centrosCustoRepository;
+        this.contasReceberService = contasReceberService;
     }
 
     @GetMapping
@@ -42,103 +30,29 @@ public class ContasReceberController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ContasReceberResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ContasReceberResponseDTO getById(@PathVariable Integer id) {
+        ContasReceber entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta a receber nao encontrada"));
+
+        return new ContasReceberResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveContasReceber(@RequestBody ContasReceberRequestDTO data) {
-        try {
-            Empresas empresa = data.empresa() != null
-                    ? empresasRepository.findById(data.empresa())
-                    .orElseThrow(() -> new RuntimeException("Empresa nao encontrada"))
-                    : null;
-
-            Parceiros cliente = data.cliente() != null
-                    ? parceirosRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            CentrosCusto centroCusto = data.centroCusto() != null
-                    ? centrosCustoRepository.findById(data.centroCusto())
-                    .orElseThrow(() -> new RuntimeException("Centro de custo nao encontrado"))
-                    : null;
-
-            ContasReceber entity = new ContasReceber();
-            entity.setEmpresa(empresa);
-            entity.setCliente(cliente);
-            entity.setCentroCusto(centroCusto);
-            entity.setNumeroDocumento(data.numeroDocumento());
-            entity.setDescricao(data.descricao());
-            entity.setValorOriginal(data.valorOriginal());
-            entity.setValorRecebido(data.valorRecebido());
-            entity.setDataEmissao(data.dataEmissao());
-            entity.setDataVencimento(data.dataVencimento());
-            entity.setDataRecebimento(data.dataRecebimento());
-            entity.setStatus(data.status());
-            entity.setFormaPagamento(data.formaPagamento());
-            entity.setCreatedAt(data.createdAt());
-
-            ContasReceber saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ContasReceberResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public ContasReceberResponseDTO saveContasReceber(@RequestBody ContasReceberRequestDTO data) {
+        ContasReceber saved = contasReceberService.criar(data);
+        return new ContasReceberResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContasReceber(@PathVariable Integer id, @RequestBody ContasReceberRequestDTO data) {
-        try {
-            ContasReceber entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Conta a receber nao encontrada"));
-
-            Empresas empresa = data.empresa() != null
-                    ? empresasRepository.findById(data.empresa())
-                    .orElseThrow(() -> new RuntimeException("Empresa nao encontrada"))
-                    : null;
-
-            Parceiros cliente = data.cliente() != null
-                    ? parceirosRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            CentrosCusto centroCusto = data.centroCusto() != null
-                    ? centrosCustoRepository.findById(data.centroCusto())
-                    .orElseThrow(() -> new RuntimeException("Centro de custo nao encontrado"))
-                    : null;
-
-            entity.setEmpresa(empresa);
-            entity.setCliente(cliente);
-            entity.setCentroCusto(centroCusto);
-            entity.setNumeroDocumento(data.numeroDocumento());
-            entity.setDescricao(data.descricao());
-            entity.setValorOriginal(data.valorOriginal());
-            entity.setValorRecebido(data.valorRecebido());
-            entity.setDataEmissao(data.dataEmissao());
-            entity.setDataVencimento(data.dataVencimento());
-            entity.setDataRecebimento(data.dataRecebimento());
-            entity.setStatus(data.status());
-            entity.setFormaPagamento(data.formaPagamento());
-            entity.setCreatedAt(data.createdAt());
-
-            ContasReceber updated = repository.save(entity);
-            return ResponseEntity.ok(new ContasReceberResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public ContasReceberResponseDTO updateContasReceber(@PathVariable Integer id, @RequestBody ContasReceberRequestDTO data) {
+        ContasReceber updated = contasReceberService.atualizar(id, data);
+        return new ContasReceberResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContasReceber(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Contas a Receber deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteContasReceber(@PathVariable Integer id) {
+        contasReceberService.excluir(id);
+        return "Contas a Receber deleted";
     }
 }

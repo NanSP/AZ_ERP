@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 public record ContasReceberResponseDTO
         (
                 Integer id,
-                Integer empresaId,
-                Integer clienteId,
-                Integer centroCustoId,
+                Integer empresa,
+                Integer cliente,
+                Integer centroCusto,
                 String numeroDocumento,
                 String descricao,
                 BigDecimal valorOriginal,
