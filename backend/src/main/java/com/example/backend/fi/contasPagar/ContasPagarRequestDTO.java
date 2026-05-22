@@ -2,7 +2,6 @@ package com.example.backend.fi.contasPagar;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record ContasPagarRequestDTO
         (
@@ -17,7 +16,6 @@ public record ContasPagarRequestDTO
                 LocalDate dataVencimento,
                 LocalDate dataPagamento,
                 String status,
-                String formaPagamento,
-                LocalDateTime createdAt
+                String formaPagamento
         ) {
 }
