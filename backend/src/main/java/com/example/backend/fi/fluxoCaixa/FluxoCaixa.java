@@ -38,16 +38,4 @@ public class FluxoCaixa {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public FluxoCaixa(FluxoCaixaRequestDTO data){
-        this.saldoInicial = data.saldoInicial();
-        this.entradasPrevistas = data.entradasPrevistas();
-        this.saidasPrevistas = data.saidasPrevistas();
-        this.entradasRealizadas = data.entradasRealizadas();
-        this.saidasRealizadas = data.saidasRealizadas();
-        this.saldoFinalPrevisto = data.saldoFinalPrevisto();
-        this.saldoFinalReal = data.saldoFinalReal();
-        this.createdAt = data.createdAt();
-        this.dataReferencia = data.dataReferencia();
-    }
 }

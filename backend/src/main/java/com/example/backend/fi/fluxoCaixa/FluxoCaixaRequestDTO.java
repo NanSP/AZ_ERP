@@ -2,7 +2,6 @@ package com.example.backend.fi.fluxoCaixa;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record FluxoCaixaRequestDTO
         (
@@ -11,9 +10,6 @@ public record FluxoCaixaRequestDTO
                 BigDecimal entradasPrevistas,
                 BigDecimal saidasPrevistas,
                 BigDecimal entradasRealizadas,
-                BigDecimal saidasRealizadas,
-                BigDecimal saldoFinalPrevisto,
-                BigDecimal saldoFinalReal,
-                LocalDateTime createdAt
+                BigDecimal saidasRealizadas
         ) {
 }
