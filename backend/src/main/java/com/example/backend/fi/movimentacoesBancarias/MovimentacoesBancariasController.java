@@ -1,7 +1,7 @@
 package com.example.backend.fi.movimentacoesBancarias;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class MovimentacoesBancariasController {
 
     private final MovimentacoesBancariasRepository repository;
+    private final MovimentacoesBancariasService movimentacoesBancariasService;
 
-    public MovimentacoesBancariasController(MovimentacoesBancariasRepository repository) {
+    public MovimentacoesBancariasController(
+            MovimentacoesBancariasRepository repository,
+            MovimentacoesBancariasService movimentacoesBancariasService
+    ) {
         this.repository = repository;
+        this.movimentacoesBancariasService = movimentacoesBancariasService;
     }
 
     @GetMapping
@@ -25,46 +30,29 @@ public class MovimentacoesBancariasController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new MovimentacoesBancariasResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public MovimentacoesBancariasResponseDTO getById(@PathVariable Integer id) {
+        MovimentacoesBancarias entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Movimentacao bancaria nao encontrada"));
+
+        return new MovimentacoesBancariasResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveMovimentacoesBancarias(@RequestBody MovimentacoesBancariasRequestDTO data) {
-        MovimentacoesBancarias entity = new MovimentacoesBancarias(data);
-        MovimentacoesBancarias saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new MovimentacoesBancariasResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public MovimentacoesBancariasResponseDTO saveMovimentacoesBancarias(@RequestBody MovimentacoesBancariasRequestDTO data) {
+        MovimentacoesBancarias saved = movimentacoesBancariasService.criar(data);
+        return new MovimentacoesBancariasResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMovimentacoesBancarias(@PathVariable Integer id, @RequestBody MovimentacoesBancariasRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setContaBancariaId(data.contaBancariaId());
-                    entity.setTipoMovimento(data.tipoMovimento());
-                    entity.setValor(data.valor());
-                    entity.setDataMovimento(data.dataMovimento());
-                    entity.setHistorico(data.historico());
-                    entity.setDocumentoVinculado(data.documentoVinculado());
-                    entity.setConciliado(data.conciliado());
-                    entity.setDataConciliacao(data.dataConciliacao());
-                    entity.setCreatedAt(data.createdAt());
-
-                    MovimentacoesBancarias updated = repository.save(entity);
-                    return ResponseEntity.ok(new MovimentacoesBancariasResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public MovimentacoesBancariasResponseDTO updateMovimentacoesBancarias(@PathVariable Integer id, @RequestBody MovimentacoesBancariasRequestDTO data) {
+        MovimentacoesBancarias updated = movimentacoesBancariasService.atualizar(id, data);
+        return new MovimentacoesBancariasResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMovimentacoesBancarias(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Movimentacao Bancaria deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteMovimentacoesBancarias(@PathVariable Integer id) {
+        movimentacoesBancariasService.excluir(id);
+        return "Movimentacao bancaria deleted";
     }
 }

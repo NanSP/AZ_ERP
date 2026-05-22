@@ -2,7 +2,6 @@ package com.example.backend.fi.movimentacoesBancarias;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record MovimentacoesBancariasRequestDTO
         (
@@ -13,7 +12,6 @@ public record MovimentacoesBancariasRequestDTO
                 String historico,
                 String documentoVinculado,
                 Boolean conciliado,
-                LocalDate dataConciliacao,
-                LocalDateTime createdAt
+                LocalDate dataConciliacao
         ) {
 }

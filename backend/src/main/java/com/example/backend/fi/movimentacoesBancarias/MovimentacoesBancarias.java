@@ -36,16 +36,4 @@ public class MovimentacoesBancarias {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public MovimentacoesBancarias(MovimentacoesBancariasRequestDTO data){
-        this.contaBancariaId = data.contaBancariaId();
-        this.tipoMovimento = data.tipoMovimento();
-        this.valor = data.valor();
-        this.dataMovimento = data.dataMovimento();
-        this.historico = data.historico();
-        this.documentoVinculado = data.documentoVinculado();
-        this.conciliado = data.conciliado();
-        this.dataConciliacao = data.dataConciliacao();
-        this.createdAt = data.createdAt();
-    }
-
 }
