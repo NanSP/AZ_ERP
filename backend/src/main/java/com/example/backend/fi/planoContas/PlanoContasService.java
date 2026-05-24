@@ -17,6 +17,7 @@ public class PlanoContasService {
     @Transactional
     public PlanoContas criar(PlanoContasRequestDTO data) {
         validar(data);
+        validarCodigoDuplicadoParaCriacao(data.codigo().trim());
 
         PlanoContas contaPai = buscarContaPai(data.contaPai(), null);
 
@@ -29,6 +30,7 @@ public class PlanoContasService {
     @Transactional
     public PlanoContas atualizar(Integer id, PlanoContasRequestDTO data) {
         validar(data);
+        validarCodigoDuplicadoParaAtualizacao(data.codigo().trim(), id);
 
         PlanoContas entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Plano de contas nao encontrado"));
@@ -50,6 +52,8 @@ public class PlanoContasService {
 
         repository.delete(entity);
     }
+
+
 
     private void preencher(PlanoContas entity, PlanoContasRequestDTO data, PlanoContas contaPai) {
         entity.setCodigo(data.codigo().trim());
@@ -98,8 +102,37 @@ public class PlanoContasService {
             throw new ValidacaoException("Conta nao pode ser pai dela mesma");
         }
 
-        return repository.findById(contaPaiId)
+        PlanoContas contaPai = repository.findById(contaPaiId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Conta pai nao encontrada"));
+
+        if (contaAtualId != null) {
+            validarCicloHierarquico(contaPai, contaAtualId);
+        }
+
+        return contaPai;
+    }
+
+    private void validarCicloHierarquico(PlanoContas contaPai, Integer contaAtualId) {
+        PlanoContas atual = contaPai;
+
+        while (atual != null) {
+            if (atual.getId().equals(contaAtualId)) {
+                throw new ValidacaoException("Nao e permitido criar ciclo na hierarquia do plano de contas");
+            }
+            atual = atual.getContaPai();
+        }
+    }
+
+    private void validarCodigoDuplicadoParaCriacao(String codigo) {
+        if (repository.existsByCodigo(codigo)) {
+            throw new ValidacaoException("Ja existe uma conta com o codigo informado");
+        }
+    }
+
+    private void validarCodigoDuplicadoParaAtualizacao(String codigo, Integer id) {
+        if (repository.existsByCodigoAndIdNot(codigo, id)) {
+            throw new ValidacaoException("Ja existe uma conta com o codigo informado");
+        }
     }
 
     private String normalizar(String valor) {
