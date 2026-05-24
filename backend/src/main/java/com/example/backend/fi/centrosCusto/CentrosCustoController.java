@@ -1,7 +1,7 @@
 package com.example.backend.fi.centrosCusto;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class CentrosCustoController {
 
     private final CentrosCustoRepository repository;
+    private final CentrosCustoService centrosCustoService;
 
-    public CentrosCustoController(CentrosCustoRepository repository) {
+    public CentrosCustoController(
+            CentrosCustoRepository repository,
+            CentrosCustoService centrosCustoService
+    ) {
         this.repository = repository;
+        this.centrosCustoService = centrosCustoService;
     }
 
     @GetMapping
@@ -25,42 +30,29 @@ public class CentrosCustoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new CentrosCustoResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public CentrosCustoResponseDTO getById(@PathVariable Integer id) {
+        CentrosCusto entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Centro de custo nao encontrado"));
+
+        return new CentrosCustoResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveCentrosCusto(@RequestBody CentrosCustoRequestDTO data) {
-        CentrosCusto entity = new CentrosCusto(data);
-        CentrosCusto saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CentrosCustoResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public CentrosCustoResponseDTO saveCentrosCusto(@RequestBody CentrosCustoRequestDTO data) {
+        CentrosCusto saved = centrosCustoService.criar(data);
+        return new CentrosCustoResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCentrosCusto(@PathVariable Integer id, @RequestBody CentrosCustoRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setCodigo(data.codigo());
-                    entity.setNome(data.nome());
-                    entity.setTipo(data.tipo());
-                    entity.setResponsavel(data.responsavel());
-                    entity.setAtivo(data.ativo());
-
-                    CentrosCusto updated = repository.save(entity);
-                    return ResponseEntity.ok(new CentrosCustoResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public CentrosCustoResponseDTO updateCentrosCusto(@PathVariable Integer id, @RequestBody CentrosCustoRequestDTO data) {
+        CentrosCusto updated = centrosCustoService.atualizar(id, data);
+        return new CentrosCustoResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCentrosCusto(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Centro de custo deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteCentrosCusto(@PathVariable Integer id) {
+        centrosCustoService.excluir(id);
+        return "Centro de custo deleted";
     }
 }
