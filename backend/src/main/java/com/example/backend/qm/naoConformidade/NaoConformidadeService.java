@@ -89,7 +89,16 @@ public class NaoConformidadeService {
             throw new ValidacaoException("Dados da nao conformidade sao obrigatorios");
         }
 
+        if (data.inspecao() == null) {
+            throw new ValidacaoException("Inspecao e obrigatoria");
+        }
+
+        if (data.responsavel() == null) {
+            throw new ValidacaoException("Responsavel e obrigatorio");
+        }
+
         String status = normalizarStatus(data.status());
+        validarStatus(status);
 
         if (data.dataIdentificacao() != null
                 && data.dataResolucao() != null
@@ -106,20 +115,21 @@ public class NaoConformidadeService {
         }
     }
 
-    private Inspecoes buscarInspecao(Integer inspecaoId) {
-        if (inspecaoId == null) {
-            return null;
+    private void validarStatus(String status) {
+        if (!status.equals("aberta")
+                && !status.equals("em_tratamento")
+                && !status.equals("resolvida")
+                && !status.equals("cancelada")) {
+            throw new ValidacaoException("Status invalido");
         }
+    }
 
+    private Inspecoes buscarInspecao(Integer inspecaoId) {
         return inspecoesRepository.findById(inspecaoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Inspecao nao encontrada"));
     }
 
     private Colaboradores buscarResponsavel(Integer responsavelId) {
-        if (responsavelId == null) {
-            return null;
-        }
-
         return colaboradoresRepository.findById(responsavelId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Responsavel nao encontrado"));
     }
