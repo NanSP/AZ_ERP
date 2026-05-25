@@ -1,7 +1,6 @@
 package com.example.backend.qm.naoConformidade;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record NaoConformidadeRequestDTO
         (
@@ -14,7 +13,6 @@ public record NaoConformidadeRequestDTO
                 Integer responsavel,
                 LocalDate dataIdentificacao,
                 LocalDate dataResolucao,
-                String status,
-                LocalDateTime createdAt
+                String status
         ) {
 }
