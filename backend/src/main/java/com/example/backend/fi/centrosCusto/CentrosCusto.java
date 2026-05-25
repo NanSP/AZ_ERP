@@ -20,12 +20,4 @@ public class CentrosCusto {
     private String tipo;
     private String responsavel;
     private Boolean ativo;
-
-    public CentrosCusto(CentrosCustoRequestDTO data){
-        this.codigo = data.codigo();
-        this.nome = data.nome();
-        this.tipo = data.tipo();
-        this.responsavel = data.responsavel();
-        this.ativo = data.ativo();
-    }
 }
