@@ -2,7 +2,6 @@ package com.example.backend.pp.ordemProducao;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record OrdemProducaoRequestDTO
         (
@@ -16,7 +15,6 @@ public record OrdemProducaoRequestDTO
                 LocalDate dataPrevista,
                 String status,
                 Integer prioridade,
-                String observacoes,
-                LocalDateTime createdAt
+                String observacoes
         ) {
 }
