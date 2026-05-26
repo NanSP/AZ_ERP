@@ -2,7 +2,6 @@ package com.example.backend.ps.projetos;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record ProjetosRequestDTO
         (
@@ -18,7 +17,6 @@ public record ProjetosRequestDTO
                 BigDecimal orcamentoTotal,
                 BigDecimal orcamentoGasto,
                 String status,
-                Integer prioridade,
-                LocalDateTime createdAt
+                Integer prioridade
         ) {
 }
