@@ -89,10 +89,10 @@ public class ApontamentosService {
             return updated;
         }
 
-        reverterQuantidadeProduzidaOp(opAtual, quantidadeAnterior);
+        reverterImpactoApontamentoOp(opAtual, quantidadeAnterior);
         recalcularStatusOp(opAtual);
 
-        atualizarQuantidadeProduzidaOp(novaOp, zeroSeNulo(data.quantidadeProduzida()), BigDecimal.ZERO);
+        aplicarImpactoApontamentoOp(novaOp, zeroSeNulo(data.quantidadeProduzida()));
         recalcularStatusOp(novaOp);
 
         return updated;
@@ -104,7 +104,7 @@ public class ApontamentosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Apontamento nao encontrado"));
 
         repository.delete(entity);
-        reverterQuantidadeProduzidaOp(entity.getOp(), zeroSeNulo(entity.getQuantidadeProduzida()));
+        reverterImpactoApontamentoOp(entity.getOp(), zeroSeNulo(entity.getQuantidadeProduzida()));
         recalcularStatusOp(entity.getOp());
     }
 
@@ -259,6 +259,14 @@ public class ApontamentosService {
         op.setQuantidadeProduzida(produzidaResultante);
     }
 
+    private void aplicarImpactoApontamentoOp(OrdemProducao op, BigDecimal quantidadeProduzida) {
+        if (op == null) {
+            return;
+        }
+
+        atualizarQuantidadeProduzidaOp(op, quantidadeProduzida, BigDecimal.ZERO);
+    }
+
     private void recalcularStatusOp(OrdemProducao op) {
         if (op == null) {
             return;
@@ -282,7 +290,7 @@ public class ApontamentosService {
         op.setStatus("concluida");
     }
 
-    private void reverterQuantidadeProduzidaOp(OrdemProducao op, BigDecimal quantidadeAnterior) {
+    private void reverterImpactoApontamentoOp(OrdemProducao op, BigDecimal quantidadeAnterior) {
         if (op == null) {
             return;
         }

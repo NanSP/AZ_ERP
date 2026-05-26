@@ -1,7 +1,6 @@
 package com.example.backend.pp.bom;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public record BomRequestDTO
         (
@@ -12,7 +11,6 @@ public record BomRequestDTO
                 Integer nivel,
                 BigDecimal tempoPreparacao,
                 BigDecimal tempoProducao,
-                Integer roteiro,
-                LocalDateTime createdAt
+                Integer roteiro
         ) {
 }
