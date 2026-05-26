@@ -2,7 +2,6 @@ package com.example.backend.ps.tarefas;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record TarefasRequestDTO
         (
@@ -17,7 +16,6 @@ public record TarefasRequestDTO
                 BigDecimal horasRealizadas,
                 Integer percentualConcluido,
                 String status,
-                Integer prioridade,
-                LocalDateTime createdAt
+                Integer prioridade
         ) {
 }
