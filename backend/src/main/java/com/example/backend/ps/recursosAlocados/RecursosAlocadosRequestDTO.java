@@ -2,7 +2,6 @@ package com.example.backend.ps.recursosAlocados;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record RecursosAlocadosRequestDTO
         (
@@ -12,8 +11,6 @@ public record RecursosAlocadosRequestDTO
                 Integer recursoId,
                 BigDecimal quantidade,
                 BigDecimal valorUnitario,
-                BigDecimal valorTotal,
-                LocalDate dataAlocacao,
-                LocalDateTime createdAt
+                LocalDate dataAlocacao
         ) {
 }
