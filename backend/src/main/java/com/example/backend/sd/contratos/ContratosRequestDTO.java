@@ -2,7 +2,6 @@ package com.example.backend.sd.contratos;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record ContratosRequestDTO
         (
@@ -12,7 +11,6 @@ public record ContratosRequestDTO
                 BigDecimal valorTotal,
                 LocalDate dataInicio,
                 LocalDate dataFim,
-                String status,
-                LocalDateTime createdAt
+                String status
         ) {
 }

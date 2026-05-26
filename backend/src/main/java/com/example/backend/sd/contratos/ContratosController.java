@@ -1,9 +1,7 @@
 package com.example.backend.sd.contratos;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.core.parceiros.ParceirosRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +11,14 @@ import java.util.List;
 public class ContratosController {
 
     private final ContratosRepository repository;
-    private final ParceirosRepository parceirosRepository;
+    private final ContratosService contratosService;
 
     public ContratosController(
             ContratosRepository repository,
-            ParceirosRepository parceirosRepository
+            ContratosService contratosService
     ) {
         this.repository = repository;
-        this.parceirosRepository = parceirosRepository;
+        this.contratosService = contratosService;
     }
 
     @GetMapping
@@ -32,73 +30,29 @@ public class ContratosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ContratosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ContratosResponseDTO getById(@PathVariable Integer id) {
+        Contratos entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Contrato nao encontrado"));
+
+        return new ContratosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveContratos(@RequestBody ContratosRequestDTO data) {
-        try {
-            Parceiros cliente = data.cliente() != null
-                    ? parceirosRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            Contratos entity = new Contratos();
-            entity.setCliente(cliente);
-            entity.setNumeroContrato(data.numeroContrato());
-            entity.setObjeto(data.objeto());
-            entity.setValorTotal(data.valorTotal());
-            entity.setDataInicio(data.dataInicio());
-            entity.setDataFim(data.dataFim());
-            entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
-
-            Contratos saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ContratosResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public ContratosResponseDTO saveContratos(@RequestBody ContratosRequestDTO data) {
+        Contratos saved = contratosService.criar(data);
+        return new ContratosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateContratos(@PathVariable Integer id, @RequestBody ContratosRequestDTO data) {
-        try {
-            Contratos entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Contrato nao encontrado"));
-
-            Parceiros cliente = data.cliente() != null
-                    ? parceirosRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            entity.setCliente(cliente);
-            entity.setNumeroContrato(data.numeroContrato());
-            entity.setObjeto(data.objeto());
-            entity.setValorTotal(data.valorTotal());
-            entity.setDataInicio(data.dataInicio());
-            entity.setDataFim(data.dataFim());
-            entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
-
-            Contratos updated = repository.save(entity);
-            return ResponseEntity.ok(new ContratosResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public ContratosResponseDTO updateContratos(@PathVariable Integer id, @RequestBody ContratosRequestDTO data) {
+        Contratos updated = contratosService.atualizar(id, data);
+        return new ContratosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteContratos(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Contrato deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteContratos(@PathVariable Integer id) {
+        contratosService.excluir(id);
+        return "Contrato deleted";
     }
 }
