@@ -2,7 +2,6 @@ package com.example.backend.sd.pedidos;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record PedidosRequestDTO
         (Integer cliente,
@@ -13,6 +12,6 @@ public record PedidosRequestDTO
          BigDecimal descontoTotal,
          String condicoesPagamento,
          String status,
-         String observacoes,
-         LocalDateTime createdAt) {
+         String observacoes
+        ) {
 }
