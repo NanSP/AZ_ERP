@@ -10,4 +10,7 @@ public interface PedidoItensRepository extends JpaRepository<PedidoItens, Intege
 
     @Query("select coalesce(sum(pi.valorTotal), 0) from PedidoItens pi where pi.pedido.id = :pedidoId")
     BigDecimal sumValorTotalByPedidoId(Integer pedidoId);
+
+    @Query("select coalesce(sum(pi.desconto), 0) from PedidoItens pi where pi.pedido.id = :pedidoId")
+    BigDecimal sumDescontoByPedidoId(Integer pedidoId);
 }

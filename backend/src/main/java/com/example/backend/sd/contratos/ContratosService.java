@@ -2,6 +2,7 @@ package com.example.backend.sd.contratos;
 
 import com.example.backend.core.parceiros.Parceiros;
 import com.example.backend.core.parceiros.ParceirosRepository;
+import com.example.backend.sd.clientes.ClientesRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
@@ -16,13 +17,16 @@ public class ContratosService {
 
     private final ContratosRepository repository;
     private final ParceirosRepository parceirosRepository;
+    private final ClientesRepository clientesRepository;
 
     public ContratosService(
             ContratosRepository repository,
-            ParceirosRepository parceirosRepository
+            ParceirosRepository parceirosRepository,
+            ClientesRepository clientesRepository
     ) {
         this.repository = repository;
         this.parceirosRepository = parceirosRepository;
+        this.clientesRepository = clientesRepository;
     }
 
     @Transactional
@@ -90,6 +94,7 @@ public class ContratosService {
             throw new ValidacaoException("Cliente e obrigatorio");
         }
 
+        validarClienteComercial(data.cliente());
         validarNaoNegativo(data.valorTotal(), "Valor total nao pode ser negativo");
 
         if (data.dataInicio() != null
@@ -136,6 +141,12 @@ public class ContratosService {
     private Parceiros buscarCliente(Integer clienteId) {
         return parceirosRepository.findById(clienteId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente nao encontrado"));
+    }
+
+    private void validarClienteComercial(Integer clienteId) {
+        if (!clientesRepository.existsByParceiroId(clienteId)) {
+            throw new ValidacaoException("Cliente informado precisa estar cadastrado no CRM");
+        }
     }
 
     private void validarNaoNegativo(BigDecimal valor, String mensagem) {

@@ -2,6 +2,7 @@ package com.example.backend.sd.pedidos;
 
 import com.example.backend.core.parceiros.Parceiros;
 import com.example.backend.core.parceiros.ParceirosRepository;
+import com.example.backend.sd.clientes.ClientesRepository;
 import com.example.backend.sd.faturas.FaturasRepository;
 import com.example.backend.sd.pedidoItens.PedidoItensRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
@@ -17,17 +18,20 @@ public class PedidosService {
 
     private final PedidosRepository repository;
     private final ParceirosRepository parceirosRepository;
+    private final ClientesRepository clientesRepository;
     private final PedidoItensRepository pedidoItensRepository;
     private final FaturasRepository faturasRepository;
 
     public PedidosService(
             PedidosRepository repository,
             ParceirosRepository parceirosRepository,
+            ClientesRepository clientesRepository,
             PedidoItensRepository pedidoItensRepository,
             FaturasRepository faturasRepository
     ) {
         this.repository = repository;
         this.parceirosRepository = parceirosRepository;
+        this.clientesRepository = clientesRepository;
         this.pedidoItensRepository = pedidoItensRepository;
         this.faturasRepository = faturasRepository;
     }
@@ -85,8 +89,8 @@ public class PedidosService {
         entity.setNumeroPedido(normalizarOpcional(data.numeroPedido()));
         entity.setDataPedido(data.dataPedido());
         entity.setDataEntrega(data.dataEntrega());
-        entity.setValorTotal(zeroSeNulo(data.valorTotal()));
-        entity.setDescontoTotal(zeroSeNulo(data.descontoTotal()));
+        entity.setValorTotal(calcularValorTotalPedido(entity));
+        entity.setDescontoTotal(calcularDescontoTotalPedido(entity));
         entity.setCondicoesPagamento(normalizarOpcional(data.condicoesPagamento()));
         entity.setStatus(normalizarStatus(data.status()));
         entity.setObservacoes(normalizarOpcional(data.observacoes()));
@@ -106,17 +110,9 @@ public class PedidosService {
             throw new ValidacaoException("Data do pedido e obrigatoria");
         }
 
-        if (data.valorTotal() == null || data.valorTotal().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ValidacaoException("Valor total deve ser maior que zero");
-        }
-
+        validarClienteComercial(data.cliente());
+        validarNaoNegativo(data.valorTotal(), "Valor total nao pode ser negativo");
         validarNaoNegativo(data.descontoTotal(), "Desconto total nao pode ser negativo");
-
-        if (data.valorTotal() != null
-                && data.descontoTotal() != null
-                && data.descontoTotal().compareTo(data.valorTotal()) >= 0) {
-            throw new ValidacaoException("Desconto total deve ser menor que o valor total");
-        }
 
         if (data.dataEntrega() != null && data.dataEntrega().isBefore(data.dataPedido())) {
             throw new ValidacaoException("Data de entrega nao pode ser anterior a data do pedido");
@@ -166,14 +162,32 @@ public class PedidosService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente nao encontrado"));
     }
 
+    private void validarClienteComercial(Integer clienteId) {
+        if (!clientesRepository.existsByParceiroId(clienteId)) {
+            throw new ValidacaoException("Cliente informado precisa estar cadastrado no CRM");
+        }
+    }
+
     private void validarNaoNegativo(BigDecimal valor, String mensagem) {
         if (valor != null && valor.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidacaoException(mensagem);
         }
     }
 
-    private BigDecimal zeroSeNulo(BigDecimal valor) {
-        return valor != null ? valor : BigDecimal.ZERO;
+    private BigDecimal calcularValorTotalPedido(Pedidos pedido) {
+        if (pedido.getId() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return pedidoItensRepository.sumValorTotalByPedidoId(pedido.getId());
+    }
+
+    private BigDecimal calcularDescontoTotalPedido(Pedidos pedido) {
+        if (pedido.getId() == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return pedidoItensRepository.sumDescontoByPedidoId(pedido.getId());
     }
 
     private String normalizarOpcional(String valor) {

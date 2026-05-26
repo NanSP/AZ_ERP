@@ -1,6 +1,7 @@
 package com.example.backend.sd.faturas;
 
 import com.example.backend.sd.pedidos.Pedidos;
+import com.example.backend.sd.pedidoItens.PedidoItensRepository;
 import com.example.backend.sd.pedidos.PedidosRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
@@ -15,13 +16,16 @@ public class FaturasService {
 
     private final FaturasRepository repository;
     private final PedidosRepository pedidosRepository;
+    private final PedidoItensRepository pedidoItensRepository;
 
     public FaturasService(
             FaturasRepository repository,
-            PedidosRepository pedidosRepository
+            PedidosRepository pedidosRepository,
+            PedidoItensRepository pedidoItensRepository
     ) {
         this.repository = repository;
         this.pedidosRepository = pedidosRepository;
+        this.pedidoItensRepository = pedidoItensRepository;
     }
 
     @Transactional
@@ -183,9 +187,12 @@ public class FaturasService {
             return;
         }
 
-        if (!repository.existsByPedidoIdAndStatusNot(pedido.getId(), "cancelada")
-                && "faturado".equalsIgnoreCase(pedido.getStatus())) {
-            pedido.setStatus("em_andamento");
+        if (!repository.existsByPedidoIdAndStatusNot(pedido.getId(), "cancelada")) {
+            if (pedidoItensRepository.existsByPedidoId(pedido.getId())) {
+                pedido.setStatus("em_andamento");
+            } else {
+                pedido.setStatus("aberto");
+            }
         }
     }
 

@@ -187,5 +187,6 @@ public class PedidoItensService {
         }
 
         pedido.setValorTotal(repository.sumValorTotalByPedidoId(pedido.getId()));
+        pedido.setDescontoTotal(repository.sumDescontoByPedidoId(pedido.getId()));
     }
 }

@@ -31,6 +31,7 @@ public class ClientesService {
     @Transactional
     public Clientes criar(ClientesRequestDTO data) {
         validar(data);
+        validarParceiroDuplicadoParaCriacao(data.parceiro());
 
         Parceiros parceiro = buscarParceiro(data.parceiro());
 
@@ -43,6 +44,7 @@ public class ClientesService {
     @Transactional
     public Clientes atualizar(Integer id, ClientesRequestDTO data) {
         validar(data);
+        validarParceiroDuplicadoParaAtualizacao(data.parceiro(), id);
 
         Clientes entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente nao encontrado"));
@@ -109,6 +111,18 @@ public class ClientesService {
                 && !classificacao.equals("prospect")
                 && !classificacao.equals("cliente")) {
             throw new ValidacaoException("Classificacao invalida");
+        }
+    }
+
+    private void validarParceiroDuplicadoParaCriacao(Integer parceiroId) {
+        if (repository.existsByParceiroId(parceiroId)) {
+            throw new ValidacaoException("Ja existe um cliente CRM vinculado ao parceiro informado");
+        }
+    }
+
+    private void validarParceiroDuplicadoParaAtualizacao(Integer parceiroId, Integer id) {
+        if (repository.existsByParceiroIdAndIdNot(parceiroId, id)) {
+            throw new ValidacaoException("Ja existe um cliente CRM vinculado ao parceiro informado");
         }
     }
 
