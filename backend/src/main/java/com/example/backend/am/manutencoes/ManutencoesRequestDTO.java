@@ -2,7 +2,6 @@ package com.example.backend.am.manutencoes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record ManutencoesRequestDTO
         (
@@ -13,8 +12,6 @@ public record ManutencoesRequestDTO
                 String descricao,
                 BigDecimal custoMaoObra,
                 BigDecimal custoMaterial,
-                BigDecimal custoTotal,
-                Integer tecnico,
-                LocalDateTime createdAt
+                Integer tecnico
         ) {
 }
