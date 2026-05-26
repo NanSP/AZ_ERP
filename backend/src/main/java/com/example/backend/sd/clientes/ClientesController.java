@@ -1,9 +1,7 @@
 package com.example.backend.sd.clientes;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.core.parceiros.ParceirosRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +11,14 @@ import java.util.List;
 public class ClientesController {
 
     private final ClientesRepository repository;
-    private final ParceirosRepository parceirosRepository;
+    private final ClientesService clientesService;
 
     public ClientesController(
             ClientesRepository repository,
-            ParceirosRepository parceirosRepository
+            ClientesService clientesService
     ) {
         this.repository = repository;
-        this.parceirosRepository = parceirosRepository;
+        this.clientesService = clientesService;
     }
 
     @GetMapping
@@ -32,71 +30,29 @@ public class ClientesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ClientesResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ClientesResponseDTO getById(@PathVariable Integer id) {
+        Clientes entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente nao encontrado"));
+
+        return new ClientesResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveClientes(@RequestBody ClientesRequestDTO data) {
-        try {
-            Parceiros parceiro = data.parceiro() != null
-                    ? parceirosRepository.findById(data.parceiro())
-                    .orElseThrow(() -> new RuntimeException("Parceiro nao encontrado"))
-                    : null;
-
-            Clientes entity = new Clientes();
-            entity.setParceiro(parceiro);
-            entity.setClassificacao(data.classificacao());
-            entity.setOrigem(data.origem());
-            entity.setWebsite(data.website());
-            entity.setFaturamentoAnual(data.faturamentoAnual());
-            entity.setNumeroFuncionarios(data.numeroFuncionarios());
-            entity.setCreatedAt(data.createdAt());
-
-            Clientes saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ClientesResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public ClientesResponseDTO saveClientes(@RequestBody ClientesRequestDTO data) {
+        Clientes saved = clientesService.criar(data);
+        return new ClientesResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateClientes(@PathVariable Integer id, @RequestBody ClientesRequestDTO data) {
-        try {
-            Clientes entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"));
-
-            Parceiros parceiro = data.parceiro() != null
-                    ? parceirosRepository.findById(data.parceiro())
-                    .orElseThrow(() -> new RuntimeException("Parceiro nao encontrado"))
-                    : null;
-
-            entity.setParceiro(parceiro);
-            entity.setClassificacao(data.classificacao());
-            entity.setOrigem(data.origem());
-            entity.setWebsite(data.website());
-            entity.setFaturamentoAnual(data.faturamentoAnual());
-            entity.setNumeroFuncionarios(data.numeroFuncionarios());
-            entity.setCreatedAt(data.createdAt());
-
-            Clientes updated = repository.save(entity);
-            return ResponseEntity.ok(new ClientesResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public ClientesResponseDTO updateClientes(@PathVariable Integer id, @RequestBody ClientesRequestDTO data) {
+        Clientes updated = clientesService.atualizar(id, data);
+        return new ClientesResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteClientes(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Cliente deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteClientes(@PathVariable Integer id) {
+        clientesService.excluir(id);
+        return "Cliente deleted";
     }
 }
