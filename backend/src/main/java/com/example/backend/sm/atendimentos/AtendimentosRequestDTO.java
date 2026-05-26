@@ -11,7 +11,6 @@ public record AtendimentosRequestDTO
                 LocalDateTime dataHora,
                 String descricao,
                 BigDecimal horasGastas,
-                Map<String, Object> materiaisUtilizados,
-                LocalDateTime createdAt
+                Map<String, Object> materiaisUtilizados
         ) {
 }

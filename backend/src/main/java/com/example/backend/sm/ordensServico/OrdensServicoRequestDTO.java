@@ -16,7 +16,6 @@ public record OrdensServicoRequestDTO
                 LocalDateTime dataInicio,
                 LocalDateTime dataFim,
                 Integer tecnico,
-                String status,
-                LocalDateTime createdAt
+                String status
         ) {
 }

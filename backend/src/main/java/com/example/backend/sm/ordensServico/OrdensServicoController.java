@@ -1,13 +1,7 @@
 package com.example.backend.sm.ordensServico;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.core.parceiros.ParceirosRepository;
-import com.example.backend.core.produtos.Produtos;
-import com.example.backend.core.produtos.ProdutosRepository;
-import com.example.backend.rh.colaboradores.Colaboradores;
-import com.example.backend.rh.colaboradores.ColaboradoresRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,20 +11,14 @@ import java.util.List;
 public class OrdensServicoController {
 
     private final OrdensServicoRepository repository;
-    private final ParceirosRepository parceirosRepository;
-    private final ProdutosRepository produtosRepository;
-    private final ColaboradoresRepository colaboradoresRepository;
+    private final OrdensServicoService ordensServicoService;
 
     public OrdensServicoController(
             OrdensServicoRepository repository,
-            ParceirosRepository parceirosRepository,
-            ProdutosRepository produtosRepository,
-            ColaboradoresRepository colaboradoresRepository
+            OrdensServicoService ordensServicoService
     ) {
         this.repository = repository;
-        this.parceirosRepository = parceirosRepository;
-        this.produtosRepository = produtosRepository;
-        this.colaboradoresRepository = colaboradoresRepository;
+        this.ordensServicoService = ordensServicoService;
     }
 
     @GetMapping
@@ -42,103 +30,29 @@ public class OrdensServicoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new OrdensServicoResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public OrdensServicoResponseDTO getById(@PathVariable Integer id) {
+        OrdensServico entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Ordem de servico nao encontrada"));
+
+        return new OrdensServicoResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveOrdensServico(@RequestBody OrdensServicoRequestDTO data) {
-        try {
-            Parceiros cliente = data.cliente() != null
-                    ? parceirosRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            Produtos produto = data.produto() != null
-                    ? produtosRepository.findById(data.produto())
-                    .orElseThrow(() -> new RuntimeException("Produto nao encontrado"))
-                    : null;
-
-            Colaboradores tecnico = data.tecnico() != null
-                    ? colaboradoresRepository.findById(data.tecnico())
-                    .orElseThrow(() -> new RuntimeException("Tecnico nao encontrado"))
-                    : null;
-
-            OrdensServico entity = new OrdensServico();
-            entity.setNumeroOs(data.numeroOs());
-            entity.setCliente(cliente);
-            entity.setProduto(produto);
-            entity.setTipoServico(data.tipoServico());
-            entity.setDescricaoProblema(data.descricaoProblema());
-            entity.setPrioridade(data.prioridade());
-            entity.setDataAbertura(data.dataAbertura());
-            entity.setDataAgendamento(data.dataAgendamento());
-            entity.setDataInicio(data.dataInicio());
-            entity.setDataFim(data.dataFim());
-            entity.setTecnico(tecnico);
-            entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
-
-            OrdensServico saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new OrdensServicoResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrdensServicoResponseDTO saveOrdensServico(@RequestBody OrdensServicoRequestDTO data) {
+        OrdensServico saved = ordensServicoService.criar(data);
+        return new OrdensServicoResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOrdensServico(@PathVariable Integer id, @RequestBody OrdensServicoRequestDTO data) {
-        try {
-            OrdensServico entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Ordem de servico nao encontrada"));
-
-            Parceiros cliente = data.cliente() != null
-                    ? parceirosRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            Produtos produto = data.produto() != null
-                    ? produtosRepository.findById(data.produto())
-                    .orElseThrow(() -> new RuntimeException("Produto nao encontrado"))
-                    : null;
-
-            Colaboradores tecnico = data.tecnico() != null
-                    ? colaboradoresRepository.findById(data.tecnico())
-                    .orElseThrow(() -> new RuntimeException("Tecnico nao encontrado"))
-                    : null;
-
-            entity.setNumeroOs(data.numeroOs());
-            entity.setCliente(cliente);
-            entity.setProduto(produto);
-            entity.setTipoServico(data.tipoServico());
-            entity.setDescricaoProblema(data.descricaoProblema());
-            entity.setPrioridade(data.prioridade());
-            entity.setDataAbertura(data.dataAbertura());
-            entity.setDataAgendamento(data.dataAgendamento());
-            entity.setDataInicio(data.dataInicio());
-            entity.setDataFim(data.dataFim());
-            entity.setTecnico(tecnico);
-            entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
-
-            OrdensServico updated = repository.save(entity);
-            return ResponseEntity.ok(new OrdensServicoResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public OrdensServicoResponseDTO updateOrdensServico(@PathVariable Integer id, @RequestBody OrdensServicoRequestDTO data) {
+        OrdensServico updated = ordensServicoService.atualizar(id, data);
+        return new OrdensServicoResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOrdensServico(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Ordem de servico deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteOrdensServico(@PathVariable Integer id) {
+        ordensServicoService.excluir(id);
+        return "Ordem de servico deleted";
     }
 }
