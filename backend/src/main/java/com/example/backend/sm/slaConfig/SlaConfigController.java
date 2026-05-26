@@ -1,7 +1,7 @@
 package com.example.backend.sm.slaConfig;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class SlaConfigController {
 
     private final SlaConfigRepository repository;
+    private final SlaConfigService slaConfigService;
 
-    public SlaConfigController(SlaConfigRepository repository) {
+    public SlaConfigController(
+            SlaConfigRepository repository,
+            SlaConfigService slaConfigService
+    ) {
         this.repository = repository;
+        this.slaConfigService = slaConfigService;
     }
 
     @GetMapping
@@ -25,42 +30,29 @@ public class SlaConfigController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new SlaConfigResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public SlaConfigResponseDTO getById(@PathVariable Integer id) {
+        SlaConfig entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Configuracao de SLA nao encontrada"));
+
+        return new SlaConfigResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveSlaConfig(@RequestBody SlaConfigRequestDTO data) {
-        SlaConfig entity = new SlaConfig(data);
-        SlaConfig saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new SlaConfigResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public SlaConfigResponseDTO saveSlaConfig(@RequestBody SlaConfigRequestDTO data) {
+        SlaConfig saved = slaConfigService.criar(data);
+        return new SlaConfigResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSlaConfig(@PathVariable Integer id, @RequestBody SlaConfigRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setTipoServico(data.tipoServico());
-                    entity.setPrioridade(data.prioridade());
-                    entity.setTempoAtendimentoHoras(data.tempoAtendimentoHoras());
-                    entity.setTempoResolucaoHoras(data.tempoResolucaoHoras());
-                    entity.setCreatedAt(data.createdAt());
-
-                    SlaConfig updated = repository.save(entity);
-                    return ResponseEntity.ok(new SlaConfigResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public SlaConfigResponseDTO updateSlaConfig(@PathVariable Integer id, @RequestBody SlaConfigRequestDTO data) {
+        SlaConfig updated = slaConfigService.atualizar(id, data);
+        return new SlaConfigResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSlaConfig(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("SLA config deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteSlaConfig(@PathVariable Integer id) {
+        slaConfigService.excluir(id);
+        return "SLA config deleted";
     }
 }

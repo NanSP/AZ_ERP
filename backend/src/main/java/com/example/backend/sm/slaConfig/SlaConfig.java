@@ -27,11 +27,4 @@ public class SlaConfig {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    public SlaConfig(SlaConfigRequestDTO data) {
-        this.tipoServico = data.tipoServico();
-        this.prioridade = data.prioridade();
-        this.tempoAtendimentoHoras = data.tempoAtendimentoHoras();
-        this.tempoResolucaoHoras = data.tempoResolucaoHoras();
-        this.createdAt = data.createdAt();
-    }
 }
