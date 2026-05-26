@@ -2,7 +2,6 @@ package com.example.backend.am.bensPatrimoniais;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record BensPatrimoniaisRequestDTO
         (
@@ -19,7 +18,6 @@ public record BensPatrimoniaisRequestDTO
                 LocalDate dataDepreciacao,
                 Integer fornecedor,
                 Integer responsavel,
-                String status,
-                LocalDateTime createdAt
+                String status
         ) {
 }

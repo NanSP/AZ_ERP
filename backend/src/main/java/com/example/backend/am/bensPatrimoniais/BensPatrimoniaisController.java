@@ -1,11 +1,7 @@
 package com.example.backend.am.bensPatrimoniais;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.core.parceiros.ParceirosRepository;
-import com.example.backend.rh.colaboradores.Colaboradores;
-import com.example.backend.rh.colaboradores.ColaboradoresRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,17 +11,14 @@ import java.util.List;
 public class BensPatrimoniaisController {
 
     private final BensPatrimoniaisRepository repository;
-    private final ParceirosRepository parceirosRepository;
-    private final ColaboradoresRepository colaboradoresRepository;
+    private final BensPatrimoniaisService bensPatrimoniaisService;
 
     public BensPatrimoniaisController(
             BensPatrimoniaisRepository repository,
-            ParceirosRepository parceirosRepository,
-            ColaboradoresRepository colaboradoresRepository
+            BensPatrimoniaisService bensPatrimoniaisService
     ) {
         this.repository = repository;
-        this.parceirosRepository = parceirosRepository;
-        this.colaboradoresRepository = colaboradoresRepository;
+        this.bensPatrimoniaisService = bensPatrimoniaisService;
     }
 
     @GetMapping
@@ -37,97 +30,29 @@ public class BensPatrimoniaisController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new BensPatrimoniaisResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public BensPatrimoniaisResponseDTO getById(@PathVariable Integer id) {
+        BensPatrimoniais entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Bem patrimonial nao encontrado"));
+
+        return new BensPatrimoniaisResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveBensPatrimoniais(@RequestBody BensPatrimoniaisRequestDTO data) {
-        try {
-            Parceiros fornecedor = data.fornecedor() != null
-                    ? parceirosRepository.findById(data.fornecedor())
-                    .orElseThrow(() -> new RuntimeException("Fornecedor nao encontrado"))
-                    : null;
-
-            Colaboradores responsavel = data.responsavel() != null
-                    ? colaboradoresRepository.findById(data.responsavel())
-                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
-                    : null;
-
-            BensPatrimoniais entity = new BensPatrimoniais();
-            entity.setCodigoPatrimonio(data.codigoPatrimonio());
-            entity.setNome(data.nome());
-            entity.setDescricao(data.descricao());
-            entity.setTipoAtivo(data.tipoAtivo());
-            entity.setLocalizacao(data.localizacao());
-            entity.setDataAquisicao(data.dataAquisicao());
-            entity.setValorAquisicao(data.valorAquisicao());
-            entity.setValorAtual(data.valorAtual());
-            entity.setVidaUtilAnos(data.vidaUtilAnos());
-            entity.setTaxaDepreciacao(data.taxaDepreciacao());
-            entity.setDataDepreciacao(data.dataDepreciacao());
-            entity.setFornecedor(fornecedor);
-            entity.setResponsavel(responsavel);
-            entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
-
-            BensPatrimoniais saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new BensPatrimoniaisResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public BensPatrimoniaisResponseDTO saveBensPatrimoniais(@RequestBody BensPatrimoniaisRequestDTO data) {
+        BensPatrimoniais saved = bensPatrimoniaisService.criar(data);
+        return new BensPatrimoniaisResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBensPatrimoniais(@PathVariable Integer id, @RequestBody BensPatrimoniaisRequestDTO data) {
-        try {
-            BensPatrimoniais entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Bem patrimonial nao encontrado"));
-
-            Parceiros fornecedor = data.fornecedor() != null
-                    ? parceirosRepository.findById(data.fornecedor())
-                    .orElseThrow(() -> new RuntimeException("Fornecedor nao encontrado"))
-                    : null;
-
-            Colaboradores responsavel = data.responsavel() != null
-                    ? colaboradoresRepository.findById(data.responsavel())
-                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
-                    : null;
-
-            entity.setCodigoPatrimonio(data.codigoPatrimonio());
-            entity.setNome(data.nome());
-            entity.setDescricao(data.descricao());
-            entity.setTipoAtivo(data.tipoAtivo());
-            entity.setLocalizacao(data.localizacao());
-            entity.setDataAquisicao(data.dataAquisicao());
-            entity.setValorAquisicao(data.valorAquisicao());
-            entity.setValorAtual(data.valorAtual());
-            entity.setVidaUtilAnos(data.vidaUtilAnos());
-            entity.setTaxaDepreciacao(data.taxaDepreciacao());
-            entity.setDataDepreciacao(data.dataDepreciacao());
-            entity.setFornecedor(fornecedor);
-            entity.setResponsavel(responsavel);
-            entity.setStatus(data.status());
-            entity.setCreatedAt(data.createdAt());
-
-            BensPatrimoniais updated = repository.save(entity);
-            return ResponseEntity.ok(new BensPatrimoniaisResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public BensPatrimoniaisResponseDTO updateBensPatrimoniais(@PathVariable Integer id, @RequestBody BensPatrimoniaisRequestDTO data) {
+        BensPatrimoniais updated = bensPatrimoniaisService.atualizar(id, data);
+        return new BensPatrimoniaisResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBensPatrimoniais(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Bem patrimonial deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteBensPatrimoniais(@PathVariable Integer id) {
+        bensPatrimoniaisService.excluir(id);
+        return "Bem patrimonial deleted";
     }
 }
