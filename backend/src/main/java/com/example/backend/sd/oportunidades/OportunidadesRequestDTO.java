@@ -2,7 +2,6 @@ package com.example.backend.sd.oportunidades;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record OportunidadesRequestDTO
         (
@@ -14,7 +13,6 @@ public record OportunidadesRequestDTO
                 String estagio,
                 LocalDate dataPrevistaFechamento,
                 String motivoPerda,
-                Integer responsavel,
-                LocalDateTime createdAt
+                Integer responsavel
         ) {
 }

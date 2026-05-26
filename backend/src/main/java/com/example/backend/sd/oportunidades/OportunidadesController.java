@@ -1,11 +1,7 @@
 package com.example.backend.sd.oportunidades;
 
-import com.example.backend.sd.clientes.Clientes;
-import com.example.backend.sd.clientes.ClientesRepository;
-import com.example.backend.sys.usuarios.Usuarios;
-import com.example.backend.sys.usuarios.UsuariosRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,17 +11,14 @@ import java.util.List;
 public class OportunidadesController {
 
     private final OportunidadesRepository repository;
-    private final ClientesRepository clientesRepository;
-    private final UsuariosRepository usuariosRepository;
+    private final OportunidadesService oportunidadesService;
 
     public OportunidadesController(
             OportunidadesRepository repository,
-            ClientesRepository clientesRepository,
-            UsuariosRepository usuariosRepository
+            OportunidadesService oportunidadesService
     ) {
         this.repository = repository;
-        this.clientesRepository = clientesRepository;
-        this.usuariosRepository = usuariosRepository;
+        this.oportunidadesService = oportunidadesService;
     }
 
     @GetMapping
@@ -37,87 +30,29 @@ public class OportunidadesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new OportunidadesResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public OportunidadesResponseDTO getById(@PathVariable Integer id) {
+        Oportunidades entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Oportunidade nao encontrada"));
+
+        return new OportunidadesResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveOportunidades(@RequestBody OportunidadesRequestDTO data) {
-        try {
-            Clientes cliente = data.cliente() != null
-                    ? clientesRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            Usuarios responsavel = data.responsavel() != null
-                    ? usuariosRepository.findById(data.responsavel())
-                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
-                    : null;
-
-            Oportunidades entity = new Oportunidades();
-            entity.setCliente(cliente);
-            entity.setTitulo(data.titulo());
-            entity.setDescricao(data.descricao());
-            entity.setValorEstimado(data.valorEstimado());
-            entity.setProbabilidade(data.probabilidade());
-            entity.setEstagio(data.estagio());
-            entity.setDataPrevistaFechamento(data.dataPrevistaFechamento());
-            entity.setMotivoPerda(data.motivoPerda());
-            entity.setResponsavel(responsavel);
-            entity.setCreatedAt(data.createdAt());
-
-            Oportunidades saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new OportunidadesResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public OportunidadesResponseDTO saveOportunidades(@RequestBody OportunidadesRequestDTO data) {
+        Oportunidades saved = oportunidadesService.criar(data);
+        return new OportunidadesResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOportunidades(@PathVariable Integer id, @RequestBody OportunidadesRequestDTO data) {
-        try {
-            Oportunidades entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Oportunidade nao encontrada"));
-
-            Clientes cliente = data.cliente() != null
-                    ? clientesRepository.findById(data.cliente())
-                    .orElseThrow(() -> new RuntimeException("Cliente nao encontrado"))
-                    : null;
-
-            Usuarios responsavel = data.responsavel() != null
-                    ? usuariosRepository.findById(data.responsavel())
-                    .orElseThrow(() -> new RuntimeException("Responsavel nao encontrado"))
-                    : null;
-
-            entity.setCliente(cliente);
-            entity.setTitulo(data.titulo());
-            entity.setDescricao(data.descricao());
-            entity.setValorEstimado(data.valorEstimado());
-            entity.setProbabilidade(data.probabilidade());
-            entity.setEstagio(data.estagio());
-            entity.setDataPrevistaFechamento(data.dataPrevistaFechamento());
-            entity.setMotivoPerda(data.motivoPerda());
-            entity.setResponsavel(responsavel);
-            entity.setCreatedAt(data.createdAt());
-
-            Oportunidades updated = repository.save(entity);
-            return ResponseEntity.ok(new OportunidadesResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public OportunidadesResponseDTO updateOportunidades(@PathVariable Integer id, @RequestBody OportunidadesRequestDTO data) {
+        Oportunidades updated = oportunidadesService.atualizar(id, data);
+        return new OportunidadesResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteOportunidades(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Oportunidade deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteOportunidades(@PathVariable Integer id) {
+        oportunidadesService.excluir(id);
+        return "Oportunidade deleted";
     }
 }
