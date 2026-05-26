@@ -13,7 +13,6 @@ public record ApontamentosRequestDTO
                 BigDecimal quantidadeProduzida,
                 BigDecimal quantidadeRefugo,
                 BigDecimal tempoParado,
-                String observacoes,
-                LocalDateTime createdAt
+                String observacoes
         ) {
 }
