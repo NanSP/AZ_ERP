@@ -1,51 +1,208 @@
 package com.example.backend.rh.folhaDePagamento;
 
+import com.example.backend.rh.colaboradores.Colaboradores;
+import com.example.backend.rh.colaboradores.ColaboradoresRepository;
+import com.example.backend.rh.controleDePonto.ControleDePontoRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
+import com.example.backend.shared.exception.ValidacaoException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.time.LocalDate;
 
 @Service
 public class FolhaDePagamentoService {
 
-    private static final BigDecimal HORAS_MES_PADRAO = new BigDecimal("220");
-    private static final BigDecimal FATOR_HORA_EXTRA = new BigDecimal("1.50");
-    private static final int SCALE_INTERNA = 10;
-    private static final int SCALE_FINAL = 2;
+    private final FolhaDePagamentoRepository repository;
+    private final ColaboradoresRepository colaboradoresRepository;
+    private final ControleDePontoRepository controleDePontoRepository;
+    private final FolhaDePagamentoCalculator calculator;
 
-    public FolhaCalculadaDTO calcular(FolhaDePagamentoRequestDTO data) {
-        BigDecimal salarioBase = nvl(data.salarioBase());
-        BigDecimal horasExtras = nvl(data.horasExtras());
-        BigDecimal adicionais = nvl(data.adicionais());
-        BigDecimal descontos = nvl(data.descontos());
-
-        BigDecimal valorHoraCalculado = BigDecimal.ZERO;
-        if (HORAS_MES_PADRAO.compareTo(BigDecimal.ZERO) > 0) {
-            valorHoraCalculado = salarioBase.divide(HORAS_MES_PADRAO, SCALE_INTERNA, RoundingMode.HALF_UP);
-        }
-
-        BigDecimal valorHorasNormais = salarioBase;
-
-        BigDecimal valorHorasExtras = valorHoraCalculado
-                .multiply(FATOR_HORA_EXTRA)
-                .multiply(horasExtras);
-
-        BigDecimal valorBruto = valorHorasNormais
-                .add(valorHorasExtras)
-                .add(adicionais);
-
-        BigDecimal valorLiquido = valorBruto.subtract(descontos);
-
-        return new FolhaCalculadaDTO(
-                valorHoraCalculado.setScale(SCALE_FINAL, RoundingMode.HALF_UP),
-                valorHorasNormais.setScale(SCALE_FINAL, RoundingMode.HALF_UP),
-                valorHorasExtras.setScale(SCALE_FINAL, RoundingMode.HALF_UP),
-                valorBruto.setScale(SCALE_FINAL, RoundingMode.HALF_UP),
-                valorLiquido.setScale(SCALE_FINAL, RoundingMode.HALF_UP)
-        );
+    public FolhaDePagamentoService(
+            FolhaDePagamentoRepository repository,
+            ColaboradoresRepository colaboradoresRepository,
+            ControleDePontoRepository controleDePontoRepository,
+            FolhaDePagamentoCalculator calculator
+    ) {
+        this.repository = repository;
+        this.colaboradoresRepository = colaboradoresRepository;
+        this.controleDePontoRepository = controleDePontoRepository;
+        this.calculator = calculator;
     }
 
-    private BigDecimal nvl(BigDecimal value) {
-        return value != null ? value : BigDecimal.ZERO;
+    @Transactional
+    public FolhaDePagamento criar(FolhaDePagamentoRequestDTO data) {
+        validar(data);
+        validarDuplicidadeParaCriacao(data.colaborador(), data.competencia());
+
+        Colaboradores colaborador = buscarColaborador(data.colaborador());
+        BigDecimal horasNormais = resolverHorasNormais(data, colaborador);
+        BigDecimal horasExtras = resolverHorasExtras(data, colaborador);
+        FolhaCalculadaDTO calculada = calculator.calcular(
+                data.salarioBase(),
+                horasNormais,
+                horasExtras,
+                data.adicionais(),
+                data.descontos()
+        );
+
+        FolhaDePagamento entity = new FolhaDePagamento();
+        preencher(entity, data, colaborador, calculada, horasNormais, horasExtras);
+
+        return repository.save(entity);
+    }
+
+    @Transactional
+    public FolhaDePagamento atualizar(Integer id, FolhaDePagamentoRequestDTO data) {
+        validar(data);
+        validarDuplicidadeParaAtualizacao(data.colaborador(), data.competencia(), id);
+
+        FolhaDePagamento entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Folha de pagamento nao encontrada"));
+
+        Colaboradores colaborador = buscarColaborador(data.colaborador());
+        BigDecimal horasNormais = resolverHorasNormais(data, colaborador);
+        BigDecimal horasExtras = resolverHorasExtras(data, colaborador);
+        FolhaCalculadaDTO calculada = calculator.calcular(
+                data.salarioBase(),
+                horasNormais,
+                horasExtras,
+                data.adicionais(),
+                data.descontos()
+        );
+
+        preencher(entity, data, colaborador, calculada, horasNormais, horasExtras);
+
+        return repository.save(entity);
+    }
+
+    @Transactional
+    public void excluir(Integer id) {
+        FolhaDePagamento entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Folha de pagamento nao encontrada"));
+
+        repository.delete(entity);
+    }
+
+    private void preencher(
+            FolhaDePagamento entity,
+            FolhaDePagamentoRequestDTO data,
+            Colaboradores colaborador,
+            FolhaCalculadaDTO calculada,
+            BigDecimal horasNormais,
+            BigDecimal horasExtras
+    ) {
+        entity.setColaborador(colaborador);
+        entity.setCompetencia(data.competencia());
+        entity.setSalarioBase(data.salarioBase());
+        entity.setHorasNormais(horasNormais);
+        entity.setHorasExtras(horasExtras);
+        entity.setAdicionais(data.adicionais());
+        entity.setDescontos(data.descontos());
+        entity.setValorHora(calculada.valorHora());
+        entity.setValorHorasNormais(calculada.valorHorasNormais());
+        entity.setValorHorasExtras(calculada.valorHorasExtras());
+        entity.setValorBruto(calculada.valorBruto());
+        entity.setValorLiquido(calculada.valorLiquido());
+        entity.setDataPagamento(data.dataPagamento());
+        entity.setStatus(normalizarStatus(data.status()));
+    }
+
+    private void validar(FolhaDePagamentoRequestDTO data) {
+        if (data == null) {
+            throw new ValidacaoException("Dados da folha de pagamento sao obrigatorios");
+        }
+
+        if (data.colaborador() == null) {
+            throw new ValidacaoException("Colaborador e obrigatorio");
+        }
+
+        if (data.competencia() == null) {
+            throw new ValidacaoException("Competencia e obrigatoria");
+        }
+
+        validarNaoNegativo(data.salarioBase(), "Salario base nao pode ser negativo");
+        validarNaoNegativo(data.horasNormais(), "Horas normais nao podem ser negativas");
+        validarNaoNegativo(data.horasExtras(), "Horas extras nao podem ser negativas");
+        validarNaoNegativo(data.adicionais(), "Adicionais nao podem ser negativos");
+        validarNaoNegativo(data.descontos(), "Descontos nao podem ser negativos");
+
+        if (data.dataPagamento() != null && data.dataPagamento().isBefore(data.competencia())) {
+            throw new ValidacaoException("Data de pagamento nao pode ser anterior a competencia");
+        }
+
+        validarStatus(normalizarStatus(data.status()), data.dataPagamento());
+    }
+
+    private void validarStatus(String status, LocalDate dataPagamento) {
+        if (!status.equals("calculado")
+                && !status.equals("pago")
+                && !status.equals("cancelado")) {
+            throw new ValidacaoException("Status invalido");
+        }
+
+        if (status.equals("pago") && dataPagamento == null) {
+            throw new ValidacaoException("Data de pagamento e obrigatoria para folha com status pago");
+        }
+    }
+
+    private void validarDuplicidadeParaCriacao(Integer colaboradorId, LocalDate competencia) {
+        if (repository.existsByColaboradorIdAndCompetencia(colaboradorId, competencia)) {
+            throw new ValidacaoException("Ja existe folha de pagamento para este colaborador nesta competencia");
+        }
+    }
+
+    private void validarDuplicidadeParaAtualizacao(Integer colaboradorId, LocalDate competencia, Integer id) {
+        if (repository.existsByColaboradorIdAndCompetenciaAndIdNot(colaboradorId, competencia, id)) {
+            throw new ValidacaoException("Ja existe folha de pagamento para este colaborador nesta competencia");
+        }
+    }
+
+    private Colaboradores buscarColaborador(Integer colaboradorId) {
+        return colaboradoresRepository.findById(colaboradorId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Colaborador nao encontrado"));
+    }
+
+    private void validarNaoNegativo(BigDecimal valor, String mensagem) {
+        if (valor != null && valor.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ValidacaoException(mensagem);
+        }
+    }
+
+    private String normalizarStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return "calculado";
+        }
+
+        return status.trim().toLowerCase();
+    }
+
+    private BigDecimal resolverHorasNormais(FolhaDePagamentoRequestDTO data, Colaboradores colaborador) {
+        if (data.horasNormais() != null) {
+            return data.horasNormais();
+        }
+
+        return buscarHorasTrabalhadasNoPonto(colaborador.getId(), data.competencia());
+    }
+
+    private BigDecimal resolverHorasExtras(FolhaDePagamentoRequestDTO data, Colaboradores colaborador) {
+        if (data.horasExtras() != null) {
+            return data.horasExtras();
+        }
+
+        return buscarHorasExtrasNoPonto(colaborador.getId(), data.competencia());
+    }
+
+    private BigDecimal buscarHorasTrabalhadasNoPonto(Integer colaboradorId, LocalDate competencia) {
+        LocalDate dataInicio = competencia.withDayOfMonth(1);
+        LocalDate dataFim = competencia.withDayOfMonth(competencia.lengthOfMonth());
+        return controleDePontoRepository.sumHorasTrabalhadasByColaboradorIdAndPeriodo(colaboradorId, dataInicio, dataFim);
+    }
+
+    private BigDecimal buscarHorasExtrasNoPonto(Integer colaboradorId, LocalDate competencia) {
+        LocalDate dataInicio = competencia.withDayOfMonth(1);
+        LocalDate dataFim = competencia.withDayOfMonth(competencia.lengthOfMonth());
+        return controleDePontoRepository.sumHorasExtrasByColaboradorIdAndPeriodo(colaboradorId, dataInicio, dataFim);
     }
 }
