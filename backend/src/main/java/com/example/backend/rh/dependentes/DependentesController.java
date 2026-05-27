@@ -1,9 +1,7 @@
 package com.example.backend.rh.dependentes;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
-import com.example.backend.rh.colaboradores.ColaboradoresRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +11,14 @@ import java.util.List;
 public class DependentesController {
 
     private final DependentesRepository repository;
-    private final ColaboradoresRepository colaboradoresRepository;
+    private final DependentesService dependentesService;
 
     public DependentesController(
             DependentesRepository repository,
-            ColaboradoresRepository colaboradoresRepository
+            DependentesService dependentesService
     ) {
         this.repository = repository;
-        this.colaboradoresRepository = colaboradoresRepository;
+        this.dependentesService = dependentesService;
     }
 
     @GetMapping
@@ -32,69 +30,29 @@ public class DependentesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new DependentesResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public DependentesResponseDTO getById(@PathVariable Integer id) {
+        Dependentes entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Dependente nao encontrado"));
+
+        return new DependentesResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveDependente(@RequestBody DependentesRequestDTO data) {
-        try {
-            Colaboradores colaborador = data.colaborador() != null
-                    ? colaboradoresRepository.findById(data.colaborador())
-                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
-                    : null;
-
-            Dependentes entity = new Dependentes();
-            entity.setColaborador(colaborador);
-            entity.setNome(data.nome());
-            entity.setDataNascimento(data.dataNascimento());
-            entity.setParentesco(data.parentesco());
-            entity.setCpf(data.cpf());
-            entity.setCreatedAt(data.createdAt());
-
-            Dependentes saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new DependentesResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public DependentesResponseDTO saveDependente(@RequestBody DependentesRequestDTO data) {
+        Dependentes saved = dependentesService.criar(data);
+        return new DependentesResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateDependente(@PathVariable Integer id, @RequestBody DependentesRequestDTO data) {
-        try {
-            Dependentes entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Dependente nao encontrado"));
-
-            Colaboradores colaborador = data.colaborador() != null
-                    ? colaboradoresRepository.findById(data.colaborador())
-                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
-                    : null;
-
-            entity.setColaborador(colaborador);
-            entity.setNome(data.nome());
-            entity.setDataNascimento(data.dataNascimento());
-            entity.setParentesco(data.parentesco());
-            entity.setCpf(data.cpf());
-            entity.setCreatedAt(data.createdAt());
-
-            Dependentes updated = repository.save(entity);
-            return ResponseEntity.ok(new DependentesResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public DependentesResponseDTO updateDependente(@PathVariable Integer id, @RequestBody DependentesRequestDTO data) {
+        Dependentes updated = dependentesService.atualizar(id, data);
+        return new DependentesResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDependente(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Dependente deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteDependente(@PathVariable Integer id) {
+        dependentesService.excluir(id);
+        return "Dependente deleted";
     }
 }
