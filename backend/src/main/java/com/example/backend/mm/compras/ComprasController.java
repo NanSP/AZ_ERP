@@ -1,9 +1,7 @@
 package com.example.backend.mm.compras;
 
-import com.example.backend.core.parceiros.Parceiros;
-import com.example.backend.core.parceiros.ParceirosRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +11,14 @@ import java.util.List;
 public class ComprasController {
 
     private final ComprasRepository repository;
-    private final ParceirosRepository parceirosRepository;
+    private final ComprasService comprasService;
 
     public ComprasController(
             ComprasRepository repository,
-            ParceirosRepository parceirosRepository
+            ComprasService comprasService
     ) {
         this.repository = repository;
-        this.parceirosRepository = parceirosRepository;
+        this.comprasService = comprasService;
     }
 
     @GetMapping
@@ -32,75 +30,29 @@ public class ComprasController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ComprasResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ComprasResponseDTO getById(@PathVariable Integer id) {
+        Compras entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Compra nao encontrada"));
+
+        return new ComprasResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveCompras(@RequestBody ComprasRequestDTO data) {
-        try {
-            Parceiros fornecedor = data.fornecedor() != null
-                    ? parceirosRepository.findById(data.fornecedor())
-                    .orElseThrow(() -> new RuntimeException("Fornecedor nao encontrado"))
-                    : null;
-
-            Compras entity = new Compras();
-            entity.setFornecedor(fornecedor);
-            entity.setDataPedido(data.dataPedido());
-            entity.setDataPrevistaEntrega(data.dataPrevistaEntrega());
-            entity.setDataEntrega(data.dataEntrega());
-            entity.setValorTotal(data.valorTotal());
-            entity.setCondicoesPagamento(data.condicoesPagamento());
-            entity.setStatus(data.status());
-            entity.setObservacoes(data.observacoes());
-            entity.setCreatedAt(data.createdAt());
-
-            Compras saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ComprasResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public ComprasResponseDTO saveCompras(@RequestBody ComprasRequestDTO data) {
+        Compras saved = comprasService.criar(data);
+        return new ComprasResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCompras(@PathVariable Integer id, @RequestBody ComprasRequestDTO data) {
-        try {
-            Compras entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Compra nao encontrada"));
-
-            Parceiros fornecedor = data.fornecedor() != null
-                    ? parceirosRepository.findById(data.fornecedor())
-                    .orElseThrow(() -> new RuntimeException("Fornecedor nao encontrado"))
-                    : null;
-
-            entity.setFornecedor(fornecedor);
-            entity.setDataPedido(data.dataPedido());
-            entity.setDataPrevistaEntrega(data.dataPrevistaEntrega());
-            entity.setDataEntrega(data.dataEntrega());
-            entity.setValorTotal(data.valorTotal());
-            entity.setCondicoesPagamento(data.condicoesPagamento());
-            entity.setStatus(data.status());
-            entity.setObservacoes(data.observacoes());
-            entity.setCreatedAt(data.createdAt());
-
-            Compras updated = repository.save(entity);
-            return ResponseEntity.ok(new ComprasResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public ComprasResponseDTO updateCompras(@PathVariable Integer id, @RequestBody ComprasRequestDTO data) {
+        Compras updated = comprasService.atualizar(id, data);
+        return new ComprasResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCompras(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Compra deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteCompras(@PathVariable Integer id) {
+        comprasService.excluir(id);
+        return "Compra deleted";
     }
 }
