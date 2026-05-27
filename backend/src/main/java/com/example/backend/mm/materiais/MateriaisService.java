@@ -2,6 +2,7 @@ package com.example.backend.mm.materiais;
 
 import com.example.backend.core.produtos.Produtos;
 import com.example.backend.core.produtos.ProdutosRepository;
+import com.example.backend.mm.estoques.EstoquesRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
@@ -14,18 +15,22 @@ public class MateriaisService {
 
     private final MateriaisRepository repository;
     private final ProdutosRepository produtosRepository;
+    private final EstoquesRepository estoquesRepository;
 
     public MateriaisService(
             MateriaisRepository repository,
-            ProdutosRepository produtosRepository
+            ProdutosRepository produtosRepository,
+            EstoquesRepository estoquesRepository
     ) {
         this.repository = repository;
         this.produtosRepository = produtosRepository;
+        this.estoquesRepository = estoquesRepository;
     }
 
     @Transactional
     public Materiais criar(MateriaisRequestDTO data) {
         validar(data);
+        validarDuplicidadeProdutoParaCriacao(data.produto());
 
         Produtos produto = buscarProduto(data.produto());
 
@@ -38,6 +43,7 @@ public class MateriaisService {
     @Transactional
     public Materiais atualizar(Integer id, MateriaisRequestDTO data) {
         validar(data);
+        validarDuplicidadeProdutoParaAtualizacao(data.produto(), id);
 
         Materiais entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Material nao encontrado"));
@@ -52,6 +58,12 @@ public class MateriaisService {
     public void excluir(Integer id) {
         Materiais entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Material nao encontrado"));
+
+        if (entity.getProduto() != null
+                && entity.getProduto().getId() != null
+                && estoquesRepository.existsByProdutoId(entity.getProduto().getId())) {
+            throw new ValidacaoException("Nao e permitido excluir material com estoque vinculado ao produto");
+        }
 
         repository.delete(entity);
     }
@@ -88,7 +100,7 @@ public class MateriaisService {
 
     private void validarTipoMaterial(String tipoMaterial) {
         if (tipoMaterial == null) {
-            return;
+            throw new ValidacaoException("Tipo de material e obrigatorio");
         }
 
         if (!tipoMaterial.equals("materia_prima")
@@ -103,6 +115,18 @@ public class MateriaisService {
     private Produtos buscarProduto(Integer produtoId) {
         return produtosRepository.findById(produtoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto nao encontrado"));
+    }
+
+    private void validarDuplicidadeProdutoParaCriacao(Integer produtoId) {
+        if (repository.existsByProdutoId(produtoId)) {
+            throw new ValidacaoException("Ja existe cadastro de material para o produto informado");
+        }
+    }
+
+    private void validarDuplicidadeProdutoParaAtualizacao(Integer produtoId, Integer id) {
+        if (repository.existsByProdutoIdAndIdNot(produtoId, id)) {
+            throw new ValidacaoException("Ja existe cadastro de material para o produto informado");
+        }
     }
 
     private String normalizarTipoMaterial(String tipoMaterial) {
