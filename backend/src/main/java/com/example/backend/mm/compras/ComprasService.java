@@ -50,6 +50,7 @@ public class ComprasService {
 
         Parceiros fornecedor = buscarFornecedor(data.fornecedor());
         preencher(entity, data, fornecedor, entity.getCreatedAt());
+        sincronizarCompraComItens(entity);
 
         return repository.save(entity);
     }
@@ -107,6 +108,30 @@ public class ComprasService {
         }
 
         validarStatus(normalizarStatus(data.status()), data.dataEntrega());
+    }
+
+    private void sincronizarCompraComItens(Compras compra) {
+        if (compra == null || compra.getId() == null || !compraItensRepository.existsByComprasId(compra.getId())) {
+            return;
+        }
+
+        compra.setValorTotal(compraItensRepository.sumValorTotalByCompraId(compra.getId()));
+
+        if (!compraItensRepository.existsByComprasIdAndQuantidadeRecebidaGreaterThan(compra.getId(), BigDecimal.ZERO)) {
+            compra.setStatus("aberto");
+            compra.setDataEntrega(null);
+            return;
+        }
+
+        if (compraItensRepository.existsByComprasIdAndQuantidadeRecebidaLessThanQuantidade(compra.getId())) {
+            compra.setStatus("parcial");
+            return;
+        }
+
+        compra.setStatus("recebido");
+        if (compra.getDataEntrega() == null) {
+            compra.setDataEntrega(LocalDate.now());
+        }
     }
 
     private void validarStatus(String status, LocalDate dataEntrega) {

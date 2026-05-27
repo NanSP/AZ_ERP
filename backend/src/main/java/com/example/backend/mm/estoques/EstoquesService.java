@@ -55,6 +55,8 @@ public class EstoquesService {
         Estoques entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Estoque nao encontrado"));
 
+        validarAtualizacaoComMovimentacoes(entity, data);
+
         Produtos produto = buscarProduto(data.produto());
         Empresas empresa = buscarEmpresa(data.empresa());
 
@@ -171,5 +173,26 @@ public class EstoquesService {
 
         String normalizado = valor.trim();
         return normalizado.isBlank() ? null : normalizado;
+    }
+
+    private void validarAtualizacaoComMovimentacoes(Estoques entity, EstoquesRequestDTO data) {
+        if (entity.getId() == null || !movimentacoesRepository.existsByEstoqueId(entity.getId())) {
+            return;
+        }
+
+        if (!entity.getProduto().getId().equals(data.produto())
+                || !entity.getEmpresa().getId().equals(data.empresa())
+                || !normalizarOpcional(entity.getLocalizacao()).equals(normalizarOpcional(data.localizacao()))
+                || !normalizarOpcional(entity.getLote()).equals(normalizarOpcional(data.lote()))) {
+            throw new ValidacaoException("Nao e permitido alterar identificacao do estoque apos existir movimentacao");
+        }
+
+        BigDecimal quantidadeAtual = entity.getQuantidade();
+        BigDecimal novaQuantidade = data.quantidade();
+        if (quantidadeAtual != null || novaQuantidade != null) {
+            if (quantidadeAtual == null || novaQuantidade == null || quantidadeAtual.compareTo(novaQuantidade) != 0) {
+                throw new ValidacaoException("Nao e permitido alterar quantidade diretamente apos existir movimentacao");
+            }
+        }
     }
 }
