@@ -1,11 +1,8 @@
 package com.example.backend.rh.beneficios;
 
-import com.example.backend.rh.colaboradores.Colaboradores;
-import com.example.backend.rh.colaboradores.ColaboradoresRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -13,14 +10,14 @@ import java.util.List;
 public class BeneficiosController {
 
     private final BeneficiosRepository repository;
-    private final ColaboradoresRepository colaboradoresRepository;
+    private final BeneficiosService beneficiosService;
 
     public BeneficiosController(
             BeneficiosRepository repository,
-            ColaboradoresRepository colaboradoresRepository
+            BeneficiosService beneficiosService
     ) {
         this.repository = repository;
-        this.colaboradoresRepository = colaboradoresRepository;
+        this.beneficiosService = beneficiosService;
     }
 
     @GetMapping
@@ -32,69 +29,29 @@ public class BeneficiosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new BeneficiosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public BeneficiosResponseDTO getById(@PathVariable Integer id) {
+        Beneficios entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Beneficio nao encontrado"));
+
+        return new BeneficiosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveBeneficio(@RequestBody BeneficiosRequestDTO data) {
-        try {
-            Colaboradores colaborador = data.colaborador() != null
-                    ? colaboradoresRepository.findById(data.colaborador())
-                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
-                    : null;
-
-            Beneficios entity = new Beneficios();
-            entity.setColaborador(colaborador);
-            entity.setTipoBeneficio(data.tipoBeneficio());
-            entity.setValor(data.valor());
-            entity.setDataInicio(data.dataInicio());
-            entity.setDataFim(data.dataFim());
-            entity.setAtivo(data.ativo());
-
-            Beneficios saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new BeneficiosResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public BeneficiosResponseDTO saveBeneficio(@RequestBody BeneficiosRequestDTO data) {
+        Beneficios saved = beneficiosService.criar(data);
+        return new BeneficiosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBeneficio(@PathVariable Integer id, @RequestBody BeneficiosRequestDTO data) {
-        try {
-            Beneficios entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Beneficio nao encontrado"));
-
-            Colaboradores colaborador = data.colaborador() != null
-                    ? colaboradoresRepository.findById(data.colaborador())
-                    .orElseThrow(() -> new RuntimeException("Colaborador nao encontrado"))
-                    : null;
-
-            entity.setColaborador(colaborador);
-            entity.setTipoBeneficio(data.tipoBeneficio());
-            entity.setValor(data.valor());
-            entity.setDataInicio(data.dataInicio());
-            entity.setDataFim(data.dataFim());
-            entity.setAtivo(data.ativo());
-
-            Beneficios updated = repository.save(entity);
-            return ResponseEntity.ok(new BeneficiosResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public BeneficiosResponseDTO updateBeneficio(@PathVariable Integer id, @RequestBody BeneficiosRequestDTO data) {
+        Beneficios updated = beneficiosService.atualizar(id, data);
+        return new BeneficiosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBeneficio(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Beneficio deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteBeneficio(@PathVariable Integer id) {
+        beneficiosService.excluir(id);
+        return "Beneficio deleted";
     }
 }
