@@ -2,7 +2,6 @@ package com.example.backend.mm.estoques;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record EstoquesRequestDTO
         (
@@ -14,7 +13,6 @@ public record EstoquesRequestDTO
                 BigDecimal quantidadeMinima,
                 BigDecimal quantidadeMaxima,
                 BigDecimal valorUnitario,
-                LocalDate dataValidade,
-                LocalDateTime createdAt
+                LocalDate dataValidade
         ) {
 }
