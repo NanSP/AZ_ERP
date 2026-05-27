@@ -1,7 +1,7 @@
 package com.example.backend.rh.colaboradores;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class ColaboradoresController {
 
     private final ColaboradoresRepository repository;
+    private final ColaboradoresService colaboradoresService;
 
-    public ColaboradoresController(ColaboradoresRepository repository) {
+    public ColaboradoresController(
+            ColaboradoresRepository repository,
+            ColaboradoresService colaboradoresService
+    ) {
         this.repository = repository;
+        this.colaboradoresService = colaboradoresService;
     }
 
     @GetMapping
@@ -25,58 +30,29 @@ public class ColaboradoresController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ColaboradoresResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ColaboradoresResponseDTO getById(@PathVariable Integer id) {
+        Colaboradores entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Colaborador nao encontrado"));
+
+        return new ColaboradoresResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveColaborador(@RequestBody ColaboradoresRequestDTO data) {
-        Colaboradores entity = new Colaboradores(data);
-        Colaboradores saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ColaboradoresResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ColaboradoresResponseDTO saveColaborador(@RequestBody ColaboradoresRequestDTO data) {
+        Colaboradores saved = colaboradoresService.criar(data);
+        return new ColaboradoresResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateColaborador(@PathVariable Integer id, @RequestBody ColaboradoresRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setCodigo(data.codigo());
-                    entity.setNome(data.nome());
-                    entity.setCpf(data.cpf());
-                    entity.setRg(data.rg());
-                    entity.setDataNascimento(data.dataNascimento());
-                    entity.setSexo(data.sexo());
-                    entity.setEstadoCivil(data.estadoCivil());
-                    entity.setNacionalidade(data.nacionalidade());
-                    entity.setEmailPessoal(data.emailPessoal());
-                    entity.setEmailCorporativo(data.emailCorporativo());
-                    entity.setTelefone(data.telefone());
-                    entity.setCelular(data.celular());
-                    entity.setDataAdmissao(data.dataAdmissao());
-                    entity.setDataDemissao(data.dataDemissao());
-                    entity.setCargo(data.cargo());
-                    entity.setDepartamento(data.departamento());
-                    entity.setSalario(data.salario());
-                    entity.setTipoContrato(data.tipoContrato());
-                    entity.setJornadaSemanal(data.jornadaSemanal());
-                    entity.setSituacao(data.situacao());
-                    entity.setCreatedAt(data.createdAt());
-
-                    Colaboradores updated = repository.save(entity);
-                    return ResponseEntity.ok(new ColaboradoresResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ColaboradoresResponseDTO updateColaborador(@PathVariable Integer id, @RequestBody ColaboradoresRequestDTO data) {
+        Colaboradores updated = colaboradoresService.atualizar(id, data);
+        return new ColaboradoresResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteColaborador(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Colaborador deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteColaborador(@PathVariable Integer id) {
+        colaboradoresService.excluir(id);
+        return "Colaborador deleted";
     }
 }

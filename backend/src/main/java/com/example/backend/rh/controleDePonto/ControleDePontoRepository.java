@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 
 public interface ControleDePontoRepository extends JpaRepository <ControleDePonto, Integer> {
+    boolean existsByColaboradorId(Integer colaboradorId);
     boolean existsByColaboradorIdAndData(Integer colaboradorId, LocalDate data);
     boolean existsByColaboradorIdAndDataAndIdNot(Integer colaboradorId, LocalDate data, Integer id);
 }

@@ -2,7 +2,6 @@ package com.example.backend.rh.colaboradores;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record ColaboradoresRequestDTO
         (
@@ -25,8 +24,7 @@ public record ColaboradoresRequestDTO
                 BigDecimal salario,
                 String tipoContrato,
                 Integer jornadaSemanal,
-                String situacao,
-                LocalDateTime createdAt
+                String situacao
         )
     {
 }

@@ -50,28 +50,4 @@ public class Colaboradores {
     private String situacao = "ativo";
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Colaboradores(ColaboradoresRequestDTO data){
-        this.codigo = data.codigo();
-        this.nome = data.nome();
-        this.cpf = data.cpf();
-        this.rg = data.rg();
-        this.dataNascimento = data.dataNascimento();
-        this.sexo = data.sexo();
-        this.estadoCivil = data.estadoCivil();
-        this.nacionalidade = data.nacionalidade();
-        this.emailPessoal = data.emailPessoal();
-        this.emailCorporativo = data.emailCorporativo();
-        this.telefone = data.telefone();
-        this.celular = data.celular();
-        this.dataAdmissao = data.dataAdmissao();
-        this.dataDemissao = data.dataDemissao();
-        this.cargo = data.cargo();
-        this.departamento = data.departamento();
-        this.salario = data.salario();
-        this.tipoContrato = data.tipoContrato();
-        this.jornadaSemanal = data.jornadaSemanal();
-        this.situacao = data.situacao();
-        this.createdAt = data.createdAt();
-    }
 }
