@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Service
 public class BeneficiosService {
@@ -27,9 +28,10 @@ public class BeneficiosService {
     @Transactional
     public Beneficios criar(BeneficiosRequestDTO data) {
         validar(data);
-        validarDuplicidadeBeneficioAtivoParaCriacao(data.colaborador(), normalizarTipoBeneficio(data.tipoBeneficio()), normalizarAtivo(data.ativo()));
 
         Colaboradores colaborador = buscarColaborador(data.colaborador());
+        validarRelacionamentoComColaborador(colaborador, data);
+        validarDuplicidadeBeneficioAtivoParaCriacao(data.colaborador(), normalizarTipoBeneficio(data.tipoBeneficio()), normalizarAtivo(data.ativo()));
 
         Beneficios entity = new Beneficios();
         preencher(entity, data, colaborador);
@@ -40,6 +42,9 @@ public class BeneficiosService {
     @Transactional
     public Beneficios atualizar(Integer id, BeneficiosRequestDTO data) {
         validar(data);
+
+        Colaboradores colaborador = buscarColaborador(data.colaborador());
+        validarRelacionamentoComColaborador(colaborador, data);
         validarDuplicidadeBeneficioAtivoParaAtualizacao(
                 data.colaborador(),
                 normalizarTipoBeneficio(data.tipoBeneficio()),
@@ -50,7 +55,6 @@ public class BeneficiosService {
         Beneficios entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Beneficio nao encontrado"));
 
-        Colaboradores colaborador = buscarColaborador(data.colaborador());
         preencher(entity, data, colaborador);
 
         return repository.save(entity);
@@ -126,6 +130,36 @@ public class BeneficiosService {
     private Colaboradores buscarColaborador(Integer colaboradorId) {
         return colaboradoresRepository.findById(colaboradorId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Colaborador nao encontrado"));
+    }
+
+    private void validarRelacionamentoComColaborador(Colaboradores colaborador, BeneficiosRequestDTO data) {
+        if (colaborador.getDataAdmissao() != null
+                && data.dataInicio() != null
+                && data.dataInicio().isBefore(colaborador.getDataAdmissao())) {
+            throw new ValidacaoException("Data de inicio do beneficio nao pode ser anterior a data de admissao do colaborador");
+        }
+
+        if (colaborador.getDataDemissao() != null
+                && data.dataFim() != null
+                && data.dataFim().isAfter(colaborador.getDataDemissao())) {
+            throw new ValidacaoException("Data fim do beneficio nao pode ser posterior a data de demissao do colaborador");
+        }
+
+        if (Boolean.TRUE.equals(normalizarAtivo(data.ativo()))) {
+            String situacao = colaborador.getSituacao() != null
+                    ? colaborador.getSituacao().trim().toLowerCase()
+                    : null;
+
+            if ("desligado".equals(situacao) || "inativo".equals(situacao)) {
+                throw new ValidacaoException("Nao e permitido manter beneficio ativo para colaborador inativo");
+            }
+
+            if (colaborador.getDataDemissao() != null
+                    && data.dataInicio() != null
+                    && YearMonth.from(data.dataInicio()).isAfter(YearMonth.from(colaborador.getDataDemissao()))) {
+                throw new ValidacaoException("Nao e permitido iniciar beneficio ativo apos a demissao do colaborador");
+            }
+        }
     }
 
     private void validarDuplicidadeBeneficioAtivoParaCriacao(Integer colaboradorId, String tipoBeneficio, Boolean ativo) {

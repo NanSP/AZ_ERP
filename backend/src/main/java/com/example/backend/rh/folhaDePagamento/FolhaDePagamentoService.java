@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Service
 public class FolhaDePagamentoService {
@@ -37,6 +38,7 @@ public class FolhaDePagamentoService {
         validarDuplicidadeParaCriacao(data.colaborador(), data.competencia());
 
         Colaboradores colaborador = buscarColaborador(data.colaborador());
+        validarRelacionamentoComColaborador(colaborador, data.competencia());
         BigDecimal horasNormais = resolverHorasNormais(data, colaborador);
         BigDecimal horasExtras = resolverHorasExtras(data, colaborador);
         FolhaCalculadaDTO calculada = calculator.calcular(
@@ -62,6 +64,7 @@ public class FolhaDePagamentoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Folha de pagamento nao encontrada"));
 
         Colaboradores colaborador = buscarColaborador(data.colaborador());
+        validarRelacionamentoComColaborador(colaborador, data.competencia());
         BigDecimal horasNormais = resolverHorasNormais(data, colaborador);
         BigDecimal horasExtras = resolverHorasExtras(data, colaborador);
         FolhaCalculadaDTO calculada = calculator.calcular(
@@ -164,6 +167,20 @@ public class FolhaDePagamentoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Colaborador nao encontrado"));
     }
 
+    private void validarRelacionamentoComColaborador(Colaboradores colaborador, LocalDate competencia) {
+        YearMonth competenciaMes = YearMonth.from(competencia);
+
+        if (colaborador.getDataAdmissao() != null
+                && competenciaMes.isBefore(YearMonth.from(colaborador.getDataAdmissao()))) {
+            throw new ValidacaoException("Nao e permitido gerar folha antes do mes de admissao do colaborador");
+        }
+
+        if (colaborador.getDataDemissao() != null
+                && competenciaMes.isAfter(YearMonth.from(colaborador.getDataDemissao()))) {
+            throw new ValidacaoException("Nao e permitido gerar folha apos o mes de demissao do colaborador");
+        }
+    }
+
     private void validarNaoNegativo(BigDecimal valor, String mensagem) {
         if (valor != null && valor.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidacaoException(mensagem);
@@ -183,7 +200,11 @@ public class FolhaDePagamentoService {
             return data.horasNormais();
         }
 
-        return buscarHorasTrabalhadasNoPonto(colaborador.getId(), data.competencia());
+        BigDecimal horasTrabalhadas = buscarHorasTrabalhadasNoPonto(colaborador.getId(), data.competencia());
+        BigDecimal horasExtras = resolverHorasExtras(data, colaborador);
+        BigDecimal horasNormais = horasTrabalhadas.subtract(horasExtras);
+
+        return horasNormais.max(BigDecimal.ZERO);
     }
 
     private BigDecimal resolverHorasExtras(FolhaDePagamentoRequestDTO data, Colaboradores colaborador) {
