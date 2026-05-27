@@ -1,6 +1,5 @@
 package com.example.backend.mm.materiais;
 
-import java.time.LocalDateTime;
 
 public record MateriaisRequestDTO(
 
@@ -12,6 +11,6 @@ public record MateriaisRequestDTO(
         String modelo,
         String especificacoesTecnicas,
         String condicaoArmazenamento,
-        String classePerigo,
-        LocalDateTime createdAt) {
+        String classePerigo
+    ){
 }

@@ -110,12 +110,20 @@ public class MovimentacoesService {
             throw new ValidacaoException("Estoque e obrigatorio");
         }
 
+        if (data.usuario() == null) {
+            throw new ValidacaoException("Usuario e obrigatorio");
+        }
+
         if (data.tipoMovimento() == null || data.tipoMovimento().isBlank()) {
             throw new ValidacaoException("Tipo de movimento e obrigatorio");
         }
 
         String tipo = normalizarTipoMovimento(data.tipoMovimento());
-        if (!tipo.equals("entrada") && !tipo.equals("saida")) {
+        if (!tipo.equals("entrada")
+                && !tipo.equals("saida")
+                && !tipo.equals("transferencia")
+                && !tipo.equals("ajuste")
+                && !tipo.equals("inventario")) {
             throw new ValidacaoException("Tipo de movimento invalido");
         }
 
@@ -123,8 +131,8 @@ public class MovimentacoesService {
             throw new ValidacaoException("Quantidade deve ser maior que zero");
         }
 
-        if (data.valorUnitario() == null || data.valorUnitario().compareTo(BigDecimal.ZERO) < 0) {
-            throw new ValidacaoException("Valor unitario deve ser informado e nao pode ser negativo");
+        if (data.valorUnitario() != null && data.valorUnitario().compareTo(BigDecimal.ZERO) < 0) {
+            throw new ValidacaoException("Valor unitario nao pode ser negativo");
         }
     }
 
@@ -146,7 +154,7 @@ public class MovimentacoesService {
         BigDecimal saldoAtual = nvl(estoque.getQuantidade());
         String tipo = normalizarTipoMovimento(tipoMovimento);
 
-        if (tipo.equals("entrada")) {
+        if (tipo.equals("entrada") || tipo.equals("ajuste") || tipo.equals("inventario")) {
             estoque.setQuantidade(saldoAtual.add(quantidade));
             return;
         }
@@ -163,7 +171,7 @@ public class MovimentacoesService {
         BigDecimal quantidade = nvl(movimentacao.getQuantidade());
         String tipo = normalizarTipoMovimento(movimentacao.getTipoMovimento());
 
-        if (tipo.equals("entrada")) {
+        if (tipo.equals("entrada") || tipo.equals("ajuste") || tipo.equals("inventario")) {
             if (saldoAtual.compareTo(quantidade) < 0) {
                 throw new RegraNegocioException("Nao foi possivel desfazer movimentacao de entrada");
             }
@@ -178,7 +186,11 @@ public class MovimentacoesService {
             BigDecimal quantidade,
             BigDecimal valorUnitario
     ) {
-            return quantidade.multiply(valorUnitario);
+        if (valorUnitario == null) {
+            return null;
+        }
+
+        return quantidade.multiply(valorUnitario);
     }
 
     private BigDecimal nvl(BigDecimal value) {
