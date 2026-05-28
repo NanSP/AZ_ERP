@@ -3,4 +3,6 @@ package com.example.backend.fiscal.esocialEventos;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EsocialEventosRepository extends JpaRepository<EsocialEventos, Long> {
+    boolean existsByEventoId(String eventoId);
+    boolean existsByEventoIdAndIdNot(String eventoId, Long id);
 }

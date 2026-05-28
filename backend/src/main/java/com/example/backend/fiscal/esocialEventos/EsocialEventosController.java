@@ -1,7 +1,7 @@
 package com.example.backend.fiscal.esocialEventos;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class EsocialEventosController {
 
     private final EsocialEventosRepository repository;
+    private final EsocialEventosService esocialEventosService;
 
-    public EsocialEventosController(EsocialEventosRepository repository) {
+    public EsocialEventosController(
+            EsocialEventosRepository repository,
+            EsocialEventosService esocialEventosService
+    ) {
         this.repository = repository;
+        this.esocialEventosService = esocialEventosService;
     }
 
     @GetMapping
@@ -25,50 +30,29 @@ public class EsocialEventosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EsocialEventosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EsocialEventosResponseDTO getById(@PathVariable Long id) {
+        EsocialEventos entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Evento eSocial nao encontrado"));
+
+        return new EsocialEventosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveEsocialEventos(@RequestBody EsocialEventosRequestDTO data) {
-        EsocialEventos entity = new EsocialEventos();
-        entity.setPeriodoApuracao(data.periodoApuracao());
-        entity.setTipoEvento(data.tipoEvento());
-        entity.setEventoId(data.eventoId());
-        entity.setConteudo(data.conteudo());
-        entity.setStatus(data.status());
-        entity.setCreatedAt(data.createdAt());
-
-        EsocialEventos saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new EsocialEventosResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public EsocialEventosResponseDTO saveEsocialEventos(@RequestBody EsocialEventosRequestDTO data) {
+        EsocialEventos saved = esocialEventosService.criar(data);
+        return new EsocialEventosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEsocialEventos(@PathVariable Long id, @RequestBody EsocialEventosRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setPeriodoApuracao(data.periodoApuracao());
-                    entity.setTipoEvento(data.tipoEvento());
-                    entity.setEventoId(data.eventoId());
-                    entity.setConteudo(data.conteudo());
-                    entity.setStatus(data.status());
-                    entity.setCreatedAt(data.createdAt());
-
-                    EsocialEventos updated = repository.save(entity);
-                    return ResponseEntity.ok(new EsocialEventosResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EsocialEventosResponseDTO updateEsocialEventos(@PathVariable Long id, @RequestBody EsocialEventosRequestDTO data) {
+        EsocialEventos updated = esocialEventosService.atualizar(id, data);
+        return new EsocialEventosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEsocialEventos(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("eSocial evento deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteEsocialEventos(@PathVariable Long id) {
+        esocialEventosService.excluir(id);
+        return "eSocial evento deleted";
     }
 }

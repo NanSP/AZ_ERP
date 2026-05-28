@@ -1,7 +1,6 @@
 package com.example.backend.fiscal.esocialEventos;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record EsocialEventosRequestDTO
         (
@@ -9,7 +8,6 @@ public record EsocialEventosRequestDTO
                 String tipoEvento,
                 String eventoId,
                 String conteudo,
-                String status,
-                LocalDateTime createdAt
+                String status
         ) {
 }
