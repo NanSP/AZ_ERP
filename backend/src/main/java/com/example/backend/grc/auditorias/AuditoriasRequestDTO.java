@@ -1,7 +1,6 @@
 package com.example.backend.grc.auditorias;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record AuditoriasRequestDTO
         (
@@ -11,7 +10,6 @@ public record AuditoriasRequestDTO
                 LocalDate dataInicio,
                 LocalDate dataFim,
                 Integer responsavel,
-                String status,
-                LocalDateTime createdAt
+                String status
         ) {
 }
