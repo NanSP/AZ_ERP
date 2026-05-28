@@ -1,7 +1,7 @@
 package com.example.backend.grc.consentimentos;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class ConsentimentosController {
 
     private final ConsentimentosRepository repository;
+    private final ConsentimentosService consentimentosService;
 
-    public ConsentimentosController(ConsentimentosRepository repository) {
+    public ConsentimentosController(
+            ConsentimentosRepository repository,
+            ConsentimentosService consentimentosService
+    ) {
         this.repository = repository;
+        this.consentimentosService = consentimentosService;
     }
 
     @GetMapping
@@ -25,52 +30,29 @@ public class ConsentimentosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new ConsentimentosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ConsentimentosResponseDTO getById(@PathVariable Integer id) {
+        Consentimentos entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Consentimento nao encontrado"));
+
+        return new ConsentimentosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveConsentimentos(@RequestBody ConsentimentosRequestDTO data) {
-        Consentimentos entity = new Consentimentos();
-        entity.setTitular(data.titular());
-        entity.setTipoTitular(data.tipoTitular());
-        entity.setFinalidade(data.finalidade());
-        entity.setDataConsentimento(data.dataConsentimento());
-        entity.setDataRevogacao(data.dataRevogacao());
-        entity.setIpAddress(data.ipAddress());
-        entity.setUserAgent(data.userAgent());
-
-        Consentimentos saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ConsentimentosResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ConsentimentosResponseDTO saveConsentimentos(@RequestBody ConsentimentosRequestDTO data) {
+        Consentimentos saved = consentimentosService.criar(data);
+        return new ConsentimentosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateConsentimentos(@PathVariable Integer id, @RequestBody ConsentimentosRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setTitular(data.titular());
-                    entity.setTipoTitular(data.tipoTitular());
-                    entity.setFinalidade(data.finalidade());
-                    entity.setDataConsentimento(data.dataConsentimento());
-                    entity.setDataRevogacao(data.dataRevogacao());
-                    entity.setIpAddress(data.ipAddress());
-                    entity.setUserAgent(data.userAgent());
-
-                    Consentimentos updated = repository.save(entity);
-                    return ResponseEntity.ok(new ConsentimentosResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public ConsentimentosResponseDTO updateConsentimentos(@PathVariable Integer id, @RequestBody ConsentimentosRequestDTO data) {
+        Consentimentos updated = consentimentosService.atualizar(id, data);
+        return new ConsentimentosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteConsentimentos(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Consentimento deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteConsentimentos(@PathVariable Integer id) {
+        consentimentosService.excluir(id);
+        return "Consentimento deleted";
     }
 }
