@@ -81,6 +81,7 @@ public class LogErrosService {
         }
 
         validarContexto(data.url(), data.parametros());
+        validarContextoDeRastreabilidade(data.usuario(), data.ipAddress(), data.url());
     }
 
     private void validarContexto(String url, Map<String, Object> parametros) {
@@ -131,6 +132,18 @@ public class LogErrosService {
 
         String normalizado = valor.trim();
         return normalizado.isBlank() ? null : normalizado;
+    }
+
+    private void validarContextoDeRastreabilidade(Integer usuarioId, java.net.InetAddress ipAddress, String url) {
+        String urlNormalizada = normalizarOpcional(url);
+
+        if (usuarioId != null && ipAddress == null) {
+            throw new ValidacaoException("IP deve ser informado quando houver usuario no log de erro");
+        }
+
+        if (ipAddress != null && urlNormalizada == null) {
+            throw new ValidacaoException("URL deve ser informada quando houver IP no log de erro");
+        }
     }
 
     private boolean urlValida(String url) {

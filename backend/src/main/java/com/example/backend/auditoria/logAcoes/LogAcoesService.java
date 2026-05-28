@@ -78,6 +78,7 @@ public class LogAcoesService {
 
         validarAcao(acao);
         validarContextoDaAcao(acao, data.registroId(), data.dadosAntigos(), data.dadosNovos());
+        validarContextoDeRastreabilidade(data.usuario(), data.ipAddress());
     }
 
     private void validarAcao(String acao) {
@@ -135,5 +136,11 @@ public class LogAcoesService {
 
         String normalizado = valor.trim();
         return normalizado.isBlank() ? null : normalizado;
+    }
+
+    private void validarContextoDeRastreabilidade(Integer usuarioId, java.net.InetAddress ipAddress) {
+        if (usuarioId != null && ipAddress == null) {
+            throw new ValidacaoException("IP deve ser informado quando houver usuario no log de acao");
+        }
     }
 }
