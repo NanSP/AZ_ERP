@@ -6,6 +6,7 @@ import lombok.*;
 import com.example.backend.sd.pedidos.Pedidos;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Table(name = "documentos", schema = "fiscal")
@@ -28,7 +29,7 @@ public class Documentos {
     @Column(name = "chave_acesso")
     private String chaveAcesso;
     @Column(name = "data_emissao")
-    private LocalDateTime dataEmissao;
+    private LocalDate dataEmissao;
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")

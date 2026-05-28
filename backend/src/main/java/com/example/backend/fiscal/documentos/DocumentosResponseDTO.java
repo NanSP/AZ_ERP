@@ -1,6 +1,7 @@
 package com.example.backend.fiscal.documentos;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record DocumentosResponseDTO
@@ -10,7 +11,7 @@ public record DocumentosResponseDTO
                 String numero,
                 String serie,
                 String chaveAcesso,
-                LocalDateTime dataEmissao,
+                LocalDate dataEmissao,
                 Integer pedido,
                 Integer cliente,
                 BigDecimal valorTotal,
