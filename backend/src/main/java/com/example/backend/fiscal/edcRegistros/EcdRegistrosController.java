@@ -1,7 +1,7 @@
 package com.example.backend.fiscal.edcRegistros;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class EcdRegistrosController {
 
     private final EcdRegistrosRepository repository;
+    private final EcdRegistrosService ecdRegistrosService;
 
-    public EcdRegistrosController(EcdRegistrosRepository repository) {
+    public EcdRegistrosController(
+            EcdRegistrosRepository repository,
+            EcdRegistrosService ecdRegistrosService
+    ) {
         this.repository = repository;
+        this.ecdRegistrosService = ecdRegistrosService;
     }
 
     @GetMapping
@@ -25,46 +30,29 @@ public class EcdRegistrosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EcdRegistrosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EcdRegistrosResponseDTO getById(@PathVariable Long id) {
+        EcdRegistros entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Registro ECD nao encontrado"));
+
+        return new EcdRegistrosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveEdcRegistros(@RequestBody EcdRegistrosRequestDTO data) {
-        EcdRegistros entity = new EcdRegistros();
-        entity.setPeriodo(data.periodo());
-        entity.setRegistro(data.registro());
-        entity.setConteudo(data.conteudo());
-        entity.setCreatedAt(data.createdAt());
-
-        EcdRegistros saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new EcdRegistrosResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public EcdRegistrosResponseDTO saveEcdRegistros(@RequestBody EcdRegistrosRequestDTO data) {
+        EcdRegistros saved = ecdRegistrosService.criar(data);
+        return new EcdRegistrosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEdcRegistros(@PathVariable Long id, @RequestBody EcdRegistrosRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setPeriodo(data.periodo());
-                    entity.setRegistro(data.registro());
-                    entity.setConteudo(data.conteudo());
-                    entity.setCreatedAt(data.createdAt());
-
-                    EcdRegistros updated = repository.save(entity);
-                    return ResponseEntity.ok(new EcdRegistrosResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EcdRegistrosResponseDTO updateEcdRegistros(@PathVariable Long id, @RequestBody EcdRegistrosRequestDTO data) {
+        EcdRegistros updated = ecdRegistrosService.atualizar(id, data);
+        return new EcdRegistrosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEcdRegistros(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("ECD registro deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteEcdRegistros(@PathVariable Long id) {
+        ecdRegistrosService.excluir(id);
+        return "ECD registro deleted";
     }
 }
