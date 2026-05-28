@@ -1,9 +1,7 @@
 package com.example.backend.auditoria.logErros;
 
-import com.example.backend.sys.usuarios.Usuarios;
-import com.example.backend.sys.usuarios.UsuariosRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +11,14 @@ import java.util.List;
 public class LogErrosController {
 
     private final LogErrosRepository repository;
-    private final UsuariosRepository usuariosRepository;
+    private final LogErrosService logErrosService;
 
     public LogErrosController(
             LogErrosRepository repository,
-            UsuariosRepository usuariosRepository
+            LogErrosService logErrosService
     ) {
         this.repository = repository;
-        this.usuariosRepository = usuariosRepository;
+        this.logErrosService = logErrosService;
     }
 
     @GetMapping
@@ -32,73 +30,29 @@ public class LogErrosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new LogErrosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public LogErrosResponseDTO getById(@PathVariable Long id) {
+        LogErros entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Log de erro nao encontrado"));
+
+        return new LogErrosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveLogErros(@RequestBody LogErrosRequestDTO data) {
-        try {
-            Usuarios usuario = data.usuario() != null
-                    ? usuariosRepository.findById(data.usuario())
-                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
-                    : null;
-
-            LogErros entity = new LogErros();
-            entity.setErroCodigo(data.erroCodigo());
-            entity.setErroMensagem(data.erroMensagem());
-            entity.setModulo(data.modulo());
-            entity.setUsuario(usuario);
-            entity.setUrl(data.url());
-            entity.setParametros(data.parametros());
-            entity.setIpAddress(data.ipAddress());
-            entity.setCreatedAt(data.createdAt());
-
-            LogErros saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new LogErrosResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public LogErrosResponseDTO saveLogErros(@RequestBody LogErrosRequestDTO data) {
+        LogErros saved = logErrosService.criar(data);
+        return new LogErrosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateLogErros(@PathVariable Long id, @RequestBody LogErrosRequestDTO data) {
-        try {
-            LogErros entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Log de erro nao encontrado"));
-
-            Usuarios usuario = data.usuario() != null
-                    ? usuariosRepository.findById(data.usuario())
-                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
-                    : null;
-
-            entity.setErroCodigo(data.erroCodigo());
-            entity.setErroMensagem(data.erroMensagem());
-            entity.setModulo(data.modulo());
-            entity.setUsuario(usuario);
-            entity.setUrl(data.url());
-            entity.setParametros(data.parametros());
-            entity.setIpAddress(data.ipAddress());
-            entity.setCreatedAt(data.createdAt());
-
-            LogErros updated = repository.save(entity);
-            return ResponseEntity.ok(new LogErrosResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public LogErrosResponseDTO updateLogErros(@PathVariable Long id, @RequestBody LogErrosRequestDTO data) {
+        LogErros updated = logErrosService.atualizar(id, data);
+        return new LogErrosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteLogErros(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Log de erro deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteLogErros(@PathVariable Long id) {
+        logErrosService.excluir(id);
+        return "Log de erro deleted";
     }
 }

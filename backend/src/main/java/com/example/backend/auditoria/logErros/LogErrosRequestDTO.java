@@ -1,7 +1,6 @@
 package com.example.backend.auditoria.logErros;
 
 import java.net.InetAddress;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 public record LogErrosRequestDTO
@@ -12,7 +11,6 @@ public record LogErrosRequestDTO
                 Integer usuario,
                 String url,
                 Map<String, Object> parametros,
-                InetAddress ipAddress,
-                LocalDateTime createdAt
+                InetAddress ipAddress
         ) {
 }
