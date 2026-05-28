@@ -10,7 +10,6 @@ public record DispositivosRequestDTO
                 String devicePlatform,
                 String pushToken,
                 LocalDateTime ultimoAcesso,
-                Boolean ativo,
-                LocalDateTime createdAt
+                Boolean ativo
         ) {
 }
