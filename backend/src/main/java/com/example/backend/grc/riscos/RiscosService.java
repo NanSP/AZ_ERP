@@ -94,6 +94,7 @@ public class RiscosService {
 
         validarEscala(data.probabilidade(), "Probabilidade deve estar entre 1 e 5");
         validarEscala(data.impacto(), "Impacto deve estar entre 1 e 5");
+        validarResponsabilizacao(data);
     }
 
     private void validarEscala(Integer valor, String mensagem) {
@@ -159,6 +160,25 @@ public class RiscosService {
                 || entity.getImpacto() != null
                 || normalizarOpcional(entity.getPlanoMitigacao()) != null) {
             throw new ValidacaoException("Nao e permitido excluir risco ja avaliado ou com plano de mitigacao");
+        }
+    }
+
+    private void validarResponsabilizacao(RiscosRequestDTO data) {
+        String nivelRisco = calcularNivelRisco(data.probabilidade(), data.impacto());
+        String planoMitigacao = normalizarOpcional(data.planoMitigacao());
+
+        if ("alto".equals(nivelRisco)) {
+            if (data.responsavel() == null) {
+                throw new ValidacaoException("Risco alto deve possuir responsavel");
+            }
+
+            if (planoMitigacao == null) {
+                throw new ValidacaoException("Risco alto deve possuir plano de mitigacao");
+            }
+        }
+
+        if ("medio".equals(nivelRisco) && planoMitigacao != null && data.responsavel() == null) {
+            throw new ValidacaoException("Plano de mitigacao exige responsavel para o risco");
         }
     }
 

@@ -92,6 +92,7 @@ public class ControlesService {
 
         validarTipoControle(normalizarTipoControle(data.tipoControle()));
         validarFrequencia(normalizarFrequencia(data.frequencia()));
+        validarResponsabilizacao(data);
     }
 
     private void validarTipoControle(String tipoControle) {
@@ -172,6 +173,18 @@ public class ControlesService {
     private void validarExclusao(Controles entity) {
         if (normalizarOpcional(entity.getCodigo()) != null) {
             throw new ValidacaoException("Nao e permitido excluir controle formalizado com codigo");
+        }
+    }
+
+    private void validarResponsabilizacao(ControlesRequestDTO data) {
+        String codigo = normalizarOpcional(data.codigo());
+
+        if (codigo != null && data.responsavel() == null) {
+            throw new ValidacaoException("Controle formalizado com codigo deve possuir responsavel");
+        }
+
+        if (Boolean.TRUE.equals(data.efetivo()) && data.responsavel() == null) {
+            throw new ValidacaoException("Controle efetivo deve possuir responsavel");
         }
     }
 }

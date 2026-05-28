@@ -97,6 +97,7 @@ public class AuditoriasService {
         String status = normalizarStatus(data.status());
         validarStatus(status);
         validarStatusComDatas(status, data.dataInicio(), data.dataFim());
+        validarResponsabilizacao(status, data.responsavel());
     }
 
     private void validarTipoAuditoria(String tipoAuditoria) {
@@ -215,6 +216,12 @@ public class AuditoriasService {
 
         if ("em_andamento".equals(status) || "concluida".equals(status) || "cancelada".equals(status)) {
             throw new ValidacaoException("Nao e permitido excluir auditoria que ja entrou em ciclo de execucao");
+        }
+    }
+
+    private void validarResponsabilizacao(String status, Integer responsavelId) {
+        if (("em_andamento".equals(status) || "concluida".equals(status)) && responsavelId == null) {
+            throw new ValidacaoException("Auditoria em execucao deve possuir responsavel");
         }
     }
 }
