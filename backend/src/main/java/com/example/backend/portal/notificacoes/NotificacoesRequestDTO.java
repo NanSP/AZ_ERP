@@ -9,7 +9,6 @@ public record NotificacoesRequestDTO
                 String mensagem,
                 String tipo,
                 Boolean lida,
-                LocalDateTime dataLeitura,
-                LocalDateTime createdAt
+                LocalDateTime dataLeitura
         ) {
 }
