@@ -1,9 +1,7 @@
 package com.example.backend.portal.sessoes;
 
-import com.example.backend.sys.usuarios.Usuarios;
-import com.example.backend.sys.usuarios.UsuariosRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +11,14 @@ import java.util.List;
 public class SessoesController {
 
     private final SessoesRepository repository;
-    private final UsuariosRepository usuariosRepository;
+    private final SessoesService sessoesService;
 
     public SessoesController(
             SessoesRepository repository,
-            UsuariosRepository usuariosRepository
+            SessoesService sessoesService
     ) {
         this.repository = repository;
-        this.usuariosRepository = usuariosRepository;
+        this.sessoesService = sessoesService;
     }
 
     @GetMapping
@@ -32,71 +30,29 @@ public class SessoesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new SessoesResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public SessoesResponseDTO getById(@PathVariable Integer id) {
+        Sessoes entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Sessao nao encontrada"));
+
+        return new SessoesResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveSessoes(@RequestBody SessoesRequestDTO data) {
-        try {
-            Usuarios usuario = data.usuario() != null
-                    ? usuariosRepository.findById(data.usuario())
-                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
-                    : null;
-
-            Sessoes entity = new Sessoes();
-            entity.setUsuario(usuario);
-            entity.setTokenSessao(data.tokenSessao());
-            entity.setIpAddress(data.ipAddress());
-            entity.setUserAgent(data.userAgent());
-            entity.setDataLogin(data.dataLogin());
-            entity.setDataLogout(data.dataLogout());
-            entity.setExpiracao(data.expiracao());
-
-            Sessoes saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new SessoesResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public SessoesResponseDTO saveSessoes(@RequestBody SessoesRequestDTO data) {
+        Sessoes saved = sessoesService.criar(data);
+        return new SessoesResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSessoes(@PathVariable Integer id, @RequestBody SessoesRequestDTO data) {
-        try {
-            Sessoes entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Sessao nao encontrada"));
-
-            Usuarios usuario = data.usuario() != null
-                    ? usuariosRepository.findById(data.usuario())
-                    .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"))
-                    : null;
-
-            entity.setUsuario(usuario);
-            entity.setTokenSessao(data.tokenSessao());
-            entity.setIpAddress(data.ipAddress());
-            entity.setUserAgent(data.userAgent());
-            entity.setDataLogin(data.dataLogin());
-            entity.setDataLogout(data.dataLogout());
-            entity.setExpiracao(data.expiracao());
-
-            Sessoes updated = repository.save(entity);
-            return ResponseEntity.ok(new SessoesResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public SessoesResponseDTO updateSessoes(@PathVariable Integer id, @RequestBody SessoesRequestDTO data) {
+        Sessoes updated = sessoesService.atualizar(id, data);
+        return new SessoesResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSessoes(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Sessao deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteSessoes(@PathVariable Integer id) {
+        sessoesService.excluir(id);
+        return "Sessao deleted";
     }
 }
