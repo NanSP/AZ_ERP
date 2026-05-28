@@ -194,5 +194,15 @@ public class EstoquesService {
                 throw new ValidacaoException("Nao e permitido alterar quantidade diretamente apos existir movimentacao");
             }
         }
+
+        BigDecimal valorUnitarioAtual = entity.getValorUnitario();
+        BigDecimal novoValorUnitario = data.valorUnitario();
+        if (valorUnitarioAtual != null || novoValorUnitario != null) {
+            if (valorUnitarioAtual == null
+                    || novoValorUnitario == null
+                    || valorUnitarioAtual.compareTo(novoValorUnitario) != 0) {
+                throw new ValidacaoException("Nao e permitido alterar valor unitario diretamente apos existir movimentacao");
+            }
+        }
     }
 }

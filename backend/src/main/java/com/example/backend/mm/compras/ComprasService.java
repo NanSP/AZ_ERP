@@ -31,7 +31,7 @@ public class ComprasService {
 
     @Transactional
     public Compras criar(ComprasRequestDTO data) {
-        validar(data);
+        validar(data, null);
 
         Parceiros fornecedor = buscarFornecedor(data.fornecedor());
 
@@ -43,10 +43,10 @@ public class ComprasService {
 
     @Transactional
     public Compras atualizar(Integer id, ComprasRequestDTO data) {
-        validar(data);
-
         Compras entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Compra nao encontrada"));
+
+        validar(data, entity);
 
         Parceiros fornecedor = buscarFornecedor(data.fornecedor());
         preencher(entity, data, fornecedor, entity.getCreatedAt());
@@ -84,7 +84,7 @@ public class ComprasService {
         entity.setCreatedAt(createdAt);
     }
 
-    private void validar(ComprasRequestDTO data) {
+    private void validar(ComprasRequestDTO data, Compras compraAtual) {
         if (data == null) {
             throw new ValidacaoException("Dados da compra sao obrigatorios");
         }
@@ -108,6 +108,7 @@ public class ComprasService {
         }
 
         validarStatus(normalizarStatus(data.status()), data.dataEntrega());
+        validarRelacionamentoComItens(data, compraAtual);
     }
 
     private void sincronizarCompraComItens(Compras compra) {
@@ -145,6 +146,36 @@ public class ComprasService {
         if (status.equals("recebido") && dataEntrega == null) {
             throw new ValidacaoException("Data de entrega e obrigatoria para compra recebida");
         }
+    }
+
+    private void validarRelacionamentoComItens(ComprasRequestDTO data, Compras compraAtual) {
+        if (compraAtual == null || compraAtual.getId() == null || !compraItensRepository.existsByComprasId(compraAtual.getId())) {
+            return;
+        }
+
+        BigDecimal valorTotalDerivado = compraItensRepository.sumValorTotalByCompraId(compraAtual.getId());
+        String statusDerivado = calcularStatusDerivadoDaCompra(compraAtual.getId());
+
+        if (data.valorTotal() != null && valorTotalDerivado.compareTo(data.valorTotal()) != 0) {
+            throw new ValidacaoException("Valor total da compra com itens deve seguir a soma dos itens");
+        }
+
+        String statusInformado = normalizarStatus(data.status());
+        if (!statusDerivado.equals(statusInformado)) {
+            throw new ValidacaoException("Status da compra com itens deve seguir o recebimento real dos itens");
+        }
+    }
+
+    private String calcularStatusDerivadoDaCompra(Integer compraId) {
+        if (!compraItensRepository.existsByComprasIdAndQuantidadeRecebidaGreaterThan(compraId, BigDecimal.ZERO)) {
+            return "aberto";
+        }
+
+        if (compraItensRepository.existsByComprasIdAndQuantidadeRecebidaLessThanQuantidade(compraId)) {
+            return "parcial";
+        }
+
+        return "recebido";
     }
 
     private Parceiros buscarFornecedor(Integer fornecedorId) {
