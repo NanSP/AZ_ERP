@@ -1,7 +1,7 @@
 package com.example.backend.fiscal.efdRegistros;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class EfdRegistrosController {
 
     private final EfdRegistrosRepository repository;
+    private final EfdRegistrosService efdRegistrosService;
 
-    public EfdRegistrosController(EfdRegistrosRepository repository) {
+    public EfdRegistrosController(
+            EfdRegistrosRepository repository,
+            EfdRegistrosService efdRegistrosService
+    ) {
         this.repository = repository;
+        this.efdRegistrosService = efdRegistrosService;
     }
 
     @GetMapping
@@ -25,46 +30,29 @@ public class EfdRegistrosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EfdRegistrosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EfdRegistrosResponseDTO getById(@PathVariable Long id) {
+        EfdRegistros entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Registro EFD nao encontrado"));
+
+        return new EfdRegistrosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveEfdRegistros(@RequestBody EfdRegistrosRequestDTO data) {
-        EfdRegistros entity = new EfdRegistros();
-        entity.setPeriodo(data.periodo());
-        entity.setRegistro(data.registro());
-        entity.setConteudo(data.conteudo());
-        entity.setCreatedAt(data.createdAt());
-
-        EfdRegistros saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new EfdRegistrosResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public EfdRegistrosResponseDTO saveEfdRegistros(@RequestBody EfdRegistrosRequestDTO data) {
+        EfdRegistros saved = efdRegistrosService.criar(data);
+        return new EfdRegistrosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEfdRegistros(@PathVariable Long id, @RequestBody EfdRegistrosRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setPeriodo(data.periodo());
-                    entity.setRegistro(data.registro());
-                    entity.setConteudo(data.conteudo());
-                    entity.setCreatedAt(data.createdAt());
-
-                    EfdRegistros updated = repository.save(entity);
-                    return ResponseEntity.ok(new EfdRegistrosResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EfdRegistrosResponseDTO updateEfdRegistros(@PathVariable Long id, @RequestBody EfdRegistrosRequestDTO data) {
+        EfdRegistros updated = efdRegistrosService.atualizar(id, data);
+        return new EfdRegistrosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEfdRegistros(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("EFD registro deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteEfdRegistros(@PathVariable Long id) {
+        efdRegistrosService.excluir(id);
+        return "EFD registro deleted";
     }
 }
