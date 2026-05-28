@@ -96,8 +96,8 @@ public class EfdRegistrosService {
     private void validarExclusao(EfdRegistros entity) {
         LocalDate inicioMesAtual = LocalDate.now().withDayOfMonth(1);
 
-        if (entity.getPeriodo() != null && !entity.getPeriodo().isAfter(inicioMesAtual)) {
-            throw new ValidacaoException("Nao e permitido excluir registro EFD de periodo atual ou passado");
+        if (entity.getPeriodo() != null && entity.getPeriodo().isBefore(inicioMesAtual)) {
+            throw new ValidacaoException("Nao e permitido excluir registro EFD de periodo passado");
         }
     }
 }

@@ -79,14 +79,16 @@ public class DocumentosService {
             Parceiros cliente,
             LocalDateTime createdAt
     ) {
+        Parceiros clienteResolvido = resolverCliente(pedido, cliente);
+
         entity.setTipoDocumento(normalizarTipoDocumento(data.tipoDocumento()));
         entity.setNumero(normalizarObrigatorio(data.numero(), "Numero do documento e obrigatorio"));
         entity.setSerie(normalizarOpcional(data.serie()));
         entity.setChaveAcesso(normalizarOpcional(data.chaveAcesso()));
         entity.setDataEmissao(data.dataEmissao());
         entity.setPedido(pedido);
-        entity.setCliente(cliente);
-        entity.setValorTotal(data.valorTotal());
+        entity.setCliente(clienteResolvido);
+        entity.setValorTotal(resolverValorTotal(data.valorTotal(), pedido));
         entity.setStatus(normalizarStatus(data.status()));
         entity.setXml_file(normalizarOpcional(data.xml_file()));
         entity.setCreatedAt(createdAt);
@@ -125,6 +127,8 @@ public class DocumentosService {
                 throw new ValidacaoException("Nao e permitido emitir documento para pedido cancelado");
             }
         }
+
+        validarValorTotalComPedido(data.valorTotal(), pedido);
 
         String tipoDocumento = normalizarTipoDocumento(data.tipoDocumento());
         if ((tipoDocumento.equals("nfe") || tipoDocumento.equals("nfce"))
@@ -231,6 +235,32 @@ public class DocumentosService {
         if (valor != null && valor.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidacaoException(mensagem);
         }
+    }
+
+    private void validarValorTotalComPedido(BigDecimal valorTotal, Pedidos pedido) {
+        if (pedido == null || pedido.getValorTotal() == null || valorTotal == null) {
+            return;
+        }
+
+        if (pedido.getValorTotal().compareTo(valorTotal) != 0) {
+            throw new ValidacaoException("Valor total do documento diverge do valor total do pedido");
+        }
+    }
+
+    private Parceiros resolverCliente(Pedidos pedido, Parceiros cliente) {
+        if (pedido != null && pedido.getCliente() != null) {
+            return pedido.getCliente();
+        }
+
+        return cliente;
+    }
+
+    private BigDecimal resolverValorTotal(BigDecimal valorTotal, Pedidos pedido) {
+        if (pedido != null && pedido.getValorTotal() != null) {
+            return pedido.getValorTotal();
+        }
+
+        return valorTotal;
     }
 
     private String normalizarTipoDocumento(String tipoDocumento) {
