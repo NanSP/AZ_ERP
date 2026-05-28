@@ -2,6 +2,7 @@ package com.example.backend.portal.notificacoes;
 
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
+import com.example.backend.portal.sessoes.SessoesRepository;
 import com.example.backend.sys.usuarios.Usuarios;
 import com.example.backend.sys.usuarios.UsuariosRepository;
 import jakarta.transaction.Transactional;
@@ -14,13 +15,16 @@ public class NotificacoesService {
 
     private final NotificacoesRepository repository;
     private final UsuariosRepository usuariosRepository;
+    private final SessoesRepository sessoesRepository;
 
     public NotificacoesService(
             NotificacoesRepository repository,
-            UsuariosRepository usuariosRepository
+            UsuariosRepository usuariosRepository,
+            SessoesRepository sessoesRepository
     ) {
         this.repository = repository;
         this.usuariosRepository = usuariosRepository;
+        this.sessoesRepository = sessoesRepository;
     }
 
     @Transactional
@@ -88,6 +92,7 @@ public class NotificacoesService {
 
         validarTipo(normalizarTipo(data.tipo()));
         validarLeitura(normalizarLida(data.lida()), data.dataLeitura());
+        validarRelacionamentoComSessoes(data.usuario(), normalizarLida(data.lida()));
     }
 
     private void validarTipo(String tipo) {
@@ -198,6 +203,12 @@ public class NotificacoesService {
     private void validarExclusao(Notificacoes entity) {
         if (Boolean.TRUE.equals(entity.getLida()) || entity.getDataLeitura() != null) {
             throw new ValidacaoException("Nao e permitido excluir notificacao que ja foi lida");
+        }
+    }
+
+    private void validarRelacionamentoComSessoes(Integer usuarioId, Boolean lida) {
+        if (Boolean.TRUE.equals(lida) && !sessoesRepository.existsByUsuarioIdAndDataLogoutIsNull(usuarioId)) {
+            throw new ValidacaoException("Usuario precisa possuir sessao ativa para marcar notificacao como lida");
         }
     }
 }

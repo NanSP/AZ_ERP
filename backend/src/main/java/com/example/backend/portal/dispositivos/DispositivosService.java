@@ -2,6 +2,7 @@ package com.example.backend.portal.dispositivos;
 
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
+import com.example.backend.portal.sessoes.SessoesRepository;
 import com.example.backend.sys.usuarios.Usuarios;
 import com.example.backend.sys.usuarios.UsuariosRepository;
 import jakarta.transaction.Transactional;
@@ -14,13 +15,16 @@ public class DispositivosService {
 
     private final DispositivosRepository repository;
     private final UsuariosRepository usuariosRepository;
+    private final SessoesRepository sessoesRepository;
 
     public DispositivosService(
             DispositivosRepository repository,
-            UsuariosRepository usuariosRepository
+            UsuariosRepository usuariosRepository,
+            SessoesRepository sessoesRepository
     ) {
         this.repository = repository;
         this.usuariosRepository = usuariosRepository;
+        this.sessoesRepository = sessoesRepository;
     }
 
     @Transactional
@@ -46,6 +50,7 @@ public class DispositivosService {
         Dispositivos entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Dispositivo nao encontrado"));
 
+        validarRelacionamentoComSessoesNaAtualizacao(entity, data);
         Usuarios usuario = buscarUsuario(data.usuario());
 
         preencher(entity, data, usuario, entity.getCreatedAt());
@@ -58,6 +63,7 @@ public class DispositivosService {
         Dispositivos entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Dispositivo nao encontrado"));
 
+        validarRelacionamentoComSessoesNaExclusao(entity);
         validarExclusao(entity);
         repository.delete(entity);
     }
@@ -173,6 +179,25 @@ public class DispositivosService {
 
         if (entity.getUltimoAcesso() != null) {
             throw new ValidacaoException("Nao e permitido excluir dispositivo com historico de acesso");
+        }
+    }
+
+    private void validarRelacionamentoComSessoesNaAtualizacao(Dispositivos entity, DispositivosRequestDTO data) {
+        if (entity.getUsuario() == null || entity.getUsuario().getId() == null) {
+            return;
+        }
+
+        if (Boolean.FALSE.equals(data.ativo())
+                && sessoesRepository.existsByUsuarioIdAndDataLogoutIsNull(entity.getUsuario().getId())) {
+            throw new ValidacaoException("Nao e permitido desativar dispositivo de usuario com sessao ativa");
+        }
+    }
+
+    private void validarRelacionamentoComSessoesNaExclusao(Dispositivos entity) {
+        if (entity.getUsuario() != null
+                && entity.getUsuario().getId() != null
+                && sessoesRepository.existsByUsuarioIdAndDataLogoutIsNull(entity.getUsuario().getId())) {
+            throw new ValidacaoException("Nao e permitido excluir dispositivo de usuario com sessao ativa");
         }
     }
 }
