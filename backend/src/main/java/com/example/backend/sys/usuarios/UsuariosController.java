@@ -1,8 +1,7 @@
 package com.example.backend.sys.usuarios;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,14 +11,14 @@ import java.util.List;
 public class UsuariosController {
 
     private final UsuariosRepository repository;
-    private final PasswordEncoder passwordEncoder;
+    private final UsuariosService usuariosService;
 
     public UsuariosController(
             UsuariosRepository repository,
-            PasswordEncoder passwordEncoder
+            UsuariosService usuariosService
     ) {
         this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
+        this.usuariosService = usuariosService;
     }
 
     @GetMapping
@@ -31,66 +30,29 @@ public class UsuariosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new UsuariosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public UsuariosResponseDTO getById(@PathVariable Integer id) {
+        Usuarios entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario nao encontrado"));
+
+        return new UsuariosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveUsuarios(@RequestBody UsuariosRequestDTO data) {
-        if (data.senha() == null || data.senha().isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Senha obrigatoria");
-        }
-
-        Usuarios entity = new Usuarios();
-        entity.setNome(data.nome());
-        entity.setEmail(data.email());
-        entity.setLogin(data.login());
-        entity.setSenhaHash(passwordEncoder.encode(data.senha()));
-        entity.setDocumento(data.documento());
-        entity.setTipoUsuario(data.tipoUsuario());
-        entity.setStatus(data.status());
-        entity.setUltimoAcesso(data.ultimoAcesso());
-        entity.setExpiracaoSenha(data.expiracaoSenha());
-        entity.setTentativasLogin(data.tentativasLogin());
-
-        Usuarios saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new UsuariosResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public UsuariosResponseDTO saveUsuarios(@RequestBody UsuariosRequestDTO data) {
+        Usuarios saved = usuariosService.criar(data);
+        return new UsuariosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUsuarios(@PathVariable Integer id, @RequestBody UsuariosRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setNome(data.nome());
-                    entity.setEmail(data.email());
-                    entity.setLogin(data.login());
-
-                    if (data.senha() != null && !data.senha().isBlank()) {
-                        entity.setSenhaHash(passwordEncoder.encode(data.senha()));
-                    }
-
-                    entity.setDocumento(data.documento());
-                    entity.setTipoUsuario(data.tipoUsuario());
-                    entity.setStatus(data.status());
-                    entity.setUltimoAcesso(data.ultimoAcesso());
-                    entity.setExpiracaoSenha(data.expiracaoSenha());
-                    entity.setTentativasLogin(data.tentativasLogin());
-
-                    Usuarios updated = repository.save(entity);
-                    return ResponseEntity.ok(new UsuariosResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public UsuariosResponseDTO updateUsuarios(@PathVariable Integer id, @RequestBody UsuariosRequestDTO data) {
+        Usuarios updated = usuariosService.atualizar(id, data);
+        return new UsuariosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUsuarios(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Usuario deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteUsuarios(@PathVariable Integer id) {
+        usuariosService.excluir(id);
+        return "Usuario deleted";
     }
 }
