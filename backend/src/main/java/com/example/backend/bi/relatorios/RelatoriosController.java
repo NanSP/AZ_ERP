@@ -1,7 +1,7 @@
 package com.example.backend.bi.relatorios;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class RelatoriosController {
 
     private final RelatoriosRepository repository;
+    private final RelatoriosService relatoriosService;
 
-    public RelatoriosController(RelatoriosRepository repository) {
+    public RelatoriosController(
+            RelatoriosRepository repository,
+            RelatoriosService relatoriosService
+    ) {
         this.repository = repository;
+        this.relatoriosService = relatoriosService;
     }
 
     @GetMapping
@@ -25,43 +30,29 @@ public class RelatoriosController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new RelatoriosResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public RelatoriosResponseDTO getById(@PathVariable Integer id) {
+        Relatorios entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Relatorio nao encontrado"));
+
+        return new RelatoriosResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveRelatorios(@RequestBody RelatoriosRequestDTO data) {
-        Relatorios entity = new Relatorios(data);
-        Relatorios saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new RelatoriosResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public RelatoriosResponseDTO saveRelatorios(@RequestBody RelatoriosRequestDTO data) {
+        Relatorios saved = relatoriosService.criar(data);
+        return new RelatoriosResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRelatorios(@PathVariable Integer id, @RequestBody RelatoriosRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setNome(data.nome());
-                    entity.setDescricao(data.descricao());
-                    entity.setTipoRelatorio(data.tipoRelatorio());
-                    entity.setQuerySql(data.querySql());
-                    entity.setParametros(data.parametros());
-                    entity.setCreatedAt(data.createdAt());
-
-                    Relatorios updated = repository.save(entity);
-                    return ResponseEntity.ok(new RelatoriosResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public RelatoriosResponseDTO updateRelatorios(@PathVariable Integer id, @RequestBody RelatoriosRequestDTO data) {
+        Relatorios updated = relatoriosService.atualizar(id, data);
+        return new RelatoriosResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRelatorios(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Relatorio deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteRelatorios(@PathVariable Integer id) {
+        relatoriosService.excluir(id);
+        return "Relatorio deleted";
     }
 }

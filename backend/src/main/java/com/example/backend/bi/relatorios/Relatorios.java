@@ -2,6 +2,7 @@ package com.example.backend.bi.relatorios;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -32,15 +33,7 @@ public class Relatorios {
     @Column(name = "parametros",columnDefinition = "jsonb")
     private Map<String, Object> parametros;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    public Relatorios(RelatoriosRequestDTO data) {
-        this.nome = data.nome();
-        this.tipoRelatorio = data.tipoRelatorio();
-        this.descricao = data.descricao();
-        this.parametros = data.parametros();
-        this.querySql = data.querySql();
-        this.createdAt = data.createdAt();
-    }
 }

@@ -1,6 +1,5 @@
 package com.example.backend.bi.relatorios;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 public record RelatoriosRequestDTO
@@ -9,7 +8,6 @@ public record RelatoriosRequestDTO
                 String descricao,
                 String tipoRelatorio,
                 String querySql,
-                Map<String, Object> parametros,
-                LocalDateTime createdAt
+                Map<String, Object> parametros
         ) {
 }
