@@ -2,6 +2,8 @@ package com.example.backend.sys.permissoes;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Table(name = "permissoes", schema = "sys")
@@ -22,16 +24,8 @@ public class Permissoes {
     private String recurso;
     private String acao;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Permissoes(PermissoesRequestDTO data){
-
-        this.nome = data.nome();
-        this.descricao = data.descricao();
-        this.modulo = data.modulo();
-        this.recurso = data.recurso();
-        this.acao = data.acao();
-        this.createdAt = data.createdAt();
-    }
 }
