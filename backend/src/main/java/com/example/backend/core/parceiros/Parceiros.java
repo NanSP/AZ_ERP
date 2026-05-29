@@ -1,14 +1,10 @@
 package com.example.backend.core.parceiros;
 
-import com.example.backend.fi.contasPagar.ContasPagar;
-import com.example.backend.fi.contasReceber.ContasReceber;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Table(name = "parceiros", schema = "core")
 @Entity
@@ -37,12 +33,6 @@ public class Parceiros {
     @Column(name = "dias_prazo")
     private Integer diasPrazo;
     private String observacoes;
-
-    @OneToMany(mappedBy = "fornecedor")
-    private List<ContasPagar> contasAPagar = new ArrayList<>();
-
-    @OneToMany(mappedBy = "cliente")
-    private List<ContasReceber> contasAReceber = new ArrayList<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
