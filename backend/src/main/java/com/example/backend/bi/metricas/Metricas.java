@@ -2,6 +2,7 @@ package com.example.backend.bi.metricas;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,16 +29,7 @@ public class Metricas {
     @Column(precision = 15, scale = 2)
     private BigDecimal meta;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    public Metricas(MetricasRequestDTO data) {
-        this.nome = data.nome();
-        this.descricao = data.descricao();
-        this.categoria = data.categoria();
-        this.formula = data.formula();
-        this.unidadeMedida = data.unidadeMedida();
-        this.meta = data.meta();
-        this.createdAt = data.createdAt();
-    }
 }

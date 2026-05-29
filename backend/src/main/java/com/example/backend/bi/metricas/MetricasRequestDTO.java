@@ -1,7 +1,6 @@
 package com.example.backend.bi.metricas;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public record MetricasRequestDTO
         (
@@ -10,7 +9,6 @@ public record MetricasRequestDTO
                 String categoria,
                 String formula,
                 String unidadeMedida,
-                BigDecimal meta,
-                LocalDateTime createdAt
+                BigDecimal meta
         ) {
 }

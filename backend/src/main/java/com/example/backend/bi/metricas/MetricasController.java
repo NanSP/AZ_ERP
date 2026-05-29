@@ -1,7 +1,7 @@
 package com.example.backend.bi.metricas;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class MetricasController {
 
     private final MetricasRepository repository;
+    private final MetricasService metricasService;
 
-    public MetricasController(MetricasRepository repository) {
+    public MetricasController(
+            MetricasRepository repository,
+            MetricasService metricasService
+    ) {
         this.repository = repository;
+        this.metricasService = metricasService;
     }
 
     @GetMapping
@@ -25,44 +30,29 @@ public class MetricasController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new MetricasResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public MetricasResponseDTO getById(@PathVariable Integer id) {
+        Metricas entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Metrica nao encontrada"));
+
+        return new MetricasResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveMetricas(@RequestBody MetricasRequestDTO data) {
-        Metricas entity = new Metricas(data);
-        Metricas saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new MetricasResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public MetricasResponseDTO saveMetricas(@RequestBody MetricasRequestDTO data) {
+        Metricas saved = metricasService.criar(data);
+        return new MetricasResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateMetricas(@PathVariable Integer id, @RequestBody MetricasRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setNome(data.nome());
-                    entity.setDescricao(data.descricao());
-                    entity.setCategoria(data.categoria());
-                    entity.setFormula(data.formula());
-                    entity.setUnidadeMedida(data.unidadeMedida());
-                    entity.setMeta(data.meta());
-                    entity.setCreatedAt(data.createdAt());
-
-                    Metricas updated = repository.save(entity);
-                    return ResponseEntity.ok(new MetricasResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public MetricasResponseDTO updateMetricas(@PathVariable Integer id, @RequestBody MetricasRequestDTO data) {
+        Metricas updated = metricasService.atualizar(id, data);
+        return new MetricasResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteMetricas(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Metrica deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteMetricas(@PathVariable Integer id) {
+        metricasService.excluir(id);
+        return "Metrica deleted";
     }
 }
