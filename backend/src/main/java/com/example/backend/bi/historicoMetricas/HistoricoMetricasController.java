@@ -1,9 +1,7 @@
 package com.example.backend.bi.historicoMetricas;
 
-import com.example.backend.bi.metricas.Metricas;
-import com.example.backend.bi.metricas.MetricasRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +11,14 @@ import java.util.List;
 public class HistoricoMetricasController {
 
     private final HistoricoMetricasRepository repository;
-    private final MetricasRepository metricasRepository;
+    private final HistoricoMetricasService historicoMetricasService;
 
     public HistoricoMetricasController(
             HistoricoMetricasRepository repository,
-            MetricasRepository metricasRepository
+            HistoricoMetricasService historicoMetricasService
     ) {
         this.repository = repository;
-        this.metricasRepository = metricasRepository;
+        this.historicoMetricasService = historicoMetricasService;
     }
 
     @GetMapping
@@ -32,65 +30,29 @@ public class HistoricoMetricasController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new HistoricoMetricasResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public HistoricoMetricasResponseDTO getById(@PathVariable Long id) {
+        HistoricoMetricas entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Historico de metrica nao encontrado"));
+
+        return new HistoricoMetricasResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveHistoricoMetricas(@RequestBody HistoricoMetricasRequestDTO data) {
-        try {
-            Metricas metrica = data.metrica() != null
-                    ? metricasRepository.findById(data.metrica())
-                    .orElseThrow(() -> new RuntimeException("Metrica nao encontrada"))
-                    : null;
-
-            HistoricoMetricas entity = new HistoricoMetricas();
-            entity.setMetrica(metrica);
-            entity.setPeriodo(data.periodo());
-            entity.setValorApurado(data.valorApurado());
-            entity.setCreatedAt(data.createdAt());
-
-            HistoricoMetricas saved = repository.save(entity);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new HistoricoMetricasResponseDTO(saved));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public HistoricoMetricasResponseDTO saveHistoricoMetricas(@RequestBody HistoricoMetricasRequestDTO data) {
+        HistoricoMetricas saved = historicoMetricasService.criar(data);
+        return new HistoricoMetricasResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateHistoricoMetricas(@PathVariable Long id, @RequestBody HistoricoMetricasRequestDTO data) {
-        try {
-            HistoricoMetricas entity = repository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Historico de metrica nao encontrado"));
-
-            Metricas metrica = data.metrica() != null
-                    ? metricasRepository.findById(data.metrica())
-                    .orElseThrow(() -> new RuntimeException("Metrica nao encontrada"))
-                    : null;
-
-            entity.setMetrica(metrica);
-            entity.setPeriodo(data.periodo());
-            entity.setValorApurado(data.valorApurado());
-            entity.setCreatedAt(data.createdAt());
-
-            HistoricoMetricas updated = repository.save(entity);
-            return ResponseEntity.ok(new HistoricoMetricasResponseDTO(updated));
-
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    public HistoricoMetricasResponseDTO updateHistoricoMetricas(@PathVariable Long id, @RequestBody HistoricoMetricasRequestDTO data) {
+        HistoricoMetricas updated = historicoMetricasService.atualizar(id, data);
+        return new HistoricoMetricasResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteHistoricoMetricas(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Historico de metrica deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteHistoricoMetricas(@PathVariable Long id) {
+        historicoMetricasService.excluir(id);
+        return "Historico de metrica deleted";
     }
 }

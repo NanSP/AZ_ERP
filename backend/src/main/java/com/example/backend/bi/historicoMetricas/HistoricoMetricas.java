@@ -3,6 +3,7 @@ package com.example.backend.bi.historicoMetricas;
 import com.example.backend.bi.metricas.Metricas;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ public class HistoricoMetricas {
     @Column(name = "valor_apurado", precision = 15, scale = 2)
     private BigDecimal valorApurado;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 }
