@@ -2,6 +2,7 @@ package com.example.backend.sys.usuarioPerfil;
 
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
+import com.example.backend.sys.perfilPermissao.PerfilPermissaoRepository;
 import com.example.backend.sys.perfis.Perfis;
 import com.example.backend.sys.perfis.PerfisRepository;
 import com.example.backend.sys.usuarios.Usuarios;
@@ -17,15 +18,18 @@ public class UsuarioPerfilService {
     private final UsuarioPerfilRepository repository;
     private final UsuariosRepository usuariosRepository;
     private final PerfisRepository perfisRepository;
+    private final PerfilPermissaoRepository perfilPermissaoRepository;
 
     public UsuarioPerfilService(
             UsuarioPerfilRepository repository,
             UsuariosRepository usuariosRepository,
-            PerfisRepository perfisRepository
+            PerfisRepository perfisRepository,
+            PerfilPermissaoRepository perfilPermissaoRepository
     ) {
         this.repository = repository;
         this.usuariosRepository = usuariosRepository;
         this.perfisRepository = perfisRepository;
+        this.perfilPermissaoRepository = perfilPermissaoRepository;
     }
 
     @Transactional
@@ -35,6 +39,7 @@ public class UsuarioPerfilService {
 
         Usuarios usuario = buscarUsuario(data.usuario());
         Perfis perfil = buscarPerfil(data.perfil());
+        validarRelacionamento(usuario, perfil);
 
         UsuarioPerfil entity = new UsuarioPerfil();
         entity.setUsuario(usuario);
@@ -56,6 +61,7 @@ public class UsuarioPerfilService {
 
         Usuarios usuario = buscarUsuario(data.usuario());
         Perfis perfil = buscarPerfil(data.perfil());
+        validarRelacionamento(usuario, perfil);
 
         entity.setUsuario(usuario);
         entity.setPerfil(perfil);
@@ -111,6 +117,16 @@ public class UsuarioPerfilService {
 
         if (usuarioId != null && !repository.existsByUsuarioIdAndIdNot(usuarioId, entity.getId())) {
             throw new ValidacaoException("Nao e permitido remover o ultimo perfil do usuario");
+        }
+    }
+
+    private void validarRelacionamento(Usuarios usuario, Perfis perfil) {
+        if (usuario != null && !"ativo".equalsIgnoreCase(usuario.getStatus())) {
+            throw new ValidacaoException("Nao e permitido vincular perfil a usuario que nao esteja ativo");
+        }
+
+        if (perfil != null && !perfilPermissaoRepository.existsByPerfilId(perfil.getId())) {
+            throw new ValidacaoException("Nao e permitido vincular a usuario um perfil sem permissoes");
         }
     }
 
