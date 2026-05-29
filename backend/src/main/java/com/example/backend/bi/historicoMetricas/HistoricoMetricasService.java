@@ -31,6 +31,7 @@ public class HistoricoMetricasService {
         validarDuplicidade(data.metrica(), data.periodo(), null);
 
         Metricas metrica = buscarMetrica(data.metrica());
+        validarRelacionamentoComMetrica(metrica);
 
         HistoricoMetricas entity = new HistoricoMetricas();
         preencher(entity, data, metrica, LocalDateTime.now());
@@ -49,6 +50,7 @@ public class HistoricoMetricasService {
         validarDuplicidade(data.metrica(), data.periodo(), id);
 
         Metricas metrica = buscarMetrica(data.metrica());
+        validarRelacionamentoComMetrica(metrica);
         preencher(entity, data, metrica, entity.getCreatedAt());
 
         return repository.save(entity);
@@ -140,5 +142,22 @@ public class HistoricoMetricasService {
     private Metricas buscarMetrica(Integer metricaId) {
         return metricasRepository.findById(metricaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Metrica nao encontrada"));
+    }
+
+    private void validarRelacionamentoComMetrica(Metricas metrica) {
+        if (metrica == null) {
+            return;
+        }
+
+        String categoria = metrica.getCategoria();
+
+        if (("financeira".equals(categoria) || "operacional".equals(categoria))
+                && (metrica.getFormula() == null || metrica.getFormula().isBlank())) {
+            throw new ValidacaoException("Nao e permitido registrar historico para metrica sem formula na categoria informada");
+        }
+
+        if ("estrategica".equals(categoria) && metrica.getMeta() == null) {
+            throw new ValidacaoException("Nao e permitido registrar historico para metrica estrategica sem meta definida");
+        }
     }
 }
