@@ -1,7 +1,7 @@
 package com.example.backend.sys.perfis;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class PerfisController {
 
     private final PerfisRepository repository;
+    private final PerfisService perfisService;
 
-    public PerfisController(PerfisRepository repository) {
+    public PerfisController(
+            PerfisRepository repository,
+            PerfisService perfisService
+    ) {
         this.repository = repository;
+        this.perfisService = perfisService;
     }
 
     @GetMapping
@@ -25,41 +30,29 @@ public class PerfisController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new PerfisResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public PerfisResponseDTO getById(@PathVariable Integer id) {
+        Perfis entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Perfil nao encontrado"));
+
+        return new PerfisResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> savePerfis(@RequestBody PerfisRequestDTO data) {
-        Perfis entity = new Perfis(data);
-        Perfis saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new PerfisResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public PerfisResponseDTO savePerfis(@RequestBody PerfisRequestDTO data) {
+        Perfis saved = perfisService.criar(data);
+        return new PerfisResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePerfis(@PathVariable Integer id, @RequestBody PerfisRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setNome(data.nome());
-                    entity.setDescricao(data.descricao());
-                    entity.setNivelAcesso(data.nivelAcesso());
-                    entity.setCreatedAt(data.createdAt());
-
-                    Perfis updated = repository.save(entity);
-                    return ResponseEntity.ok(new PerfisResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public PerfisResponseDTO updatePerfis(@PathVariable Integer id, @RequestBody PerfisRequestDTO data) {
+        Perfis updated = perfisService.atualizar(id, data);
+        return new PerfisResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePerfis(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Perfil deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deletePerfis(@PathVariable Integer id) {
+        perfisService.excluir(id);
+        return "Perfil deleted";
     }
 }

@@ -2,6 +2,8 @@ package com.example.backend.sys.perfis;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.LocalDateTime;
 
 @Table(name = "perfis", schema = "sys")
@@ -21,13 +23,8 @@ public class Perfis {
     @Column(name = "nivel_acesso")
     private Integer nivelAcesso;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Perfis(PerfisRequestDTO data){
-        this.nome = data.nome();
-        this.descricao = data.descricao();
-        this.nivelAcesso = data.nivelAcesso();
-        this.createdAt = data.createdAt();
-    }
 }
