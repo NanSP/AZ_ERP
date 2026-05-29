@@ -38,28 +38,12 @@ public class Parceiros {
     private Integer diasPrazo;
     private String observacoes;
 
-    @OneToMany(mappedBy = "fornecedor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fornecedor")
     private List<ContasPagar> contasAPagar = new ArrayList<>();
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cliente")
     private List<ContasReceber> contasAReceber = new ArrayList<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Parceiros(ParceirosRequestDTO data){
-        this.tipoParceiro = data.tipoParceiro();
-        this.codigo = data.codigo();
-        this.nome = data.nome();
-        this.nomeFantasia = data.nomeFantasia();
-        this.documento = data.documento();
-        this.tipoPessoa = data.tipoPessoa();
-        this.situacao = data.situacao();
-        this.limiteCredito = data.limiteCredito();
-        this.diasPrazo = data.diasPrazo();
-        this.observacoes = data.observacoes();
-        this.contasAPagar = data.contasAPagar();
-        this.contasAReceber = data.contasAReceber();
-        this.createdAt = data.createdAt();
-    }
 }

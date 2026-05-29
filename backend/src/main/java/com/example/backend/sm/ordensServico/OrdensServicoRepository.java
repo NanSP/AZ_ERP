@@ -6,4 +6,5 @@ public interface OrdensServicoRepository extends JpaRepository<OrdensServico, In
     boolean existsByNumeroOs(String numeroOs);
     boolean existsByNumeroOsAndIdNot(String numeroOs, Integer id);
     boolean existsByProdutoId(Integer produtoId);
+    boolean existsByClienteId(Integer clienteId);
 }
