@@ -1,6 +1,5 @@
 package com.example.backend.core.enderecos;
 
-import java.time.LocalDateTime;
 
 public record EnderecosRequestDTO
         (
@@ -15,7 +14,6 @@ public record EnderecosRequestDTO
                 String uf,
                 String cep,
                 String pais,
-                Boolean principal,
-                LocalDateTime createdAt
+                Boolean principal
         ) {
 }

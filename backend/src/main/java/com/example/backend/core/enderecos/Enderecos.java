@@ -34,21 +34,4 @@ public class Enderecos {
     private Boolean principal;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Enderecos(EnderecosRequestDTO data){
-
-        this.entidadeTipo = data.entidadeTipo();
-        this.entidadeId = data.entidadeId();
-        this.tipoEndereco = data.tipoEndereco();
-        this.logradouro = data.logradouro();
-        this.numero = data.numero();
-        this.complemento = data.complemento();
-        this.bairro = data.bairro();
-        this.cidade = data.cidade();
-        this.uf = data.uf();
-        this.cep = data.cep();
-        this.pais = data.pais();
-        this.principal = data.principal();
-        this.createdAt = data.createdAt();
-    }
 }
