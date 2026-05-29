@@ -27,15 +27,5 @@ public class Contatos {
     private String observacao;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Contatos(ContatosRequestDTO data){
-        this.entidadeTipo = data.entidadeTipo();
-        this.entidadeId = data.entidadeId();
-        this.tipoContato = data.tipoContato();
-        this.valor = data.valor();
-        this.principal = data.principal();
-        this.observacao = data.observacao();
-        this.createdAt = data.createdAt();
-    }
 }
 
