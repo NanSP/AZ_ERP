@@ -4,4 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ContasPagarRepository extends JpaRepository<ContasPagar, Integer> {
     boolean existsByFornecedorId(Integer fornecedorId);
+    boolean existsByEmpresaId(Integer empresaId);
 }

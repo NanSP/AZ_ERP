@@ -1,7 +1,7 @@
 package com.example.backend.core.empresas;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +11,14 @@ import java.util.List;
 public class EmpresasController {
 
     private final EmpresasRepository repository;
+    private final EmpresasService empresasService;
 
-    public EmpresasController(EmpresasRepository repository) {
+    public EmpresasController(
+            EmpresasRepository repository,
+            EmpresasService empresasService
+    ) {
         this.repository = repository;
+        this.empresasService = empresasService;
     }
 
     @GetMapping
@@ -25,47 +30,29 @@ public class EmpresasController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> ResponseEntity.ok(new EmpresasResponseDTO(entity)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EmpresasResponseDTO getById(@PathVariable Integer id) {
+        Empresas entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa nao encontrada"));
+
+        return new EmpresasResponseDTO(entity);
     }
 
     @PostMapping
-    public ResponseEntity<?> saveEmpresa(@RequestBody EmpresasRequestDTO data) {
-        Empresas entity = new Empresas(data);
-        Empresas saved = repository.save(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new EmpresasResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public EmpresasResponseDTO saveEmpresa(@RequestBody EmpresasRequestDTO data) {
+        Empresas saved = empresasService.criar(data);
+        return new EmpresasResponseDTO(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEmpresa(@PathVariable Integer id, @RequestBody EmpresasRequestDTO data) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    entity.setCodigo(data.codigo());
-                    entity.setRazaoSocial(data.razaoSocial());
-                    entity.setNomeFantasia(data.nomeFantasia());
-                    entity.setCnpj(data.cnpj());
-                    entity.setInscricaoEstadual(data.inscricaoEstadual());
-                    entity.setInscricaoMunicipal(data.inscricaoMunicipal());
-                    entity.setRegimeTributario(data.regimeTributario());
-                    entity.setDataFundacao(data.dataFundacao());
-                    entity.setSituacao(data.situacao());
-                    entity.setCreatedAt(data.createdAt());
-
-                    Empresas updated = repository.save(entity);
-                    return ResponseEntity.ok(new EmpresasResponseDTO(updated));
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public EmpresasResponseDTO updateEmpresa(@PathVariable Integer id, @RequestBody EmpresasRequestDTO data) {
+        Empresas updated = empresasService.atualizar(id, data);
+        return new EmpresasResponseDTO(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEmpresa(@PathVariable Integer id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(entity -> {
-                    repository.delete(entity);
-                    return ResponseEntity.ok("Empresa deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nao encontrado"));
+    public String deleteEmpresa(@PathVariable Integer id) {
+        empresasService.excluir(id);
+        return "Empresa deleted";
     }
 }

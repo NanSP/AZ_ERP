@@ -35,18 +35,4 @@ public class Empresas {
     private String situacao;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Empresas(EmpresasRequestDTO data){
-
-        this.codigo = data.codigo();
-        this.razaoSocial = data.razaoSocial();
-        this.nomeFantasia = data.nomeFantasia();
-        this.cnpj = data.cnpj();
-        this.inscricaoEstadual = data.inscricaoEstadual();
-        this.inscricaoMunicipal = data.inscricaoMunicipal();
-        this.regimeTributario = data.regimeTributario();
-        this.dataFundacao = data.dataFundacao();
-        this.situacao = data.situacao();
-        this.createdAt = data.createdAt();
-    }
 }

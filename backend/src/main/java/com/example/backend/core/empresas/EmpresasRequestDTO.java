@@ -1,7 +1,6 @@
 package com.example.backend.core.empresas;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record EmpresasRequestDTO
         (
@@ -13,7 +12,6 @@ public record EmpresasRequestDTO
                 String inscricaoMunicipal,
                 String regimeTributario,
                 LocalDate dataFundacao,
-                String situacao,
-                LocalDateTime createdAt
+                String situacao
         ) {
 }

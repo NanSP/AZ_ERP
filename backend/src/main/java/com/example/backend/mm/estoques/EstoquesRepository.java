@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EstoquesRepository extends JpaRepository<Estoques, Integer> {
     boolean existsByProdutoId(Integer produtoId);
+    boolean existsByEmpresaId(Integer empresaId);
 
     boolean existsByProdutoIdAndEmpresaIdAndLocalizacaoAndLote(
             Integer produtoId,
