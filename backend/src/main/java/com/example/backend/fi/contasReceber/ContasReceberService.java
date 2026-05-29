@@ -147,13 +147,32 @@ public class ContasReceberService {
     }
 
     private Empresas buscarEmpresa(Integer empresaId) {
-        return empresasRepository.findById(empresaId)
+        Empresas empresa = empresasRepository.findById(empresaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa nao encontrada"));
+
+        String situacao = empresa.getSituacao() == null ? null : empresa.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Empresa precisa estar ativa para uso financeiro");
+        }
+
+        return empresa;
     }
 
     private Parceiros buscarCliente(Integer clienteId) {
-        return parceirosRepository.findById(clienteId)
+        Parceiros cliente = parceirosRepository.findById(clienteId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente nao encontrado"));
+
+        String situacao = cliente.getSituacao() == null ? null : cliente.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Cliente precisa estar ativo para contas a receber");
+        }
+
+        String tipoParceiro = cliente.getTipoParceiro() == null ? null : cliente.getTipoParceiro().trim().toLowerCase();
+        if (!"cliente".equals(tipoParceiro)) {
+            throw new ValidacaoException("Parceiro informado precisa ser do tipo cliente");
+        }
+
+        return cliente;
     }
 
     private CentrosCusto buscarCentroCusto(Integer centroCustoId) {

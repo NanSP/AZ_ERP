@@ -167,13 +167,37 @@ public class OrdensServicoService {
     }
 
     private Parceiros buscarCliente(Integer clienteId) {
-        return parceirosRepository.findById(clienteId)
+        Parceiros cliente = parceirosRepository.findById(clienteId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente nao encontrado"));
+
+        String situacao = cliente.getSituacao() == null ? null : cliente.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Cliente precisa estar ativo para ordem de servico");
+        }
+
+        String tipoParceiro = cliente.getTipoParceiro() == null ? null : cliente.getTipoParceiro().trim().toLowerCase();
+        if (!"cliente".equals(tipoParceiro)) {
+            throw new ValidacaoException("Parceiro informado precisa ser do tipo cliente");
+        }
+
+        return cliente;
     }
 
     private Produtos buscarProduto(Integer produtoId) {
-        return produtosRepository.findById(produtoId)
+        Produtos produto = produtosRepository.findById(produtoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto nao encontrado"));
+
+        String situacao = produto.getSituacao() == null ? null : produto.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Produto precisa estar ativo para ordem de servico");
+        }
+
+        String tipoItem = produto.getTipoItem() == null ? null : produto.getTipoItem().trim().toLowerCase();
+        if ("insumo".equals(tipoItem) || "embalagem".equals(tipoItem)) {
+            throw new ValidacaoException("Produto do tipo insumo ou embalagem nao pode ser usado em ordem de servico");
+        }
+
+        return produto;
     }
 
     private Colaboradores buscarTecnico(Integer tecnicoId) {

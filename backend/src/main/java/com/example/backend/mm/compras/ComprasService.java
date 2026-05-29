@@ -179,8 +179,20 @@ public class ComprasService {
     }
 
     private Parceiros buscarFornecedor(Integer fornecedorId) {
-        return parceirosRepository.findById(fornecedorId)
+        Parceiros fornecedor = parceirosRepository.findById(fornecedorId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Fornecedor nao encontrado"));
+
+        String situacao = fornecedor.getSituacao() == null ? null : fornecedor.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Fornecedor precisa estar ativo para uso em compras");
+        }
+
+        String tipoParceiro = fornecedor.getTipoParceiro() == null ? null : fornecedor.getTipoParceiro().trim().toLowerCase();
+        if (!"fornecedor".equals(tipoParceiro)) {
+            throw new ValidacaoException("Parceiro informado precisa ser do tipo fornecedor");
+        }
+
+        return fornecedor;
     }
 
     private void validarNaoNegativo(BigDecimal valor, String mensagem) {

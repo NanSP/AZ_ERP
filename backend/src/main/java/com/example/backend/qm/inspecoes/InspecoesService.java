@@ -181,8 +181,20 @@ public class InspecoesService {
             return null;
         }
 
-        return produtosRepository.findById(produtoId)
+        Produtos produto = produtosRepository.findById(produtoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto nao encontrado"));
+
+        String situacao = produto.getSituacao() == null ? null : produto.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Produto precisa estar ativo para inspecao");
+        }
+
+        String tipoItem = produto.getTipoItem() == null ? null : produto.getTipoItem().trim().toLowerCase();
+        if ("servico".equals(tipoItem)) {
+            throw new ValidacaoException("Produto do tipo servico nao pode ser usado em inspecao");
+        }
+
+        return produto;
     }
 
     private Colaboradores buscarInspetor(Integer inspetorId) {

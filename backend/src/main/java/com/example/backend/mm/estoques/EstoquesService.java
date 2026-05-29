@@ -147,13 +147,32 @@ public class EstoquesService {
     }
 
     private Produtos buscarProduto(Integer produtoId) {
-        return produtosRepository.findById(produtoId)
+        Produtos produto = produtosRepository.findById(produtoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto nao encontrado"));
+
+        String situacao = produto.getSituacao() == null ? null : produto.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Produto precisa estar ativo para uso em estoque");
+        }
+
+        String tipoItem = produto.getTipoItem() == null ? null : produto.getTipoItem().trim().toLowerCase();
+        if ("servico".equals(tipoItem)) {
+            throw new ValidacaoException("Produto do tipo servico nao pode gerar estoque");
+        }
+
+        return produto;
     }
 
     private Empresas buscarEmpresa(Integer empresaId) {
-        return empresasRepository.findById(empresaId)
+        Empresas empresa = empresasRepository.findById(empresaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa nao encontrada"));
+
+        String situacao = empresa.getSituacao() == null ? null : empresa.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Empresa precisa estar ativa para uso em estoque");
+        }
+
+        return empresa;
     }
 
     private void validarNaoNegativo(BigDecimal valor, String mensagem) {

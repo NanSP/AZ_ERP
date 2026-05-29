@@ -158,8 +158,20 @@ public class PedidosService {
     }
 
     private Parceiros buscarCliente(Integer clienteId) {
-        return parceirosRepository.findById(clienteId)
+        Parceiros cliente = parceirosRepository.findById(clienteId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente nao encontrado"));
+
+        String situacao = cliente.getSituacao() == null ? null : cliente.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Cliente precisa estar ativo para uso em pedidos");
+        }
+
+        String tipoParceiro = cliente.getTipoParceiro() == null ? null : cliente.getTipoParceiro().trim().toLowerCase();
+        if (!"cliente".equals(tipoParceiro)) {
+            throw new ValidacaoException("Parceiro informado precisa ser do tipo cliente");
+        }
+
+        return cliente;
     }
 
     private void validarClienteComercial(Integer clienteId) {

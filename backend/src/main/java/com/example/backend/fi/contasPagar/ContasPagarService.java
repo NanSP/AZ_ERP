@@ -147,13 +147,32 @@ public class ContasPagarService {
     }
 
     private Empresas buscarEmpresa(Integer empresaId) {
-        return empresasRepository.findById(empresaId)
+        Empresas empresa = empresasRepository.findById(empresaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Empresa nao encontrada"));
+
+        String situacao = empresa.getSituacao() == null ? null : empresa.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Empresa precisa estar ativa para uso financeiro");
+        }
+
+        return empresa;
     }
 
     private Parceiros buscarFornecedor(Integer fornecedorId) {
-        return parceirosRepository.findById(fornecedorId)
+        Parceiros fornecedor = parceirosRepository.findById(fornecedorId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Fornecedor nao encontrado"));
+
+        String situacao = fornecedor.getSituacao() == null ? null : fornecedor.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Fornecedor precisa estar ativo para contas a pagar");
+        }
+
+        String tipoParceiro = fornecedor.getTipoParceiro() == null ? null : fornecedor.getTipoParceiro().trim().toLowerCase();
+        if (!"fornecedor".equals(tipoParceiro)) {
+            throw new ValidacaoException("Parceiro informado precisa ser do tipo fornecedor");
+        }
+
+        return fornecedor;
     }
 
     private CentrosCusto buscarCentroCusto(Integer centroCustoId) {

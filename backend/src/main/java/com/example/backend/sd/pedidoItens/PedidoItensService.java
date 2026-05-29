@@ -157,8 +157,20 @@ public class PedidoItensService {
     }
 
     private Produtos buscarProduto(Integer produtoId) {
-        return produtosRepository.findById(produtoId)
+        Produtos produto = produtosRepository.findById(produtoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto nao encontrado"));
+
+        String situacao = produto.getSituacao() == null ? null : produto.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Produto precisa estar ativo para uso em pedidos");
+        }
+
+        String tipoItem = produto.getTipoItem() == null ? null : produto.getTipoItem().trim().toLowerCase();
+        if ("insumo".equals(tipoItem) || "embalagem".equals(tipoItem)) {
+            throw new ValidacaoException("Produto do tipo insumo ou embalagem nao pode ser usado em item de pedido");
+        }
+
+        return produto;
     }
 
     private void validarNaoNegativo(BigDecimal valor, String mensagem) {

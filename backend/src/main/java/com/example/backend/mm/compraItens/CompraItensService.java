@@ -155,8 +155,20 @@ public class CompraItensService {
     }
 
     private Produtos buscarProduto(Integer produtoId) {
-        return produtosRepository.findById(produtoId)
+        Produtos produto = produtosRepository.findById(produtoId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto nao encontrado"));
+
+        String situacao = produto.getSituacao() == null ? null : produto.getSituacao().trim().toLowerCase();
+        if (!"ativo".equals(situacao)) {
+            throw new ValidacaoException("Produto precisa estar ativo para uso em compras");
+        }
+
+        String tipoItem = produto.getTipoItem() == null ? null : produto.getTipoItem().trim().toLowerCase();
+        if ("servico".equals(tipoItem)) {
+            throw new ValidacaoException("Produto do tipo servico nao pode ser usado em item de compra de materiais");
+        }
+
+        return produto;
     }
 
     private void validarNaoNegativo(BigDecimal valor, String mensagem) {
