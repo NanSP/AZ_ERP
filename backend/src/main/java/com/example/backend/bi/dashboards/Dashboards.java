@@ -2,6 +2,7 @@ package com.example.backend.bi.dashboards;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -32,14 +33,7 @@ public class Dashboards {
     @Column(name = "configuracoes",columnDefinition = "jsonb")
     private Map<String, Object> configuracoes;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    public Dashboards(DashboardsRequestDTO data) {
-        this.nome = data.nome();
-        this.descricao = data.descricao();
-        this.layout = data.layout();
-        this.configuracoes = data.configuracoes();
-        this.createdAt = data.createdAt();
-    }
 }
