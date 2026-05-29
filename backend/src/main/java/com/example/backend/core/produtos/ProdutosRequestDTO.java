@@ -1,7 +1,6 @@
 package com.example.backend.core.produtos;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public record ProdutosRequestDTO
         (
@@ -16,7 +15,6 @@ public record ProdutosRequestDTO
                 BigDecimal pesoBruto,
                 BigDecimal pesoLiquido,
                 Integer origem,
-                String situacao,
-                LocalDateTime createdAt
+                String situacao
         ) {
 }

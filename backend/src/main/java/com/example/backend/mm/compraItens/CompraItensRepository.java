@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 public interface CompraItensRepository extends JpaRepository<CompraItens, Integer> {
     boolean existsByComprasId(Integer comprasId);
+    boolean existsByProdutosId(Integer produtoId);
     boolean existsByComprasIdAndQuantidadeRecebidaGreaterThan(Integer comprasId, BigDecimal quantidadeRecebida);
 
     @Query("""

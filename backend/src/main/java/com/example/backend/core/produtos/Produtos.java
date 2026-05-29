@@ -36,21 +36,4 @@ public class Produtos {
     private String situacao;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public Produtos(ProdutosRequestDTO data){
-
-        this.codigo = data.codigo();
-        this.codigoBarras = data.codigoBarras();
-        this.nome = data.nome();
-        this.descricao = data.descricao();
-        this.tipoItem = data.tipoItem();
-        this.unidadeMedida = data.unidadeMedida();
-        this.ncm = data.ncm();
-        this.cest = data.cest();
-        this.pesoBruto = data.pesoBruto();
-        this.pesoLiquido = data.pesoLiquido();
-        this.origem = data.origem();
-        this.situacao = data.situacao();
-        this.createdAt = data.createdAt();
-    }
 }
