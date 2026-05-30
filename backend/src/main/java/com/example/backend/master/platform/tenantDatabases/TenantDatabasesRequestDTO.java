@@ -11,10 +11,7 @@ public record TenantDatabasesRequestDTO
                 Integer dbPort,
                 String dbUsername,
                 String dbPassword,
-                LocalDateTime provisionedAt,
                 String provisionStatus,
-                LocalDateTime lastCheckAt,
-                LocalDateTime createdAt,
-                LocalDateTime updatedAt
+                LocalDateTime lastCheckAt
         ) {
 }

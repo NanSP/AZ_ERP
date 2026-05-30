@@ -3,6 +3,8 @@ package com.example.backend.master.platform.tenantDatabases;
 import com.example.backend.master.platform.tenants.Tenants;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -40,23 +42,12 @@ public class TenantDatabases {
     private String provisionStatus;
     @Column(name = "last_check_at")
     private LocalDateTime lastCheckAt;
-    @Column(name = "created_at")
+
+    @CreationTimestamp
+    @Column(name = "created_at",updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    public TenantDatabases(TenantDatabasesRequestDTO data) {
-        this.databaseName = data.databaseName();
-        this.templateName = data.templateName();
-        this.dbUsername = data.dbUsername();
-        this.dbPort = data.dbPort();
-        this.dbHost = data.dbHost();
-        this.dbPassword = data.dbPassword();
-        this.provisionStatus = data.provisionStatus();
-        this.provisionedAt = data.provisionedAt();
-        this.lastCheckAt = data.lastCheckAt();
-        this.createdAt = data.createdAt();
-        this.updatedAt = data.updatedAt();
-    }
-
 }
