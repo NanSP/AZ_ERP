@@ -5,6 +5,6 @@ public record AuthResponseDTO(
         Long userId,
         String login,
         String role,
-        String scope
+        String contexto
 ) {
 }
