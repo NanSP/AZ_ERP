@@ -2,7 +2,6 @@ package com.example.backend.master.platform.tenantProvisioning;
 
 import com.example.backend.master.platform.tenantProvisioning.services.TenantProvisioningOrchestratorService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +18,9 @@ public class TenantProvisioningController {
     }
 
     @PostMapping
-    public ResponseEntity<?> provision(@RequestBody TenantProvisioningRequestDTO data) {
-        try {
-            TenantProvisioningResponseDTO response = service.provision(data);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
+    @org.springframework.web.bind.annotation.ResponseStatus(HttpStatus.CREATED)
+    public TenantProvisioningResponseDTO provision(@RequestBody TenantProvisioningRequestDTO data) {
+        return service.provision(data);
     }
 }
 

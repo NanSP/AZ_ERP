@@ -1,20 +1,20 @@
 package com.example.backend.master.platform.tenantProvisioning.services;
 
-import com.example.backend.master.platform.provisioningLogs.ProvisioningLogs;
-import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsRepository;
+import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsRequestDTO;
+import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsService;
 import com.example.backend.master.platform.systemUsers.SystemUsers;
 import com.example.backend.master.platform.systemUsers.SystemUsersRepository;
-import com.example.backend.master.platform.tenantAdminUsers.TenantAdminUsers;
-import com.example.backend.master.platform.tenantAdminUsers.TenantAdminUsersRepository;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
-import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRepository;
+import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRequestDTO;
+import com.example.backend.master.platform.tenantDatabases.TenantDatabasesService;
 import com.example.backend.master.platform.tenantProvisioning.TenantProvisioningRequestDTO;
 import com.example.backend.master.platform.tenants.Tenants;
-import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.master.platform.tenants.TenantsRequestDTO;
+import com.example.backend.master.platform.tenants.TenantsService;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,55 +22,47 @@ import java.util.Map;
 @Service
 public class TenantProvisioningRegistrationService {
 
-    private final TenantsRepository tenantsRepository;
-    private final TenantDatabasesRepository tenantDatabasesRepository;
-    private final TenantAdminUsersRepository tenantAdminUsersRepository;
-    private final ProvisioningLogsRepository provisioningLogsRepository;
+    private final TenantsService tenantsService;
+    private final TenantDatabasesService tenantDatabasesService;
+    private final ProvisioningLogsService provisioningLogsService;
     private final SystemUsersRepository systemUsersRepository;
 
     public TenantProvisioningRegistrationService(
-            TenantsRepository tenantsRepository,
-            TenantDatabasesRepository tenantDatabasesRepository,
-            TenantAdminUsersRepository tenantAdminUsersRepository,
-            ProvisioningLogsRepository provisioningLogsRepository,
+            TenantsService tenantsService,
+            TenantDatabasesService tenantDatabasesService,
+            ProvisioningLogsService provisioningLogsService,
             SystemUsersRepository systemUsersRepository
     ) {
-        this.tenantsRepository = tenantsRepository;
-        this.tenantDatabasesRepository = tenantDatabasesRepository;
-        this.tenantAdminUsersRepository = tenantAdminUsersRepository;
-        this.provisioningLogsRepository = provisioningLogsRepository;
+        this.tenantsService = tenantsService;
+        this.tenantDatabasesService = tenantDatabasesService;
+        this.provisioningLogsService = provisioningLogsService;
         this.systemUsersRepository = systemUsersRepository;
     }
 
     @Transactional
     public RegistrationResult register(TenantProvisioningRequestDTO data) {
-        validarDuplicidades(data);
-
-        LocalDateTime now = LocalDateTime.now();
         List<String> etapasExecutadas = new ArrayList<>();
 
         SystemUsers executor = systemUsersRepository.findById(data.systemUserId())
-                .orElseThrow(() -> new RuntimeException("Usuário executor não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario executor nao encontrado"));
 
-        Tenants tenant = new Tenants();
-        tenant.setCodigo(data.codigo());
-        tenant.setNome(data.nome());
-        tenant.setNomeFantasia(data.nomeFantasia());
-        tenant.setDocumento(data.documento());
-        tenant.setTipoDocumento(data.tipoDocumento());
-        tenant.setEmailResponsavel(data.emailResponsavel());
-        tenant.setTelefoneResponsavel(data.telefoneResponsavel());
-        tenant.setPlano(data.plano());
-        tenant.setStatus("PENDENTE");
-        tenant.setSchemaVersion("v1");
-        tenant.setCreatedAt(now);
-        tenant.setUpdatedAt(now);
-        tenant = tenantsRepository.save(tenant);
+        Tenants tenant = tenantsService.criar(new TenantsRequestDTO(
+                data.codigo(),
+                data.nome(),
+                data.nomeFantasia(),
+                data.documento(),
+                data.tipoDocumento(),
+                data.emailResponsavel(),
+                data.telefoneResponsavel(),
+                "PENDENTE",
+                data.plano(),
+                "V1",
+                null
+        ));
         etapasExecutadas.add("TENANT_CREATED");
 
-        salvarLog(
-                tenant,
-                executor,
+        provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
+                tenant.getId(),
                 "TENANT_CREATED",
                 "SUCESSO",
                 "Tenant criado com sucesso",
@@ -79,113 +71,40 @@ public class TenantProvisioningRegistrationService {
                         "codigo", tenant.getCodigo(),
                         "nome", tenant.getNome()
                 ),
-                now
-        );
+                executor.getId()
+        ));
 
-        TenantDatabases tenantDatabase = new TenantDatabases();
-        tenantDatabase.setTenantId(tenant);
-        tenantDatabase.setDatabaseName(data.databaseName());
-        tenantDatabase.setTemplateName("az_erp_template");
-        tenantDatabase.setDbHost(data.dbHost());
-        tenantDatabase.setDbPort(data.dbPort());
-        tenantDatabase.setDbUsername(data.dbUsername());
-        tenantDatabase.setDbPassword(data.dbPassword());
-        tenantDatabase.setProvisionStatus("CRIANDO");
-        tenantDatabase.setProvisionedAt(null);
-        tenantDatabase.setLastCheckAt(null);
-        tenantDatabase.setCreatedAt(now);
-        tenantDatabase.setUpdatedAt(now);
-        tenantDatabase = tenantDatabasesRepository.save(tenantDatabase);
+        TenantDatabases tenantDatabase = tenantDatabasesService.criar(new TenantDatabasesRequestDTO(
+                tenant.getId(),
+                data.databaseName(),
+                "az_erp_template",
+                data.dbHost(),
+                data.dbPort(),
+                data.dbUsername(),
+                data.dbPassword(),
+                "PENDENTE",
+                null
+        ));
         etapasExecutadas.add("DATABASE_REGISTERED");
 
-        salvarLog(
-                tenant,
-                executor,
+        provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
+                tenant.getId(),
                 "DATABASE_REGISTERED",
                 "SUCESSO",
-                "Banco do tenant registrado com status CRIANDO",
+                "Banco do tenant registrado com status PENDENTE",
                 Map.of(
                         "tenantDatabaseId", tenantDatabase.getId(),
                         "databaseName", tenantDatabase.getDatabaseName(),
                         "status", tenantDatabase.getProvisionStatus()
                 ),
-                now
-        );
-
-        TenantAdminUsers tenantAdmin = new TenantAdminUsers();
-        tenantAdmin.setTenantId(tenant);
-        tenantAdmin.setNome(data.adminNome());
-        tenantAdmin.setEmail(data.adminEmail());
-        tenantAdmin.setLogin(data.adminLogin());
-        tenantAdmin.setSenha(data.adminSenha());
-        tenantAdmin.setRole("ADMIN_TENANT");
-        tenantAdmin.setStatus("ATIVO");
-        tenantAdmin.setUltimoAcesso(null);
-        tenantAdmin.setCreatedAt(now);
-        tenantAdmin.setUpdatedAt(now);
-        tenantAdmin = tenantAdminUsersRepository.save(tenantAdmin);
-        etapasExecutadas.add("TENANT_ADMIN_CREATED");
-
-        salvarLog(
-                tenant,
-                executor,
-                "TENANT_ADMIN_CREATED",
-                "SUCESSO",
-                "Administrador inicial do tenant criado com sucesso",
-                Map.of(
-                        "tenantAdminUserId", tenantAdmin.getId(),
-                        "adminNome", tenantAdmin.getNome(),
-                        "adminEmail", tenantAdmin.getEmail(),
-                        "adminLogin", tenantAdmin.getLogin()
-                ),
-                now
-        );
+                executor.getId()
+        ));
 
         return new RegistrationResult(
                 tenant,
                 tenantDatabase,
-                tenantAdmin,
                 executor,
                 etapasExecutadas
         );
-    }
-
-    private void validarDuplicidades(TenantProvisioningRequestDTO data) {
-        if (tenantsRepository.existsByCodigo(data.codigo())) {
-            throw new RuntimeException("Já existe um tenant com esse código");
-        }
-
-        if (tenantDatabasesRepository.existsByDatabaseNameIgnoreCase(data.databaseName())) {
-            throw new RuntimeException("Já existe um banco cadastrado com esse nome");
-        }
-
-        if (tenantAdminUsersRepository.existsByEmailIgnoreCase(data.adminEmail())) {
-            throw new RuntimeException("Já existe um admin de tenant com esse email");
-        }
-
-        if (tenantAdminUsersRepository.existsByLoginIgnoreCase(data.adminLogin())) {
-            throw new RuntimeException("Já existe um admin de tenant com esse login");
-        }
-    }
-
-    private void salvarLog(
-            Tenants tenant,
-            SystemUsers executor,
-            String etapa,
-            String status,
-            String mensagem,
-            Map<String, Object> detalhes,
-            LocalDateTime createdAt
-    ) {
-        ProvisioningLogs log = new ProvisioningLogs();
-        log.setTenantId(tenant);
-        log.setEtapa(etapa);
-        log.setStatus(status);
-        log.setMensagem(mensagem);
-        log.setDetalhes(detalhes);
-        log.setExecutadoPor(executor);
-        log.setCreatedAt(createdAt);
-
-        provisioningLogsRepository.save(log);
     }
 }

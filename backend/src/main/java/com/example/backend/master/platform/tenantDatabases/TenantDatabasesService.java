@@ -60,6 +60,22 @@ public class TenantDatabasesService {
         throw new ValidacaoException("Tenant database nao pode ser excluido");
     }
 
+    @Transactional
+    public TenantDatabases atualizarStatusProvisionamento(Long id, String provisionStatus, LocalDateTime lastCheckAt) {
+        TenantDatabases entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant database nao encontrado"));
+
+        entity.setProvisionStatus(normalizarProvisionStatus(provisionStatus));
+        validarProvisionStatus(entity.getProvisionStatus());
+        entity.setLastCheckAt(lastCheckAt);
+
+        if ("ATIVO".equals(entity.getProvisionStatus()) && entity.getProvisionedAt() == null) {
+            entity.setProvisionedAt(LocalDateTime.now());
+        }
+
+        return repository.save(entity);
+    }
+
     private void preencher(
             TenantDatabases entity,
             TenantDatabasesRequestDTO data,

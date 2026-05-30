@@ -23,7 +23,7 @@ public class ProvisioningLogs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "tenant_id")
     private Tenants tenantId;
 

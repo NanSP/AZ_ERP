@@ -9,7 +9,6 @@ import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -34,7 +33,6 @@ public class ProvisioningLogsService {
         validar(data);
 
         Tenants tenant = buscarTenant(data.tenantId());
-        validarRelacionamentoComTenant(tenant);
         SystemUsers executadoPor = buscarExecutor(data.executadoPorId());
 
         ProvisioningLogs entity = new ProvisioningLogs();
@@ -75,14 +73,11 @@ public class ProvisioningLogsService {
             throw new ValidacaoException("Dados do provisioning log sao obrigatorios");
         }
 
-        if (data.tenantId() == null) {
-            throw new ValidacaoException("Tenant e obrigatorio");
-        }
-
         if (data.executadoPorId() == null) {
             throw new ValidacaoException("Usuario executor e obrigatorio");
         }
 
+        validarRelacionamentoComTenant(buscarTenant(data.tenantId()));
         normalizarObrigatorio(data.etapa(), "Etapa e obrigatoria");
         normalizarObrigatorio(data.mensagem(), "Mensagem e obrigatoria");
         validarStatus(normalizarStatus(data.status()));
@@ -90,10 +85,9 @@ public class ProvisioningLogsService {
     }
 
     private void validarStatus(String status) {
-        if (!status.equals("PENDENTE")
+        if (!status.equals("INFO")
                 && !status.equals("SUCESSO")
-                && !status.equals("ERRO")
-                && !status.equals("AVISO")) {
+                && !status.equals("ERRO")) {
             throw new ValidacaoException("Status do provisioning log invalido");
         }
     }
@@ -109,6 +103,10 @@ public class ProvisioningLogsService {
     }
 
     private Tenants buscarTenant(Long tenantId) {
+        if (tenantId == null) {
+            return null;
+        }
+
         return tenantsRepository.findById(tenantId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant nao encontrado"));
     }

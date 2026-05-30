@@ -1,12 +1,17 @@
 package com.example.backend.master.platform.tenantProvisioning.services;
 
-import com.example.backend.master.platform.provisioningLogs.ProvisioningLogs;
-import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsRepository;
+import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsRequestDTO;
+import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsService;
+import com.example.backend.master.platform.tenantAdminUsers.TenantAdminUsers;
+import com.example.backend.master.platform.tenantAdminUsers.TenantAdminUsersRequestDTO;
+import com.example.backend.master.platform.tenantAdminUsers.TenantAdminUsersService;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
-import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRepository;
+import com.example.backend.master.platform.tenantDatabases.TenantDatabasesService;
 import com.example.backend.master.platform.tenantProvisioning.TenantProvisioningRequestDTO;
 import com.example.backend.master.platform.tenantProvisioning.TenantProvisioningResponseDTO;
-import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.master.platform.tenants.Tenants;
+import com.example.backend.master.platform.tenants.TenantsService;
+import com.example.backend.shared.exception.ValidacaoException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,125 +23,122 @@ public class TenantProvisioningOrchestratorService {
 
     private final TenantProvisioningRegistrationService registrationService;
     private final TenantDatabaseProvisioningService tenantDatabaseProvisioningService;
-    private final TenantDatabasesRepository tenantDatabasesRepository;
-    private final TenantsRepository tenantsRepository;
-    private final ProvisioningLogsRepository provisioningLogsRepository;
+    private final TenantDatabasesService tenantDatabasesService;
+    private final TenantsService tenantsService;
+    private final TenantAdminUsersService tenantAdminUsersService;
+    private final ProvisioningLogsService provisioningLogsService;
 
     public TenantProvisioningOrchestratorService(
             TenantProvisioningRegistrationService registrationService,
             TenantDatabaseProvisioningService tenantDatabaseProvisioningService,
-            TenantDatabasesRepository tenantDatabasesRepository,
-            TenantsRepository tenantsRepository,
-            ProvisioningLogsRepository provisioningLogsRepository
+            TenantDatabasesService tenantDatabasesService,
+            TenantsService tenantsService,
+            TenantAdminUsersService tenantAdminUsersService,
+            ProvisioningLogsService provisioningLogsService
     ) {
         this.registrationService = registrationService;
         this.tenantDatabaseProvisioningService = tenantDatabaseProvisioningService;
-        this.tenantDatabasesRepository = tenantDatabasesRepository;
-        this.tenantsRepository = tenantsRepository;
-        this.provisioningLogsRepository = provisioningLogsRepository;
+        this.tenantDatabasesService = tenantDatabasesService;
+        this.tenantsService = tenantsService;
+        this.tenantAdminUsersService = tenantAdminUsersService;
+        this.provisioningLogsService = provisioningLogsService;
     }
 
     public TenantProvisioningResponseDTO provision(TenantProvisioningRequestDTO data) {
         RegistrationResult result = registrationService.register(data);
 
         TenantDatabases tenantDatabase = result.tenantDatabase();
-        LocalDateTime now = LocalDateTime.now();
+        Tenants tenant = result.tenant();
         ArrayList<String> etapasExecutadas = new ArrayList<>(result.etapasExecutadas());
+        TenantAdminUsers tenantAdmin;
 
         try {
-            tenantDatabaseProvisioningService.createTenantDatabase(
-                    tenantDatabase.getDatabaseName()
+            tenantDatabaseProvisioningService.createTenantDatabase(tenantDatabase.getDatabaseName());
+
+            tenant = tenantsService.atualizarStatusProvisionamento(tenant.getId(), "ATIVO");
+            tenantDatabase = tenantDatabasesService.atualizarStatusProvisionamento(
+                    tenantDatabase.getId(),
+                    "ATIVO",
+                    LocalDateTime.now()
             );
-
-            result.tenant().setStatus("ATIVO");
-            result.tenant().setUpdatedAt(now);
-            tenantsRepository.save(result.tenant());
-
-            tenantDatabase.setProvisionStatus("ATIVO");
-            tenantDatabase.setProvisionedAt(now);
-            tenantDatabase.setUpdatedAt(now);
-            tenantDatabasesRepository.save(tenantDatabase);
-
             etapasExecutadas.add("DATABASE_CREATED");
 
-            salvarLogFinal(
-                    result,
+            provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
+                    tenant.getId(),
                     "DATABASE_CREATED",
                     "SUCESSO",
-                    "Banco físico do tenant criado com sucesso",
+                    "Banco fisico do tenant criado com sucesso",
                     Map.of(
                             "tenantDatabaseId", tenantDatabase.getId(),
                             "databaseName", tenantDatabase.getDatabaseName(),
                             "status", tenantDatabase.getProvisionStatus()
                     ),
-                    now
-            );
+                    result.executor().getId()
+            ));
 
+            tenantAdmin = tenantAdminUsersService.criar(new TenantAdminUsersRequestDTO(
+                    tenant.getId(),
+                    data.adminNome(),
+                    data.adminEmail(),
+                    data.adminLogin(),
+                    data.adminSenha(),
+                    "TENANT_ADMIN",
+                    "ATIVO"
+            ));
+            etapasExecutadas.add("TENANT_ADMIN_CREATED");
+
+            provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
+                    tenant.getId(),
+                    "TENANT_ADMIN_CREATED",
+                    "SUCESSO",
+                    "Administrador inicial do tenant criado com sucesso",
+                    Map.of(
+                            "tenantAdminUserId", tenantAdmin.getId(),
+                            "adminNome", tenantAdmin.getNome(),
+                            "adminEmail", tenantAdmin.getEmail(),
+                            "adminLogin", tenantAdmin.getLogin()
+                    ),
+                    result.executor().getId()
+            ));
         } catch (Exception ex) {
-
-            result.tenant().setStatus("SUSPENSO");
-            result.tenant().setUpdatedAt(now);
-            tenantsRepository.save(result.tenant());
-
-            tenantDatabase.setProvisionStatus("ERRO");
-            tenantDatabase.setUpdatedAt(now);
-            tenantDatabasesRepository.save(tenantDatabase);
-
+            tenant = tenantsService.atualizarStatusProvisionamento(tenant.getId(), "SUSPENSO");
+            tenantDatabase = tenantDatabasesService.atualizarStatusProvisionamento(
+                    tenantDatabase.getId(),
+                    "ERRO",
+                    LocalDateTime.now()
+            );
             etapasExecutadas.add("DATABASE_ERROR");
 
-            salvarLogFinal(
-                    result,
+            provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
+                    tenant.getId(),
                     "DATABASE_CREATED",
                     "ERRO",
-                    "Erro ao criar banco físico do tenant",
+                    "Erro ao criar banco fisico do tenant",
                     Map.of(
                             "tenantDatabaseId", tenantDatabase.getId(),
                             "databaseName", tenantDatabase.getDatabaseName(),
                             "erro", ex.getMessage()
                     ),
-                    now
-            );
+                    result.executor().getId()
+            ));
 
-            throw new RuntimeException(
-                    "Falha no provisionamento físico do banco: " + ex.getMessage(),
-                    ex
-            );
+            throw new ValidacaoException("Falha no provisionamento fisico do banco: " + ex.getMessage());
         }
 
         return new TenantProvisioningResponseDTO(
-                result.tenant().getId(),
-                result.tenant().getCodigo(),
-                result.tenant().getNome(),
-                result.tenant().getStatus(),
+                tenant.getId(),
+                tenant.getCodigo(),
+                tenant.getNome(),
+                tenant.getStatus(),
                 tenantDatabase.getId(),
                 tenantDatabase.getDatabaseName(),
                 tenantDatabase.getProvisionStatus(),
-                result.tenantAdmin().getId(),
-                result.tenantAdmin().getNome(),
-                result.tenantAdmin().getEmail(),
-                result.tenantAdmin().getLogin(),
+                tenantAdmin.getId(),
+                tenantAdmin.getNome(),
+                tenantAdmin.getEmail(),
+                tenantAdmin.getLogin(),
                 tenantDatabase.getProvisionedAt(),
                 etapasExecutadas
         );
-    }
-
-    private void salvarLogFinal(
-            RegistrationResult result,
-            String etapa,
-            String status,
-            String mensagem,
-            Map<String, Object> detalhes,
-            LocalDateTime createdAt
-    ) {
-        ProvisioningLogs log = new ProvisioningLogs();
-        log.setTenantId(result.tenant());
-        log.setExecutadoPor(result.executor());
-        log.setEtapa(etapa);
-        log.setStatus(status);
-        log.setMensagem(mensagem);
-        log.setDetalhes(detalhes);
-        log.setCreatedAt(createdAt);
-
-        provisioningLogsRepository.save(log);
     }
 }

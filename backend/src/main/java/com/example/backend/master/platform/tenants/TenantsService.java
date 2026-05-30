@@ -70,6 +70,17 @@ public class TenantsService {
         repository.delete(entity);
     }
 
+    @Transactional
+    public Tenants atualizarStatusProvisionamento(Long id, String status) {
+        Tenants entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant nao encontrado"));
+
+        entity.setStatus(normalizarStatus(status));
+        validarStatus(entity.getStatus());
+
+        return repository.save(entity);
+    }
+
     private void preencher(Tenants entity, TenantsRequestDTO data) {
         entity.setCodigo(normalizarObrigatorio(data.codigo(), "Codigo do tenant e obrigatorio"));
         entity.setNome(normalizarObrigatorio(data.nome(), "Nome do tenant e obrigatorio"));

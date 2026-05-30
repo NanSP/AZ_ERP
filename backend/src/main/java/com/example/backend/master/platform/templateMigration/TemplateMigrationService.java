@@ -1,40 +1,30 @@
 package com.example.backend.master.platform.templateMigration;
 
-import com.example.backend.master.platform.provisioningLogs.ProvisioningLogs;
-import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsRepository;
-import com.example.backend.master.platform.systemUsers.SystemUsers;
-import com.example.backend.master.platform.systemUsers.SystemUsersRepository;
+import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsRequestDTO;
+import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsService;
+import com.example.backend.shared.exception.ValidacaoException;
 import org.flywaydb.core.Flyway;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
 public class TemplateMigrationService {
 
     private final TemplateMigrationProperties properties;
-    private final ProvisioningLogsRepository provisioningLogsRepository;
-    private final SystemUsersRepository systemUsersRepository;
+    private final ProvisioningLogsService provisioningLogsService;
 
     public TemplateMigrationService(
             TemplateMigrationProperties properties,
-            ProvisioningLogsRepository provisioningLogsRepository,
-            SystemUsersRepository systemUsersRepository
+            ProvisioningLogsService provisioningLogsService
     ) {
         this.properties = properties;
-        this.provisioningLogsRepository = provisioningLogsRepository;
-        this.systemUsersRepository = systemUsersRepository;
+        this.provisioningLogsService = provisioningLogsService;
     }
 
     public void migrateTemplate(Long systemUserId) {
-        SystemUsers executor = systemUsersRepository.findById(systemUserId)
-                .orElseThrow(() -> new RuntimeException("Usuario executor nao encontrado"));
-
-        LocalDateTime now = LocalDateTime.now();
-
         salvarLog(
-                executor,
+                systemUserId,
                 "TEMPLATE_MIGRATION_STARTED",
                 "INFO",
                 "Inicio da migracao do banco template",
@@ -43,8 +33,7 @@ public class TemplateMigrationService {
                         "host", properties.getHost(),
                         "port", properties.getPort(),
                         "location", "classpath:db/migration/template"
-                ),
-                now
+                )
         );
 
         try {
@@ -61,7 +50,7 @@ public class TemplateMigrationService {
             flyway.migrate();
 
             salvarLog(
-                    executor,
+                    systemUserId,
                     "TEMPLATE_MIGRATION_FINISHED",
                     "SUCESSO",
                     "Migracao do banco template executada com sucesso",
@@ -70,13 +59,12 @@ public class TemplateMigrationService {
                             "host", properties.getHost(),
                             "port", properties.getPort(),
                             "location", "classpath:db/migration/template"
-                    ),
-                    LocalDateTime.now()
+                    )
             );
 
         } catch (Exception ex) {
             salvarLog(
-                    executor,
+                    systemUserId,
                     "TEMPLATE_MIGRATION_FINISHED",
                     "ERRO",
                     "Erro ao executar migracao do banco template",
@@ -86,18 +74,14 @@ public class TemplateMigrationService {
                             "port", properties.getPort(),
                             "location", "classpath:db/migration/template",
                             "erro", ex.getMessage()
-                    ),
-                    LocalDateTime.now()
+                    )
             );
 
-            throw new RuntimeException("Erro ao migrar template: " + ex.getMessage(), ex);
+            throw new ValidacaoException("Erro ao migrar template: " + ex.getMessage());
         }
     }
 
     public void validateTemplate(Long systemUserId) {
-        SystemUsers executor = systemUsersRepository.findById(systemUserId)
-                .orElseThrow(() -> new RuntimeException("Usuario executor nao encontrado"));
-
         try {
             Flyway flyway = Flyway.configure()
                     .dataSource(
@@ -112,20 +96,19 @@ public class TemplateMigrationService {
             flyway.validate();
 
             salvarLog(
-                    executor,
+                    systemUserId,
                     "TEMPLATE_VALIDATION",
                     "SUCESSO",
                     "Validacao do banco template executada com sucesso",
                     Map.of(
                             "database", properties.getDatabase(),
                             "location", "classpath:db/migration/template"
-                    ),
-                    LocalDateTime.now()
+                    )
             );
 
         } catch (Exception ex) {
             salvarLog(
-                    executor,
+                    systemUserId,
                     "TEMPLATE_VALIDATION",
                     "ERRO",
                     "Erro na validacao do banco template",
@@ -133,18 +116,14 @@ public class TemplateMigrationService {
                             "database", properties.getDatabase(),
                             "location", "classpath:db/migration/template",
                             "erro", ex.getMessage()
-                    ),
-                    LocalDateTime.now()
+                    )
             );
 
-            throw new RuntimeException("Erro ao validar template: " + ex.getMessage(), ex);
+            throw new ValidacaoException("Erro ao validar template: " + ex.getMessage());
         }
     }
 
     public String infoTemplate(Long systemUserId) {
-        SystemUsers executor = systemUsersRepository.findById(systemUserId)
-                .orElseThrow(() -> new RuntimeException("Usuario executor nao encontrado"));
-
         try {
             Flyway flyway = Flyway.configure()
                     .dataSource(
@@ -162,53 +141,48 @@ public class TemplateMigrationService {
                     : "Versao atual do template: " + current.getVersion() + " - " + current.getDescription();
 
             salvarLog(
-                    executor,
+                    systemUserId,
                     "TEMPLATE_INFO",
                     "INFO",
                     "Consulta de versao do banco template executada",
                     Map.of(
                             "database", properties.getDatabase(),
                             "info", info
-                    ),
-                    LocalDateTime.now()
+                    )
             );
 
             return info;
 
         } catch (Exception ex) {
             salvarLog(
-                    executor,
+                    systemUserId,
                     "TEMPLATE_INFO",
                     "ERRO",
                     "Erro ao consultar informacoes do banco template",
                     Map.of(
                             "database", properties.getDatabase(),
                             "erro", ex.getMessage()
-                    ),
-                    LocalDateTime.now()
+                    )
             );
 
-            throw new RuntimeException("Erro ao consultar template: " + ex.getMessage(), ex);
+            throw new ValidacaoException("Erro ao consultar template: " + ex.getMessage());
         }
     }
 
     private void salvarLog(
-            SystemUsers executor,
+            Long systemUserId,
             String etapa,
             String status,
             String mensagem,
-            Map<String, Object> detalhes,
-            LocalDateTime createdAt
+            Map<String, Object> detalhes
     ) {
-        ProvisioningLogs log = new ProvisioningLogs();
-        log.setTenantId(null);
-        log.setExecutadoPor(executor);
-        log.setEtapa(etapa);
-        log.setStatus(status);
-        log.setMensagem(mensagem);
-        log.setDetalhes(detalhes);
-        log.setCreatedAt(createdAt);
-
-        provisioningLogsRepository.save(log);
+        provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
+                null,
+                etapa,
+                status,
+                mensagem,
+                detalhes,
+                systemUserId
+        ));
     }
 }
