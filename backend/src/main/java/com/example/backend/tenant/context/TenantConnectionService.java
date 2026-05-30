@@ -21,7 +21,7 @@ public class TenantConnectionService {
     }
 
     public TenantConnectionInfo resolve(String tenantCode) {
-        Tenants tenant = tenantsRepository.findByCodigoIgnoreCase(tenantCode)
+        Tenants tenant = tenantsRepository.findByCodigo(tenantCode)
                 .orElseThrow(() -> new RuntimeException("Tenant nao encontrado"));
 
         TenantDatabases tenantDatabase = tenantDatabasesRepository.findByTenantId(tenant)

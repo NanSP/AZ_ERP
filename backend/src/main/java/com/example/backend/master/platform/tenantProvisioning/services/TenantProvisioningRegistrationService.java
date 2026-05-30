@@ -151,7 +151,7 @@ public class TenantProvisioningRegistrationService {
     }
 
     private void validarDuplicidades(TenantProvisioningRequestDTO data) {
-        if (tenantsRepository.existsByCodigoIgnoreCase(data.codigo())) {
+        if (tenantsRepository.existsByCodigo(data.codigo())) {
             throw new RuntimeException("Já existe um tenant com esse código");
         }
 

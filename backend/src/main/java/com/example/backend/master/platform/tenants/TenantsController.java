@@ -1,73 +1,58 @@
 package com.example.backend.master.platform.tenants;
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/platform/tenants")
 public class TenantsController {
 
-    @Autowired
-    private TenantsRepository repository;
+    private final TenantsRepository repository;
+    private final TenantsService tenantsService;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public TenantsController(
+            TenantsRepository repository,
+            TenantsService tenantsService
+    ) {
+        this.repository = repository;
+        this.tenantsService = tenantsService;
+    }
+
     @GetMapping
-    public List<TenantsResponseDTO> getAll(){
-
-        List<TenantsResponseDTO> tenantsList = repository.findAll().stream().map(TenantsResponseDTO::new).toList();
-        return tenantsList;
+    public List<TenantsResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(TenantsResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Long id){
+    public TenantsResponseDTO getById(@PathVariable Long id) {
+        Tenants entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant nao encontrado"));
 
-        Optional<Tenants> tenants = repository.findById(id);
-        if(tenants.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        TenantsResponseDTO tenantsDTO = new TenantsResponseDTO(tenants.get());
-        return  ResponseEntity.ok(tenantsDTO);
+        return new TenantsResponseDTO(entity);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveTenants(@RequestBody TenantsRequestDTO data){
-
-        Tenants tenantsData = new Tenants(data);
-        repository.save(tenantsData);
-        return;
+    @ResponseStatus(HttpStatus.CREATED)
+    public TenantsResponseDTO saveTenants(@RequestBody TenantsRequestDTO data) {
+        Tenants saved = tenantsService.criar(data);
+        return new TenantsResponseDTO(saved);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTenants(@PathVariable(value = "id") Long id, @RequestBody TenantsRequestDTO upData){
-
-        Optional<Tenants> tenants = repository.findById(id);
-        if(tenants.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        Tenants tenantsModel = tenants.get();
-        BeanUtils.copyProperties(upData, tenantsModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(tenantsModel));
+    public TenantsResponseDTO updateTenants(@PathVariable Long id, @RequestBody TenantsRequestDTO data) {
+        Tenants updated = tenantsService.atualizar(id, data);
+        return new TenantsResponseDTO(updated);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTenants(@PathVariable(value = "id") Long id){
-
-        Optional<Tenants> tenants = repository.findById(id);
-        if(tenants.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(tenants.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("Tenants deleted");
+    public String deleteTenants(@PathVariable Long id) {
+        tenantsService.excluir(id);
+        return "Tenant deleted";
     }
 }

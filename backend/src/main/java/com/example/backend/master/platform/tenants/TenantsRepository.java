@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface TenantsRepository extends JpaRepository<Tenants, Long> {
-    boolean existsByCodigoIgnoreCase(String codigo);
-    Optional<Tenants> findByCodigoIgnoreCase(String codigo);
-
+    boolean existsByCodigo(String codigo);
+    boolean existsByCodigoAndIdNot(String codigo, Long id);
+    boolean existsByDocumento(String documento);
+    boolean existsByDocumentoAndIdNot(String documento, Long id);
+    Optional<Tenants> findByCodigo(String codigo);
 }

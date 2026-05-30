@@ -9,4 +9,5 @@ public interface TenantDatabasesRepository extends JpaRepository<TenantDatabases
     boolean existsByDatabaseNameIgnoreCase(String databaseName);
 
     Optional<TenantDatabases> findByTenantId(Tenants tenant);
+    boolean existsByTenantIdId(Long tenantId);
 }

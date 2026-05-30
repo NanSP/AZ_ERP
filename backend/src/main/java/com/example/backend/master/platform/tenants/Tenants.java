@@ -2,6 +2,8 @@ package com.example.backend.master.platform.tenants;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -35,24 +37,11 @@ public class Tenants {
     private String schemaVersion;
     private String observacoes;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    public Tenants(TenantsRequestDTO data) {
-        this.codigo = data.codigo();
-        this.nome = data.nome();
-        this.nomeFantasia = data.nomeFantasia();
-        this.documento = data.documento();
-        this.tipoDocumento = data.tipoDocumento();
-        this.emailResponsavel = data.emailResponsavel();
-        this.telefoneResponsavel = data.telefoneResponsavel();
-        this.plano = data.plano();
-        this.status = data.status();
-        this.schemaVersion = data.schemaVersion();
-        this.observacoes = data.observacoes();
-        this.createdAt = data.createdAt();
-        this.updatedAt = data.updatedAt();
-    }
 }
