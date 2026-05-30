@@ -1,74 +1,59 @@
 package com.example.backend.master.platform.systemUsers;
 
 
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/platform/systemUsers")
 public class SystemUsersController {
 
-    @Autowired
     private SystemUsersRepository repository;
+    private final SystemUsersService systemUsersService;
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
+    public SystemUsersController(
+            SystemUsersRepository repository,
+            SystemUsersService systemUsersService
+    ) {
+        this.repository = repository;
+        this.systemUsersService = systemUsersService;
+    }
+
     @GetMapping
-    public List<SystemUsersResponseDTO> getAll(){
-
-        List<SystemUsersResponseDTO> systemUsersList = repository.findAll().stream().map(SystemUsersResponseDTO::new).toList();
-        return systemUsersList;
+    public List<SystemUsersResponseDTO> getAll() {
+        return repository.findAll()
+                .stream()
+                .map(SystemUsersResponseDTO::new)
+                .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(value = "id") Long id){
+    public SystemUsersResponseDTO getById(@PathVariable Long id) {
+        SystemUsers entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("System user nao encontrado"));
 
-        Optional<SystemUsers> systemUsers = repository.findById(id);
-        if(systemUsers.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        SystemUsersResponseDTO systemUsersDTO = new SystemUsersResponseDTO(systemUsers.get());
-        return  ResponseEntity.ok(systemUsersDTO);
+        return new SystemUsersResponseDTO(entity);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public void saveSystemUsers(@RequestBody SystemUsersRequestDTO data){
-
-        SystemUsers systemUsersData = new SystemUsers(data);
-        repository.save(systemUsersData);
-        return;
+    @ResponseStatus(HttpStatus.CREATED)
+    public SystemUsersResponseDTO saveSystemUsers(@RequestBody SystemUsersRequestDTO data) {
+        SystemUsers saved = systemUsersService.criar(data);
+        return new SystemUsersResponseDTO(saved);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSystemUsers(@PathVariable(value = "id") Long id, @RequestBody SystemUsersRequestDTO upData){
-
-        Optional<SystemUsers> systemUsers = repository.findById(id);
-        if(systemUsers.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-
-        SystemUsers systemUsersModel = systemUsers.get();
-        BeanUtils.copyProperties(upData, systemUsersModel);
-        return  ResponseEntity.status(HttpStatus.OK).body(repository.save(systemUsersModel));
+    public SystemUsersResponseDTO updateSystemUsers(@PathVariable Long id, @RequestBody SystemUsersRequestDTO data) {
+        SystemUsers updated = systemUsersService.atualizar(id, data);
+        return new SystemUsersResponseDTO(updated);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSystemUsers(@PathVariable(value = "id") Long id){
-
-        Optional<SystemUsers> systemUsers = repository.findById(id);
-        if(systemUsers.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado");
-        }
-        repository.delete(systemUsers.get());
-        return  ResponseEntity.status(HttpStatus.OK).body("SystemUsers deleted");
+    public String deleteSystemUsers(@PathVariable Long id) {
+        systemUsersService.excluir(id);
+        return "System user deleted";
     }
 }

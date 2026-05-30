@@ -4,4 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProvisioningLogsRepository extends JpaRepository<ProvisioningLogs, Long> {
     boolean existsByTenantIdId(Long tenantId);
+    boolean existsByExecutadoPorId(Long executadoPorId);
 }

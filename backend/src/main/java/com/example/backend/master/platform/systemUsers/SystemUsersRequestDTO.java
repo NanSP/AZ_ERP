@@ -1,7 +1,5 @@
 package com.example.backend.master.platform.systemUsers;
 
-import java.time.LocalDateTime;
-
 public record SystemUsersRequestDTO
         (
                 String nome,
@@ -9,9 +7,6 @@ public record SystemUsersRequestDTO
                 String login,
                 String senha,
                 String role,
-                String status,
-                LocalDateTime ultimoAcesso,
-                LocalDateTime createdAt,
-                LocalDateTime updatedAt
+                String status
         ) {
 }

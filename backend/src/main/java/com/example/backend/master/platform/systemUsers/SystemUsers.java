@@ -3,6 +3,9 @@ package com.example.backend.master.platform.systemUsers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
 @Table(name = "system_users", schema = "platform")
@@ -30,21 +33,13 @@ public class SystemUsers {
 
     @Column(name = "ultimo_acesso")
     private LocalDateTime ultimoAcesso;
-    @Column(name = "created_at")
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    public SystemUsers(SystemUsersRequestDTO data) {
-        this.nome = data.nome();
-        this.email = data.email();
-        this.login = data.login();
-        this.senha = data.senha();
-        this.role = data.role();
-        this.status = data.status();
-        this.ultimoAcesso = data.ultimoAcesso();
-        this.createdAt = data.createdAt();
-        this.updatedAt = data.updatedAt();
-    }
 
 }
