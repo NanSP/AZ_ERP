@@ -1,6 +1,6 @@
 package com.example.backend.master.platform.provisioningLogs;
 
-import java.time.LocalDateTime;
+
 import java.util.Map;
 
 public record ProvisioningLogsRequestDTO
@@ -10,7 +10,6 @@ public record ProvisioningLogsRequestDTO
                 String status,
                 String mensagem,
                 Map<String, Object> detalhes,
-                Long executadoPorId,
-                LocalDateTime createdAt
+                Long executadoPorId
         ) {
 }

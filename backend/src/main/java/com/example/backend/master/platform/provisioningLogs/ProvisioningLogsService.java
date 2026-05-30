@@ -4,12 +4,18 @@ import com.example.backend.master.platform.systemUsers.SystemUsers;
 import com.example.backend.master.platform.systemUsers.SystemUsersRepository;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
+import com.example.backend.shared.exception.ValidacaoException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class ProvisioningLogsService {
 
-    private final ProvisioningLogsRepository provisioningLogsRepository;
+    private final ProvisioningLogsRepository repository;
     private final TenantsRepository tenantsRepository;
     private final SystemUsersRepository systemUsersRepository;
 
@@ -18,48 +24,125 @@ public class ProvisioningLogsService {
             TenantsRepository tenantsRepository,
             SystemUsersRepository systemUsersRepository
     ) {
-        this.provisioningLogsRepository = provisioningLogsRepository;
+        this.repository = provisioningLogsRepository;
         this.tenantsRepository = tenantsRepository;
         this.systemUsersRepository = systemUsersRepository;
     }
 
-    public ProvisioningLogs create(ProvisioningLogsRequestDTO data) {
-        Tenants tenant = tenantsRepository.findById(data.tenantId())
-                .orElseThrow(() -> new RuntimeException("Tenant não encontrado"));
+    @Transactional
+    public ProvisioningLogs criar(ProvisioningLogsRequestDTO data) {
+        validar(data);
 
-        SystemUsers executadoPor = systemUsersRepository.findById(data.executadoPorId())
-                .orElseThrow(() -> new RuntimeException("Usuário executor não encontrado"));
+        Tenants tenant = buscarTenant(data.tenantId());
+        validarRelacionamentoComTenant(tenant);
+        SystemUsers executadoPor = buscarExecutor(data.executadoPorId());
 
         ProvisioningLogs entity = new ProvisioningLogs();
-        entity.setTenantId(tenant);
-        entity.setEtapa(data.etapa());
-        entity.setStatus(data.status());
-        entity.setMensagem(data.mensagem());
-        entity.setDetalhes(data.detalhes());
-        entity.setExecutadoPor(executadoPor);
-        entity.setCreatedAt(data.createdAt());
+        preencher(entity, data, tenant, executadoPor);
 
-        return provisioningLogsRepository.save(entity);
+        return repository.save(entity);
     }
 
-    public ProvisioningLogs update(Long id, ProvisioningLogsRequestDTO data) {
-        ProvisioningLogs entity = provisioningLogsRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Provisioning log não encontrado"));
+    @Transactional
+    public ProvisioningLogs atualizar(Long id, ProvisioningLogsRequestDTO data) {
+        throw new ValidacaoException("Provisioning log nao pode ser alterado");
+    }
 
-        Tenants tenant = tenantsRepository.findById(data.tenantId())
-                .orElseThrow(() -> new RuntimeException("Tenant não encontrado"));
+    @Transactional
+    public void excluir(Long id) {
+        ProvisioningLogs entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Provisioning log nao encontrado"));
 
-        SystemUsers executadoPor = systemUsersRepository.findById(data.executadoPorId())
-                .orElseThrow(() -> new RuntimeException("Usuário executor não encontrado"));
+        throw new ValidacaoException("Provisioning log nao pode ser excluido");
+    }
 
+    private void preencher(
+            ProvisioningLogs entity,
+            ProvisioningLogsRequestDTO data,
+            Tenants tenant,
+            SystemUsers executadoPor
+    ) {
         entity.setTenantId(tenant);
-        entity.setEtapa(data.etapa());
-        entity.setStatus(data.status());
-        entity.setMensagem(data.mensagem());
-        entity.setDetalhes(data.detalhes());
+        entity.setEtapa(normalizarObrigatorio(data.etapa(), "Etapa e obrigatoria"));
+        entity.setStatus(normalizarStatus(data.status()));
+        entity.setMensagem(normalizarObrigatorio(data.mensagem(), "Mensagem e obrigatoria"));
+        entity.setDetalhes(normalizarDetalhes(data.detalhes()));
         entity.setExecutadoPor(executadoPor);
-        entity.setCreatedAt(data.createdAt());
+    }
 
-        return provisioningLogsRepository.save(entity);
+    private void validar(ProvisioningLogsRequestDTO data) {
+        if (data == null) {
+            throw new ValidacaoException("Dados do provisioning log sao obrigatorios");
+        }
+
+        if (data.tenantId() == null) {
+            throw new ValidacaoException("Tenant e obrigatorio");
+        }
+
+        if (data.executadoPorId() == null) {
+            throw new ValidacaoException("Usuario executor e obrigatorio");
+        }
+
+        normalizarObrigatorio(data.etapa(), "Etapa e obrigatoria");
+        normalizarObrigatorio(data.mensagem(), "Mensagem e obrigatoria");
+        validarStatus(normalizarStatus(data.status()));
+        validarDetalhes(normalizarDetalhes(data.detalhes()));
+    }
+
+    private void validarStatus(String status) {
+        if (!status.equals("PENDENTE")
+                && !status.equals("SUCESSO")
+                && !status.equals("ERRO")
+                && !status.equals("AVISO")) {
+            throw new ValidacaoException("Status do provisioning log invalido");
+        }
+    }
+
+    private void validarDetalhes(Map<String, Object> detalhes) {
+        if (detalhes == null) {
+            return;
+        }
+
+        if (detalhes.size() > 100) {
+            throw new ValidacaoException("Detalhes do provisioning log excedem o limite permitido");
+        }
+    }
+
+    private Tenants buscarTenant(Long tenantId) {
+        return tenantsRepository.findById(tenantId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant nao encontrado"));
+    }
+
+    private SystemUsers buscarExecutor(Long executadoPorId) {
+        return systemUsersRepository.findById(executadoPorId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario executor nao encontrado"));
+    }
+
+    private void validarRelacionamentoComTenant(Tenants tenant) {
+        if (tenant != null
+                && !"PENDENTE".equalsIgnoreCase(tenant.getStatus())
+                && !"ATIVO".equalsIgnoreCase(tenant.getStatus())) {
+            throw new ValidacaoException("Nao e permitido registrar provisioning log para tenant fora do ciclo operacional");
+        }
+    }
+
+    private String normalizarStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new ValidacaoException("Status e obrigatorio");
+        }
+
+        return status.trim().toUpperCase();
+    }
+
+    private Map<String, Object> normalizarDetalhes(Map<String, Object> detalhes) {
+        return detalhes == null || detalhes.isEmpty() ? null : detalhes;
+    }
+
+    private String normalizarObrigatorio(String valor, String mensagem) {
+        if (valor == null || valor.isBlank()) {
+            throw new ValidacaoException(mensagem);
+        }
+
+        return valor.trim();
     }
 }

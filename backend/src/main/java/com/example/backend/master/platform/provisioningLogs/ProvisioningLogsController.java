@@ -1,7 +1,7 @@
 package com.example.backend.master.platform.provisioningLogs;
 
+import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,17 +11,16 @@ import java.util.List;
 public class ProvisioningLogsController {
 
     private final ProvisioningLogsRepository repository;
-    private final ProvisioningLogsService service;
+    private final ProvisioningLogsService provisioningLogsService;
 
     public ProvisioningLogsController(
             ProvisioningLogsRepository repository,
-            ProvisioningLogsService service
+            ProvisioningLogsService provisioningLogsService
     ) {
         this.repository = repository;
-        this.service = service;
+        this.provisioningLogsService = provisioningLogsService;
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping
     public List<ProvisioningLogsResponseDTO> getAll() {
         return repository.findAll()
@@ -30,40 +29,31 @@ public class ProvisioningLogsController {
                 .toList();
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(log -> ResponseEntity.ok(new ProvisioningLogsResponseDTO(log)))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado"));
+    public ProvisioningLogsResponseDTO getById(@PathVariable Long id) {
+        ProvisioningLogs entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Provisioning log nao encontrado"));
+
+        return new ProvisioningLogsResponseDTO(entity);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PostMapping
-    public ResponseEntity<?> saveProvisioningLog(@RequestBody ProvisioningLogsRequestDTO data) {
-        ProvisioningLogs saved = service.create(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ProvisioningLogsResponseDTO(saved));
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProvisioningLogsResponseDTO saveProvisioningLogs(@RequestBody ProvisioningLogsRequestDTO data) {
+        ProvisioningLogs saved = provisioningLogsService.criar(data);
+        return new ProvisioningLogsResponseDTO(saved);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProvisioningLogs(@PathVariable Long id, @RequestBody ProvisioningLogsRequestDTO data) {
-        try {
-            ProvisioningLogs updated = service.update(id, data);
-            return ResponseEntity.ok(new ProvisioningLogsResponseDTO(updated));
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }
+    public ProvisioningLogsResponseDTO updateProvisioningLogs(@PathVariable Long id, @RequestBody ProvisioningLogsRequestDTO data) {
+        ProvisioningLogs updated = provisioningLogsService.atualizar(id, data);
+        return new ProvisioningLogsResponseDTO(updated);
     }
 
-    @CrossOrigin(origins = "*", allowedHeaders = "*")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProvisioningLogs(@PathVariable Long id) {
-        return repository.findById(id)
-                .<ResponseEntity<?>>map(log -> {
-                    repository.delete(log);
-                    return ResponseEntity.ok("ProvisioningLogs deleted");
-                })
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não encontrado"));
+    public String deleteProvisioningLogs(@PathVariable Long id) {
+        provisioningLogsService.excluir(id);
+        return "Provisioning log deleted";
     }
+
 }

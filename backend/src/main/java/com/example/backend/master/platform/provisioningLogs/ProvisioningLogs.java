@@ -4,6 +4,7 @@ import com.example.backend.master.platform.systemUsers.SystemUsers;
 import com.example.backend.master.platform.tenants.Tenants;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -22,7 +23,7 @@ public class ProvisioningLogs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "tenant_id")
     private Tenants tenantId;
 
@@ -34,18 +35,12 @@ public class ProvisioningLogs {
     @Column(name = "detalhes",columnDefinition = "jsonb")
     private Map<String, Object> detalhes;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "executado_por")
     private SystemUsers executadoPor;
 
-    @Column(name = "created_at")
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public ProvisioningLogs(ProvisioningLogsRequestDTO data) {
-        this.etapa = data.etapa();
-        this.status = data.status();
-        this.mensagem = data.mensagem();
-        this.detalhes = data.detalhes();
-        this.createdAt = data.createdAt();
-    }
 }
