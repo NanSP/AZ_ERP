@@ -4,6 +4,8 @@ import com.example.backend.master.platform.tenants.Tenants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +22,7 @@ public class TenantAdminUsers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "tenant_id")
     private Tenants tenantId;
 
@@ -36,20 +38,12 @@ public class TenantAdminUsers {
 
     @Column(name = "ultimo_acesso")
     private LocalDateTime ultimoAcesso;
-    @Column(name = "created_at")
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public TenantAdminUsers(TenantAdminUsersRequestDTO data) {
-        this.nome = data.nome();
-        this.email = data.email();
-        this.login = data.login();
-        this.senha = data.senha();
-        this.role = data.role();
-        this.status = data.status();
-        this.ultimoAcesso = data.ultimoAcesso();
-        this.createdAt = data.createdAt();
-        this.updatedAt = data.updatedAt();
-    }
 }
