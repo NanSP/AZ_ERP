@@ -13,9 +13,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -107,5 +112,44 @@ class TenantsControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Ja existe tenant com o codigo informado"))
                 .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void deveBuscarTenantPorId() throws Exception {
+        Tenants entity = new Tenants();
+        entity.setId(60L);
+        entity.setCodigo("acme");
+        entity.setNome("Acme Ltda");
+        entity.setStatus("ATIVO");
+        entity.setPlano("STARTER");
+        entity.setCreatedAt(LocalDateTime.of(2026, 6, 1, 12, 0));
+        entity.setUpdatedAt(LocalDateTime.of(2026, 6, 1, 12, 5));
+
+        when(repository.findById(60L)).thenReturn(Optional.of(entity));
+
+        mockMvc.perform(get("/platform/tenants/60"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(60))
+                .andExpect(jsonPath("$.codigo").value("acme"))
+                .andExpect(jsonPath("$.nome").value("Acme Ltda"));
+    }
+
+    @Test
+    void deveTraduzirNaoEncontradoAoBuscarTenantPorId() throws Exception {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/platform/tenants/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Tenant nao encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void deveExcluirTenant() throws Exception {
+        mockMvc.perform(delete("/platform/tenants/60"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Tenant deleted"));
+
+        verify(tenantsService).excluir(60L);
     }
 }

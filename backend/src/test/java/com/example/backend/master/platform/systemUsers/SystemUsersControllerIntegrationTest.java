@@ -13,9 +13,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -92,5 +97,45 @@ class SystemUsersControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Ja existe system user com o login informado"))
                 .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void deveBuscarSystemUserPorId() throws Exception {
+        SystemUsers entity = new SystemUsers();
+        entity.setId(90L);
+        entity.setNome("Operador Master");
+        entity.setEmail("master@empresa.com");
+        entity.setLogin("master.ops");
+        entity.setRole("OPERATIONS");
+        entity.setStatus("ATIVO");
+        entity.setCreatedAt(LocalDateTime.of(2026, 6, 1, 13, 0));
+        entity.setUpdatedAt(LocalDateTime.of(2026, 6, 1, 13, 5));
+
+        when(repository.findById(90L)).thenReturn(Optional.of(entity));
+
+        mockMvc.perform(get("/platform/systemUsers/90"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(90))
+                .andExpect(jsonPath("$.nome").value("Operador Master"))
+                .andExpect(jsonPath("$.login").value("master.ops"));
+    }
+
+    @Test
+    void deveTraduzirNaoEncontradoAoBuscarSystemUserPorId() throws Exception {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/platform/systemUsers/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("System user nao encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void deveExcluirSystemUser() throws Exception {
+        mockMvc.perform(delete("/platform/systemUsers/90"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("System user deleted"));
+
+        verify(systemUsersService).excluir(90L);
     }
 }
