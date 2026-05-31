@@ -16,9 +16,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -95,6 +100,48 @@ class ProvisioningLogsControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Tenant fora do ciclo operacional para provisioning log"))
                 .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void deveBuscarProvisioningLogPorId() throws Exception {
+        ProvisioningLogs entity = new ProvisioningLogs();
+        entity.setId(100L);
+        entity.setTenantId(criarTenant(1L, "acme", "Acme Ltda"));
+        entity.setEtapa("CRIACAO_DATABASE");
+        entity.setStatus("SUCESSO");
+        entity.setMensagem("Database criada com sucesso");
+        entity.setDetalhes(Map.of("database", "acme_db"));
+        entity.setExecutadoPor(criarSystemUser(2L, "master.ops", "Operador Master"));
+        entity.setCreatedAt(LocalDateTime.of(2026, 6, 1, 13, 30));
+
+        when(repository.findById(100L)).thenReturn(Optional.of(entity));
+
+        mockMvc.perform(get("/platform/provisioningLogs/100"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(100))
+                .andExpect(jsonPath("$.tenantId").value(1))
+                .andExpect(jsonPath("$.tenantCodigo").value("acme"))
+                .andExpect(jsonPath("$.executadoPorId").value(2))
+                .andExpect(jsonPath("$.executadoPorLogin").value("master.ops"));
+    }
+
+    @Test
+    void deveTraduzirNaoEncontradoAoBuscarProvisioningLogPorId() throws Exception {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/platform/provisioningLogs/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Provisioning log nao encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void deveExcluirProvisioningLog() throws Exception {
+        mockMvc.perform(delete("/platform/provisioningLogs/100"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Provisioning log deleted"));
+
+        verify(provisioningLogsService).excluir(100L);
     }
 
     private Tenants criarTenant(Long id, String codigo, String nome) {
