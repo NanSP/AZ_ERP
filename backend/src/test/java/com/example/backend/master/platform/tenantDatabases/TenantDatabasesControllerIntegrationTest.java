@@ -14,9 +14,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -125,6 +130,49 @@ class TenantDatabasesControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Ja existe tenant database com o database name informado"))
                 .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void deveBuscarTenantDatabasePorId() throws Exception {
+        TenantDatabases entity = new TenantDatabases();
+        entity.setId(70L);
+        entity.setTenantId(criarTenant(1L, "acme", "Acme Ltda"));
+        entity.setDatabaseName("acme_db");
+        entity.setTemplateName("template_v1");
+        entity.setDbHost("localhost");
+        entity.setDbPort(5432);
+        entity.setDbUsername("postgres");
+        entity.setProvisionStatus("ATIVO");
+        entity.setCreatedAt(LocalDateTime.of(2026, 6, 1, 12, 0));
+        entity.setUpdatedAt(LocalDateTime.of(2026, 6, 1, 12, 5));
+
+        when(repository.findById(70L)).thenReturn(Optional.of(entity));
+
+        mockMvc.perform(get("/platform/tenantDatabases/70"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(70))
+                .andExpect(jsonPath("$.tenantId").value(1))
+                .andExpect(jsonPath("$.tenantCodigo").value("acme"))
+                .andExpect(jsonPath("$.databaseName").value("acme_db"));
+    }
+
+    @Test
+    void deveTraduzirNaoEncontradoAoBuscarTenantDatabasePorId() throws Exception {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/platform/tenantDatabases/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Tenant database nao encontrado"))
+                .andExpect(jsonPath("$.status").value(404));
+    }
+
+    @Test
+    void deveExcluirTenantDatabase() throws Exception {
+        mockMvc.perform(delete("/platform/tenantDatabases/70"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Tenant database deleted"));
+
+        verify(tenantDatabasesService).excluir(70L);
     }
 
     private Tenants criarTenant(Long id, String codigo, String nome) {
