@@ -25,5 +25,8 @@ jobs:
           java-version: "21"
           cache: maven
 
+      - name: Grant execute permission to mvnw
+        run: chmod +x mvnw
+
       - name: Run unit tests
         run: ./mvnw test
