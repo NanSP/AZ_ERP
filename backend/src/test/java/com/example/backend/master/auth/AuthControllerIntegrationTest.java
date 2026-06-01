@@ -41,7 +41,7 @@ class AuthControllerIntegrationTest {
 
         when(service.login(request)).thenReturn(response);
 
-        mockMvc.perform(post("/master/auth/login")
+        mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -57,7 +57,7 @@ class AuthControllerIntegrationTest {
 
         when(service.login(request)).thenThrow(new ValidacaoException("Senha e obrigatoria"));
 
-        mockMvc.perform(post("/master/auth/login")
+        mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
