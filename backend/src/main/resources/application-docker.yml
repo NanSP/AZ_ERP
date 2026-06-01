@@ -1,0 +1,37 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  flyway:
+    locations: classpath:db/migration/master
+    enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  mvc:
+    servlet:
+      path: /api
+
+app:
+  datasource:
+    master:
+      host: ${MASTER_DB_HOST:postgres}
+      port: ${MASTER_DB_PORT:5432}
+      database: ${MASTER_DB_NAME:az_erp}
+      username: ${MASTER_DB_USERNAME:az_erp}
+      password: ${MASTER_DB_PASSWORD:az_erp}
+
+    template:
+      host: ${TEMPLATE_DB_HOST:postgres}
+      port: ${TEMPLATE_DB_PORT:5432}
+      database: ${TEMPLATE_DB_NAME:az_erp_template}
+      username: ${TEMPLATE_DB_USERNAME:az_erp}
+      password: ${TEMPLATE_DB_PASSWORD:az_erp}
+
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+      issuer: ${JWT_ISSUER:az-erp-backend}
+      expiration-hours: ${JWT_EXPIRATION_HOURS:8}

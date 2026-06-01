@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  postgres-test:
+    image: postgres:16
+    container_name: az_erp_postgres_test
+    environment:
+      POSTGRES_DB: az_erp_test
+      POSTGRES_USER: az_erp
+      POSTGRES_PASSWORD: az_erp
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U az_erp -d az_erp_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
