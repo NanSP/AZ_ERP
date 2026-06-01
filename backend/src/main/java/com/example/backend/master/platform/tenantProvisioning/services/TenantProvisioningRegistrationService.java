@@ -7,6 +7,8 @@ import com.example.backend.master.platform.systemUsers.SystemUsersRepository;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRequestDTO;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesService;
+import com.example.backend.master.platform.templateMigration.TemplateMigrationProperties;
+import com.example.backend.master.platform.templateMigration.TemplateRegistryService;
 import com.example.backend.master.platform.tenantProvisioning.TenantProvisioningRequestDTO;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRequestDTO;
@@ -26,22 +28,29 @@ public class TenantProvisioningRegistrationService {
     private final TenantDatabasesService tenantDatabasesService;
     private final ProvisioningLogsService provisioningLogsService;
     private final SystemUsersRepository systemUsersRepository;
+    private final TemplateRegistryService templateRegistryService;
+    private final TemplateMigrationProperties templateMigrationProperties;
 
     public TenantProvisioningRegistrationService(
             TenantsService tenantsService,
             TenantDatabasesService tenantDatabasesService,
             ProvisioningLogsService provisioningLogsService,
-            SystemUsersRepository systemUsersRepository
+            SystemUsersRepository systemUsersRepository,
+            TemplateRegistryService templateRegistryService,
+            TemplateMigrationProperties templateMigrationProperties
     ) {
         this.tenantsService = tenantsService;
         this.tenantDatabasesService = tenantDatabasesService;
         this.provisioningLogsService = provisioningLogsService;
         this.systemUsersRepository = systemUsersRepository;
+        this.templateRegistryService = templateRegistryService;
+        this.templateMigrationProperties = templateMigrationProperties;
     }
 
     @Transactional
     public RegistrationResult register(TenantProvisioningRequestDTO data) {
         List<String> etapasExecutadas = new ArrayList<>();
+        String templateVersion = templateRegistryService.getReadyRegistry().getCurrentVersion();
 
         SystemUsers executor = systemUsersRepository.findById(data.systemUserId())
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario executor nao encontrado"));
@@ -56,7 +65,7 @@ public class TenantProvisioningRegistrationService {
                 data.telefoneResponsavel(),
                 "PENDENTE",
                 data.plano(),
-                "V1",
+                templateVersion,
                 null
         ));
         etapasExecutadas.add("TENANT_CREATED");
@@ -77,7 +86,7 @@ public class TenantProvisioningRegistrationService {
         TenantDatabases tenantDatabase = tenantDatabasesService.criar(new TenantDatabasesRequestDTO(
                 tenant.getId(),
                 data.databaseName(),
-                "az_erp_template",
+                templateMigrationProperties.getDatabase(),
                 data.dbHost(),
                 data.dbPort(),
                 data.dbUsername(),

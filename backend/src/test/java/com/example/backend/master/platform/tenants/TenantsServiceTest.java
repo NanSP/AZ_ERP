@@ -6,7 +6,6 @@ import com.example.backend.master.platform.tenantDatabases.TenantDatabasesReposi
 import com.example.backend.shared.exception.ValidacaoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -14,7 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -26,13 +24,10 @@ class TenantsServiceTest {
 
     @Mock
     private TenantsRepository repository;
-
     @Mock
     private TenantDatabasesRepository tenantDatabasesRepository;
-
     @Mock
     private TenantAdminUsersRepository tenantAdminUsersRepository;
-
     @Mock
     private ProvisioningLogsRepository provisioningLogsRepository;
 
@@ -107,6 +102,18 @@ class TenantsServiceTest {
 
         assertEquals("Nao e permitido excluir tenant com infraestrutura ou historico associado", exception.getMessage());
         verify(repository, never()).delete(any(Tenants.class));
+    }
+
+    @Test
+    void deveAtualizarSchemaVersionPorFluxoInterno() {
+        Tenants entity = criarTenant();
+
+        when(repository.findById(1L)).thenReturn(Optional.of(entity));
+        when(repository.save(any(Tenants.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Tenants updated = service.atualizarSchemaVersionInterna(1L, "V36");
+
+        assertEquals("V36", updated.getSchemaVersion());
     }
 
     private Tenants criarTenant() {

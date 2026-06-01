@@ -32,6 +32,12 @@ class TemplateMigrationServiceTest {
 
     @Mock
     private TemplateMigrationProperties properties;
+    @Mock
+    private TemplateRegistryService templateRegistryService;
+    @Mock
+    private TemplateDatabaseAdminService templateDatabaseAdminService;
+    @Mock
+    private TenantSchemaUpgradeService tenantSchemaUpgradeService;
 
     @InjectMocks
     private TemplateMigrationService service;
@@ -47,11 +53,17 @@ class TemplateMigrationServiceTest {
         when(properties.getUsername()).thenReturn("postgres");
         when(properties.getPassword()).thenReturn("secret");
         when(properties.buildJdbcUrl()).thenReturn("jdbc:postgresql://localhost:5432/az_erp_template");
+        when(templateRegistryService.markReady("V14")).thenReturn(new TemplateRegistry());
         when(configuration.dataSource("jdbc:postgresql://localhost:5432/az_erp_template", "postgres", "secret"))
                 .thenReturn(configuration);
         when(configuration.locations("classpath:db/migration/template")).thenReturn(configuration);
         when(configuration.baselineOnMigrate(true)).thenReturn(configuration);
         when(configuration.load()).thenReturn(flyway);
+        MigrationInfoService infoService = mock(MigrationInfoService.class);
+        MigrationInfo migrationInfo = mock(MigrationInfo.class);
+        when(flyway.info()).thenReturn(infoService);
+        when(infoService.current()).thenReturn(migrationInfo);
+        when(migrationInfo.getVersion()).thenReturn(org.flywaydb.core.api.MigrationVersion.fromVersion("14"));
 
         try (MockedStatic<Flyway> flywayStatic = mockStatic(Flyway.class)) {
             flywayStatic.when(Flyway::configure).thenReturn(configuration);
@@ -60,6 +72,10 @@ class TemplateMigrationServiceTest {
         }
 
         verify(flyway).migrate();
+        verify(templateRegistryService).acquireLock("MIGRATING");
+        verify(templateRegistryService).markReady("V14");
+        verify(templateDatabaseAdminService).terminateConnections("az_erp_template");
+        verify(tenantSchemaUpgradeService).upgradeOutdatedTenants(99L, "V14");
         verify(provisioningLogsService, times(2)).criar(any(ProvisioningLogsRequestDTO.class));
     }
 
@@ -121,6 +137,7 @@ class TemplateMigrationServiceTest {
         }
 
         assertEquals("Erro ao migrar template: flyway down", exception.getMessage());
+        verify(templateRegistryService).markError("ERROR");
         verify(provisioningLogsService, times(2)).criar(any(ProvisioningLogsRequestDTO.class));
     }
 }

@@ -81,6 +81,16 @@ public class TenantsService {
         return repository.save(entity);
     }
 
+    @Transactional
+    public Tenants atualizarSchemaVersionInterna(Long id, String schemaVersion) {
+        Tenants entity = repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant nao encontrado"));
+
+        entity.setSchemaVersion(normalizarSchemaVersion(schemaVersion));
+        validarSchemaVersion(entity.getSchemaVersion());
+        return repository.save(entity);
+    }
+
     private void preencher(Tenants entity, TenantsRequestDTO data) {
         entity.setCodigo(normalizarObrigatorio(data.codigo(), "Codigo do tenant e obrigatorio"));
         entity.setNome(normalizarObrigatorio(data.nome(), "Nome do tenant e obrigatorio"));

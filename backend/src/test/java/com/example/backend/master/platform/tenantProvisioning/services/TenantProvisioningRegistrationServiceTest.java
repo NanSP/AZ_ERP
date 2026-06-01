@@ -7,6 +7,9 @@ import com.example.backend.master.platform.systemUsers.SystemUsersRepository;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRequestDTO;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesService;
+import com.example.backend.master.platform.templateMigration.TemplateMigrationProperties;
+import com.example.backend.master.platform.templateMigration.TemplateRegistry;
+import com.example.backend.master.platform.templateMigration.TemplateRegistryService;
 import com.example.backend.master.platform.tenantProvisioning.TenantProvisioningRequestDTO;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRequestDTO;
@@ -38,6 +41,10 @@ class TenantProvisioningRegistrationServiceTest {
     private ProvisioningLogsService provisioningLogsService;
     @Mock
     private SystemUsersRepository systemUsersRepository;
+    @Mock
+    private TemplateRegistryService templateRegistryService;
+    @Mock
+    private TemplateMigrationProperties templateMigrationProperties;
 
     @InjectMocks
     private TenantProvisioningRegistrationService service;
@@ -78,7 +85,12 @@ class TenantProvisioningRegistrationServiceTest {
         tenantDatabase.setDatabaseName("tenant_a_db");
         tenantDatabase.setProvisionStatus("PENDENTE");
 
+        TemplateRegistry templateRegistry = new TemplateRegistry();
+        templateRegistry.setCurrentVersion("V36");
+
         when(systemUsersRepository.findById(5L)).thenReturn(Optional.of(executor));
+        when(templateRegistryService.getReadyRegistry()).thenReturn(templateRegistry);
+        when(templateMigrationProperties.getDatabase()).thenReturn("az_erp_template");
         when(tenantsService.criar(any(TenantsRequestDTO.class))).thenReturn(tenant);
         when(tenantDatabasesService.criar(any(TenantDatabasesRequestDTO.class))).thenReturn(tenantDatabase);
 
@@ -92,7 +104,7 @@ class TenantProvisioningRegistrationServiceTest {
         ArgumentCaptor<TenantsRequestDTO> tenantRequestCaptor = ArgumentCaptor.forClass(TenantsRequestDTO.class);
         verify(tenantsService).criar(tenantRequestCaptor.capture());
         assertEquals("PENDENTE", tenantRequestCaptor.getValue().status());
-        assertEquals("V1", tenantRequestCaptor.getValue().schemaVersion());
+        assertEquals("V36", tenantRequestCaptor.getValue().schemaVersion());
 
         ArgumentCaptor<TenantDatabasesRequestDTO> databaseRequestCaptor = ArgumentCaptor.forClass(TenantDatabasesRequestDTO.class);
         verify(tenantDatabasesService).criar(databaseRequestCaptor.capture());
