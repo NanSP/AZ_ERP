@@ -26,6 +26,7 @@ public class TenantProvisioningOrchestratorService {
     private final TenantDatabasesService tenantDatabasesService;
     private final TenantsService tenantsService;
     private final TenantAdminUsersService tenantAdminUsersService;
+    private final TenantApplicationUserProvisioningService tenantApplicationUserProvisioningService;
     private final ProvisioningLogsService provisioningLogsService;
 
     public TenantProvisioningOrchestratorService(
@@ -34,6 +35,7 @@ public class TenantProvisioningOrchestratorService {
             TenantDatabasesService tenantDatabasesService,
             TenantsService tenantsService,
             TenantAdminUsersService tenantAdminUsersService,
+            TenantApplicationUserProvisioningService tenantApplicationUserProvisioningService,
             ProvisioningLogsService provisioningLogsService
     ) {
         this.registrationService = registrationService;
@@ -41,6 +43,7 @@ public class TenantProvisioningOrchestratorService {
         this.tenantDatabasesService = tenantDatabasesService;
         this.tenantsService = tenantsService;
         this.tenantAdminUsersService = tenantAdminUsersService;
+        this.tenantApplicationUserProvisioningService = tenantApplicationUserProvisioningService;
         this.provisioningLogsService = provisioningLogsService;
     }
 
@@ -72,6 +75,28 @@ public class TenantProvisioningOrchestratorService {
                             "tenantDatabaseId", tenantDatabase.getId(),
                             "databaseName", tenantDatabase.getDatabaseName(),
                             "status", tenantDatabase.getProvisionStatus()
+                    ),
+                    result.executor().getId()
+            ));
+
+            tenantApplicationUserProvisioningService.createInitialAdminUser(
+                    tenantDatabase,
+                    data.adminNome(),
+                    data.adminEmail(),
+                    data.adminLogin(),
+                    data.adminSenha()
+            );
+            etapasExecutadas.add("TENANT_APP_USER_CREATED");
+
+            provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
+                    tenant.getId(),
+                    "TENANT_APP_USER_CREATED",
+                    "SUCESSO",
+                    "Usuario inicial do tenant criado no banco provisionado",
+                    Map.of(
+                            "databaseName", tenantDatabase.getDatabaseName(),
+                            "adminEmail", data.adminEmail(),
+                            "adminLogin", data.adminLogin()
                     ),
                     result.executor().getId()
             ));
