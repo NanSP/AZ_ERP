@@ -76,7 +76,7 @@ jobs:
 
       - name: Smoke test tenant provisioning
         run: |
-          system_user_id="$(docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc "INSERT INTO platform.system_users (nome, email, login, senha_hash, role, status) VALUES ('CI Provisioning', 'ci.provisioning@azerp.com', 'ci.provisioning', '\$2a\$10\$012345678901234567890uC8wN9QnAyY1Q0xF7v6V8M9dWQjG1z6K', 'ADMIN_SISTEMA', 'ATIVO') RETURNING id;" | tr -d '[:space:]')"
+          system_user_id="$(docker exec az_erp_postgres psql -U az_erp -d az_erp -qAtX -v ON_ERROR_STOP=1 -c "INSERT INTO platform.system_users (nome, email, login, senha_hash, role, status) VALUES ('CI Provisioning', 'ci.provisioning@azerp.com', 'ci.provisioning', '\$2a\$10\$012345678901234567890uC8wN9QnAyY1Q0xF7v6V8M9dWQjG1z6K', 'ADMIN_SISTEMA', 'ATIVO') RETURNING id;" | head -n 1 | tr -d '[:space:]')"
           tenant_suffix="$(date +%Y%m%d%H%M%S)"
           tenant_code="TENANTCI${tenant_suffix}"
           database_name="tenant_ci_${tenant_suffix}"
