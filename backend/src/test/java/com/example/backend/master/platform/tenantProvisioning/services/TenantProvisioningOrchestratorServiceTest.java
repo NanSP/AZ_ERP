@@ -51,6 +51,9 @@ class TenantProvisioningOrchestratorServiceTest {
     private TenantAdminUsersService tenantAdminUsersService;
 
     @Mock
+    private TenantApplicationUserProvisioningService tenantApplicationUserProvisioningService;
+
+    @Mock
     private ProvisioningLogsService provisioningLogsService;
 
     @InjectMocks
@@ -77,14 +80,21 @@ class TenantProvisioningOrchestratorServiceTest {
         assertEquals(2L, response.tenantDatabaseId());
         assertEquals("ATIVO", response.provisionStatus());
         assertEquals(3L, response.tenantAdminUserId());
-        assertEquals(List.of("TENANT_CREATED", "DATABASE_REGISTERED", "DATABASE_CREATED", "TENANT_ADMIN_CREATED"),
+        assertEquals(List.of("TENANT_CREATED", "DATABASE_REGISTERED", "DATABASE_CREATED", "TENANT_APP_USER_CREATED", "TENANT_ADMIN_CREATED"),
                 response.etapasExecutadas());
 
         ArgumentCaptor<TenantAdminUsersRequestDTO> adminCaptor = ArgumentCaptor.forClass(TenantAdminUsersRequestDTO.class);
         verify(tenantAdminUsersService).criar(adminCaptor.capture());
         assertEquals("TENANT_ADMIN", adminCaptor.getValue().role());
 
-        verify(provisioningLogsService, times(2)).criar(any(ProvisioningLogsRequestDTO.class));
+        verify(tenantApplicationUserProvisioningService).createInitialAdminUser(
+                any(TenantDatabases.class),
+                eq("Admin Tenant"),
+                eq("admin@tenant.com"),
+                eq("tenant.admin"),
+                eq("senhaForte123")
+        );
+        verify(provisioningLogsService, times(3)).criar(any(ProvisioningLogsRequestDTO.class));
     }
 
     @Test
