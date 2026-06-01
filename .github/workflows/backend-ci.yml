@@ -61,10 +61,18 @@ jobs:
 
       - name: Verify template registry bootstrap
         run: |
-          docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc \
-            "select current_version || '|' || status from platform.template_registry where database_name = 'az_erp_template';" \
-            | tee template_registry.txt
-          grep -q "READY" template_registry.txt
+          for i in {1..24}; do
+            registry_status="$(docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc "select coalesce(current_version, '') || '|' || status from platform.template_registry where database_name = 'az_erp_template';" 2>/dev/null || true)"
+            if echo "$registry_status" | grep -q "READY"; then
+              echo "$registry_status" | tee template_registry.txt
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Template registry did not reach READY in time"
+          docker compose logs backend
+          docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc "select database_name, current_version, status, lock_active from platform.template_registry;" || true
+          exit 1
 
       - name: Print running containers
         if: always()
