@@ -74,6 +74,80 @@ jobs:
           docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc "select database_name, current_version, status, lock_active from platform.template_registry;" || true
           exit 1
 
+      - name: Smoke test tenant provisioning
+        run: |
+          system_user_id="$(docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc "INSERT INTO platform.system_users (nome, email, login, senha_hash, role, status) VALUES ('CI Provisioning', 'ci.provisioning@azerp.com', 'ci.provisioning', '$2a$10$012345678901234567890uC8wN9QnAyY1Q0xF7v6V8M9dWQjG1z6K', 'ADMIN_SISTEMA', 'ATIVO') RETURNING id;")"
+          tenant_suffix="$(date +%Y%m%d%H%M%S)"
+          tenant_code="TENANTCI${tenant_suffix}"
+          database_name="tenant_ci_${tenant_suffix}"
+          tenant_document="9${tenant_suffix}01"
+          admin_password="SenhaCITenant123"
+
+          base64url() {
+            openssl base64 -A | tr '+/' '-_' | tr -d '='
+          }
+
+          header='{"alg":"HS256","typ":"JWT"}'
+          issued_at="$(date +%s)"
+          expires_at="$((issued_at + 28800))"
+          payload="$(printf '{"iss":"az-erp-backend","sub":"ci.provisioning","userId":%s,"role":"ADMIN_SISTEMA","scope":"master","iat":%s,"exp":%s}' "$system_user_id" "$issued_at" "$expires_at")"
+          unsigned_token="$(printf '%s' "$header" | base64url).$(printf '%s' "$payload" | base64url)"
+          signature="$(printf '%s' "$unsigned_token" | openssl dgst -binary -sha256 -hmac "change-me-in-real-env" | base64url)"
+          token="${unsigned_token}.${signature}"
+
+          provision_payload="$(cat <<EOF
+          {
+            "systemUserId": ${system_user_id},
+            "codigo": "${tenant_code}",
+            "nome": "Tenant CI ${tenant_suffix}",
+            "nomeFantasia": "Tenant CI",
+            "documento": "${tenant_document}",
+            "tipoDocumento": "CNPJ",
+            "emailResponsavel": "owner.ci@azerp.com",
+            "telefoneResponsavel": "71999999999",
+            "plano": "PROFESSIONAL",
+            "databaseName": "${database_name}",
+            "dbHost": "postgres",
+            "dbPort": 5432,
+            "dbUsername": "az_erp",
+            "dbPassword": "az_erp",
+            "adminNome": "Admin CI",
+            "adminEmail": "admin.ci@tenant.com",
+            "adminLogin": "admin.ci",
+            "adminSenha": "${admin_password}"
+          }
+          EOF
+          )"
+
+          curl --fail-with-body -s \
+            -X POST "http://localhost:8080/api/platform/tenantProvisioning" \
+            -H "Authorization: Bearer ${token}" \
+            -H "Content-Type: application/json" \
+            -d "${provision_payload}" \
+            | tee tenant_provisioning_response.json
+
+          grep -q "\"tenantStatus\":\"ATIVO\"" tenant_provisioning_response.json
+          grep -q "\"provisionStatus\":\"ATIVO\"" tenant_provisioning_response.json
+          grep -q "\"TENANT_APP_USER_CREATED\"" tenant_provisioning_response.json
+
+          tenant_login_payload="$(cat <<EOF
+          {
+            "tenantCode": "${tenant_code}",
+            "login": "admin.ci",
+            "senha": "${admin_password}"
+          }
+          EOF
+          )"
+
+          curl --fail-with-body -s \
+            -X POST "http://localhost:8080/api/tenant/auth/login" \
+            -H "Content-Type: application/json" \
+            -d "${tenant_login_payload}" \
+            | tee tenant_login_response.json
+
+          grep -q "\"scope\":\"tenant\"" tenant_login_response.json
+          grep -q "\"login\":\"admin.ci\"" tenant_login_response.json
+
       - name: Print running containers
         if: always()
         run: docker compose ps
@@ -93,6 +167,8 @@ jobs:
             backend/backend-docker.log
             backend/postgres-docker.log
             backend/template_registry.txt
+            backend/tenant_provisioning_response.json
+            backend/tenant_login_response.json
 
       - name: Stop Docker stack
         if: always()
