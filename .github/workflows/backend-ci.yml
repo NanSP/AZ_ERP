@@ -80,7 +80,7 @@ jobs:
           tenant_suffix="$(date +%Y%m%d%H%M%S)"
           tenant_code="TENANTCI${tenant_suffix}"
           database_name="tenant_ci_${tenant_suffix}"
-          tenant_document="9${tenant_suffix}01"
+          tenant_document="$(date +%y%m%d%H%M%S)90"
           admin_password="SenhaCITenant123"
           token="$(SYSTEM_USER_ID="${system_user_id}" python - <<'PY'
           import base64
