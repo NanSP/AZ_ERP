@@ -4,6 +4,7 @@ import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsRequ
 import com.example.backend.master.platform.provisioningLogs.ProvisioningLogsService;
 import com.example.backend.shared.exception.ValidacaoException;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationInfo;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -13,76 +14,33 @@ public class TemplateMigrationService {
 
     private final TemplateMigrationProperties properties;
     private final ProvisioningLogsService provisioningLogsService;
+    private final TemplateRegistryService templateRegistryService;
+    private final TemplateDatabaseAdminService templateDatabaseAdminService;
+    private final TenantSchemaUpgradeService tenantSchemaUpgradeService;
 
     public TemplateMigrationService(
             TemplateMigrationProperties properties,
-            ProvisioningLogsService provisioningLogsService
+            ProvisioningLogsService provisioningLogsService,
+            TemplateRegistryService templateRegistryService,
+            TemplateDatabaseAdminService templateDatabaseAdminService,
+            TenantSchemaUpgradeService tenantSchemaUpgradeService
     ) {
         this.properties = properties;
         this.provisioningLogsService = provisioningLogsService;
+        this.templateRegistryService = templateRegistryService;
+        this.templateDatabaseAdminService = templateDatabaseAdminService;
+        this.tenantSchemaUpgradeService = tenantSchemaUpgradeService;
     }
 
     public void migrateTemplate(Long systemUserId) {
-        salvarLog(
-                systemUserId,
-                "TEMPLATE_MIGRATION_STARTED",
-                "INFO",
-                "Inicio da migracao do banco template",
-                Map.of(
-                        "database", properties.getDatabase(),
-                        "host", properties.getHost(),
-                        "port", properties.getPort(),
-                        "location", "classpath:db/migration/template"
-                )
-        );
-
-        try {
-            Flyway flyway = Flyway.configure()
-                    .dataSource(
-                            properties.buildJdbcUrl(),
-                            properties.getUsername(),
-                            properties.getPassword()
-                    )
-                    .locations("classpath:db/migration/template")
-                    .baselineOnMigrate(true)
-                    .load();
-
-            flyway.migrate();
-
-            salvarLog(
-                    systemUserId,
-                    "TEMPLATE_MIGRATION_FINISHED",
-                    "SUCESSO",
-                    "Migracao do banco template executada com sucesso",
-                    Map.of(
-                            "database", properties.getDatabase(),
-                            "host", properties.getHost(),
-                            "port", properties.getPort(),
-                            "location", "classpath:db/migration/template"
-                    )
-            );
-
-        } catch (Exception ex) {
-            salvarLog(
-                    systemUserId,
-                    "TEMPLATE_MIGRATION_FINISHED",
-                    "ERRO",
-                    "Erro ao executar migracao do banco template",
-                    Map.of(
-                            "database", properties.getDatabase(),
-                            "host", properties.getHost(),
-                            "port", properties.getPort(),
-                            "location", "classpath:db/migration/template",
-                            "erro", ex.getMessage()
-                    )
-            );
-
-            throw new ValidacaoException("Erro ao migrar template: " + ex.getMessage());
-        }
+        migrateTemplateInterno(systemUserId, true);
     }
 
     public void validateTemplate(Long systemUserId) {
         try {
+            templateRegistryService.acquireLock("VALIDATING");
+            templateDatabaseAdminService.terminateConnections(properties.getDatabase());
+
             Flyway flyway = Flyway.configure()
                     .dataSource(
                             properties.buildJdbcUrl(),
@@ -101,12 +59,15 @@ public class TemplateMigrationService {
                     "SUCESSO",
                     "Validacao do banco template executada com sucesso",
                     Map.of(
-                            "database", properties.getDatabase(),
-                            "location", "classpath:db/migration/template"
-                    )
+                    "database", properties.getDatabase(),
+                    "location", "classpath:db/migration/template"
+            )
             );
 
+            templateRegistryService.markValidated();
+
         } catch (Exception ex) {
+            templateRegistryService.markError("ERROR");
             salvarLog(
                     systemUserId,
                     "TEMPLATE_VALIDATION",
@@ -135,7 +96,7 @@ public class TemplateMigrationService {
                     .baselineOnMigrate(true)
                     .load();
 
-            var current = flyway.info().current();
+            MigrationInfo current = flyway.info().current();
             String info = current == null
                     ? "Template sem versao aplicada"
                     : "Versao atual do template: " + current.getVersion() + " - " + current.getDescription();
@@ -169,6 +130,85 @@ public class TemplateMigrationService {
         }
     }
 
+    void migrateTemplateInterno(Long systemUserId, boolean upgradeTenants) {
+        boolean registrarLog = systemUserId != null;
+        if (registrarLog) {
+            salvarLog(
+                    systemUserId,
+                    "TEMPLATE_MIGRATION_STARTED",
+                    "INFO",
+                    "Inicio da migracao do banco template",
+                    Map.of(
+                            "database", properties.getDatabase(),
+                            "host", properties.getHost(),
+                            "port", properties.getPort(),
+                            "location", "classpath:db/migration/template"
+                    )
+            );
+        }
+
+        try {
+            templateRegistryService.acquireLock("MIGRATING");
+            templateDatabaseAdminService.terminateConnections(properties.getDatabase());
+
+            Flyway flyway = Flyway.configure()
+                    .dataSource(
+                            properties.buildJdbcUrl(),
+                            properties.getUsername(),
+                            properties.getPassword()
+                    )
+                    .locations("classpath:db/migration/template")
+                    .baselineOnMigrate(true)
+                    .load();
+
+            flyway.migrate();
+
+            MigrationInfo current = flyway.info().current();
+            String currentVersion = current == null ? null : SchemaVersionUtils.fromFlywayVersion(current.getVersion().getVersion());
+            templateRegistryService.markReady(currentVersion);
+
+            if (registrarLog) {
+                salvarLog(
+                        systemUserId,
+                        "TEMPLATE_MIGRATION_FINISHED",
+                        "SUCESSO",
+                        "Migracao do banco template executada com sucesso",
+                        Map.of(
+                                "database", properties.getDatabase(),
+                                "host", properties.getHost(),
+                                "port", properties.getPort(),
+                                "location", "classpath:db/migration/template",
+                                "currentVersion", currentVersion
+                        )
+                );
+            }
+
+            if (upgradeTenants) {
+                tenantSchemaUpgradeService.upgradeOutdatedTenants(systemUserId, currentVersion);
+            }
+        } catch (Exception ex) {
+            templateRegistryService.markError("ERROR");
+
+            if (registrarLog) {
+                salvarLog(
+                        systemUserId,
+                        "TEMPLATE_MIGRATION_FINISHED",
+                        "ERRO",
+                        "Erro ao executar migracao do banco template",
+                        Map.of(
+                                "database", properties.getDatabase(),
+                                "host", properties.getHost(),
+                                "port", properties.getPort(),
+                                "location", "classpath:db/migration/template",
+                                "erro", ex.getMessage()
+                        )
+                );
+            }
+
+            throw new ValidacaoException("Erro ao migrar template: " + ex.getMessage());
+        }
+    }
+
     private void salvarLog(
             Long systemUserId,
             String etapa,
@@ -176,6 +216,10 @@ public class TemplateMigrationService {
             String mensagem,
             Map<String, Object> detalhes
     ) {
+        if (systemUserId == null) {
+            return;
+        }
+
         provisioningLogsService.criar(new ProvisioningLogsRequestDTO(
                 null,
                 etapa,

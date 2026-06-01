@@ -1,6 +1,10 @@
 package com.example.backend.master.platform.tenantProvisioning.services;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.backend.master.platform.templateMigration.TemplateDatabaseAdminService;
+import com.example.backend.master.platform.templateMigration.TemplateMigrationProperties;
+import com.example.backend.master.platform.templateMigration.TemplateRegistry;
+import com.example.backend.master.platform.templateMigration.TemplateRegistryService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -8,40 +12,56 @@ import org.springframework.stereotype.Service;
 public class TenantDatabaseProvisioningService {
 
     private final JdbcTemplate jdbcTemplate;
+    private final TemplateMigrationProperties properties;
+    private final TemplateRegistryService templateRegistryService;
+    private final TemplateDatabaseAdminService templateDatabaseAdminService;
 
-    @Value("${app.datasource.template.database}")
-    private String templateDatabase;
-
-    public TenantDatabaseProvisioningService(JdbcTemplate jdbcTemplate) {
+    public TenantDatabaseProvisioningService(
+            @Qualifier("masterJdbcTemplate") JdbcTemplate jdbcTemplate,
+            TemplateMigrationProperties properties,
+            TemplateRegistryService templateRegistryService,
+            TemplateDatabaseAdminService templateDatabaseAdminService
+    ) {
         this.jdbcTemplate = jdbcTemplate;
+        this.properties = properties;
+        this.templateRegistryService = templateRegistryService;
+        this.templateDatabaseAdminService = templateDatabaseAdminService;
     }
 
     public void createTenantDatabase(String databaseName) {
         validarNomeBanco(databaseName);
+        TemplateRegistry registry = templateRegistryService.getReadyRegistry();
+        templateRegistryService.acquireLock("CLONING");
+        templateDatabaseAdminService.setConnectionsAllowed(properties.getDatabase(), false);
+        templateDatabaseAdminService.terminateConnections(properties.getDatabase());
 
         String sql = String.format(
                 "CREATE DATABASE %s TEMPLATE %s",
                 databaseName,
-                templateDatabase
+                registry.getDatabaseName()
         );
 
         try {
             jdbcTemplate.execute(sql);
+            templateRegistryService.markCloneCompleted();
         } catch (Exception ex) {
+            templateRegistryService.releaseLockToReady();
             throw new TenantDatabaseProvisioningException(
                     "Erro ao criar banco do tenant: " + databaseName,
                     ex
             );
+        } finally {
+            templateDatabaseAdminService.setConnectionsAllowed(properties.getDatabase(), true);
         }
     }
 
     private void validarNomeBanco(String databaseName) {
         if (databaseName == null || databaseName.isBlank()) {
-            throw new IllegalArgumentException("Nome do banco é obrigatório");
+            throw new IllegalArgumentException("Nome do banco e obrigatorio");
         }
 
         if (!databaseName.matches("^[a-zA-Z0-9_]+$")) {
-            throw new IllegalArgumentException("Nome do banco contém caracteres inválidos");
+            throw new IllegalArgumentException("Nome do banco contem caracteres invalidos");
         }
     }
 }
