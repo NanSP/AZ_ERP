@@ -1,9 +1,7 @@
 package com.example.backend.bootstrap;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
-@Component
 @ConfigurationProperties(prefix = "app.bootstrap.dev")
 public class DevSeedProperties {
 
