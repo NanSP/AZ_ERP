@@ -10,6 +10,7 @@ public record TenantAuthResponseDTO(
         String login,
         String role,
         String scope,
+        boolean passwordChangeRequired,
         List<String> perfis,
         List<String> permissoes
 ) {

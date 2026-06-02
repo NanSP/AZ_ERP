@@ -3,6 +3,7 @@ package com.example.backend.master.auth;
 import com.example.backend.master.platform.systemUsers.SystemUsers;
 import com.example.backend.master.platform.systemUsers.SystemUsersRepository;
 import com.example.backend.security.JwtService;
+import com.example.backend.security.SecurityUserPrincipal;
 import com.example.backend.shared.exception.ValidacaoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,6 +53,7 @@ class MasterAuthServiceTest {
         assertEquals("admin.login", response.login());
         assertEquals("MASTER_ADMIN", response.role());
         assertEquals("master", response.contexto());
+        assertEquals(false, response.passwordChangeRequired());
 
         ArgumentCaptor<SystemUsers> userCaptor = ArgumentCaptor.forClass(SystemUsers.class);
         verify(systemUsersRepository).save(userCaptor.capture());
@@ -83,6 +85,52 @@ class MasterAuthServiceTest {
         assertEquals("Login ou senha invalidos", exception.getMessage());
     }
 
+    @Test
+    void deveSinalizarTrocaObrigatoriaDeSenhaNoLogin() {
+        AuthRequestDTO request = new AuthRequestDTO("admin.login", "segredo123");
+        SystemUsers user = criarUsuario("ATIVO");
+        user.setPasswordChangeRequired(true);
+
+        when(systemUsersRepository.findByLogin("admin.login")).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("segredo123", "senha-hash")).thenReturn(true);
+        when(jwtService.generateToken(10L, "admin.login", "MASTER_ADMIN", "master")).thenReturn("jwt-token");
+
+        AuthResponseDTO response = service.login(request);
+
+        assertEquals(true, response.passwordChangeRequired());
+    }
+
+    @Test
+    void deveAlterarSenhaDoUsuarioMaster() {
+        SystemUsers user = criarUsuario("ATIVO");
+        user.setPasswordChangeRequired(true);
+        SecurityUserPrincipal principal = new SecurityUserPrincipal(
+                10L,
+                "admin.login",
+                "MASTER_ADMIN",
+                "master",
+                null,
+                null,
+                java.util.List.of(),
+                java.util.List.of()
+        );
+
+        when(systemUsersRepository.findById(10L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("senha-atual", "senha-hash")).thenReturn(true);
+        when(passwordEncoder.matches("SenhaNova123", "senha-hash")).thenReturn(false);
+        when(passwordEncoder.encode("SenhaNova123")).thenReturn("nova-hash");
+
+        var response = service.changePassword(principal, new com.example.backend.auth.ChangePasswordRequestDTO(
+                "senha-atual",
+                "SenhaNova123"
+        ));
+
+        assertEquals("Senha alterada com sucesso", response.mensagem());
+        assertEquals("nova-hash", user.getSenha());
+        assertEquals(false, user.isPasswordChangeRequired());
+        assertNotNull(user.getPasswordChangedAt());
+    }
+
     private SystemUsers criarUsuario(String status) {
         SystemUsers user = new SystemUsers();
         user.setId(10L);
@@ -90,6 +138,7 @@ class MasterAuthServiceTest {
         user.setSenha("senha-hash");
         user.setRole("MASTER_ADMIN");
         user.setStatus(status);
+        user.setPasswordChangeRequired(false);
         user.setUltimoAcesso((LocalDateTime) null);
         return user;
     }

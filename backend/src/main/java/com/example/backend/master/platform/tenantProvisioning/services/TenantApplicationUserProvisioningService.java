@@ -92,8 +92,9 @@ public class TenantApplicationUserProvisioningService {
                     login,
                     senha_hash,
                     tipo_usuario,
-                    status
-                ) VALUES (?, ?, ?, ?, ?, ?)
+                    status,
+                    expiracao_senha
+                ) VALUES (?, ?, ?, ?, ?, ?, CURRENT_DATE)
                 RETURNING id
                 """
         )) {

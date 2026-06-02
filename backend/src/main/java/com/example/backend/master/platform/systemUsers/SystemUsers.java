@@ -34,6 +34,12 @@ public class SystemUsers {
     @Column(name = "ultimo_acesso")
     private LocalDateTime ultimoAcesso;
 
+    @Column(name = "password_change_required")
+    private boolean passwordChangeRequired;
+
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
