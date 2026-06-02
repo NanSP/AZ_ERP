@@ -73,6 +73,8 @@ public class SystemUsersService {
 
         if (criar || (data.senha() != null && !data.senha().isBlank())) {
             entity.setSenha(passwordEncoder.encode(data.senha()));
+            entity.setPasswordChangeRequired(true);
+            entity.setPasswordChangedAt(null);
         }
     }
 

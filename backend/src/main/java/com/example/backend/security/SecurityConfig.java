@@ -71,6 +71,8 @@ public class SecurityConfig {
     private void configurarRotasPublicas(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
         auth.requestMatchers("/auth/login").permitAll();
         auth.requestMatchers("/tenant/auth/login").permitAll();
+        auth.requestMatchers("/auth/change-password").hasAnyAuthority("SCOPE_MASTER");
+        auth.requestMatchers("/tenant/auth/change-password").hasAnyAuthority("SCOPE_TENANT");
         auth.requestMatchers("/error").permitAll();
     }
 
