@@ -37,7 +37,7 @@ class AuthControllerIntegrationTest {
     @Test
     void deveResponderOkNoLoginMaster() throws Exception {
         AuthRequestDTO request = new AuthRequestDTO("admin", "Senha123");
-        AuthResponseDTO response = new AuthResponseDTO("TOKEN", 1L, "admin", "MASTER_ADMIN", "master");
+        AuthResponseDTO response = new AuthResponseDTO("TOKEN", 1L, "admin", "MASTER_ADMIN", "master", true);
 
         when(service.login(request)).thenReturn(response);
 
@@ -48,7 +48,8 @@ class AuthControllerIntegrationTest {
                 .andExpect(jsonPath("$.token").value("TOKEN"))
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.login").value("admin"))
-                .andExpect(jsonPath("$.contexto").value("master"));
+                .andExpect(jsonPath("$.contexto").value("master"))
+                .andExpect(jsonPath("$.passwordChangeRequired").value(true));
     }
 
     @Test
