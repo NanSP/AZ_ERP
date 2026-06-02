@@ -1,6 +1,9 @@
 package com.example.backend.tenant.auth;
 
+import com.example.backend.auth.ChangePasswordRequestDTO;
 import com.example.backend.security.JwtService;
+import com.example.backend.security.SecurityUserPrincipal;
+import com.example.backend.shared.exception.ValidacaoException;
 import com.example.backend.tenant.context.TenantConnectionInfo;
 import com.example.backend.tenant.context.TenantConnectionService;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,11 +49,17 @@ class TenantAuthServiceTest {
     @Mock
     private PreparedStatement permissoesStatement;
     @Mock
+    private PreparedStatement updateUltimoAcessoStatement;
+    @Mock
+    private PreparedStatement updatePasswordStatement;
+    @Mock
     private ResultSet userResultSet;
     @Mock
     private ResultSet perfisResultSet;
     @Mock
     private ResultSet permissoesResultSet;
+    @Mock
+    private ResultSet passwordResultSet;
 
     @Test
     void deveAutenticarUsuarioDoTenantComPerfisEPermissoes() throws Exception {
@@ -65,7 +76,12 @@ class TenantAuthServiceTest {
         );
 
         when(tenantConnectionService.resolve("TENANT_A")).thenReturn(connectionInfo);
-        when(connection.prepareStatement(anyString())).thenReturn(userStatement, perfisStatement, permissoesStatement);
+        when(connection.prepareStatement(anyString())).thenReturn(
+                userStatement,
+                perfisStatement,
+                permissoesStatement,
+                updateUltimoAcessoStatement
+        );
         when(userStatement.executeQuery()).thenReturn(userResultSet);
         when(perfisStatement.executeQuery()).thenReturn(perfisResultSet);
         when(permissoesStatement.executeQuery()).thenReturn(permissoesResultSet);
@@ -76,6 +92,7 @@ class TenantAuthServiceTest {
         when(userResultSet.getString("senha_hash")).thenReturn("HASH");
         when(userResultSet.getString("tipo_usuario")).thenReturn("ADMIN");
         when(userResultSet.getString("status")).thenReturn("ativo");
+        when(userResultSet.getDate("expiracao_senha")).thenReturn(null);
 
         when(passwordEncoder.matches("Senha123", "HASH")).thenReturn(true);
 
@@ -113,6 +130,7 @@ class TenantAuthServiceTest {
             assertEquals("joao", response.login());
             assertEquals("ADMIN", response.role());
             assertEquals("tenant", response.scope());
+            assertEquals(false, response.passwordChangeRequired());
             assertEquals(List.of("ADMIN", "GESTOR"), response.perfis());
             assertEquals(List.of("sys:usuarios:read", "fi:contas_pagar:update"), response.permissoes());
         }
@@ -120,6 +138,7 @@ class TenantAuthServiceTest {
         verify(userStatement).setString(1, "joao");
         verify(perfisStatement).setLong(1, 10L);
         verify(permissoesStatement).setLong(1, 10L);
+        verify(updateUltimoAcessoStatement).setLong(1, 10L);
     }
 
     @Test
@@ -138,6 +157,7 @@ class TenantAuthServiceTest {
         when(userResultSet.getString("senha_hash")).thenReturn("HASH");
         when(userResultSet.getString("tipo_usuario")).thenReturn("ADMIN");
         when(userResultSet.getString("status")).thenReturn("inativo");
+        when(userResultSet.getDate("expiracao_senha")).thenReturn(null);
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
@@ -146,7 +166,7 @@ class TenantAuthServiceTest {
                     "tenant_pass"
             )).thenReturn(connection);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> service.login(request));
+            ValidacaoException exception = assertThrows(ValidacaoException.class, () -> service.login(request));
 
             assertEquals("Usuario inativo", exception.getMessage());
         }
@@ -170,6 +190,7 @@ class TenantAuthServiceTest {
         when(userResultSet.getString("senha_hash")).thenReturn("HASH");
         when(userResultSet.getString("tipo_usuario")).thenReturn("ADMIN");
         when(userResultSet.getString("status")).thenReturn("ativo");
+        when(userResultSet.getDate("expiracao_senha")).thenReturn(null);
         when(passwordEncoder.matches("Senha123", "HASH")).thenReturn(false);
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
@@ -179,7 +200,7 @@ class TenantAuthServiceTest {
                     "tenant_pass"
             )).thenReturn(connection);
 
-            RuntimeException exception = assertThrows(RuntimeException.class, () -> service.login(request));
+            ValidacaoException exception = assertThrows(ValidacaoException.class, () -> service.login(request));
 
             assertEquals("Login ou senha invalidos", exception.getMessage());
         }
@@ -193,5 +214,99 @@ class TenantAuthServiceTest {
                 eq(List.of()),
                 eq(List.of())
         );
+    }
+
+    @Test
+    void deveSinalizarTrocaObrigatoriaDeSenhaDoTenant() throws Exception {
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, passwordEncoder, jwtService);
+        TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
+
+        when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
+                1L, "TENANT_A", "tenant_a_db", "localhost", 5432, "tenant_user", "tenant_pass"
+        ));
+        when(connection.prepareStatement(anyString())).thenReturn(
+                userStatement,
+                perfisStatement,
+                permissoesStatement,
+                updateUltimoAcessoStatement
+        );
+        when(userStatement.executeQuery()).thenReturn(userResultSet);
+        when(perfisStatement.executeQuery()).thenReturn(perfisResultSet);
+        when(permissoesStatement.executeQuery()).thenReturn(permissoesResultSet);
+        when(userResultSet.next()).thenReturn(true, false);
+        when(userResultSet.getLong("id")).thenReturn(10L);
+        when(userResultSet.getString("login")).thenReturn("joao");
+        when(userResultSet.getString("senha_hash")).thenReturn("HASH");
+        when(userResultSet.getString("tipo_usuario")).thenReturn("ADMIN");
+        when(userResultSet.getString("status")).thenReturn("ativo");
+        when(userResultSet.getDate("expiracao_senha")).thenReturn(Date.valueOf(LocalDate.now()));
+        when(passwordEncoder.matches("Senha123", "HASH")).thenReturn(true);
+        when(perfisResultSet.next()).thenReturn(false);
+        when(permissoesResultSet.next()).thenReturn(false);
+        when(jwtService.generateTenantToken(
+                1L,
+                "TENANT_A",
+                10L,
+                "joao",
+                "ADMIN",
+                List.of(),
+                List.of()
+        )).thenReturn("TOKEN_TENANT");
+
+        try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
+            driverManager.when(() -> DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "tenant_user",
+                    "tenant_pass"
+            )).thenReturn(connection);
+
+            TenantAuthResponseDTO response = service.login(request);
+            assertEquals(true, response.passwordChangeRequired());
+        }
+    }
+
+    @Test
+    void deveAlterarSenhaDoUsuarioDoTenant() throws Exception {
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, passwordEncoder, jwtService);
+        SecurityUserPrincipal principal = new SecurityUserPrincipal(
+                10L,
+                "joao",
+                "ADMIN",
+                "tenant",
+                1L,
+                "TENANT_A",
+                List.of(),
+                List.of()
+        );
+
+        when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
+                1L, "TENANT_A", "tenant_a_db", "localhost", 5432, "tenant_user", "tenant_pass"
+        ));
+        when(connection.prepareStatement(anyString())).thenReturn(userStatement, updatePasswordStatement);
+        when(userStatement.executeQuery()).thenReturn(passwordResultSet);
+        when(passwordResultSet.next()).thenReturn(true);
+        when(passwordResultSet.getString("senha_hash")).thenReturn("HASH");
+        when(passwordEncoder.matches("SenhaAtual123", "HASH")).thenReturn(true);
+        when(passwordEncoder.matches("SenhaNova123", "HASH")).thenReturn(false);
+        when(passwordEncoder.encode("SenhaNova123")).thenReturn("HASH_NOVO");
+
+        try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
+            driverManager.when(() -> DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "tenant_user",
+                    "tenant_pass"
+            )).thenReturn(connection);
+
+            var response = service.changePassword(principal, new ChangePasswordRequestDTO(
+                    "SenhaAtual123",
+                    "SenhaNova123"
+            ));
+
+            assertEquals("Senha alterada com sucesso", response.mensagem());
+        }
+
+        verify(updatePasswordStatement).setString(1, "HASH_NOVO");
+        verify(updatePasswordStatement).setLong(2, 10L);
+        verify(updatePasswordStatement).executeUpdate();
     }
 }
