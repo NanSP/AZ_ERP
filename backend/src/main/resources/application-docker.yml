@@ -35,3 +35,12 @@ app:
       secret: ${JWT_SECRET}
       issuer: ${JWT_ISSUER:az-erp-backend}
       expiration-hours: ${JWT_EXPIRATION_HOURS:8}
+
+  bootstrap:
+    master:
+      enabled: ${BOOTSTRAP_MASTER_ENABLED:false}
+      nome: ${BOOTSTRAP_MASTER_NAME:Administrador Master}
+      email: ${BOOTSTRAP_MASTER_EMAIL:}
+      login: ${BOOTSTRAP_MASTER_LOGIN:}
+      password: ${BOOTSTRAP_MASTER_PASSWORD:}
+      force-password-change: ${BOOTSTRAP_MASTER_FORCE_PASSWORD_CHANGE:true}
