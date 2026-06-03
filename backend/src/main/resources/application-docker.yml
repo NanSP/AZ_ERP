@@ -67,3 +67,17 @@ logging:
     org.springframework.security: WARN
     org.hibernate.SQL: WARN
     com.example.backend: INFO
+
+spring:
+  flyway:
+    locations: classpath:db/migration/master
+    enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+  mvc:
+    servlet:
+      path: /api
