@@ -20,6 +20,7 @@ public class TemplateRegistryHealthIndicator implements HealthIndicator {
         return repository.findByDatabaseName(TEMPLATE_DATABASE)
                 .map(this::avaliarRegistry)
                 .orElseGet(() -> Health.outOfService()
+                        .withDetail("component", "templateRegistry")
                         .withDetail("database", TEMPLATE_DATABASE)
                         .withDetail("reason", "template registry not found")
                         .build());
@@ -30,7 +31,10 @@ public class TemplateRegistryHealthIndicator implements HealthIndicator {
                 .withDetail("database", registry.getDatabaseName())
                 .withDetail("status", registry.getStatus())
                 .withDetail("version", registry.getCurrentVersion())
-                .withDetail("lockActive", registry.isLockActive());
+                .withDetail("lockActive", registry.isLockActive())
+                .withDetail("lastMigratedAt", registry.getLastMigratedAt())
+                .withDetail("lastValidatedAt", registry.getLastValidatedAt())
+                .withDetail("lastClonedAt", registry.getLastClonedAt());
 
         if (registry.isLockActive()) {
             return builder
@@ -51,10 +55,14 @@ public class TemplateRegistryHealthIndicator implements HealthIndicator {
         }
 
         return Health.up()
+                .withDetail("component", "templateRegistry")
                 .withDetail("database", registry.getDatabaseName())
                 .withDetail("status", registry.getStatus())
                 .withDetail("version", registry.getCurrentVersion())
                 .withDetail("lockActive", registry.isLockActive())
+                .withDetail("lastMigratedAt", registry.getLastMigratedAt())
+                .withDetail("lastValidatedAt", registry.getLastValidatedAt())
+                .withDetail("lastClonedAt", registry.getLastClonedAt())
                 .build();
     }
 
