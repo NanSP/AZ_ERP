@@ -45,25 +45,25 @@ app:
       password: ${BOOTSTRAP_MASTER_PASSWORD:}
       force-password-change: ${BOOTSTRAP_MASTER_FORCE_PASSWORD_CHANGE:true}
 
-  management:
-    endpoints:
-      web:
-        exposure:
-          include: health,info
-    endpoint:
-      health:
-        probes:
-          enabled: true
-        show-details: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
     health:
-      livenessstate:
+      probes:
         enabled: true
-      readinessstate:
-        enabled: true
+      show-details: never
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
 
-  logging:
-    level:
-      root: INFO
-      org.springframework.security: WARN
-      org.hibernate.SQL: WARN
-      com.example.backend: INFO
+logging:
+  level:
+    root: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    com.example.backend: INFO
