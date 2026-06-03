@@ -57,7 +57,7 @@ jobs:
       - name: Wait for liveness
         run: |
           for i in {1..24}; do
-            status="$(curl -fsS http://localhost:8080/actuator/health/liveness | jq -r '.status' 2>/dev/null || true)"
+            status="$(curl -fsS http://localhost:8080/api/actuator/health/liveness | jq -r '.status' 2>/dev/null || true)"
             if [ "${status}" = "UP" ]; then
               exit 0
             fi
@@ -70,7 +70,7 @@ jobs:
       - name: Wait for readiness
         run: |
           for i in {1..24}; do
-            curl -fsS http://localhost:8080/actuator/health/readiness -o readiness.json || true
+            curl -fsS http://localhost:8080/api/actuator/health/readiness -o readiness.json || true
             status="$(jq -r '.status // empty' readiness.json 2>/dev/null || true)"
             if [ "${status}" = "UP" ]; then
               cp readiness.json template_registry_health.json
