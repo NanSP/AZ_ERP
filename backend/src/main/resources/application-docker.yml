@@ -44,3 +44,19 @@ app:
       login: ${BOOTSTRAP_MASTER_LOGIN:}
       password: ${BOOTSTRAP_MASTER_PASSWORD:}
       force-password-change: ${BOOTSTRAP_MASTER_FORCE_PASSWORD_CHANGE:true}
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info
+    endpoint:
+      health:
+        probes:
+          enabled: true
+        show-details: never
+    health:
+      livenessstate:
+        enabled: true
+      readinessstate:
+        enabled: true
