@@ -74,6 +74,9 @@ public class SecurityConfig {
         auth.requestMatchers("/auth/change-password").hasAnyAuthority("SCOPE_MASTER");
         auth.requestMatchers("/tenant/auth/change-password").hasAnyAuthority("SCOPE_TENANT");
         auth.requestMatchers("/error").permitAll();
+        auth.requestMatchers("/actuator/health").permitAll();
+        auth.requestMatchers("/actuator/health/**").permitAll();
+        auth.requestMatchers("/actuator/info").permitAll();
     }
 
     private void configurarPlatform(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
