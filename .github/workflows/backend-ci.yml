@@ -54,31 +54,33 @@ jobs:
           fi
           docker compose up --build -d
 
-      - name: Wait for backend startup
+      - name: Wait for liveness
         run: |
           for i in {1..24}; do
-            if docker compose logs backend | grep -q "Started BackendApplication"; then
+            status="$(curl -fsS http://localhost:8080/actuator/health/liveness | jq -r '.status' 2>/dev/null || true)"
+            if [ "${status}" = "UP" ]; then
               exit 0
             fi
             sleep 5
           done
-          echo "Backend did not finish startup in time"
+          echo "Liveness did not reach UP in time"
           docker compose logs backend
           exit 1
 
-      - name: Verify template registry bootstrap
+      - name: Wait for readiness
         run: |
           for i in {1..24}; do
-            registry_status="$(docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc "select coalesce(current_version, '') || '|' || status from platform.template_registry where database_name = 'az_erp_template';" 2>/dev/null || true)"
-            if echo "$registry_status" | grep -q "READY"; then
-              echo "$registry_status" | tee template_registry.txt
+            curl -fsS http://localhost:8080/actuator/health/readiness -o readiness.json || true
+            status="$(jq -r '.status // empty' readiness.json 2>/dev/null || true)"
+            if [ "${status}" = "UP" ]; then
+              cp readiness.json template_registry_health.json
               exit 0
             fi
             sleep 5
           done
-          echo "Template registry did not reach READY in time"
+          echo "Readiness did not reach UP in time"
+          cat readiness.json || true
           docker compose logs backend
-          docker exec az_erp_postgres psql -U az_erp -d az_erp -Atc "select database_name, current_version, status, lock_active from platform.template_registry;" || true
           exit 1
 
       - name: Smoke test tenant provisioning
@@ -275,7 +277,8 @@ jobs:
           path: |
             backend/backend-docker.log
             backend/postgres-docker.log
-            backend/template_registry.txt
+            backend/readiness.json
+            backend/template_registry_health.json
             backend/tenant_provisioning_response.json
             backend/tenant_login_summary.json
             backend/tenant_change_password_response.json

@@ -60,3 +60,10 @@ app:
         enabled: true
       readinessstate:
         enabled: true
+
+  logging:
+    level:
+      root: INFO
+      org.springframework.security: WARN
+      org.hibernate.SQL: WARN
+      com.example.backend: INFO
