@@ -7,6 +7,7 @@ import com.example.backend.security.SecurityUserPrincipal;
 import com.example.backend.shared.exception.ValidacaoException;
 import com.example.backend.tenant.context.TenantConnectionInfo;
 import com.example.backend.tenant.context.TenantConnectionService;
+import com.example.backend.tenant.context.TenantDataSourceRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,15 +22,18 @@ import java.time.LocalDate;
 public class TenantAuthService {
 
     private final TenantConnectionService tenantConnectionService;
+    private final TenantDataSourceRegistry tenantDataSourceRegistry;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public TenantAuthService(
             TenantConnectionService tenantConnectionService,
+            TenantDataSourceRegistry tenantDataSourceRegistry,
             PasswordEncoder passwordEncoder,
             JwtService jwtService
     ) {
         this.tenantConnectionService = tenantConnectionService;
+        this.tenantDataSourceRegistry = tenantDataSourceRegistry;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -132,8 +136,6 @@ public class TenantAuthService {
     public PasswordChangeResponseDTO changePassword(SecurityUserPrincipal principal, ChangePasswordRequestDTO data) {
         validarTrocaSenha(data);
 
-        TenantConnectionInfo connectionInfo = tenantConnectionService.resolve(principal.getTenantCode());
-
         String selectSql = """
                 SELECT senha_hash
                 FROM sys.usuarios
@@ -146,11 +148,7 @@ public class TenantAuthService {
                 """;
 
         try (
-                Connection connection = DriverManager.getConnection(
-                        connectionInfo.jdbcUrl(),
-                        connectionInfo.username(),
-                        connectionInfo.password()
-                );
+                Connection connection = tenantDataSourceRegistry.getOrCreate(principal.getTenantCode()).getConnection();
                 PreparedStatement selectStatement = connection.prepareStatement(selectSql);
                 PreparedStatement updateStatement = connection.prepareStatement(updateSql)
         ) {

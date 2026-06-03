@@ -6,6 +6,7 @@ import com.example.backend.security.SecurityUserPrincipal;
 import com.example.backend.shared.exception.ValidacaoException;
 import com.example.backend.tenant.context.TenantConnectionInfo;
 import com.example.backend.tenant.context.TenantConnectionService;
+import com.example.backend.tenant.context.TenantDataSourceRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -13,6 +14,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -37,6 +39,8 @@ class TenantAuthServiceTest {
     @Mock
     private TenantConnectionService tenantConnectionService;
     @Mock
+    private TenantDataSourceRegistry tenantDataSourceRegistry;
+    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private JwtService jwtService;
@@ -53,6 +57,8 @@ class TenantAuthServiceTest {
     @Mock
     private PreparedStatement updatePasswordStatement;
     @Mock
+    private DataSource tenantDataSource;
+    @Mock
     private ResultSet userResultSet;
     @Mock
     private ResultSet perfisResultSet;
@@ -63,7 +69,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveAutenticarUsuarioDoTenantComPerfisEPermissoes() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
         TenantConnectionInfo connectionInfo = new TenantConnectionInfo(
                 1L,
@@ -143,7 +149,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveBloquearUsuarioInativoDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
 
         when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
@@ -176,7 +182,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveBloquearSenhaInvalidaDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
 
         when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
@@ -218,7 +224,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveSinalizarTrocaObrigatoriaDeSenhaDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
 
         when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
@@ -267,7 +273,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveAlterarSenhaDoUsuarioDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
         SecurityUserPrincipal principal = new SecurityUserPrincipal(
                 10L,
                 "joao",
@@ -279,9 +285,8 @@ class TenantAuthServiceTest {
                 List.of()
         );
 
-        when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
-                1L, "TENANT_A", "tenant_a_db", "localhost", 5432, "tenant_user", "tenant_pass"
-        ));
+        when(tenantDataSourceRegistry.getOrCreate("TENANT_A")).thenReturn(tenantDataSource);
+        when(tenantDataSource.getConnection()).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(userStatement, updatePasswordStatement);
         when(userStatement.executeQuery()).thenReturn(passwordResultSet);
         when(passwordResultSet.next()).thenReturn(true);
