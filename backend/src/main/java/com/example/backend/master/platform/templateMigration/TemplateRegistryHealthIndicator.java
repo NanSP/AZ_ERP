@@ -27,14 +27,8 @@ public class TemplateRegistryHealthIndicator implements HealthIndicator {
     }
 
     private Health avaliarRegistry(TemplateRegistry registry) {
-        Health.Builder builder = statusBase(registry)
-                .withDetail("database", registry.getDatabaseName())
-                .withDetail("status", registry.getStatus())
-                .withDetail("version", registry.getCurrentVersion())
-                .withDetail("lockActive", registry.isLockActive())
-                .withDetail("lastMigratedAt", registry.getLastMigratedAt())
-                .withDetail("lastValidatedAt", registry.getLastValidatedAt())
-                .withDetail("lastClonedAt", registry.getLastClonedAt());
+        Health.Builder builder = statusBase(registry);
+        addCommonDetails(builder, registry);
 
         if (registry.isLockActive()) {
             return builder
@@ -54,25 +48,35 @@ public class TemplateRegistryHealthIndicator implements HealthIndicator {
                     .build();
         }
 
-        return Health.up()
-                .withDetail("component", "templateRegistry")
-                .withDetail("database", registry.getDatabaseName())
-                .withDetail("status", registry.getStatus())
-                .withDetail("version", registry.getCurrentVersion())
-                .withDetail("lockActive", registry.isLockActive())
-                .withDetail("lastMigratedAt", registry.getLastMigratedAt())
-                .withDetail("lastValidatedAt", registry.getLastValidatedAt())
-                .withDetail("lastClonedAt", registry.getLastClonedAt())
-                .build();
+        Health.Builder up = Health.up();
+        addCommonDetails(up, registry);
+        return up.build();
+    }
+
+    private void addCommonDetails(Health.Builder builder, TemplateRegistry registry) {
+        builder.withDetail("component", "templateRegistry");
+        builder.withDetail("database", safe(registry.getDatabaseName()));
+        builder.withDetail("status", safe(registry.getStatus()));
+        builder.withDetail("version", safe(registry.getCurrentVersion()));
+        builder.withDetail("lockActive", registry.isLockActive());
+        builder.withDetail("lastMigratedAt", safe(registry.getLastMigratedAt()));
+        builder.withDetail("lastValidatedAt", safe(registry.getLastValidatedAt()));
+        builder.withDetail("lastClonedAt", safe(registry.getLastClonedAt()));
     }
 
     private Health.Builder statusBase(TemplateRegistry registry) {
-        String status = registry.getStatus();
-
-        if ("ERROR".equalsIgnoreCase(status)) {
+        if ("ERROR".equalsIgnoreCase(registry.getStatus())) {
             return Health.down();
         }
 
         return Health.outOfService();
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private Object safe(Object value) {
+        return value != null ? value : "N/A";
     }
 }
