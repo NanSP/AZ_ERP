@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TemplateRegistryHealthIndicator implements HealthIndicator {
 
+    private static final String TEMPLATE_DATABASE = "az_erp_template";
+
     private final TemplateRegistryRepository repository;
 
     public TemplateRegistryHealthIndicator(TemplateRegistryRepository repository) {
@@ -15,15 +17,11 @@ public class TemplateRegistryHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        return repository.findByDatabaseName("az_erp_template")
-                .filter(registry -> "READY".equals(registry.getStatus()))
-                .map(registry -> Health.up()
-                        .withDetail("database", registry.getDatabaseName())
-                        .withDetail("version", registry.getCurrentVersion())
-                        .build())
+        return repository.findByDatabaseName(TEMPLATE_DATABASE)
+                .map(this::avaliarRegistry)
                 .orElseGet(() -> Health.outOfService()
-                        .withDetail("database", "az_erp_template")
-                        .withDetail("reason", "template not ready")
+                        .withDetail("database", TEMPLATE_DATABASE)
+                        .withDetail("reason", "template registry not found")
                         .build());
     }
 
