@@ -89,6 +89,7 @@ jobs:
           database_name="tenant_ci_${tenant_suffix}"
           tenant_document="$(date +%y%m%d%H%M%S)90"
           admin_password="SenhaCITenant123"
+          admin_new_password="SenhaCITenantNova123"
           token="$(SYSTEM_USER_ID="${system_user_id}" python - <<'PY'
           import base64
           import hashlib
@@ -178,6 +179,7 @@ jobs:
 
           grep -q "\"scope\":\"tenant\"" tenant_login_response.json
           grep -q "\"login\":\"admin.ci\"" tenant_login_response.json
+          grep -q "\"passwordChangeRequired\":true" tenant_login_response.json
           python - <<'PY'
           import json
           from pathlib import Path
@@ -195,8 +197,65 @@ jobs:
               json.dumps(summary, ensure_ascii=False),
               encoding="utf-8",
           )
+          Path("tenant_login_token.txt").write_text(payload["token"], encoding="utf-8")
           PY
-          rm tenant_login_response.json
+
+          tenant_change_payload="$(cat <<EOF
+          {
+            "senhaAtual": "${admin_password}",
+            "novaSenha": "${admin_new_password}"
+          }
+          EOF
+          )"
+
+          tenant_token="$(cat tenant_login_token.txt)"
+          curl --fail-with-body -s \
+            -X POST "http://localhost:8080/api/tenant/auth/change-password" \
+            -H "Authorization: Bearer ${tenant_token}" \
+            -H "Content-Type: application/json" \
+            -d "${tenant_change_payload}" \
+            -o tenant_change_password_response.json
+
+          grep -q "Senha alterada com sucesso" tenant_change_password_response.json
+
+          tenant_second_login_payload="$(cat <<EOF
+          {
+            "tenantCode": "${tenant_code}",
+            "login": "admin.ci",
+            "senha": "${admin_new_password}"
+          }
+          EOF
+          )"
+
+          curl --fail-with-body -s \
+            -X POST "http://localhost:8080/api/tenant/auth/login" \
+            -H "Content-Type: application/json" \
+            -d "${tenant_second_login_payload}" \
+            -o tenant_second_login_response.json
+
+          grep -q "\"scope\":\"tenant\"" tenant_second_login_response.json
+          grep -q "\"login\":\"admin.ci\"" tenant_second_login_response.json
+          grep -q "\"passwordChangeRequired\":false" tenant_second_login_response.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          payload = json.loads(Path("tenant_second_login_response.json").read_text(encoding="utf-8"))
+          summary = {
+              "tenantId": payload.get("tenantId"),
+              "tenantCode": payload.get("tenantCode"),
+              "userId": payload.get("userId"),
+              "login": payload.get("login"),
+              "scope": payload.get("scope"),
+              "passwordChangeRequired": payload.get("passwordChangeRequired"),
+          }
+          Path("tenant_second_login_summary.json").write_text(
+              json.dumps(summary, ensure_ascii=False),
+              encoding="utf-8",
+          )
+          PY
+
+          rm tenant_login_response.json tenant_login_token.txt tenant_second_login_response.json
 
       - name: Print running containers
         if: always()
@@ -219,6 +278,8 @@ jobs:
             backend/template_registry.txt
             backend/tenant_provisioning_response.json
             backend/tenant_login_summary.json
+            backend/tenant_change_password_response.json
+            backend/tenant_second_login_summary.json
 
       - name: Stop Docker stack
         if: always()
