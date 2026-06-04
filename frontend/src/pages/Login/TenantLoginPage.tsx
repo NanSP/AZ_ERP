@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/useAuth";
-import AuthLayout from "../layouts/AuthLayout";
+import { useAuth } from "../../auth/useAuth";
+import AuthLayout from "../../layouts/AuthLayout";
 
 export default function TenantLoginPage() {
   const navigate = useNavigate();
