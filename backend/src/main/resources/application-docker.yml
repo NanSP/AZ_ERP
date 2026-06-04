@@ -61,10 +61,18 @@ management:
       enabled: true
     readinessstate:
       enabled: true
+  info:
+    env:
+      enabled: true
 
 logging:
   level:
     root: INFO
     org.springframework.security: WARN
     org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN
+    org.springframework.web: INFO
+    org.springframework.web.servlet.PageNotFound: WARN
+    org.flywaydb: INFO
+    com.zaxxer.hikari: INFO
     com.example.backend: INFO
