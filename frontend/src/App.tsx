@@ -1,57 +1,30 @@
-import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
-import "./App.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./auth/AuthContext";
+import ProtectedRoute from "./auth/ProtectedRoute";
+import PasswordChangeGuard from "./auth/PasswordChangeGuard";
 import Home from "./pages/Home";
 import ModulePage from "./pages/ModulePage";
+import MasterLoginPage from "./pages/MasterLoginPage";
+import TenantLoginPage from "./pages/TenantLoginPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
-function App() {
+export default function App() {
   return (
-    <BrowserRouter basename="/">
-      <div>
-        <header
-          className="app-header"
-          style={{
-            padding: "16px",
-            background: "linear-gradient(135deg, #87a2d8 0%, #8e9fc2 100%)",
-          }}
-        >
-          <h1>AZ ERP</h1>
-          <nav>
-            <NavLink to="/" end style={{ marginRight: 12 }}>
-              Início
-            </NavLink>
-            <NavLink to="/module/ps/projetos" style={{ marginRight: 12 }}>
-              Projetos
-            </NavLink>
-            <NavLink to="/module/ps/tarefas" style={{ marginRight: 12 }}>
-              Tarefas
-            </NavLink>
-            <NavLink to="/module/mm/compras" style={{ marginRight: 12 }}>
-              Compras
-            </NavLink>
-            <NavLink to="/module/fi/contasPagar" style={{ marginRight: 12 }}>
-              Contas a Pagar
-            </NavLink>
-          </nav>
-        </header>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<MasterLoginPage />} />
+          <Route path="/tenant-login" element={<TenantLoginPage />} />
+          <Route path="/change-password" element={<ChangePasswordPage />} />
 
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/module/:schema/:entity" element={<ModulePage />} />
-            <Route
-              path="*"
-              element={
-                <div style={{ padding: 24 }}>
-                  <h2>Página não encontrada</h2>
-                  <p>Use o menu para selecionar um módulo.</p>
-                </div>
-              }
-            />
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+          <Route element={<ProtectedRoute />}>
+            <Route element={<PasswordChangeGuard />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/module/:schema/:entity" element={<ModulePage />} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-export default App;
