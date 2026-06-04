@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ModuleCrud from "../components/ModuleCrud";
 import { modules } from "../services/resourceService";
 
@@ -16,9 +16,9 @@ export default function ModulePage() {
   if (!module) {
     return (
       <div style={{ padding: "24px" }}>
-        <h2>Módulo não encontrado</h2>
-        <p>Verifique a URL e selecione algo válido.</p>
-        <Link to="/">Voltar</Link>
+        <h2>Modulo nao encontrado</h2>
+        <p>Verifique a URL e selecione algo valido.</p>
+        <Link to="/app">Voltar</Link>
       </div>
     );
   }
