@@ -2,12 +2,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import PasswordChangeGuard from "./auth/PasswordChangeGuard";
-import Home from "./pages/Home";
+import Home from "./pages/Home/Home";
 import ModulePage from "./pages/ModulePage";
-import EntryPage from "./pages/EntryPage";
-import MasterLoginPage from "./pages/MasterLoginPage";
-import TenantLoginPage from "./pages/TenantLoginPage";
-import ChangePasswordPage from "./pages/ChangePasswordPage";
+import EntryPage from "./pages/EntryPage/EntryPage";
+import MasterLoginPage from "./pages/Login/MasterLoginPage";
+import TenantLoginPage from "./pages/Login/TenantLoginPage";
+import ChangePasswordPage from "./pages/Login/ChangePasswordPage";
 
 export default function App() {
   return (
