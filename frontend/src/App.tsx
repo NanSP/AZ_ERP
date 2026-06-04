@@ -4,6 +4,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import PasswordChangeGuard from "./auth/PasswordChangeGuard";
 import Home from "./pages/Home";
 import ModulePage from "./pages/ModulePage";
+import EntryPage from "./pages/EntryPage";
 import MasterLoginPage from "./pages/MasterLoginPage";
 import TenantLoginPage from "./pages/TenantLoginPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
@@ -13,14 +14,18 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<EntryPage />} />
           <Route path="/login" element={<MasterLoginPage />} />
           <Route path="/tenant-login" element={<TenantLoginPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<PasswordChangeGuard />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/module/:schema/:entity" element={<ModulePage />} />
+              <Route path="/app" element={<Home />} />
+              <Route
+                path="/app/module/:schema/:entity"
+                element={<ModulePage />}
+              />
             </Route>
           </Route>
         </Routes>
