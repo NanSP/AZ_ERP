@@ -18,7 +18,7 @@ export default function TenantLoginPage() {
     try {
       await loginTenantAction({ tenantCode, login, senha });
       navigate("/", { replace: true });
-    } catch (error) {
+    } catch {
       setErro("Nao foi possivel autenticar no tenant.");
     }
   }
