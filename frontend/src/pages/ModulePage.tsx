@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import ModuleCrud from "../components/ModuleCrud";
+import ModuleCrud from "../components/ModuleCrud/ModuleCrud";
 import { modules } from "../services/resourceService";
 
 export default function ModulePage() {

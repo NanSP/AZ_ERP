@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import Breadcrumbs from "../../components/Breadcrumbs/Breadcrumbs";
-import ModuleCrud from "../../components/ModuleCrud";
+import ModuleCrud from "../../components/ModuleCrud/ModuleCrud";
 import { tenantModules } from "../../services/tenantModules";
 import "./module-workspace.css";
 
