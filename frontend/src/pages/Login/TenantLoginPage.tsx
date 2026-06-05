@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import AuthLayout from "../../layouts/AuthLayout";
 
@@ -25,27 +25,63 @@ export default function TenantLoginPage() {
 
   return (
     <AuthLayout>
-      <h1>Login Tenant</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          value={tenantCode}
-          onChange={(e) => setTenantCode(e.target.value)}
-          placeholder="Codigo do tenant"
-        />
-        <input
-          value={login}
-          onChange={(e) => setLogin(e.target.value)}
-          placeholder="Login"
-        />
-        <input
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-          placeholder="Senha"
-          type="password"
-        />
-        <button type="submit">Entrar</button>
+      <div className="auth-badge auth-badge--light">Acesso tenant</div>
+      <h1 className="auth-title">Entrar no ambiente operacional</h1>
+      <p className="auth-subtitle">
+        Informe o codigo do tenant e siga para a rotina do cliente.
+      </p>
+
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="auth-field">
+          <label className="auth-label" htmlFor="tenant-code">
+            Codigo do tenant
+          </label>
+          <input
+            id="tenant-code"
+            className="auth-input"
+            value={tenantCode}
+            onChange={(e) => setTenantCode(e.target.value)}
+            placeholder="Ex.: TENANT01"
+          />
+        </div>
+
+        <div className="auth-field">
+          <label className="auth-label" htmlFor="tenant-login">
+            Login
+          </label>
+          <input
+            id="tenant-login"
+            className="auth-input"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            placeholder="Seu usuario"
+          />
+        </div>
+
+        <div className="auth-field">
+          <label className="auth-label" htmlFor="tenant-password">
+            Senha
+          </label>
+          <input
+            id="tenant-password"
+            className="auth-input"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            placeholder="Sua senha"
+            type="password"
+          />
+        </div>
+
+        <button className="auth-submit" type="submit">
+          Entrar
+        </button>
       </form>
-      {erro && <p>{erro}</p>}
+
+      {erro && <p className="auth-error">{erro}</p>}
+
+      <p className="auth-helper">
+        Precisa acessar a camada administrativa? <Link to="/login">Ir para o login master</Link>
+      </p>
     </AuthLayout>
   );
 }

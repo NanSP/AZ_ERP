@@ -1,22 +1,22 @@
-/* index.css - Estilos globais */
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap");
 
 :root {
-  --primary-color: #667eea;
-  --primary-dark: #5a67d8;
-  --secondary-color: #764ba2;
-  --success-color: #10b981;
-  --error-color: #ef4444;
-  --warning-color: #f59e0b;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1e293b;
-  --gray-900: #0f172a;
+  --primary-color: #0f0f0f;
+  --primary-dark: #202020;
+  --secondary-color: #4a4a4a;
+  --success-color: #0f0f0f;
+  --error-color: #4a4a4a;
+  --warning-color: #a0a0a0;
+  --gray-50: #ffffff;
+  --gray-100: #f7f7f7;
+  --gray-200: #e5e5e5;
+  --gray-300: #d6d6d6;
+  --gray-400: #bdbdbd;
+  --gray-500: #a0a0a0;
+  --gray-600: #4a4a4a;
+  --gray-700: #2a2a2a;
+  --gray-800: #161616;
+  --gray-900: #0f0f0f;
 }
 
 * {
@@ -28,12 +28,10 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, sans-serif;
+  font-family: "Google Sans Flex", sans-serif;
   line-height: 1.6;
-  color: var(--gray-800);
-  background: var(--gray-50);
+  color: #0f0f0f;
+  background: #ffffff;
 }
 
 #root {
@@ -64,7 +62,7 @@ body {
 a {
   color: var(--primary-color);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.24s ease-out;
 }
 
 a:hover {
@@ -84,7 +82,7 @@ button:focus,
 input:focus,
 textarea:focus,
 select:focus {
-  outline: 2px solid var(--primary-color);
+  outline: 2px solid #0f0f0f;
   outline-offset: 2px;
 }
 
