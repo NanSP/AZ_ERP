@@ -24,23 +24,47 @@ export default function ChangePasswordPage() {
 
   return (
     <AuthLayout>
-      <h1>Troca de Senha</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          value={senhaAtual}
-          onChange={(e) => setSenhaAtual(e.target.value)}
-          placeholder="Senha atual"
-          type="password"
-        />
-        <input
-          value={novaSenha}
-          onChange={(e) => setNovaSenha(e.target.value)}
-          placeholder="Nova senha"
-          type="password"
-        />
-        <button type="submit">Alterar senha</button>
+      <div className="auth-badge">Primeiro acesso</div>
+      <h1 className="auth-title">Atualize sua senha</h1>
+      <p className="auth-subtitle">
+        Antes de continuar, defina uma nova credencial para sua sessao.
+      </p>
+
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="auth-field">
+          <label className="auth-label" htmlFor="current-password">
+            Senha atual
+          </label>
+          <input
+            id="current-password"
+            className="auth-input"
+            value={senhaAtual}
+            onChange={(e) => setSenhaAtual(e.target.value)}
+            placeholder="Senha atual"
+            type="password"
+          />
+        </div>
+
+        <div className="auth-field">
+          <label className="auth-label" htmlFor="new-password">
+            Nova senha
+          </label>
+          <input
+            id="new-password"
+            className="auth-input"
+            value={novaSenha}
+            onChange={(e) => setNovaSenha(e.target.value)}
+            placeholder="Nova senha"
+            type="password"
+          />
+        </div>
+
+        <button className="auth-submit" type="submit">
+          Alterar senha
+        </button>
       </form>
-      {erro && <p>{erro}</p>}
+
+      {erro && <p className="auth-error">{erro}</p>}
     </AuthLayout>
   );
 }
