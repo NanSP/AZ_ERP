@@ -1,0 +1,126 @@
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.module-grid__card {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7f7f7 100%);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    border-color 220ms ease-out;
+}
+
+.module-grid__card:hover {
+  transform: translateY(-2px);
+  border-color: #d3d3d3;
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.07);
+}
+
+.module-grid__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.module-grid__sigla {
+  display: inline-grid;
+  place-items: center;
+  min-width: 56px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.module-grid__count {
+  color: #707070;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.module-grid__body {
+  display: grid;
+  gap: 10px;
+}
+
+.module-grid__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.module-grid__description {
+  margin: 0;
+  color: #595959;
+  font-size: 0.94rem;
+  line-height: 1.65;
+}
+
+.module-grid__resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.module-grid__resource {
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #353535;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.module-grid__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  background: #111111;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.module-grid__action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.12);
+}
+
+.module-grid__action--disabled {
+  background: #d9d9d9;
+  color: #6d6d6d;
+  pointer-events: none;
+}
+
+@media (max-width: 1180px) {
+  .module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
+}

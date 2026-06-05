@@ -1,0 +1,130 @@
+.dashboard-page {
+  display: grid;
+  gap: 28px;
+}
+
+.dashboard-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.dashboard-hero__content,
+.dashboard-hero__panel {
+  padding: 28px;
+  border: 1px solid #e5e5e5;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #ffffff 0%, #f7f7f7 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-hero__eyebrow,
+.dashboard-section__eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #6d6d6d;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dashboard-hero__title {
+  margin: 0 0 12px;
+  color: #0f0f0f;
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1.08;
+}
+
+.dashboard-hero__text {
+  margin: 0;
+  color: #555555;
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 60ch;
+}
+
+.dashboard-hero__panel {
+  display: grid;
+  gap: 14px;
+}
+
+.dashboard-stat {
+  padding: 18px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid #ececec;
+}
+
+.dashboard-stat__label {
+  display: block;
+  margin-bottom: 10px;
+  color: #666666;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dashboard-stat__value {
+  display: block;
+  margin-bottom: 8px;
+  color: #111111;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.dashboard-stat__description {
+  margin: 0;
+  color: #5e5e5e;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.dashboard-section {
+  display: grid;
+  gap: 18px;
+}
+
+.dashboard-section__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.dashboard-section__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.dashboard-section__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid #dddddd;
+  color: #111111;
+  background: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .dashboard-hero__content,
+  .dashboard-hero__panel {
+    padding: 22px;
+  }
+}
