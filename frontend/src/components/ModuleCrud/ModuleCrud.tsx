@@ -5,6 +5,7 @@ import {
   updateResource,
   deleteResource,
 } from "../../services/resourceService";
+import "./module-crud.css";
 
 export type GenericItem = { id?: number; [key: string]: unknown };
 
@@ -191,31 +192,42 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
               </thead>
 
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.id ?? JSON.stringify(item)}>
-                    {columns.map((column) => (
-                      <td key={column}>{String(item[column] ?? "")}</td>
-                    ))}
-                    <td className="module-crud__row-actions">
-                      <button
-                        type="button"
-                        className="module-crud__mini-button"
-                        onClick={() => selectItem(item)}
-                      >
-                        Editar
-                      </button>
-                      {item.id != null ? (
+                {items.length > 0 ? (
+                  items.map((item) => (
+                    <tr key={item.id ?? JSON.stringify(item)}>
+                      {columns.map((column) => (
+                        <td key={column}>{String(item[column] ?? "")}</td>
+                      ))}
+                      <td className="module-crud__row-actions">
                         <button
                           type="button"
-                          className="module-crud__mini-button module-crud__mini-button--danger"
-                          onClick={() => handleDelete(item.id)}
+                          className="module-crud__mini-button"
+                          onClick={() => selectItem(item)}
                         >
-                          Excluir
+                          Editar
                         </button>
-                      ) : null}
+                        {item.id != null ? (
+                          <button
+                            type="button"
+                            className="module-crud__mini-button module-crud__mini-button--danger"
+                            onClick={() => handleDelete(item.id)}
+                          >
+                            Excluir
+                          </button>
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      className="module-crud__empty"
+                      colSpan={Math.max(columns.length + 1, 2)}
+                    >
+                      Nenhum registro encontrado para este recurso.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

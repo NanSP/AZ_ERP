@@ -43,6 +43,14 @@
   color: #5d5d5d;
 }
 
+.module-crud__subtitle code {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f3f3f3;
+  color: #111111;
+  font-size: 0.82rem;
+}
+
 .module-crud__actions {
   display: flex;
   gap: 10px;
@@ -76,6 +84,20 @@
 .module-crud__button--secondary {
   background: #f2f2f2;
   color: #111111;
+}
+
+.module-crud__button:hover,
+.module-crud__mini-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.module-crud__button:disabled,
+.module-crud__mini-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
 }
 
 .module-crud__layout {
@@ -128,10 +150,30 @@
   vertical-align: top;
 }
 
+.module-crud__table th {
+  color: #555555;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.module-crud__table td {
+  color: #202020;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
 .module-crud__row-actions {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.module-crud__empty {
+  padding: 28px 12px;
+  color: #696969;
+  text-align: center;
 }
 
 .module-crud__mini-button {
@@ -166,6 +208,12 @@
   color: #111111;
   font: inherit;
   resize: vertical;
+}
+
+.module-crud__textarea:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
 }
 
 .module-crud__hint {
