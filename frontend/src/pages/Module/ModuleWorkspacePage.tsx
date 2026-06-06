@@ -8,6 +8,7 @@ import CompaniesPage from "../Core/CompaniesPage";
 import ContactsPage from "../Core/ContactsPage";
 import PartnersPage from "../Core/PartnersPage";
 import ProductsPage from "../Core/ProductsPage";
+import AccountsPayablePage from "../Fi/AccountsPayablePage";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
 import ProfilesPage from "../Sys/ProfilesPage";
@@ -72,6 +73,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "sys" && resource.entity === "usuarioPerfil";
   const isProfilePermissionsPilot =
     resource.schema === "sys" && resource.entity === "perfilPermissao";
+  const isAccountsPayablePilot =
+    resource.schema === "fi" && resource.entity === "contasPagar";
 
   if (!hasReadAccess) {
     return (
@@ -170,6 +173,8 @@ export default function ModuleWorkspacePage() {
             <UserProfilesPage embedded />
           ) : isProfilePermissionsPilot ? (
             <ProfilePermissionsPage embedded />
+          ) : isAccountsPayablePilot ? (
+            <AccountsPayablePage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
