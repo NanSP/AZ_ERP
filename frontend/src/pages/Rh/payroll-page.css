@@ -1,0 +1,348 @@
+.payroll-page {
+  display: grid;
+  gap: 20px;
+}
+
+.payroll-page--embedded {
+  gap: 18px;
+}
+
+.payroll-page__header,
+.payroll-page__toolbar,
+.payroll-table,
+.payroll-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.payroll-page__header,
+.payroll-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.payroll-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.payroll-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.payroll-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.payroll-page__actions,
+.payroll-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.payroll-page__search,
+.payroll-form__field input,
+.payroll-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.payroll-page__search {
+  min-width: min(360px, 100%);
+}
+
+.payroll-page__button,
+.payroll-page__ghost,
+.payroll-form__button,
+.payroll-form__ghost,
+.payroll-table__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.payroll-page__button,
+.payroll-form__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.payroll-page__ghost,
+.payroll-form__ghost,
+.payroll-table__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.payroll-table__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.payroll-page__button:hover,
+.payroll-page__ghost:hover,
+.payroll-form__button:hover,
+.payroll-form__ghost:hover,
+.payroll-table__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.payroll-page__button:disabled,
+.payroll-page__ghost:disabled,
+.payroll-form__button:disabled,
+.payroll-form__ghost:disabled,
+.payroll-table__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.payroll-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.payroll-page__alert--success {
+  background: #f2f2f2;
+}
+
+.payroll-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.payroll-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+  gap: 20px;
+}
+
+.payroll-table,
+.payroll-form {
+  padding: 22px;
+}
+
+.payroll-table__head,
+.payroll-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.payroll-table__title,
+.payroll-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.payroll-form__subtitle,
+.payroll-table__meta {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.payroll-form__meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.payroll-table__wrap {
+  overflow-x: auto;
+}
+
+.payroll-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.payroll-table__table th,
+.payroll-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.payroll-table__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.payroll-table__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.payroll-table__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.payroll-table__identity,
+.payroll-table__period,
+.payroll-table__hours,
+.payroll-table__values {
+  display: grid;
+  gap: 4px;
+}
+
+.payroll-table__identity strong,
+.payroll-table__period strong {
+  color: #111111;
+}
+
+.payroll-table__identity span,
+.payroll-table__period span,
+.payroll-table__hours span,
+.payroll-table__values span {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.payroll-table__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #444444;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.payroll-table__badge--paid {
+  background: #111111;
+  color: #ffffff;
+}
+
+.payroll-table__badge--cancelled {
+  background: #d7d7d7;
+  color: #111111;
+}
+
+.payroll-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.payroll-table__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.payroll-table__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.payroll-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.payroll-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.payroll-form__field span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.payroll-form__summary {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  background: #fafafa;
+  color: #4b4b4b;
+  font-size: 0.88rem;
+}
+
+.payroll-form__hint {
+  color: #6a6a6a;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.payroll-form__field input:focus,
+.payroll-form__field select:focus,
+.payroll-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1200px) {
+  .payroll-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .payroll-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payroll-page__header,
+  .payroll-page__toolbar,
+  .payroll-table,
+  .payroll-form {
+    padding: 18px;
+  }
+}
