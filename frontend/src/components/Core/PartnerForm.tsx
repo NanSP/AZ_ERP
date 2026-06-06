@@ -36,6 +36,8 @@ export default function PartnerForm({
   onSave,
   onReset,
 }: PartnerFormProps) {
+  const canSave = value.nome.trim() !== "";
+
   function update<K extends keyof Partner>(field: K, fieldValue: Partner[K]) {
     onChange({
       ...value,
@@ -53,6 +55,9 @@ export default function PartnerForm({
           <p className="partner-form__subtitle">
             Preencha os dados centrais do cadastro.
           </p>
+          {editing && value.id ? (
+            <p className="partner-form__meta">Registro selecionado: #{value.id}</p>
+          ) : null}
         </div>
 
         <button
@@ -176,7 +181,7 @@ export default function PartnerForm({
         type="button"
         className="partner-form__button"
         onClick={onSave}
-        disabled={saving}
+        disabled={saving || !canSave}
       >
         {saving
           ? "Salvando..."

@@ -92,6 +92,7 @@ export default function CompaniesPage({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Company | null>(null);
   const [draft, setDraft] = useState<Company>(emptyCompany);
+  const isBusy = loading || saving;
 
   async function loadCompanies() {
     setLoading(true);
@@ -252,11 +253,13 @@ export default function CompaniesPage({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por razao social, CNPJ, codigo ou regime"
               className="companies-page__search"
+              disabled={isBusy}
             />
             <button
               type="button"
               className="companies-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Nova empresa
             </button>
@@ -270,12 +273,14 @@ export default function CompaniesPage({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por razao social, CNPJ, codigo ou regime"
             className="companies-page__search"
+            disabled={isBusy}
           />
           <div className="companies-page__toolbar-actions">
             <button
               type="button"
               className="companies-page__ghost"
               onClick={() => void loadCompanies()}
+              disabled={isBusy}
             >
               Recarregar
             </button>
@@ -283,6 +288,7 @@ export default function CompaniesPage({
               type="button"
               className="companies-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Nova empresa
             </button>

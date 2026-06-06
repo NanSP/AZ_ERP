@@ -30,6 +30,12 @@ export default function CompanyForm({
   onSave,
   onReset,
 }: CompanyFormProps) {
+  const normalizedCnpj = value.cnpj.replace(/\D/g, "");
+  const canSave =
+    value.codigo.trim() !== "" &&
+    value.razaoSocial.trim() !== "" &&
+    normalizedCnpj.length === 14;
+
   function update<K extends keyof Company>(field: K, fieldValue: Company[K]) {
     onChange({
       ...value,
@@ -47,6 +53,9 @@ export default function CompanyForm({
           <p className="company-form__subtitle">
             Preencha os dados institucionais principais.
           </p>
+          {editing && value.id ? (
+            <p className="company-form__meta">Registro selecionado: #{value.id}</p>
+          ) : null}
         </div>
 
         <button
@@ -73,7 +82,9 @@ export default function CompanyForm({
           <span>CNPJ</span>
           <input
             value={value.cnpj}
-            onChange={(event) => update("cnpj", event.target.value)}
+            onChange={(event) =>
+              update("cnpj", event.target.value.replace(/\D/g, ""))
+            }
             placeholder="Somente numeros"
           />
         </label>
@@ -162,7 +173,7 @@ export default function CompanyForm({
         type="button"
         className="company-form__button"
         onClick={onSave}
-        disabled={saving}
+        disabled={saving || !canSave}
       >
         {saving
           ? "Salvando..."

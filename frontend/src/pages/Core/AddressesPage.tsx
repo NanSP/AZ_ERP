@@ -137,6 +137,7 @@ export default function AddressesPage({
   const [parceiroOptions, setParceiroOptions] = useState<
     AddressRelatedEntityOption[]
   >([]);
+  const isBusy = loading || saving;
 
   async function loadAddresses() {
     setLoading(true);
@@ -323,11 +324,13 @@ export default function AddressesPage({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por entidade, logradouro, cidade, CEP ou tipo"
               className="addresses-page__search"
+              disabled={isBusy}
             />
             <button
               type="button"
               className="addresses-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo endereco
             </button>
@@ -341,12 +344,14 @@ export default function AddressesPage({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por entidade, logradouro, cidade, CEP ou tipo"
             className="addresses-page__search"
+            disabled={isBusy}
           />
           <div className="addresses-page__toolbar-actions">
             <button
               type="button"
               className="addresses-page__ghost"
               onClick={() => void loadAddresses()}
+              disabled={isBusy}
             >
               Recarregar
             </button>
@@ -354,6 +359,7 @@ export default function AddressesPage({
               type="button"
               className="addresses-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo endereco
             </button>

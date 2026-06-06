@@ -116,6 +116,7 @@ export default function ContactsPage({
   const [parceiroOptions, setParceiroOptions] = useState<RelatedEntityOption[]>(
     [],
   );
+  const isBusy = loading || saving;
 
   async function loadContacts() {
     setLoading(true);
@@ -293,11 +294,13 @@ export default function ContactsPage({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por entidade, tipo, valor ou observacao"
               className="contacts-page__search"
+              disabled={isBusy}
             />
             <button
               type="button"
               className="contacts-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo contato
             </button>
@@ -311,12 +314,14 @@ export default function ContactsPage({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por entidade, tipo, valor ou observacao"
             className="contacts-page__search"
+            disabled={isBusy}
           />
           <div className="contacts-page__toolbar-actions">
             <button
               type="button"
               className="contacts-page__ghost"
               onClick={() => void loadContacts()}
+              disabled={isBusy}
             >
               Recarregar
             </button>
@@ -324,6 +329,7 @@ export default function ContactsPage({
               type="button"
               className="contacts-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo contato
             </button>
