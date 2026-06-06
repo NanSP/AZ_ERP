@@ -1,0 +1,334 @@
+.accounts-receivable-page {
+  display: grid;
+  gap: 20px;
+}
+
+.accounts-receivable-page--embedded {
+  gap: 18px;
+}
+
+.accounts-receivable-page__header,
+.accounts-receivable-page__toolbar,
+.accounts-receivable-table,
+.accounts-receivable-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.accounts-receivable-page__header,
+.accounts-receivable-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.accounts-receivable-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.accounts-receivable-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.accounts-receivable-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.accounts-receivable-page__actions,
+.accounts-receivable-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.accounts-receivable-page__search,
+.accounts-receivable-form__field input,
+.accounts-receivable-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.accounts-receivable-page__search {
+  min-width: min(360px, 100%);
+}
+
+.accounts-receivable-page__button,
+.accounts-receivable-page__ghost,
+.accounts-receivable-form__button,
+.accounts-receivable-form__ghost,
+.accounts-receivable-table__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.accounts-receivable-page__button,
+.accounts-receivable-form__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.accounts-receivable-page__ghost,
+.accounts-receivable-form__ghost,
+.accounts-receivable-table__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.accounts-receivable-table__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.accounts-receivable-page__button:hover,
+.accounts-receivable-page__ghost:hover,
+.accounts-receivable-form__button:hover,
+.accounts-receivable-form__ghost:hover,
+.accounts-receivable-table__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.accounts-receivable-page__button:disabled,
+.accounts-receivable-page__ghost:disabled,
+.accounts-receivable-form__button:disabled,
+.accounts-receivable-form__ghost:disabled,
+.accounts-receivable-table__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.accounts-receivable-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.accounts-receivable-page__alert--success {
+  background: #f2f2f2;
+}
+
+.accounts-receivable-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.accounts-receivable-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
+  gap: 20px;
+}
+
+.accounts-receivable-table,
+.accounts-receivable-form {
+  padding: 22px;
+}
+
+.accounts-receivable-table__head,
+.accounts-receivable-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.accounts-receivable-table__title,
+.accounts-receivable-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.accounts-receivable-form__subtitle,
+.accounts-receivable-table__meta {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.accounts-receivable-form__meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.accounts-receivable-table__wrap {
+  overflow-x: auto;
+}
+
+.accounts-receivable-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.accounts-receivable-table__table th,
+.accounts-receivable-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.accounts-receivable-table__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.accounts-receivable-table__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.accounts-receivable-table__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.accounts-receivable-table__identity {
+  display: grid;
+  gap: 4px;
+}
+
+.accounts-receivable-table__identity strong {
+  color: #111111;
+}
+
+.accounts-receivable-table__identity span {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.accounts-receivable-table__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #444444;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.accounts-receivable-table__badge--partial {
+  background: #dcdcdc;
+  color: #111111;
+}
+
+.accounts-receivable-table__badge--paid {
+  background: #111111;
+  color: #ffffff;
+}
+
+.accounts-receivable-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.accounts-receivable-table__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.accounts-receivable-table__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.accounts-receivable-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.accounts-receivable-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.accounts-receivable-form__field span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.accounts-receivable-form__field--span-2 {
+  grid-column: span 2;
+}
+
+.accounts-receivable-form__hint {
+  color: #6a6a6a;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.accounts-receivable-form__field input:focus,
+.accounts-receivable-form__field select:focus,
+.accounts-receivable-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1080px) {
+  .accounts-receivable-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .accounts-receivable-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accounts-receivable-page__header,
+  .accounts-receivable-page__toolbar,
+  .accounts-receivable-table,
+  .accounts-receivable-form {
+    padding: 18px;
+  }
+}
