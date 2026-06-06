@@ -50,6 +50,12 @@ export default function ProductForm({
   onSave,
   onReset,
 }: ProductFormProps) {
+  const canSave =
+    value.codigo.trim() !== "" &&
+    value.nome.trim() !== "" &&
+    (value.ncm.trim() === "" || value.ncm.replace(/\D/g, "").length === 8) &&
+    (value.cest.trim() === "" || value.cest.replace(/\D/g, "").length === 7);
+
   function update<K extends keyof Product>(field: K, fieldValue: Product[K]) {
     onChange({
       ...value,
@@ -67,6 +73,9 @@ export default function ProductForm({
           <p className="product-form__subtitle">
             Preencha os dados centrais do catalogo do item.
           </p>
+          {editing && value.id ? (
+            <p className="product-form__meta">Registro selecionado: #{value.id}</p>
+          ) : null}
         </div>
 
         <button
@@ -148,7 +157,9 @@ export default function ProductForm({
           <span>NCM</span>
           <input
             value={value.ncm}
-            onChange={(event) => update("ncm", event.target.value)}
+            onChange={(event) =>
+              update("ncm", event.target.value.replace(/\D/g, ""))
+            }
             placeholder="8 digitos"
           />
         </label>
@@ -157,7 +168,9 @@ export default function ProductForm({
           <span>CEST</span>
           <input
             value={value.cest}
-            onChange={(event) => update("cest", event.target.value)}
+            onChange={(event) =>
+              update("cest", event.target.value.replace(/\D/g, ""))
+            }
             placeholder="7 digitos"
           />
         </label>
@@ -213,7 +226,7 @@ export default function ProductForm({
         type="button"
         className="product-form__button"
         onClick={onSave}
-        disabled={saving}
+        disabled={saving || !canSave}
       >
         {saving
           ? "Salvando..."

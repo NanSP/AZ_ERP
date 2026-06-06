@@ -35,6 +35,12 @@ export default function AddressForm({
   onSave,
   onReset,
 }: AddressFormProps) {
+  const canSave =
+    value.entidadeTipo.trim() !== "" &&
+    value.entidadeId.trim() !== "" &&
+    (value.uf.trim() === "" || value.uf.trim().length === 2) &&
+    (value.cep.trim() === "" || value.cep.replace(/\D/g, "").length === 8);
+
   function update<K extends keyof Address>(field: K, fieldValue: Address[K]) {
     onChange({
       ...value,
@@ -42,8 +48,17 @@ export default function AddressForm({
     });
   }
 
+  function updateEntidadeTipo(nextValue: string) {
+    onChange({
+      ...value,
+      entidadeTipo: nextValue,
+      entidadeId: "",
+    });
+  }
+
   const showEntitySelect =
     value.entidadeTipo === "empresa" || value.entidadeTipo === "parceiro";
+  const useEntitySelect = showEntitySelect && relatedEntityOptions.length > 0;
 
   return (
     <aside className="address-form">
@@ -55,6 +70,11 @@ export default function AddressForm({
           <p className="address-form__subtitle">
             Defina o vinculo da entidade e os dados principais do endereco.
           </p>
+          {editing && value.id ? (
+            <p className="address-form__meta">
+              Registro selecionado: #{value.id}. O vinculo da entidade fica travado na edicao.
+            </p>
+          ) : null}
         </div>
 
         <button
@@ -72,7 +92,7 @@ export default function AddressForm({
           <span>Tipo de entidade</span>
           <select
             value={value.entidadeTipo}
-            onChange={(event) => update("entidadeTipo", event.target.value)}
+            onChange={(event) => updateEntidadeTipo(event.target.value)}
             disabled={editing}
           >
             {entidadeOptions.map((option) => (
@@ -83,7 +103,7 @@ export default function AddressForm({
           </select>
         </label>
 
-        {showEntitySelect ? (
+        {useEntitySelect ? (
           <label className="address-form__field">
             <span>Entidade vinculada</span>
             <select
@@ -129,7 +149,9 @@ export default function AddressForm({
           <span>CEP</span>
           <input
             value={value.cep}
-            onChange={(event) => update("cep", event.target.value)}
+            onChange={(event) =>
+              update("cep", event.target.value.replace(/\D/g, ""))
+            }
             placeholder="Somente numeros"
           />
         </label>
@@ -212,7 +234,7 @@ export default function AddressForm({
         type="button"
         className="address-form__button"
         onClick={onSave}
-        disabled={saving}
+        disabled={saving || !canSave}
       >
         {saving
           ? "Salvando..."

@@ -113,6 +113,7 @@ export default function ProductsPage({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
   const [draft, setDraft] = useState<Product>(emptyProduct);
+  const isBusy = loading || saving;
 
   async function loadProducts() {
     setLoading(true);
@@ -267,11 +268,13 @@ export default function ProductsPage({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por nome, codigo, barras, NCM ou tipo"
               className="products-page__search"
+              disabled={isBusy}
             />
             <button
               type="button"
               className="products-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo produto
             </button>
@@ -285,12 +288,14 @@ export default function ProductsPage({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por nome, codigo, barras, NCM ou tipo"
             className="products-page__search"
+            disabled={isBusy}
           />
           <div className="products-page__toolbar-actions">
             <button
               type="button"
               className="products-page__ghost"
               onClick={() => void loadProducts()}
+              disabled={isBusy}
             >
               Recarregar
             </button>
@@ -298,6 +303,7 @@ export default function ProductsPage({
               type="button"
               className="products-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo produto
             </button>

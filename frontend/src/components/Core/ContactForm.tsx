@@ -35,6 +35,12 @@ export default function ContactForm({
   onSave,
   onReset,
 }: ContactFormProps) {
+  const canSave =
+    value.entidadeTipo.trim() !== "" &&
+    value.entidadeId.trim() !== "" &&
+    value.tipoContato.trim() !== "" &&
+    value.valor.trim() !== "";
+
   function update<K extends keyof Contact>(field: K, fieldValue: Contact[K]) {
     onChange({
       ...value,
@@ -42,8 +48,17 @@ export default function ContactForm({
     });
   }
 
+  function updateEntidadeTipo(nextValue: string) {
+    onChange({
+      ...value,
+      entidadeTipo: nextValue,
+      entidadeId: "",
+    });
+  }
+
   const showEntitySelect =
     value.entidadeTipo === "empresa" || value.entidadeTipo === "parceiro";
+  const useEntitySelect = showEntitySelect && relatedEntityOptions.length > 0;
 
   return (
     <aside className="contact-form">
@@ -55,6 +70,11 @@ export default function ContactForm({
           <p className="contact-form__subtitle">
             Defina o vinculo da entidade e o canal principal de contato.
           </p>
+          {editing && value.id ? (
+            <p className="contact-form__meta">
+              Registro selecionado: #{value.id}. O vinculo da entidade fica travado na edicao.
+            </p>
+          ) : null}
         </div>
 
         <button
@@ -72,7 +92,7 @@ export default function ContactForm({
           <span>Tipo de entidade</span>
           <select
             value={value.entidadeTipo}
-            onChange={(event) => update("entidadeTipo", event.target.value)}
+            onChange={(event) => updateEntidadeTipo(event.target.value)}
             disabled={editing}
           >
             {entidadeOptions.map((option) => (
@@ -83,7 +103,7 @@ export default function ContactForm({
           </select>
         </label>
 
-        {showEntitySelect ? (
+        {useEntitySelect ? (
           <label className="contact-form__field">
             <span>Entidade vinculada</span>
             <select
@@ -101,11 +121,15 @@ export default function ContactForm({
           </label>
         ) : (
           <label className="contact-form__field">
-            <span>ID da entidade</span>
+            <span>{showEntitySelect ? "ID da entidade" : "ID da entidade"}</span>
             <input
               value={value.entidadeId}
               onChange={(event) => update("entidadeId", event.target.value)}
-              placeholder="Informe o ID do colaborador"
+              placeholder={
+                value.entidadeTipo === "colaborador"
+                  ? "Informe o ID do colaborador"
+                  : "Informe o ID da entidade"
+              }
               disabled={editing}
             />
           </label>
@@ -157,7 +181,7 @@ export default function ContactForm({
         type="button"
         className="contact-form__button"
         onClick={onSave}
-        disabled={saving}
+        disabled={saving || !canSave}
       >
         {saving
           ? "Salvando..."

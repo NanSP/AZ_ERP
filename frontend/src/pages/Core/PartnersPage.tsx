@@ -101,6 +101,7 @@ export default function PartnersPage({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Partner | null>(null);
   const [draft, setDraft] = useState<Partner>(emptyPartner);
+  const isBusy = loading || saving;
 
   async function loadPartners() {
     setLoading(true);
@@ -259,11 +260,13 @@ export default function PartnersPage({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar por nome, documento, codigo ou tipo"
               className="partners-page__search"
+              disabled={isBusy}
             />
             <button
               type="button"
               className="partners-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo parceiro
             </button>
@@ -277,12 +280,14 @@ export default function PartnersPage({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Buscar por nome, documento, codigo ou tipo"
             className="partners-page__search"
+            disabled={isBusy}
           />
           <div className="partners-page__toolbar-actions">
             <button
               type="button"
               className="partners-page__ghost"
               onClick={() => void loadPartners()}
+              disabled={isBusy}
             >
               Recarregar
             </button>
@@ -290,6 +295,7 @@ export default function PartnersPage({
               type="button"
               className="partners-page__button"
               onClick={handleCreateNew}
+              disabled={isBusy}
             >
               Novo parceiro
             </button>
