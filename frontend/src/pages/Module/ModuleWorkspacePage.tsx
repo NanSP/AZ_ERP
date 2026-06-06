@@ -17,6 +17,7 @@ import AccountsReceivablePage from "../Fi/AccountsReceivablePage";
 import DependentsPage from "../Rh/DependentsPage";
 import EmployeesPage from "../Rh/EmployeesPage";
 import BenefitsPage from "../Rh/BenefitsPage";
+import TimeTrackingPage from "../Rh/TimeTrackingPage";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
 import ProfilesPage from "../Sys/ProfilesPage";
@@ -97,6 +98,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "rh" && resource.entity === "dependentes";
   const isBenefitsPilot =
     resource.schema === "rh" && resource.entity === "beneficios";
+  const isTimeTrackingPilot =
+    resource.schema === "rh" && resource.entity === "controleDePonto";
   const isAccountsReceivablePilot =
     resource.schema === "fi" && resource.entity === "contasReceber";
 
@@ -213,6 +216,8 @@ export default function ModuleWorkspacePage() {
             <DependentsPage embedded />
           ) : isBenefitsPilot ? (
             <BenefitsPage embedded />
+          ) : isTimeTrackingPilot ? (
+            <TimeTrackingPage embedded />
           ) : isAccountsReceivablePilot ? (
             <AccountsReceivablePage embedded />
           ) : (
