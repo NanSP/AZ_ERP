@@ -21,7 +21,7 @@ import {
   loginTenant,
 } from "../services/authService";
 
-type AuthContextvalue = {
+type AuthContextValue = {
   session: AuthSession | null;
   isAuthenticated: boolean;
   loginMasterAction: (payload: MasterLoginPayload) => Promise<void>;
@@ -30,7 +30,7 @@ type AuthContextvalue = {
   changePassword: (payload: ChangePasswordPayload) => Promise<void>;
 };
 
-export const AuthContext = createContext<AuthContextvalue | null>(null);
+export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null);
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const changePassword = async (payload: ChangePasswordPayload) => {
-    if (!session) throw new Error("Sessao not found");
+    if (!session) throw new Error("Sessao nao encontrada");
 
     if (session.scope === "master") {
       await changeMasterPassword(session.token, payload);

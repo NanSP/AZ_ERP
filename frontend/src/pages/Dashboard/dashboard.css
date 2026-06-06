@@ -116,6 +116,12 @@
   font-weight: 600;
 }
 
+.dashboard-section__link--disabled {
+  color: #7a7a7a;
+  background: #f3f3f3;
+  pointer-events: none;
+}
+
 @media (max-width: 1180px) {
   .dashboard-hero {
     grid-template-columns: 1fr;
