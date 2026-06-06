@@ -1,0 +1,328 @@
+.maintenances-page {
+  display: grid;
+  gap: 20px;
+}
+
+.maintenances-page--embedded {
+  gap: 18px;
+}
+
+.maintenances-page__header,
+.maintenances-page__toolbar,
+.maintenance-table,
+.maintenance-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.maintenances-page__header,
+.maintenances-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.maintenances-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.maintenances-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.maintenances-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.maintenances-page__actions,
+.maintenances-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.maintenances-page__search,
+.maintenance-form__field input,
+.maintenance-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.maintenances-page__search {
+  min-width: min(360px, 100%);
+}
+
+.maintenances-page__button,
+.maintenances-page__ghost,
+.maintenance-form__button,
+.maintenance-form__ghost,
+.maintenance-table__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.maintenances-page__button,
+.maintenance-form__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.maintenances-page__ghost,
+.maintenance-form__ghost,
+.maintenance-table__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.maintenance-table__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.maintenances-page__button:hover,
+.maintenances-page__ghost:hover,
+.maintenance-form__button:hover,
+.maintenance-form__ghost:hover,
+.maintenance-table__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.maintenances-page__button:disabled,
+.maintenances-page__ghost:disabled,
+.maintenance-form__button:disabled,
+.maintenance-form__ghost:disabled,
+.maintenance-table__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.maintenances-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.maintenances-page__alert--success {
+  background: #f2f2f2;
+}
+
+.maintenances-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.maintenances-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+  gap: 20px;
+}
+
+.maintenance-table,
+.maintenance-form {
+  padding: 22px;
+}
+
+.maintenance-table__head,
+.maintenance-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.maintenance-table__title,
+.maintenance-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.maintenance-form__subtitle,
+.maintenance-table__meta {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.maintenance-form__meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.maintenance-table__wrap {
+  overflow-x: auto;
+}
+
+.maintenance-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.maintenance-table__table th,
+.maintenance-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.maintenance-table__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.maintenance-table__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.maintenance-table__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.maintenance-table__identity,
+.maintenance-table__details {
+  display: grid;
+  gap: 4px;
+}
+
+.maintenance-table__identity strong {
+  color: #111111;
+}
+
+.maintenance-table__identity span,
+.maintenance-table__details span {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.maintenance-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.maintenance-table__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.maintenance-table__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.maintenance-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.maintenance-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.maintenance-form__field--span-2 {
+  grid-column: span 2;
+}
+
+.maintenance-form__field span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.maintenance-form__summary {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  background: #fafafa;
+  color: #4b4b4b;
+  font-size: 0.88rem;
+}
+
+.maintenance-form__hint {
+  color: #6a6a6a;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.maintenance-form__field input:focus,
+.maintenance-form__field select:focus,
+.maintenances-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1200px) {
+  .maintenances-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .maintenance-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-form__field--span-2 {
+    grid-column: span 1;
+  }
+
+  .maintenances-page__header,
+  .maintenances-page__toolbar,
+  .maintenance-table,
+  .maintenance-form {
+    padding: 18px;
+  }
+}
