@@ -1,0 +1,322 @@
+.time-tracking-page {
+  display: grid;
+  gap: 20px;
+}
+
+.time-tracking-page--embedded {
+  gap: 18px;
+}
+
+.time-tracking-page__header,
+.time-tracking-page__toolbar,
+.time-tracking-table,
+.time-tracking-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.time-tracking-page__header,
+.time-tracking-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.time-tracking-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.time-tracking-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.time-tracking-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.time-tracking-page__actions,
+.time-tracking-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.time-tracking-page__search,
+.time-tracking-form__field input,
+.time-tracking-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.time-tracking-page__search {
+  min-width: min(360px, 100%);
+}
+
+.time-tracking-page__button,
+.time-tracking-page__ghost,
+.time-tracking-form__button,
+.time-tracking-form__ghost,
+.time-tracking-table__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.time-tracking-page__button,
+.time-tracking-form__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.time-tracking-page__ghost,
+.time-tracking-form__ghost,
+.time-tracking-table__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.time-tracking-table__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.time-tracking-page__button:hover,
+.time-tracking-page__ghost:hover,
+.time-tracking-form__button:hover,
+.time-tracking-form__ghost:hover,
+.time-tracking-table__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.time-tracking-page__button:disabled,
+.time-tracking-page__ghost:disabled,
+.time-tracking-form__button:disabled,
+.time-tracking-form__ghost:disabled,
+.time-tracking-table__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.time-tracking-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.time-tracking-page__alert--success {
+  background: #f2f2f2;
+}
+
+.time-tracking-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.time-tracking-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+  gap: 20px;
+}
+
+.time-tracking-table,
+.time-tracking-form {
+  padding: 22px;
+}
+
+.time-tracking-table__head,
+.time-tracking-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.time-tracking-table__title,
+.time-tracking-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.time-tracking-form__subtitle,
+.time-tracking-table__meta {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.time-tracking-form__meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.time-tracking-table__wrap {
+  overflow-x: auto;
+}
+
+.time-tracking-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.time-tracking-table__table th,
+.time-tracking-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.time-tracking-table__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.time-tracking-table__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.time-tracking-table__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.time-tracking-table__identity,
+.time-tracking-table__schedule,
+.time-tracking-table__hours {
+  display: grid;
+  gap: 4px;
+}
+
+.time-tracking-table__identity strong {
+  color: #111111;
+}
+
+.time-tracking-table__identity span,
+.time-tracking-table__schedule span,
+.time-tracking-table__hours span {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.time-tracking-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.time-tracking-table__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.time-tracking-table__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.time-tracking-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.time-tracking-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.time-tracking-form__field span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.time-tracking-form__summary {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  background: #fafafa;
+  color: #4b4b4b;
+  font-size: 0.88rem;
+}
+
+.time-tracking-form__hint {
+  color: #6a6a6a;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.time-tracking-form__field input:focus,
+.time-tracking-form__field select:focus,
+.time-tracking-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1200px) {
+  .time-tracking-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .time-tracking-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .time-tracking-page__header,
+  .time-tracking-page__toolbar,
+  .time-tracking-table,
+  .time-tracking-form {
+    padding: 18px;
+  }
+}
