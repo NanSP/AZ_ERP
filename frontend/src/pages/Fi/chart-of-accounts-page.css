@@ -1,0 +1,300 @@
+.chart-of-accounts-page {
+  display: grid;
+  gap: 20px;
+}
+
+.chart-of-accounts-page--embedded {
+  gap: 18px;
+}
+
+.chart-of-accounts-page__header,
+.chart-of-accounts-page__toolbar,
+.chart-of-accounts-table,
+.chart-of-accounts-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.chart-of-accounts-page__header,
+.chart-of-accounts-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.chart-of-accounts-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chart-of-accounts-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.chart-of-accounts-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.chart-of-accounts-page__actions,
+.chart-of-accounts-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.chart-of-accounts-page__search,
+.chart-of-accounts-form__field input,
+.chart-of-accounts-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.chart-of-accounts-page__search {
+  min-width: min(360px, 100%);
+}
+
+.chart-of-accounts-page__button,
+.chart-of-accounts-page__ghost,
+.chart-of-accounts-form__button,
+.chart-of-accounts-form__ghost,
+.chart-of-accounts-table__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.chart-of-accounts-page__button,
+.chart-of-accounts-form__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.chart-of-accounts-page__ghost,
+.chart-of-accounts-form__ghost,
+.chart-of-accounts-table__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.chart-of-accounts-table__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.chart-of-accounts-page__button:hover,
+.chart-of-accounts-page__ghost:hover,
+.chart-of-accounts-form__button:hover,
+.chart-of-accounts-form__ghost:hover,
+.chart-of-accounts-table__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.chart-of-accounts-page__button:disabled,
+.chart-of-accounts-page__ghost:disabled,
+.chart-of-accounts-form__button:disabled,
+.chart-of-accounts-form__ghost:disabled,
+.chart-of-accounts-table__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.chart-of-accounts-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.chart-of-accounts-page__alert--success {
+  background: #f2f2f2;
+}
+
+.chart-of-accounts-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.chart-of-accounts-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+  gap: 20px;
+}
+
+.chart-of-accounts-table,
+.chart-of-accounts-form {
+  padding: 22px;
+}
+
+.chart-of-accounts-table__head,
+.chart-of-accounts-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chart-of-accounts-table__title,
+.chart-of-accounts-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.chart-of-accounts-form__subtitle,
+.chart-of-accounts-table__meta {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.chart-of-accounts-form__meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.chart-of-accounts-table__wrap {
+  overflow-x: auto;
+}
+
+.chart-of-accounts-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.chart-of-accounts-table__table th,
+.chart-of-accounts-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.chart-of-accounts-table__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chart-of-accounts-table__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.chart-of-accounts-table__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.chart-of-accounts-table__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #444444;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.chart-of-accounts-table__badge--active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.chart-of-accounts-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chart-of-accounts-table__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.chart-of-accounts-table__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.chart-of-accounts-form__grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.chart-of-accounts-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.chart-of-accounts-form__field span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.chart-of-accounts-form__field input:focus,
+.chart-of-accounts-form__field select:focus,
+.chart-of-accounts-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1080px) {
+  .chart-of-accounts-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .chart-of-accounts-page__header,
+  .chart-of-accounts-page__toolbar,
+  .chart-of-accounts-table,
+  .chart-of-accounts-form {
+    padding: 18px;
+  }
+}

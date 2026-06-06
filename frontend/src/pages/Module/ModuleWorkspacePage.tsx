@@ -10,6 +10,7 @@ import PartnersPage from "../Core/PartnersPage";
 import ProductsPage from "../Core/ProductsPage";
 import AccountsPayablePage from "../Fi/AccountsPayablePage";
 import CostCentersPage from "../Fi/CostCentersPage";
+import ChartOfAccountsPage from "../Fi/ChartOfAccountsPage";
 import AccountsReceivablePage from "../Fi/AccountsReceivablePage";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
@@ -79,6 +80,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "fi" && resource.entity === "contasPagar";
   const isCostCentersPilot =
     resource.schema === "fi" && resource.entity === "centrosCusto";
+  const isChartOfAccountsPilot =
+    resource.schema === "fi" && resource.entity === "planoContas";
   const isAccountsReceivablePilot =
     resource.schema === "fi" && resource.entity === "contasReceber";
 
@@ -183,6 +186,8 @@ export default function ModuleWorkspacePage() {
             <AccountsPayablePage embedded />
           ) : isCostCentersPilot ? (
             <CostCentersPage embedded />
+          ) : isChartOfAccountsPilot ? (
+            <ChartOfAccountsPage embedded />
           ) : isAccountsReceivablePilot ? (
             <AccountsReceivablePage embedded />
           ) : (
