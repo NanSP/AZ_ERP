@@ -1,0 +1,328 @@
+.bank-movements-page {
+  display: grid;
+  gap: 20px;
+}
+
+.bank-movements-page--embedded {
+  gap: 18px;
+}
+
+.bank-movements-page__header,
+.bank-movements-page__toolbar,
+.bank-movement-table,
+.bank-movement-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.bank-movements-page__header,
+.bank-movements-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.bank-movements-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.bank-movements-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.bank-movements-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.bank-movements-page__actions,
+.bank-movements-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.bank-movements-page__search,
+.bank-movement-form__field input,
+.bank-movement-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.bank-movements-page__search {
+  min-width: min(360px, 100%);
+}
+
+.bank-movements-page__button,
+.bank-movements-page__ghost,
+.bank-movement-form__button,
+.bank-movement-form__ghost,
+.bank-movement-table__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.bank-movements-page__button,
+.bank-movement-form__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bank-movements-page__ghost,
+.bank-movement-form__ghost,
+.bank-movement-table__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.bank-movement-table__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bank-movements-page__button:hover,
+.bank-movements-page__ghost:hover,
+.bank-movement-form__button:hover,
+.bank-movement-form__ghost:hover,
+.bank-movement-table__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.bank-movements-page__button:disabled,
+.bank-movements-page__ghost:disabled,
+.bank-movement-form__button:disabled,
+.bank-movement-form__ghost:disabled,
+.bank-movement-table__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.bank-movements-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.bank-movements-page__alert--success {
+  background: #f2f2f2;
+}
+
+.bank-movements-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.bank-movements-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
+  gap: 20px;
+}
+
+.bank-movement-table,
+.bank-movement-form {
+  padding: 22px;
+}
+
+.bank-movement-table__head,
+.bank-movement-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.bank-movement-table__title,
+.bank-movement-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.bank-movement-form__subtitle,
+.bank-movement-table__meta {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.bank-movement-form__meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.bank-movement-table__wrap {
+  overflow-x: auto;
+}
+
+.bank-movement-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bank-movement-table__table th,
+.bank-movement-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.bank-movement-table__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bank-movement-table__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.bank-movement-table__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.bank-movement-table__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f1f1f1;
+  color: #444444;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.bank-movement-table__badge--reconciled {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bank-movement-table__meta-line {
+  display: block;
+  margin-top: 6px;
+  color: #6a6a6a;
+  font-size: 0.78rem;
+}
+
+.bank-movement-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bank-movement-table__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.bank-movement-table__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.bank-movement-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.bank-movement-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.bank-movement-form__field span,
+.bank-movement-form__checkbox span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.bank-movement-form__field--span-2 {
+  grid-column: span 2;
+}
+
+.bank-movement-form__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bank-movement-form__checkbox input {
+  width: 18px;
+  height: 18px;
+}
+
+.bank-movement-form__field input:focus,
+.bank-movement-form__field select:focus,
+.bank-movements-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1080px) {
+  .bank-movements-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .bank-movement-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bank-movements-page__header,
+  .bank-movements-page__toolbar,
+  .bank-movement-table,
+  .bank-movement-form {
+    padding: 18px;
+  }
+}
