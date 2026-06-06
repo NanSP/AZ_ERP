@@ -1,6 +1,8 @@
 import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../../auth/useAuth";
 import Breadcrumbs from "../../components/Breadcrumbs/Breadcrumbs";
 import ModuleCrud from "../../components/ModuleCrud/ModuleCrud";
+import { canReadResource } from "../../services/accessControl";
 import AddressesPage from "../Core/AddressesPage";
 import CompaniesPage from "../Core/CompaniesPage";
 import ContactsPage from "../Core/ContactsPage";
@@ -29,6 +31,7 @@ function findResource(schema?: string, entity?: string) {
 }
 
 export default function ModuleWorkspacePage() {
+  const { session } = useAuth();
   const { schema, entity } = useParams();
   const match = findResource(schema, entity);
 
@@ -48,6 +51,7 @@ export default function ModuleWorkspacePage() {
   }
 
   const { module, resource } = match;
+  const hasReadAccess = canReadResource(session, resource);
   const isPartnersPilot =
     resource.schema === "core" && resource.entity === "parceiros";
   const isCompaniesPilot =
@@ -68,6 +72,21 @@ export default function ModuleWorkspacePage() {
     resource.schema === "sys" && resource.entity === "usuarioPerfil";
   const isProfilePermissionsPilot =
     resource.schema === "sys" && resource.entity === "perfilPermissao";
+
+  if (!hasReadAccess) {
+    return (
+      <section className="module-workspace module-workspace--empty">
+        <span className="module-workspace__eyebrow">Acesso</span>
+        <h2 className="module-workspace__title">Recurso indisponivel</h2>
+        <p className="module-workspace__description">
+          Sua sessao nao possui permissao de leitura para este recurso.
+        </p>
+        <Link to="/app" className="module-workspace__back">
+          Voltar ao dashboard
+        </Link>
+      </section>
+    );
+  }
 
   return (
     <div className="module-workspace">

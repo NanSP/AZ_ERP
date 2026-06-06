@@ -10,7 +10,7 @@ export type AuthSession = {
   tenantCode?: string;
   perfis?: string[];
   permissoes?: string[];
-  passwordChangeRequired?: boolean;
+  passwordChangeRequired: boolean;
 };
 
 export type MasterLoginPayload = {
