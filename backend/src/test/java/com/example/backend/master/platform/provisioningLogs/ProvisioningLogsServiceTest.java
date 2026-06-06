@@ -74,7 +74,7 @@ class ProvisioningLogsServiceTest {
         );
         Tenants tenant = new Tenants();
         tenant.setId(1L);
-        tenant.setStatus("SUSPENSO");
+        tenant.setStatus("INATIVO");
 
         when(tenantsRepository.findById(1L)).thenReturn(Optional.of(tenant));
 

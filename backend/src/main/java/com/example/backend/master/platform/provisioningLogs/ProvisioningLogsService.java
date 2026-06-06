@@ -119,7 +119,8 @@ public class ProvisioningLogsService {
     private void validarRelacionamentoComTenant(Tenants tenant) {
         if (tenant != null
                 && !"PENDENTE".equalsIgnoreCase(tenant.getStatus())
-                && !"ATIVO".equalsIgnoreCase(tenant.getStatus())) {
+                && !"ATIVO".equalsIgnoreCase(tenant.getStatus())
+                && !"SUSPENSO".equalsIgnoreCase(tenant.getStatus())) {
             throw new ValidacaoException("Nao e permitido registrar provisioning log para tenant fora do ciclo operacional");
         }
     }
