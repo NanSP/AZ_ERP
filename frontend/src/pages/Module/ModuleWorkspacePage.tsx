@@ -14,6 +14,7 @@ import ChartOfAccountsPage from "../Fi/ChartOfAccountsPage";
 import CashFlowPage from "../Fi/CashFlowPage";
 import BankMovementsPage from "../Fi/BankMovementsPage";
 import AccountsReceivablePage from "../Fi/AccountsReceivablePage";
+import { AssetsPage } from "../Am";
 import DependentsPage from "../Rh/DependentsPage";
 import EmployeesPage from "../Rh/EmployeesPage";
 import BenefitsPage from "../Rh/BenefitsPage";
@@ -93,6 +94,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "fi" && resource.entity === "fluxoCaixa";
   const isBankMovementsPilot =
     resource.schema === "fi" && resource.entity === "movimentacoesBancarias";
+  const isAssetsPilot =
+    resource.schema === "am" && resource.entity === "bensPatrimoniais";
   const isEmployeesPilot =
     resource.schema === "rh" && resource.entity === "colaboradores";
   const isDependentsPilot =
@@ -213,6 +216,8 @@ export default function ModuleWorkspacePage() {
             <CashFlowPage embedded />
           ) : isBankMovementsPilot ? (
             <BankMovementsPage embedded />
+          ) : isAssetsPilot ? (
+            <AssetsPage embedded />
           ) : isEmployeesPilot ? (
             <EmployeesPage embedded />
           ) : isDependentsPilot ? (
