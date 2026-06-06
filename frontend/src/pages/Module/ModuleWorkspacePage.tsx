@@ -6,6 +6,7 @@ import CompaniesPage from "../Core/CompaniesPage";
 import ContactsPage from "../Core/ContactsPage";
 import PartnersPage from "../Core/PartnersPage";
 import ProductsPage from "../Core/ProductsPage";
+import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilesPage from "../Sys/ProfilesPage";
 import UsersPage from "../Sys/UsersPage";
 import { tenantModules } from "../../services/tenantModules";
@@ -59,6 +60,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "sys" && resource.entity === "usuarios";
   const isProfilesPilot =
     resource.schema === "sys" && resource.entity === "perfis";
+  const isPermissionsPilot =
+    resource.schema === "sys" && resource.entity === "permissoes";
 
   return (
     <div className="module-workspace">
@@ -136,6 +139,8 @@ export default function ModuleWorkspacePage() {
             <UsersPage embedded />
           ) : isProfilesPilot ? (
             <ProfilesPage embedded />
+          ) : isPermissionsPilot ? (
+            <PermissionsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
