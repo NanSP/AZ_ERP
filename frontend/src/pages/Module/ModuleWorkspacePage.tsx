@@ -3,6 +3,7 @@ import Breadcrumbs from "../../components/Breadcrumbs/Breadcrumbs";
 import ModuleCrud from "../../components/ModuleCrud/ModuleCrud";
 import CompaniesPage from "../Core/CompaniesPage";
 import PartnersPage from "../Core/PartnersPage";
+import ProductsPage from "../Core/ProductsPage";
 import { tenantModules } from "../../services/tenantModules";
 import "./module-workspace.css";
 
@@ -44,6 +45,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "core" && resource.entity === "parceiros";
   const isCompaniesPilot =
     resource.schema === "core" && resource.entity === "empresas";
+  const isProductsPilot =
+    resource.schema === "core" && resource.entity === "produtos";
 
   return (
     <div className="module-workspace">
@@ -111,6 +114,8 @@ export default function ModuleWorkspacePage() {
             <PartnersPage embedded />
           ) : isCompaniesPilot ? (
             <CompaniesPage embedded />
+          ) : isProductsPilot ? (
+            <ProductsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
