@@ -9,6 +9,7 @@ import ContactsPage from "../Core/ContactsPage";
 import PartnersPage from "../Core/PartnersPage";
 import ProductsPage from "../Core/ProductsPage";
 import AccountsPayablePage from "../Fi/AccountsPayablePage";
+import CostCentersPage from "../Fi/CostCentersPage";
 import AccountsReceivablePage from "../Fi/AccountsReceivablePage";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
@@ -76,6 +77,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "sys" && resource.entity === "perfilPermissao";
   const isAccountsPayablePilot =
     resource.schema === "fi" && resource.entity === "contasPagar";
+  const isCostCentersPilot =
+    resource.schema === "fi" && resource.entity === "centrosCusto";
   const isAccountsReceivablePilot =
     resource.schema === "fi" && resource.entity === "contasReceber";
 
@@ -178,6 +181,8 @@ export default function ModuleWorkspacePage() {
             <ProfilePermissionsPage embedded />
           ) : isAccountsPayablePilot ? (
             <AccountsPayablePage embedded />
+          ) : isCostCentersPilot ? (
+            <CostCentersPage embedded />
           ) : isAccountsReceivablePilot ? (
             <AccountsReceivablePage embedded />
           ) : (
