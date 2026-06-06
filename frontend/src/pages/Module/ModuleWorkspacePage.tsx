@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import Breadcrumbs from "../../components/Breadcrumbs/Breadcrumbs";
 import ModuleCrud from "../../components/ModuleCrud/ModuleCrud";
+import AddressesPage from "../Core/AddressesPage";
 import CompaniesPage from "../Core/CompaniesPage";
 import ContactsPage from "../Core/ContactsPage";
 import PartnersPage from "../Core/PartnersPage";
@@ -50,6 +51,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "core" && resource.entity === "produtos";
   const isContactsPilot =
     resource.schema === "core" && resource.entity === "contatos";
+  const isAddressesPilot =
+    resource.schema === "core" && resource.entity === "enderecos";
 
   return (
     <div className="module-workspace">
@@ -121,6 +124,8 @@ export default function ModuleWorkspacePage() {
             <ProductsPage embedded />
           ) : isContactsPilot ? (
             <ContactsPage embedded />
+          ) : isAddressesPilot ? (
+            <AddressesPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
