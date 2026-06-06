@@ -7,6 +7,7 @@ import ContactsPage from "../Core/ContactsPage";
 import PartnersPage from "../Core/PartnersPage";
 import ProductsPage from "../Core/ProductsPage";
 import PermissionsPage from "../Sys/PermissionsPage";
+import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
 import ProfilesPage from "../Sys/ProfilesPage";
 import UserProfilesPage from "../Sys/UserProfilesPage";
 import UsersPage from "../Sys/UsersPage";
@@ -65,6 +66,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "sys" && resource.entity === "permissoes";
   const isUserProfilesPilot =
     resource.schema === "sys" && resource.entity === "usuarioPerfil";
+  const isProfilePermissionsPilot =
+    resource.schema === "sys" && resource.entity === "perfilPermissao";
 
   return (
     <div className="module-workspace">
@@ -146,6 +149,8 @@ export default function ModuleWorkspacePage() {
             <PermissionsPage embedded />
           ) : isUserProfilesPilot ? (
             <UserProfilesPage embedded />
+          ) : isProfilePermissionsPilot ? (
+            <ProfilePermissionsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
