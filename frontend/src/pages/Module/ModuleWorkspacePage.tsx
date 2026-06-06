@@ -20,6 +20,7 @@ import EmployeesPage from "../Rh/EmployeesPage";
 import BenefitsPage from "../Rh/BenefitsPage";
 import TimeTrackingPage from "../Rh/TimeTrackingPage";
 import PayrollPage from "../Rh/PayrollPage";
+import { InspectionsPage } from "../Qm";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
 import ProfilesPage from "../Sys/ProfilesPage";
@@ -98,6 +99,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "am" && resource.entity === "bensPatrimoniais";
   const isMaintenancesPilot =
     resource.schema === "am" && resource.entity === "manutencoes";
+  const isInspectionsPilot =
+    resource.schema === "qm" && resource.entity === "inspecoes";
   const isEmployeesPilot =
     resource.schema === "rh" && resource.entity === "colaboradores";
   const isDependentsPilot =
@@ -222,6 +225,8 @@ export default function ModuleWorkspacePage() {
             <AssetsPage embedded />
           ) : isMaintenancesPilot ? (
             <MaintenancesPage embedded />
+          ) : isInspectionsPilot ? (
+            <InspectionsPage embedded />
           ) : isEmployeesPilot ? (
             <EmployeesPage embedded />
           ) : isDependentsPilot ? (
