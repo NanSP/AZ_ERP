@@ -18,6 +18,8 @@ export async function loginMaster(
     login: data.login,
     userId: data.userId,
     role: data.role,
+    perfis: data.perfis,
+    permissoes: data.permissoes,
     passwordChangeRequired: data.passwordChangeRequired ?? false,
   };
 }
@@ -35,6 +37,8 @@ export async function loginTenant(
     role: data.role,
     tenantId: data.tenantId,
     tenantCode: data.tenantCode,
+    perfis: data.perfis,
+    permissoes: data.permissoes,
     passwordChangeRequired: data.passwordChangeRequired ?? false,
   };
 }

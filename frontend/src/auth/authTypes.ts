@@ -8,6 +8,8 @@ export type AuthSession = {
   role?: string;
   tenantId?: number;
   tenantCode?: string;
+  perfis?: string[];
+  permissoes?: string[];
   passwordChangeRequired?: boolean;
 };
 
