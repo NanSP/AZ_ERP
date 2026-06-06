@@ -6,6 +6,7 @@ import CompaniesPage from "../Core/CompaniesPage";
 import ContactsPage from "../Core/ContactsPage";
 import PartnersPage from "../Core/PartnersPage";
 import ProductsPage from "../Core/ProductsPage";
+import UsersPage from "../Sys/UsersPage";
 import { tenantModules } from "../../services/tenantModules";
 import "./module-workspace.css";
 
@@ -53,6 +54,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "core" && resource.entity === "contatos";
   const isAddressesPilot =
     resource.schema === "core" && resource.entity === "enderecos";
+  const isUsersPilot =
+    resource.schema === "sys" && resource.entity === "usuarios";
 
   return (
     <div className="module-workspace">
@@ -126,6 +129,8 @@ export default function ModuleWorkspacePage() {
             <ContactsPage embedded />
           ) : isAddressesPilot ? (
             <AddressesPage embedded />
+          ) : isUsersPilot ? (
+            <UsersPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
