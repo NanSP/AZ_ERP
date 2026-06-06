@@ -1,0 +1,345 @@
+.benefits-page {
+  display: grid;
+  gap: 20px;
+}
+
+.benefits-page--embedded {
+  gap: 18px;
+}
+
+.benefits-page__header,
+.benefits-page__toolbar,
+.benefit-table,
+.benefit-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.benefits-page__header,
+.benefits-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.benefits-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.benefits-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.benefits-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.benefits-page__actions,
+.benefits-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.benefits-page__search,
+.benefit-form__field input,
+.benefit-form__field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.benefits-page__search {
+  min-width: min(360px, 100%);
+}
+
+.benefits-page__button,
+.benefits-page__ghost,
+.benefit-form__button,
+.benefit-form__ghost,
+.benefit-table__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.benefits-page__button,
+.benefit-form__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.benefits-page__ghost,
+.benefit-form__ghost,
+.benefit-table__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.benefit-table__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.benefits-page__button:hover,
+.benefits-page__ghost:hover,
+.benefit-form__button:hover,
+.benefit-form__ghost:hover,
+.benefit-table__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.benefits-page__button:disabled,
+.benefits-page__ghost:disabled,
+.benefit-form__button:disabled,
+.benefit-form__ghost:disabled,
+.benefit-table__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.benefits-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.benefits-page__alert--success {
+  background: #f2f2f2;
+}
+
+.benefits-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.benefits-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr);
+  gap: 20px;
+}
+
+.benefit-table,
+.benefit-form {
+  padding: 22px;
+}
+
+.benefit-table__head,
+.benefit-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.benefit-table__title,
+.benefit-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.benefit-form__subtitle,
+.benefit-table__meta {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.benefit-form__meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.benefit-table__wrap {
+  overflow-x: auto;
+}
+
+.benefit-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.benefit-table__table th,
+.benefit-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.benefit-table__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.benefit-table__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.benefit-table__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.benefit-table__identity,
+.benefit-table__period {
+  display: grid;
+  gap: 4px;
+}
+
+.benefit-table__identity strong {
+  color: #111111;
+}
+
+.benefit-table__identity span,
+.benefit-table__period span {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.benefit-table__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #d7d7d7;
+  color: #111111;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.benefit-table__badge--active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.benefit-table__badge--inactive {
+  background: #d7d7d7;
+  color: #111111;
+}
+
+.benefit-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.benefit-table__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.benefit-table__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.benefit-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.benefit-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.benefit-form__field span,
+.benefit-form__checkbox span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.benefit-form__checkbox {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 46px;
+}
+
+.benefit-form__checkbox input {
+  width: 18px;
+  height: 18px;
+}
+
+.benefit-form__hint {
+  color: #6a6a6a;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.benefit-form__field input:focus,
+.benefit-form__field select:focus,
+.benefits-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1200px) {
+  .benefits-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .benefit-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .benefits-page__header,
+  .benefits-page__toolbar,
+  .benefit-table,
+  .benefit-form {
+    padding: 18px;
+  }
+}
