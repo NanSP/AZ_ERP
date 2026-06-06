@@ -1,8 +1,13 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "../../auth/useAuth";
+import { filterModulesByReadAccess } from "../../services/accessControl";
 import { tenantModules } from "../../services/tenantModules";
 import "./sidebar.css";
 
 export default function Sidebar() {
+  const { session } = useAuth();
+  const visibleModules = filterModulesByReadAccess(tenantModules, session);
+
   return (
     <div className="sidebar">
       <div className="sidebar__header">
@@ -14,7 +19,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar__nav" aria-label="Modulos do tenant">
-        {tenantModules.map((module) => (
+        {visibleModules.map((module) => (
           <section key={module.sigla} className="sidebar__group">
             <div className="sidebar__group-head">
               <span className="sidebar__sigla">{module.sigla}</span>

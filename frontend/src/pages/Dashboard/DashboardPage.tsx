@@ -1,30 +1,37 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../../auth/useAuth";
+import {
+  filterModulesByReadAccess,
+  getFirstReadableResource,
+} from "../../services/accessControl";
 import ModuleGrid from "../../components/ModuleGrid/ModuleGrid";
 import { tenantModules } from "../../services/tenantModules";
 import "./dashboard.css";
 
-const highlights = [
-  {
-    label: "Modulos ativos",
-    value: tenantModules.length.toString().padStart(2, "0"),
-    description: "Dominios operacionais disponiveis no tenant.",
-  },
-  {
-    label: "Recursos mapeados",
-    value: tenantModules
-      .reduce((acc, module) => acc + module.resources.length, 0)
-      .toString(),
-    description: "Recursos conectados ao backend atual.",
-  },
-  {
-    label: "Workspace",
-    value: "ERP",
-    description: "Ambiente centralizado para operacao integrada.",
-  },
-];
-
 export default function DashboardPage() {
-  const featuredModules = tenantModules.slice(0, 6);
+  const { session } = useAuth();
+  const visibleModules = filterModulesByReadAccess(tenantModules, session);
+  const featuredModules = visibleModules.slice(0, 6);
+  const firstResource = getFirstReadableResource(tenantModules, session);
+  const highlights = [
+    {
+      label: "Modulos ativos",
+      value: visibleModules.length.toString().padStart(2, "0"),
+      description: "Dominios operacionais disponiveis para esta sessao.",
+    },
+    {
+      label: "Recursos visiveis",
+      value: visibleModules
+        .reduce((acc, module) => acc + module.resources.length, 0)
+        .toString(),
+      description: "Recursos liberados pelas permissoes atuais.",
+    },
+    {
+      label: "Workspace",
+      value: "ERP",
+      description: "Ambiente centralizado para operacao integrada.",
+    },
+  ];
 
   return (
     <div className="dashboard-page">
@@ -60,12 +67,18 @@ export default function DashboardPage() {
             </h3>
           </div>
 
-          <Link
-            to="/app/module/sys/usuarios"
-            className="dashboard-section__link"
-          >
-            Abrir primeiro recurso
-          </Link>
+          {firstResource ? (
+            <Link
+              to={`/app/module/${firstResource.schema}/${firstResource.entity}`}
+              className="dashboard-section__link"
+            >
+              Abrir primeiro recurso
+            </Link>
+          ) : (
+            <span className="dashboard-section__link dashboard-section__link--disabled">
+              Sem recursos liberados
+            </span>
+          )}
         </div>
 
         <ModuleGrid modules={featuredModules} />
