@@ -9,6 +9,9 @@ type NotificationFormProps = {
   editing: boolean;
   canEditFields: boolean;
   canSubmit: boolean;
+  canSaveReadState: boolean;
+  canToggleReadState: boolean;
+  readStateHint: string | null;
   saving: boolean;
   userOptions: UserOption[];
   userAccess: UserAccess;
@@ -29,6 +32,9 @@ export default function NotificationForm({
   editing,
   canEditFields,
   canSubmit,
+  canSaveReadState,
+  canToggleReadState,
+  readStateHint,
   saving,
   userOptions,
   userAccess,
@@ -39,7 +45,8 @@ export default function NotificationForm({
   const canSave =
     value.usuario.trim() !== "" &&
     value.titulo.trim() !== "" &&
-    value.mensagem.trim() !== "";
+    value.mensagem.trim() !== "" &&
+    canSaveReadState;
 
   function update<K extends keyof Notification>(
     field: K,
@@ -162,7 +169,7 @@ export default function NotificationForm({
                 dataLeitura: lida ? value.dataLeitura : "",
               });
             }}
-            disabled={!canEditFields}
+            disabled={!canEditFields || (!value.lida && !canToggleReadState)}
           />
           <span>Notificacao lida</span>
         </label>
@@ -175,6 +182,9 @@ export default function NotificationForm({
             onChange={(event) => update("dataLeitura", event.target.value)}
             disabled={!canEditFields || !value.lida}
           />
+          {readStateHint ? (
+            <small className="notification-form__hint">{readStateHint}</small>
+          ) : null}
         </label>
       </div>
 
