@@ -1,0 +1,254 @@
+.sla-config-page {
+  display: grid;
+  gap: 20px;
+}
+
+.sla-config-page--embedded {
+  gap: 18px;
+}
+
+.sla-config-page__header,
+.sla-config-page__toolbar,
+.sla-config-page__alert,
+.sla-table,
+.sla-form {
+  border: 1px solid #e5e5e5;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.sla-config-page__header,
+.sla-config-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+  border-radius: 24px;
+}
+
+.sla-config-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sla-config-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.sla-config-page__subtitle {
+  margin: 0;
+  color: #5d5d5d;
+  line-height: 1.6;
+}
+
+.sla-config-page__actions,
+.sla-config-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sla-config-page__search,
+.sla-form__field input,
+.sla-form__field select {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #dddddd;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.sla-config-page__search {
+  min-width: min(100%, 360px);
+}
+
+.sla-config-page__button,
+.sla-config-page__ghost,
+.sla-table__actions button,
+.sla-form__button,
+.sla-form__ghost {
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sla-config-page__button,
+.sla-form__button {
+  min-height: 44px;
+  padding: 0 18px;
+  background: #111111;
+  color: #ffffff;
+}
+
+.sla-config-page__ghost,
+.sla-form__ghost,
+.sla-table__actions button {
+  min-height: 40px;
+  padding: 0 14px;
+  background: #f3f3f3;
+  color: #111111;
+}
+
+.sla-config-page__alert {
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: #333333;
+}
+
+.sla-config-page__alert--success {
+  background: #f4f7f4;
+}
+
+.sla-config-page__alert--info {
+  background: #f7f7f7;
+}
+
+.sla-config-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.95fr);
+  gap: 20px;
+}
+
+.sla-table,
+.sla-form {
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.sla-table__head,
+.sla-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.sla-table__title,
+.sla-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.sla-table__meta,
+.sla-form__meta,
+.sla-form__subtitle {
+  color: #666666;
+  line-height: 1.5;
+}
+
+.sla-table__meta,
+.sla-form__meta {
+  font-size: 0.84rem;
+}
+
+.sla-form__subtitle {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+}
+
+.sla-table__wrap {
+  overflow-x: auto;
+}
+
+.sla-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sla-table__table th,
+.sla-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.sla-table__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #efefef;
+  color: #222222;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.sla-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sla-table__empty,
+.sla-table__empty-action {
+  color: #777777;
+}
+
+.sla-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sla-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.sla-form__field--span-2 {
+  grid-column: span 2;
+}
+
+.sla-form__field span {
+  color: #2f2f2f;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.sla-form__button {
+  margin-top: 18px;
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .sla-config-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .sla-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sla-form__field--span-2 {
+    grid-column: span 1;
+  }
+
+  .sla-config-page__header,
+  .sla-config-page__toolbar,
+  .sla-table,
+  .sla-form {
+    padding: 18px;
+  }
+}

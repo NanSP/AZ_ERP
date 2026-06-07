@@ -30,6 +30,7 @@ import ProjectsPage from "../Ps/ProjectsPage";
 import TasksPage from "../Ps/TasksPage";
 import AttendancesPage from "../Sm/AttendancesPage";
 import OrdersPage from "../Sm/OrdersPage";
+import SlaConfigPage from "../Sm/SlaConfigPage";
 import DependentsPage from "../Rh/DependentsPage";
 import EmployeesPage from "../Rh/EmployeesPage";
 import BenefitsPage from "../Rh/BenefitsPage";
@@ -130,6 +131,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "sm" && resource.entity === "ordensServico";
   const isAttendancesPilot =
     resource.schema === "sm" && resource.entity === "atendimentos";
+  const isSlaConfigPilot =
+    resource.schema === "sm" && resource.entity === "slaConfig";
   const isActionLogsPilot =
     resource.schema === "auditoria" && resource.entity === "logAcoes";
   const isErrorLogsPilot =
@@ -286,6 +289,8 @@ export default function ModuleWorkspacePage() {
             <OrdersPage embedded />
           ) : isAttendancesPilot ? (
             <AttendancesPage embedded />
+          ) : isSlaConfigPilot ? (
+            <SlaConfigPage embedded />
           ) : isActionLogsPilot ? (
             <ActionLogsPage embedded />
           ) : isErrorLogsPilot ? (
