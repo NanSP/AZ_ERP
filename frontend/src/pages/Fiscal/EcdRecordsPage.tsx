@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import EcdRecordsForm from "../../components/Fiscal/EcdRecordsForm";
 import EcdRecordsTable from "../../components/Fiscal/EcdRecordsTable";
+import { canAccessResourceAction } from "../../services/accessControl";
 import {
   createResource,
   deleteResource,
@@ -28,6 +29,13 @@ const emptyEntry: EcdRecordEntry = {
   registro: "",
   conteudo: "",
 };
+
+const ecdRecordsResource = {
+  schema: "fiscal",
+  entity: "ecdRegistros",
+  label: "Registros ECD",
+  description: "Registros contabeis ECD.",
+} as const;
 
 function normalizeEntry(data: Record<string, unknown>): EcdRecordEntry {
   return {
@@ -96,19 +104,22 @@ export default function EcdRecordsPage({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<EcdRecordEntry | null>(null);
   const [draft, setDraft] = useState<EcdRecordEntry>(emptyEntry);
-  const permissionSet = useMemo(
-    () => new Set(session?.permissoes ?? []),
-    [session?.permissoes],
+  const canRead = canAccessResourceAction(session, ecdRecordsResource, "read");
+  const canCreate = canAccessResourceAction(
+    session,
+    ecdRecordsResource,
+    "create",
   );
-  const isMasterScope = session?.scope === "master";
-  const canRead =
-    isMasterScope || permissionSet.has("fiscal:ecd_registros:read");
-  const canCreate =
-    isMasterScope || permissionSet.has("fiscal:ecd_registros:create");
-  const canUpdate =
-    isMasterScope || permissionSet.has("fiscal:ecd_registros:update");
-  const canDelete =
-    isMasterScope || permissionSet.has("fiscal:ecd_registros:delete");
+  const canUpdate = canAccessResourceAction(
+    session,
+    ecdRecordsResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    ecdRecordsResource,
+    "delete",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
@@ -351,7 +362,7 @@ export default function EcdRecordsPage({
             canDelete ? null : "exclusao desabilitada",
           ]
             .filter(Boolean)
-            .join(" · ")}
+            .join(" - ")}
         </div>
       ) : null}
 
