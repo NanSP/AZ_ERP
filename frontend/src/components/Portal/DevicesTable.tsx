@@ -6,6 +6,7 @@ type DevicesTableProps = {
   selectedId?: number;
   canEdit: boolean;
   canDelete: boolean;
+  canDeleteItem: (item: Device) => boolean;
   userOptions: UserOption[];
   onSelect: (item: Device) => void;
   onDelete: (item: Device) => void;
@@ -22,6 +23,7 @@ export default function DevicesTable({
   selectedId,
   canEdit,
   canDelete,
+  canDeleteItem,
   userOptions,
   onSelect,
   onDelete,
@@ -95,7 +97,18 @@ export default function DevicesTable({
                       </button>
                     ) : null}
                     {canDelete ? (
-                      <button type="button" onClick={() => onDelete(item)}>
+                      <button
+                        type="button"
+                        onClick={() => onDelete(item)}
+                        disabled={!canDeleteItem(item)}
+                        title={
+                          canDeleteItem(item)
+                            ? undefined
+                            : item.ultimoAcesso.trim() !== ""
+                              ? "Dispositivos com historico de acesso nao podem ser excluidos."
+                              : "Dispositivos ativos devem ser desativados antes da exclusao."
+                        }
+                      >
                         Excluir
                       </button>
                     ) : null}

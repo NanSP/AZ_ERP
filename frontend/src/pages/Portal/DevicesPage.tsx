@@ -290,6 +290,18 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
       return;
     }
 
+    if (item.ativo) {
+      setError("Desative o dispositivo antes de tentar exclui-lo.");
+      return;
+    }
+
+    if (item.ultimoAcesso.trim() !== "") {
+      setError(
+        "Dispositivos com historico de acesso nao podem ser excluidos.",
+      );
+      return;
+    }
+
     const confirmed = window.confirm(
       `Deseja excluir o dispositivo "${item.deviceId || item.id}"?`,
     );
@@ -410,6 +422,9 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
           selectedId={selected?.id}
           canEdit={canRead && canUpdate}
           canDelete={canRead && canDelete}
+          canDeleteItem={(item) =>
+            !item.ativo && item.ultimoAcesso.trim() === ""
+          }
           userOptions={userOptions}
           onSelect={handleSelect}
           onDelete={(item) => void handleDelete(item)}

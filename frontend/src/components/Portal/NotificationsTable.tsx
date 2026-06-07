@@ -9,6 +9,7 @@ type NotificationsTableProps = {
   selectedId?: number;
   canEdit: boolean;
   canDelete: boolean;
+  canDeleteItem: (item: Notification) => boolean;
   userOptions: UserOption[];
   onSelect: (item: Notification) => void;
   onDelete: (item: Notification) => void;
@@ -25,6 +26,7 @@ export default function NotificationsTable({
   selectedId,
   canEdit,
   canDelete,
+  canDeleteItem,
   userOptions,
   onSelect,
   onDelete,
@@ -92,7 +94,16 @@ export default function NotificationsTable({
                       </button>
                     ) : null}
                     {canDelete ? (
-                      <button type="button" onClick={() => onDelete(item)}>
+                      <button
+                        type="button"
+                        onClick={() => onDelete(item)}
+                        disabled={!canDeleteItem(item)}
+                        title={
+                          canDeleteItem(item)
+                            ? undefined
+                            : "Notificacoes ja lidas nao podem ser excluidas."
+                        }
+                      >
                         Excluir
                       </button>
                     ) : null}

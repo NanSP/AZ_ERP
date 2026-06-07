@@ -128,7 +128,6 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
   const canRead = canAccessResourceAction(session, sessionsResource, "read");
   const canCreate = canAccessResourceAction(session, sessionsResource, "create");
   const canUpdate = canAccessResourceAction(session, sessionsResource, "update");
-  const canDelete = canAccessResourceAction(session, sessionsResource, "delete");
   const canReadUsers = canAccessResourceAction(session, usersResource, "read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
@@ -344,17 +343,19 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
           {success}
         </div>
       ) : null}
-      {!canRead || !canCreate || !canDelete ? (
+      {!canRead || !canCreate ? (
         <div className="sessions-page__alert sessions-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
             canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao nao suportada pelo backend",
           ]
             .filter(Boolean)
             .join(" - ")}
         </div>
       ) : null}
+      <div className="sessions-page__alert sessions-page__alert--info">
+        Exclusao de sessoes nao e suportada pelo backend deste recurso.
+      </div>
 
       <div className="sessions-page__layout">
         <SessionsTable

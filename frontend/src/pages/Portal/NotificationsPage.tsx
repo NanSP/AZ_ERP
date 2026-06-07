@@ -18,6 +18,7 @@ export type UserOption = {
 };
 
 export type UserAccess = "idle" | "loaded" | "unavailable";
+export type SessionAccess = "idle" | "loaded" | "unavailable";
 
 export type Notification = {
   id?: number;
@@ -46,6 +47,13 @@ const usersResource = {
   entity: "usuarios",
   label: "Usuarios",
   description: "Usuarios do tenant.",
+} as const;
+
+const sessionsResource = {
+  schema: "portal",
+  entity: "sessoes",
+  label: "Sessoes",
+  description: "Controle de sessoes e atividade.",
 } as const;
 
 const emptyNotification: Notification = {
@@ -130,6 +138,8 @@ export default function NotificationsPage({
   const [draft, setDraft] = useState<Notification>(emptyNotification);
   const [userOptions, setUserOptions] = useState<UserOption[]>([]);
   const [userAccess, setUserAccess] = useState<UserAccess>("idle");
+  const [activeSessionUserIds, setActiveSessionUserIds] = useState<number[]>([]);
+  const [sessionAccess, setSessionAccess] = useState<SessionAccess>("idle");
   const canRead = canAccessResourceAction(
     session,
     notificationsResource,
@@ -151,8 +161,49 @@ export default function NotificationsPage({
     "delete",
   );
   const canReadUsers = canAccessResourceAction(session, usersResource, "read");
+  const canReadSessions = canAccessResourceAction(
+    session,
+    sessionsResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
+  const selectedUserId =
+    draft.usuario.trim() === "" ? null : Number(draft.usuario.trim());
+  const selectedUserHasActiveSession =
+    selectedUserId != null &&
+    !Number.isNaN(selectedUserId) &&
+    (selectedUserId === session?.userId ||
+      activeSessionUserIds.includes(selectedUserId));
+  const canToggleReadState =
+    !draft.lida && selectedUserHasActiveSession;
+  const canSaveReadState =
+    !draft.lida ||
+    (selectedUserHasActiveSession && draft.dataLeitura.trim() !== "");
+
+  async function loadActiveSessions() {
+    if (!canReadSessions) {
+      setActiveSessionUserIds([]);
+      setSessionAccess("unavailable");
+      return;
+    }
+
+    try {
+      const response = await listResource("portal", "sessoes");
+      const activeUsers = Array.isArray(response.data)
+        ? response.data
+            .map((item) => item as Record<string, unknown>)
+            .filter((item) => item.dataLogout == null)
+            .map((item) => Number(item.usuario))
+            .filter((value) => !Number.isNaN(value))
+        : [];
+      setActiveSessionUserIds(activeUsers);
+      setSessionAccess("loaded");
+    } catch {
+      setActiveSessionUserIds([]);
+      setSessionAccess("unavailable");
+    }
+  }
 
   async function loadNotifications() {
     if (!canRead) {
@@ -214,6 +265,10 @@ export default function NotificationsPage({
     void loadUsers();
   }, [canReadUsers]);
 
+  useEffect(() => {
+    void loadActiveSessions();
+  }, [canReadSessions]);
+
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
@@ -264,6 +319,13 @@ export default function NotificationsPage({
       return;
     }
 
+    if (draft.lida && !canSaveReadState) {
+      setError(
+        "Para marcar a notificacao como lida, o usuario precisa possuir uma sessao ativa e informar a data de leitura.",
+      );
+      return;
+    }
+
     setSaving(true);
     setError(null);
     setSuccess(null);
@@ -305,6 +367,11 @@ export default function NotificationsPage({
 
     if (!item.id) {
       setError("Nao foi possivel identificar a notificacao para exclusao.");
+      return;
+    }
+
+    if (item.lida) {
+      setError("Notificacoes ja lidas nao podem ser excluidas.");
       return;
     }
 
@@ -432,6 +499,7 @@ export default function NotificationsPage({
           selectedId={selected?.id}
           canEdit={canRead && canUpdate}
           canDelete={canRead && canDelete}
+          canDeleteItem={(item) => !item.lida}
           userOptions={userOptions}
           onSelect={handleSelect}
           onDelete={(item) => void handleDelete(item)}
@@ -442,6 +510,15 @@ export default function NotificationsPage({
           editing={!!selected}
           canEditFields={canRead && (selected ? canUpdate : canCreate)}
           canSubmit={canRead && canSubmitCurrent}
+          canSaveReadState={canSaveReadState}
+          canToggleReadState={canToggleReadState}
+          readStateHint={
+            draft.lida && !selectedUserHasActiveSession
+              ? "Somente usuarios com sessao ativa podem ter a notificacao marcada como lida."
+              : sessionAccess === "unavailable" && draft.usuario.trim() !== ""
+                ? "Nao foi possivel validar sessoes ativas deste usuario nesta rodada."
+                : null
+          }
           saving={saving}
           userOptions={userOptions}
           userAccess={userAccess}
