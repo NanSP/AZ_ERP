@@ -1,0 +1,313 @@
+.non-conformities-page {
+  display: grid;
+  gap: 20px;
+}
+
+.non-conformities-page--embedded {
+  gap: 18px;
+}
+
+.non-conformities-page__header,
+.non-conformities-page__toolbar,
+.non-conformities-table,
+.non-conformity-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.non-conformities-page__header,
+.non-conformities-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.non-conformities-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.non-conformities-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.non-conformities-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.non-conformities-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.non-conformities-page__search,
+.non-conformities-page__field input,
+.non-conformities-page__field select,
+.non-conformities-page__field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.non-conformities-page__field textarea {
+  min-height: 108px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.non-conformities-page__search {
+  min-width: min(360px, 100%);
+}
+
+.non-conformities-page__button,
+.non-conformities-page__ghost,
+.non-conformities-page__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.non-conformities-page__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.non-conformities-page__ghost,
+.non-conformities-page__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.non-conformities-page__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.non-conformities-page__button:hover,
+.non-conformities-page__ghost:hover,
+.non-conformities-page__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.non-conformities-page__button:disabled,
+.non-conformities-page__ghost:disabled,
+.non-conformities-page__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.non-conformities-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.non-conformities-page__alert--success {
+  background: #f2f2f2;
+}
+
+.non-conformities-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.non-conformities-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+  gap: 20px;
+}
+
+.non-conformities-table,
+.non-conformity-form {
+  padding: 22px;
+}
+
+.non-conformities-page__panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.non-conformities-page__panel-title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.non-conformities-page__panel-subtitle {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.non-conformities-page__panel-meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.non-conformities-page__table-wrap {
+  overflow-x: auto;
+}
+
+.non-conformities-page__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.non-conformities-page__table th,
+.non-conformities-page__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.non-conformities-page__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.non-conformities-page__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.non-conformities-page__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.non-conformities-page__identity,
+.non-conformities-page__details {
+  display: grid;
+  gap: 4px;
+}
+
+.non-conformities-page__identity strong {
+  color: #111111;
+}
+
+.non-conformities-page__identity span,
+.non-conformities-page__details span {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.non-conformities-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.non-conformities-page__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.non-conformities-page__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.non-conformities-page__form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.non-conformities-page__field {
+  display: grid;
+  gap: 8px;
+}
+
+.non-conformities-page__field--span-2 {
+  grid-column: span 2;
+}
+
+.non-conformities-page__field span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.non-conformities-page__hint {
+  color: #6a6a6a;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.non-conformities-page__field input:focus,
+.non-conformities-page__field select:focus,
+.non-conformities-page__field textarea:focus,
+.non-conformities-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1200px) {
+  .non-conformities-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .non-conformities-page__form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .non-conformities-page__field--span-2 {
+    grid-column: span 1;
+  }
+
+  .non-conformities-page__header,
+  .non-conformities-page__toolbar,
+  .non-conformities-table,
+  .non-conformity-form {
+    padding: 18px;
+  }
+}
