@@ -23,6 +23,7 @@ import {
 import { AssetsPage, MaintenancesPage } from "../Am";
 import { ActionLogsPage, ErrorLogsPage } from "../Auditoria";
 import ProjectsPage from "../Ps/ProjectsPage";
+import TasksPage from "../Ps/TasksPage";
 import DependentsPage from "../Rh/DependentsPage";
 import EmployeesPage from "../Rh/EmployeesPage";
 import BenefitsPage from "../Rh/BenefitsPage";
@@ -109,6 +110,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "am" && resource.entity === "manutencoes";
   const isProjectsPilot =
     resource.schema === "ps" && resource.entity === "projetos";
+  const isTasksPilot =
+    resource.schema === "ps" && resource.entity === "tarefas";
   const isActionLogsPilot =
     resource.schema === "auditoria" && resource.entity === "logAcoes";
   const isErrorLogsPilot =
@@ -251,6 +254,8 @@ export default function ModuleWorkspacePage() {
             <MaintenancesPage embedded />
           ) : isProjectsPilot ? (
             <ProjectsPage embedded />
+          ) : isTasksPilot ? (
+            <TasksPage embedded />
           ) : isActionLogsPilot ? (
             <ActionLogsPage embedded />
           ) : isErrorLogsPilot ? (
