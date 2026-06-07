@@ -362,7 +362,7 @@ export default function EcdRecordsPage({
             canDelete ? null : "exclusao desabilitada",
           ]
             .filter(Boolean)
-            .join(" · ")}
+            .join(" - ")}
         </div>
       ) : null}
 
