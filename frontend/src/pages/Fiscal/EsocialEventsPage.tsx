@@ -3,6 +3,7 @@ import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import EsocialEventsForm from "../../components/Fiscal/EsocialEventsForm";
 import EsocialEventsTable from "../../components/Fiscal/EsocialEventsTable";
+import { canAccessResourceAction } from "../../services/accessControl";
 import {
   createResource,
   deleteResource,
@@ -32,6 +33,13 @@ const emptyEntry: EsocialEventEntry = {
   conteudo: "",
   status: "gerado",
 };
+
+const esocialEventsResource = {
+  schema: "fiscal",
+  entity: "esocialEventos",
+  label: "Eventos eSocial",
+  description: "Eventos fiscais do eSocial.",
+} as const;
 
 function normalizeEntry(data: Record<string, unknown>): EsocialEventEntry {
   return {
@@ -83,19 +91,26 @@ export default function EsocialEventsPage({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<EsocialEventEntry | null>(null);
   const [draft, setDraft] = useState<EsocialEventEntry>(emptyEntry);
-  const permissionSet = useMemo(
-    () => new Set(session?.permissoes ?? []),
-    [session?.permissoes],
+  const canRead = canAccessResourceAction(
+    session,
+    esocialEventsResource,
+    "read",
   );
-  const isMasterScope = session?.scope === "master";
-  const canRead =
-    isMasterScope || permissionSet.has("fiscal:esocial_eventos:read");
-  const canCreate =
-    isMasterScope || permissionSet.has("fiscal:esocial_eventos:create");
-  const canUpdate =
-    isMasterScope || permissionSet.has("fiscal:esocial_eventos:update");
-  const canDelete =
-    isMasterScope || permissionSet.has("fiscal:esocial_eventos:delete");
+  const canCreate = canAccessResourceAction(
+    session,
+    esocialEventsResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    esocialEventsResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    esocialEventsResource,
+    "delete",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
