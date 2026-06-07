@@ -28,6 +28,7 @@ import SessionsPage from "../Portal/SessionsPage";
 import AllocatedResourcesPage from "../Ps/AllocatedResourcesPage";
 import ProjectsPage from "../Ps/ProjectsPage";
 import TasksPage from "../Ps/TasksPage";
+import ProductionOrdersPage from "../Pp/ProductionOrdersPage";
 import AttendancesPage from "../Sm/AttendancesPage";
 import OrdersPage from "../Sm/OrdersPage";
 import SlaConfigPage from "../Sm/SlaConfigPage";
@@ -121,6 +122,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "ps" && resource.entity === "tarefas";
   const isAllocatedResourcesPilot =
     resource.schema === "ps" && resource.entity === "recursosAlocados";
+  const isProductionOrdersPilot =
+    resource.schema === "pp" && resource.entity === "ordemProducao";
   const isNotificationsPilot =
     resource.schema === "portal" && resource.entity === "notificacoes";
   const isSessionsPilot =
@@ -279,6 +282,8 @@ export default function ModuleWorkspacePage() {
             <TasksPage embedded />
           ) : isAllocatedResourcesPilot ? (
             <AllocatedResourcesPage embedded />
+          ) : isProductionOrdersPilot ? (
+            <ProductionOrdersPage embedded />
           ) : isNotificationsPilot ? (
             <NotificationsPage embedded />
           ) : isSessionsPilot ? (

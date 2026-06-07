@@ -1,0 +1,286 @@
+.production-orders-page {
+  display: grid;
+  gap: 20px;
+}
+
+.production-orders-page--embedded {
+  gap: 18px;
+}
+
+.production-orders-page__header,
+.production-orders-page__toolbar,
+.production-orders-page__alert,
+.production-orders-table,
+.production-order-form {
+  border: 1px solid #e5e5e5;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.production-orders-page__header,
+.production-orders-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+  border-radius: 24px;
+}
+
+.production-orders-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.production-orders-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.production-orders-page__subtitle {
+  margin: 0;
+  color: #5d5d5d;
+  line-height: 1.6;
+}
+
+.production-orders-page__actions,
+.production-orders-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.production-orders-page__search,
+.production-order-form__field input,
+.production-order-form__field select,
+.production-order-form__field textarea {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #dddddd;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.production-order-form__field textarea {
+  min-height: 108px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.production-orders-page__search {
+  min-width: min(100%, 360px);
+}
+
+.production-orders-page__button,
+.production-orders-page__ghost,
+.production-orders-table__actions button,
+.production-order-form__button,
+.production-order-form__ghost {
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.production-orders-page__button,
+.production-order-form__button {
+  min-height: 44px;
+  padding: 0 18px;
+  background: #111111;
+  color: #ffffff;
+}
+
+.production-orders-page__ghost,
+.production-order-form__ghost,
+.production-orders-table__actions button {
+  min-height: 40px;
+  padding: 0 14px;
+  background: #f3f3f3;
+  color: #111111;
+}
+
+.production-orders-page__alert {
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: #333333;
+}
+
+.production-orders-page__alert--success {
+  background: #f4f7f4;
+}
+
+.production-orders-page__alert--info {
+  background: #f7f7f7;
+}
+
+.production-orders-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
+  gap: 20px;
+}
+
+.production-orders-table,
+.production-order-form {
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.production-orders-table__head,
+.production-order-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.production-orders-table__title,
+.production-order-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.production-orders-table__meta,
+.production-order-form__meta,
+.production-order-form__subtitle,
+.production-order-form__hint {
+  color: #666666;
+  line-height: 1.5;
+}
+
+.production-orders-table__meta,
+.production-order-form__meta,
+.production-order-form__hint {
+  font-size: 0.84rem;
+}
+
+.production-order-form__subtitle {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+}
+
+.production-orders-table__wrap {
+  overflow-x: auto;
+}
+
+.production-orders-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.production-orders-table__table th,
+.production-orders-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.production-orders-table__identity,
+.production-orders-table__details {
+  display: grid;
+  gap: 4px;
+}
+
+.production-orders-table__identity strong {
+  color: #111111;
+}
+
+.production-orders-table__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #efefef;
+  color: #222222;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.production-orders-table__badge--progress {
+  background: #ececec;
+}
+
+.production-orders-table__badge--done {
+  background: #111111;
+  color: #ffffff;
+}
+
+.production-orders-table__badge--cancelled {
+  background: #dcdcdc;
+}
+
+.production-orders-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.production-orders-table__empty,
+.production-orders-table__empty-action {
+  color: #777777;
+}
+
+.production-order-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.production-order-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.production-order-form__field--span-2 {
+  grid-column: span 2;
+}
+
+.production-order-form__field span {
+  color: #2f2f2f;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.production-order-form__button {
+  margin-top: 18px;
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .production-orders-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .production-order-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .production-order-form__field--span-2 {
+    grid-column: span 1;
+  }
+
+  .production-orders-page__header,
+  .production-orders-page__toolbar,
+  .production-orders-table,
+  .production-order-form {
+    padding: 18px;
+  }
+}
