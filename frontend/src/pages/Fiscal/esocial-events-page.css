@@ -1,0 +1,307 @@
+.esocial-events-page {
+  display: grid;
+  gap: 20px;
+}
+
+.esocial-events-page--embedded {
+  gap: 18px;
+}
+
+.esocial-events-page__header,
+.esocial-events-page__toolbar,
+.esocial-events-table,
+.esocial-events-form {
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.esocial-events-page__header,
+.esocial-events-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+}
+
+.esocial-events-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.esocial-events-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.esocial-events-page__subtitle {
+  margin: 0;
+  color: #5c5c5c;
+  line-height: 1.6;
+}
+
+.esocial-events-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.esocial-events-page__search,
+.esocial-events-page__field input,
+.esocial-events-page__field select,
+.esocial-events-page__field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.esocial-events-page__field textarea {
+  min-height: 140px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.esocial-events-page__search {
+  min-width: min(360px, 100%);
+}
+
+.esocial-events-page__button,
+.esocial-events-page__ghost,
+.esocial-events-page__actions button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 220ms ease-out,
+    box-shadow 220ms ease-out,
+    opacity 220ms ease-out;
+}
+
+.esocial-events-page__button {
+  background: #111111;
+  color: #ffffff;
+}
+
+.esocial-events-page__ghost,
+.esocial-events-page__actions button:first-child {
+  background: #f2f2f2;
+  color: #111111;
+}
+
+.esocial-events-page__actions button:last-child {
+  background: #111111;
+  color: #ffffff;
+}
+
+.esocial-events-page__button:hover,
+.esocial-events-page__ghost:hover,
+.esocial-events-page__actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+}
+
+.esocial-events-page__button:disabled,
+.esocial-events-page__ghost:disabled,
+.esocial-events-page__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.esocial-events-page__alert {
+  padding: 14px 16px;
+  border: 1px solid #dddddd;
+  border-radius: 16px;
+  background: #f6f6f6;
+  color: #222222;
+}
+
+.esocial-events-page__alert--success {
+  background: #f2f2f2;
+}
+
+.esocial-events-page__alert--info {
+  background: #fafafa;
+  color: #4b4b4b;
+}
+
+.esocial-events-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(380px, 1fr);
+  gap: 20px;
+}
+
+.esocial-events-table,
+.esocial-events-form {
+  padding: 22px;
+}
+
+.esocial-events-page__panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.esocial-events-page__panel-title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.esocial-events-page__panel-subtitle {
+  margin: 0;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.esocial-events-page__panel-meta {
+  margin: 8px 0 0;
+  color: #6a6a6a;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.esocial-events-page__table-wrap {
+  overflow-x: auto;
+}
+
+.esocial-events-page__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.esocial-events-page__table th,
+.esocial-events-page__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.esocial-events-page__table th {
+  color: #5b5b5b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.esocial-events-page__table td {
+  color: #202020;
+  font-size: 0.92rem;
+}
+
+.esocial-events-page__table tr[data-selected="true"] td {
+  background: #f7f7f7;
+}
+
+.esocial-events-page__identity,
+.esocial-events-page__details {
+  display: grid;
+  gap: 4px;
+}
+
+.esocial-events-page__identity strong {
+  color: #111111;
+}
+
+.esocial-events-page__identity span,
+.esocial-events-page__details span {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.esocial-events-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.esocial-events-page__empty-action {
+  color: #6a6a6a;
+  font-size: 0.82rem;
+}
+
+.esocial-events-page__empty {
+  padding: 28px 12px;
+  color: #6c6c6c;
+  text-align: center;
+}
+
+.esocial-events-page__form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.esocial-events-page__field {
+  display: grid;
+  gap: 8px;
+}
+
+.esocial-events-page__field--span-2 {
+  grid-column: span 2;
+}
+
+.esocial-events-page__field span {
+  color: #333333;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.esocial-events-page__field input:focus,
+.esocial-events-page__field select:focus,
+.esocial-events-page__field textarea:focus,
+.esocial-events-page__search:focus {
+  outline: none;
+  border-color: #bdbdbd;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 1200px) {
+  .esocial-events-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .esocial-events-page__form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .esocial-events-page__field--span-2 {
+    grid-column: span 1;
+  }
+
+  .esocial-events-page__header,
+  .esocial-events-page__toolbar,
+  .esocial-events-table,
+  .esocial-events-form {
+    padding: 18px;
+  }
+}

@@ -14,7 +14,7 @@ import ChartOfAccountsPage from "../Fi/ChartOfAccountsPage";
 import CashFlowPage from "../Fi/CashFlowPage";
 import BankMovementsPage from "../Fi/BankMovementsPage";
 import AccountsReceivablePage from "../Fi/AccountsReceivablePage";
-import { DocumentsPage } from "../Fiscal";
+import { DocumentsPage, EsocialEventsPage } from "../Fiscal";
 import { AssetsPage, MaintenancesPage } from "../Am";
 import { ActionLogsPage, ErrorLogsPage } from "../Auditoria";
 import DependentsPage from "../Rh/DependentsPage";
@@ -123,6 +123,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "fi" && resource.entity === "contasReceber";
   const isDocumentsPilot =
     resource.schema === "fiscal" && resource.entity === "documentos";
+  const isEsocialEventsPilot =
+    resource.schema === "fiscal" && resource.entity === "esocialEventos";
 
   if (!hasReadAccess) {
     return (
@@ -257,6 +259,8 @@ export default function ModuleWorkspacePage() {
             <AccountsReceivablePage embedded />
           ) : isDocumentsPilot ? (
             <DocumentsPage embedded />
+          ) : isEsocialEventsPilot ? (
+            <EsocialEventsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
