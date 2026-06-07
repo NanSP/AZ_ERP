@@ -29,6 +29,7 @@ import AllocatedResourcesPage from "../Ps/AllocatedResourcesPage";
 import ProjectsPage from "../Ps/ProjectsPage";
 import TasksPage from "../Ps/TasksPage";
 import BomPage from "../Pp/BomPage";
+import ProductionEntriesPage from "../Pp/ProductionEntriesPage";
 import ProductionOrdersPage from "../Pp/ProductionOrdersPage";
 import AttendancesPage from "../Sm/AttendancesPage";
 import OrdersPage from "../Sm/OrdersPage";
@@ -126,6 +127,8 @@ export default function ModuleWorkspacePage() {
   const isProductionOrdersPilot =
     resource.schema === "pp" && resource.entity === "ordemProducao";
   const isBomPilot = resource.schema === "pp" && resource.entity === "bom";
+  const isProductionEntriesPilot =
+    resource.schema === "pp" && resource.entity === "apontamentos";
   const isNotificationsPilot =
     resource.schema === "portal" && resource.entity === "notificacoes";
   const isSessionsPilot =
@@ -288,6 +291,8 @@ export default function ModuleWorkspacePage() {
             <ProductionOrdersPage embedded />
           ) : isBomPilot ? (
             <BomPage embedded />
+          ) : isProductionEntriesPilot ? (
+            <ProductionEntriesPage embedded />
           ) : isNotificationsPilot ? (
             <NotificationsPage embedded />
           ) : isSessionsPilot ? (
