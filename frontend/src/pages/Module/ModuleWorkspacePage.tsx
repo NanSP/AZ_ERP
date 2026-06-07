@@ -28,6 +28,7 @@ import SessionsPage from "../Portal/SessionsPage";
 import AllocatedResourcesPage from "../Ps/AllocatedResourcesPage";
 import ProjectsPage from "../Ps/ProjectsPage";
 import TasksPage from "../Ps/TasksPage";
+import AttendancesPage from "../Sm/AttendancesPage";
 import OrdersPage from "../Sm/OrdersPage";
 import DependentsPage from "../Rh/DependentsPage";
 import EmployeesPage from "../Rh/EmployeesPage";
@@ -127,6 +128,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "portal" && resource.entity === "dispositivos";
   const isOrdersPilot =
     resource.schema === "sm" && resource.entity === "ordensServico";
+  const isAttendancesPilot =
+    resource.schema === "sm" && resource.entity === "atendimentos";
   const isActionLogsPilot =
     resource.schema === "auditoria" && resource.entity === "logAcoes";
   const isErrorLogsPilot =
@@ -281,6 +284,8 @@ export default function ModuleWorkspacePage() {
             <DevicesPage embedded />
           ) : isOrdersPilot ? (
             <OrdersPage embedded />
+          ) : isAttendancesPilot ? (
+            <AttendancesPage embedded />
           ) : isActionLogsPilot ? (
             <ActionLogsPage embedded />
           ) : isErrorLogsPilot ? (
