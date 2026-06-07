@@ -22,6 +22,7 @@ import {
 } from "../Fiscal";
 import { AssetsPage, MaintenancesPage } from "../Am";
 import { ActionLogsPage, ErrorLogsPage } from "../Auditoria";
+import DevicesPage from "../Portal/DevicesPage";
 import NotificationsPage from "../Portal/NotificationsPage";
 import SessionsPage from "../Portal/SessionsPage";
 import AllocatedResourcesPage from "../Ps/AllocatedResourcesPage";
@@ -121,6 +122,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "portal" && resource.entity === "notificacoes";
   const isSessionsPilot =
     resource.schema === "portal" && resource.entity === "sessoes";
+  const isDevicesPilot =
+    resource.schema === "portal" && resource.entity === "dispositivos";
   const isActionLogsPilot =
     resource.schema === "auditoria" && resource.entity === "logAcoes";
   const isErrorLogsPilot =
@@ -271,6 +274,8 @@ export default function ModuleWorkspacePage() {
             <NotificationsPage embedded />
           ) : isSessionsPilot ? (
             <SessionsPage embedded />
+          ) : isDevicesPilot ? (
+            <DevicesPage embedded />
           ) : isActionLogsPilot ? (
             <ActionLogsPage embedded />
           ) : isErrorLogsPilot ? (
