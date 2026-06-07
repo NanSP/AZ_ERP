@@ -15,6 +15,7 @@ import CashFlowPage from "../Fi/CashFlowPage";
 import BankMovementsPage from "../Fi/BankMovementsPage";
 import AccountsReceivablePage from "../Fi/AccountsReceivablePage";
 import { AssetsPage, MaintenancesPage } from "../Am";
+import { ActionLogsPage } from "../Auditoria";
 import DependentsPage from "../Rh/DependentsPage";
 import EmployeesPage from "../Rh/EmployeesPage";
 import BenefitsPage from "../Rh/BenefitsPage";
@@ -99,6 +100,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "am" && resource.entity === "bensPatrimoniais";
   const isMaintenancesPilot =
     resource.schema === "am" && resource.entity === "manutencoes";
+  const isActionLogsPilot =
+    resource.schema === "auditoria" && resource.entity === "logAcoes";
   const isInspectionsPilot =
     resource.schema === "qm" && resource.entity === "inspecoes";
   const isNonConformitiesPilot =
@@ -227,6 +230,8 @@ export default function ModuleWorkspacePage() {
             <AssetsPage embedded />
           ) : isMaintenancesPilot ? (
             <MaintenancesPage embedded />
+          ) : isActionLogsPilot ? (
+            <ActionLogsPage embedded />
           ) : isInspectionsPilot ? (
             <InspectionsPage embedded />
           ) : isNonConformitiesPilot ? (
