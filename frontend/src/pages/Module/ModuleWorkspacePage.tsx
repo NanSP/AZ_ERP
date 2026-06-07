@@ -23,6 +23,7 @@ import {
 import { AssetsPage, MaintenancesPage } from "../Am";
 import { ActionLogsPage, ErrorLogsPage } from "../Auditoria";
 import NotificationsPage from "../Portal/NotificationsPage";
+import SessionsPage from "../Portal/SessionsPage";
 import AllocatedResourcesPage from "../Ps/AllocatedResourcesPage";
 import ProjectsPage from "../Ps/ProjectsPage";
 import TasksPage from "../Ps/TasksPage";
@@ -118,6 +119,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "ps" && resource.entity === "recursosAlocados";
   const isNotificationsPilot =
     resource.schema === "portal" && resource.entity === "notificacoes";
+  const isSessionsPilot =
+    resource.schema === "portal" && resource.entity === "sessoes";
   const isActionLogsPilot =
     resource.schema === "auditoria" && resource.entity === "logAcoes";
   const isErrorLogsPilot =
@@ -266,6 +269,8 @@ export default function ModuleWorkspacePage() {
             <AllocatedResourcesPage embedded />
           ) : isNotificationsPilot ? (
             <NotificationsPage embedded />
+          ) : isSessionsPilot ? (
+            <SessionsPage embedded />
           ) : isActionLogsPilot ? (
             <ActionLogsPage embedded />
           ) : isErrorLogsPilot ? (
