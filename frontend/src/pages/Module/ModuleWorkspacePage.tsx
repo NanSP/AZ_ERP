@@ -56,6 +56,7 @@ import TimeTrackingPage from "../Rh/TimeTrackingPage";
 import PayrollPage from "../Rh/PayrollPage";
 import { InspectionsPage, NonConformitiesPage } from "../Qm";
 import ClientsPage from "../Sd/ClientsPage";
+import ContractsPage from "../Sd/ContractsPage";
 import OpportunitiesPage from "../Sd/OpportunitiesPage";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
@@ -216,6 +217,8 @@ export default function ModuleWorkspacePage() {
   const isClientsPilot = resource.schema === "sd" && resource.entity === "clientes";
   const isOpportunitiesPilot =
     resource.schema === "sd" && resource.entity === "oportunidades";
+  const isContractsPilot =
+    resource.schema === "sd" && resource.entity === "contratos";
 
   if (!hasReadAccess) {
     return (
@@ -414,6 +417,8 @@ export default function ModuleWorkspacePage() {
             <ClientsPage embedded />
           ) : isOpportunitiesPilot ? (
             <OpportunitiesPage embedded />
+          ) : isContractsPilot ? (
+            <ContractsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
