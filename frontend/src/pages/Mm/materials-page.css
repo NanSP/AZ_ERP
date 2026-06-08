@@ -1,0 +1,259 @@
+.materials-page {
+  display: grid;
+  gap: 20px;
+}
+
+.materials-page--embedded {
+  gap: 18px;
+}
+
+.materials-page__header,
+.materials-page__toolbar,
+.materials-page__alert,
+.materials-table,
+.material-form {
+  border: 1px solid #e5e5e5;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.04);
+}
+
+.materials-page__header,
+.materials-page__toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+  flex-wrap: wrap;
+  padding: 24px;
+  border-radius: 24px;
+}
+
+.materials-page__eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #6f6f6f;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.materials-page__title {
+  margin: 0 0 8px;
+  color: #111111;
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.materials-page__subtitle {
+  margin: 0;
+  color: #5d5d5d;
+  line-height: 1.6;
+}
+
+.materials-page__actions,
+.materials-page__toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.materials-page__search,
+.material-form__field input,
+.material-form__field select,
+.material-form__field textarea {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #dddddd;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.material-form__field textarea {
+  min-height: 110px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.materials-page__search {
+  min-width: min(100%, 360px);
+}
+
+.materials-page__button,
+.materials-page__ghost,
+.materials-table__actions button,
+.material-form__button,
+.material-form__ghost {
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.materials-page__button,
+.material-form__button {
+  min-height: 44px;
+  padding: 0 18px;
+  background: #111111;
+  color: #ffffff;
+}
+
+.materials-page__ghost,
+.material-form__ghost,
+.materials-table__actions button {
+  min-height: 40px;
+  padding: 0 14px;
+  background: #f3f3f3;
+  color: #111111;
+}
+
+.materials-page__alert {
+  padding: 14px 16px;
+  border-radius: 16px;
+  color: #333333;
+}
+
+.materials-page__alert--success {
+  background: #f4f7f4;
+}
+
+.materials-page__alert--info {
+  background: #f7f7f7;
+}
+
+.materials-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr);
+  gap: 20px;
+}
+
+.materials-table,
+.material-form {
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.materials-table__head,
+.material-form__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.materials-table__title,
+.material-form__title {
+  margin: 0;
+  color: #111111;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.materials-table__meta,
+.material-form__meta,
+.material-form__subtitle,
+.material-form__hint {
+  color: #666666;
+  line-height: 1.5;
+}
+
+.materials-table__meta,
+.material-form__meta,
+.material-form__hint {
+  font-size: 0.84rem;
+}
+
+.material-form__subtitle {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+}
+
+.materials-table__wrap {
+  overflow-x: auto;
+}
+
+.materials-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.materials-table__table th,
+.materials-table__table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  text-align: left;
+  vertical-align: top;
+}
+
+.materials-table__details {
+  display: grid;
+  gap: 4px;
+}
+
+.materials-table__details strong {
+  color: #111111;
+}
+
+.materials-table__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.materials-table__empty,
+.materials-table__empty-action {
+  color: #777777;
+}
+
+.material-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.material-form__field {
+  display: grid;
+  gap: 8px;
+}
+
+.material-form__field--span-2 {
+  grid-column: span 2;
+}
+
+.material-form__field span {
+  color: #2f2f2f;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.material-form__button {
+  margin-top: 18px;
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .materials-page__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .material-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .material-form__field--span-2 {
+    grid-column: span 1;
+  }
+
+  .materials-page__header,
+  .materials-page__toolbar,
+  .materials-table,
+  .material-form {
+    padding: 18px;
+  }
+}
