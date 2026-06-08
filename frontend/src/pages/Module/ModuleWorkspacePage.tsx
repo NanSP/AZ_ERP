@@ -23,6 +23,7 @@ import {
 import { AssetsPage, MaintenancesPage } from "../Am";
 import { ActionLogsPage, ErrorLogsPage } from "../Auditoria";
 import DashboardsPage from "../Bi/DashboardsPage";
+import MetricHistoryPage from "../Bi/MetricHistoryPage";
 import MetricsPage from "../Bi/MetricsPage";
 import DevicesPage from "../Portal/DevicesPage";
 import NotificationsPage from "../Portal/NotificationsPage";
@@ -176,6 +177,8 @@ export default function ModuleWorkspacePage() {
   const isDashboardsPilot =
     resource.schema === "bi" && resource.entity === "dashboards";
   const isMetricsPilot = resource.schema === "bi" && resource.entity === "metricas";
+  const isMetricHistoryPilot =
+    resource.schema === "bi" && resource.entity === "historicoMetricas";
 
   if (!hasReadAccess) {
     return (
@@ -346,6 +349,8 @@ export default function ModuleWorkspacePage() {
             <DashboardsPage embedded />
           ) : isMetricsPilot ? (
             <MetricsPage embedded />
+          ) : isMetricHistoryPilot ? (
+            <MetricHistoryPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
