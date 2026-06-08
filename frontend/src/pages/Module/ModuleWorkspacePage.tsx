@@ -27,6 +27,7 @@ import MetricHistoryPage from "../Bi/MetricHistoryPage";
 import MetricsPage from "../Bi/MetricsPage";
 import ReportsPage from "../Bi/ReportsPage";
 import AuditsPage from "../Grc/AuditsPage";
+import ConsentsPage from "../Grc/ConsentsPage";
 import ControlsPage from "../Grc/ControlsPage";
 import RisksPage from "../Grc/RisksPage";
 import DevicesPage from "../Portal/DevicesPage";
@@ -190,6 +191,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "grc" && resource.entity === "controles";
   const isAuditsPilot =
     resource.schema === "grc" && resource.entity === "auditorias";
+  const isConsentsPilot =
+    resource.schema === "grc" && resource.entity === "consentimentos";
 
   if (!hasReadAccess) {
     return (
@@ -370,6 +373,8 @@ export default function ModuleWorkspacePage() {
             <ControlsPage embedded />
           ) : isAuditsPilot ? (
             <AuditsPage embedded />
+          ) : isConsentsPilot ? (
+            <ConsentsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
