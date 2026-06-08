@@ -183,14 +183,8 @@ select:focus {
 
 /* Responsividade global */
 @media (max-width: 768px) {
-  .page {
-    margin: 1rem;
-    padding: 1rem;
-  }
-
-  button {
-    width: 100%;
-    margin-bottom: 0.5rem;
+  html {
+    font-size: 15px;
   }
 }
 
