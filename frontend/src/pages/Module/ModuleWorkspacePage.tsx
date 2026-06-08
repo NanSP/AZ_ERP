@@ -30,6 +30,7 @@ import AuditsPage from "../Grc/AuditsPage";
 import ConsentsPage from "../Grc/ConsentsPage";
 import ControlsPage from "../Grc/ControlsPage";
 import RisksPage from "../Grc/RisksPage";
+import MaterialsPage from "../Mm/MaterialsPage";
 import DevicesPage from "../Portal/DevicesPage";
 import NotificationsPage from "../Portal/NotificationsPage";
 import SessionsPage from "../Portal/SessionsPage";
@@ -193,6 +194,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "grc" && resource.entity === "auditorias";
   const isConsentsPilot =
     resource.schema === "grc" && resource.entity === "consentimentos";
+  const isMaterialsPilot =
+    resource.schema === "mm" && resource.entity === "materiais";
 
   if (!hasReadAccess) {
     return (
@@ -375,6 +378,8 @@ export default function ModuleWorkspacePage() {
             <AuditsPage embedded />
           ) : isConsentsPilot ? (
             <ConsentsPage embedded />
+          ) : isMaterialsPilot ? (
+            <MaterialsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
