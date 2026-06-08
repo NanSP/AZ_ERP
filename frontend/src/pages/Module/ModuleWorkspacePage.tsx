@@ -32,6 +32,7 @@ import ControlsPage from "../Grc/ControlsPage";
 import RisksPage from "../Grc/RisksPage";
 import MaterialsPage from "../Mm/MaterialsPage";
 import MovementsPage from "../Mm/MovementsPage";
+import InventoriesPage from "../Mm/InventoriesPage";
 import PurchaseItemsPage from "../Mm/PurchaseItemsPage";
 import PurchasesPage from "../Mm/PurchasesPage";
 import StocksPage from "../Mm/StocksPage";
@@ -208,6 +209,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "mm" && resource.entity === "compras";
   const isPurchaseItemsPilot =
     resource.schema === "mm" && resource.entity === "compraItens";
+  const isInventoriesPilot =
+    resource.schema === "mm" && resource.entity === "inventarios";
 
   if (!hasReadAccess) {
     return (
@@ -400,6 +403,8 @@ export default function ModuleWorkspacePage() {
             <PurchasesPage embedded />
           ) : isPurchaseItemsPilot ? (
             <PurchaseItemsPage embedded />
+          ) : isInventoriesPilot ? (
+            <InventoriesPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
