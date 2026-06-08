@@ -26,6 +26,7 @@ import DashboardsPage from "../Bi/DashboardsPage";
 import MetricHistoryPage from "../Bi/MetricHistoryPage";
 import MetricsPage from "../Bi/MetricsPage";
 import ReportsPage from "../Bi/ReportsPage";
+import ControlsPage from "../Grc/ControlsPage";
 import RisksPage from "../Grc/RisksPage";
 import DevicesPage from "../Portal/DevicesPage";
 import NotificationsPage from "../Portal/NotificationsPage";
@@ -184,6 +185,8 @@ export default function ModuleWorkspacePage() {
   const isReportsPilot =
     resource.schema === "bi" && resource.entity === "relatorios";
   const isRisksPilot = resource.schema === "grc" && resource.entity === "riscos";
+  const isControlsPilot =
+    resource.schema === "grc" && resource.entity === "controles";
 
   if (!hasReadAccess) {
     return (
@@ -360,6 +363,8 @@ export default function ModuleWorkspacePage() {
             <ReportsPage embedded />
           ) : isRisksPilot ? (
             <RisksPage embedded />
+          ) : isControlsPilot ? (
+            <ControlsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
