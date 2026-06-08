@@ -58,6 +58,7 @@ import { InspectionsPage, NonConformitiesPage } from "../Qm";
 import ClientsPage from "../Sd/ClientsPage";
 import ContractsPage from "../Sd/ContractsPage";
 import OpportunitiesPage from "../Sd/OpportunitiesPage";
+import SalesOrdersPage from "../Sd/OrdersPage";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
 import ProfilesPage from "../Sys/ProfilesPage";
@@ -154,7 +155,7 @@ export default function ModuleWorkspacePage() {
     resource.schema === "portal" && resource.entity === "sessoes";
   const isDevicesPilot =
     resource.schema === "portal" && resource.entity === "dispositivos";
-  const isOrdersPilot =
+  const isServiceOrdersPilot =
     resource.schema === "sm" && resource.entity === "ordensServico";
   const isAttendancesPilot =
     resource.schema === "sm" && resource.entity === "atendimentos";
@@ -219,6 +220,7 @@ export default function ModuleWorkspacePage() {
     resource.schema === "sd" && resource.entity === "oportunidades";
   const isContractsPilot =
     resource.schema === "sd" && resource.entity === "contratos";
+  const isSalesOrdersPilot = resource.schema === "sd" && resource.entity === "pedidos";
 
   if (!hasReadAccess) {
     return (
@@ -351,7 +353,7 @@ export default function ModuleWorkspacePage() {
             <SessionsPage embedded />
           ) : isDevicesPilot ? (
             <DevicesPage embedded />
-          ) : isOrdersPilot ? (
+          ) : isServiceOrdersPilot ? (
             <OrdersPage embedded />
           ) : isAttendancesPilot ? (
             <AttendancesPage embedded />
@@ -419,6 +421,8 @@ export default function ModuleWorkspacePage() {
             <OpportunitiesPage embedded />
           ) : isContractsPilot ? (
             <ContractsPage embedded />
+          ) : isSalesOrdersPilot ? (
+            <SalesOrdersPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
