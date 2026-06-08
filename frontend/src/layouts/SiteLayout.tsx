@@ -1,9 +1,9 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
-import standaloneLogo from "../assets/standaloneLogo.png";
 import "./site-layout.css";
 
-const mainLogo = new URL("../assets/mainLogo.PNG", import.meta.url).href;
+const mainLogo = "/branding/mainLogo.webp";
+const standaloneLogo = "/branding/standaloneLogo.webp";
 
 const navItems = [
   { label: "Home", href: "/" },
