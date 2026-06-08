@@ -31,6 +31,7 @@ import ConsentsPage from "../Grc/ConsentsPage";
 import ControlsPage from "../Grc/ControlsPage";
 import RisksPage from "../Grc/RisksPage";
 import MaterialsPage from "../Mm/MaterialsPage";
+import MovementsPage from "../Mm/MovementsPage";
 import StocksPage from "../Mm/StocksPage";
 import DevicesPage from "../Portal/DevicesPage";
 import NotificationsPage from "../Portal/NotificationsPage";
@@ -199,6 +200,8 @@ export default function ModuleWorkspacePage() {
     resource.schema === "mm" && resource.entity === "materiais";
   const isStocksPilot =
     resource.schema === "mm" && resource.entity === "estoques";
+  const isMovementsPilot =
+    resource.schema === "mm" && resource.entity === "movimentacoes";
 
   if (!hasReadAccess) {
     return (
@@ -385,6 +388,8 @@ export default function ModuleWorkspacePage() {
             <MaterialsPage embedded />
           ) : isStocksPilot ? (
             <StocksPage embedded />
+          ) : isMovementsPilot ? (
+            <MovementsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
