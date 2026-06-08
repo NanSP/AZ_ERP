@@ -75,7 +75,7 @@ export default function EntryPage() {
         </div>
 
         <div className="landing-modules">
-          {moduleCatalog.map((module) => (
+          {moduleCatalog.map((module, index) => (
             <article key={module.sigla} className="landing-module-card">
               <div className="landing-module-visual">
                 <span>{module.sigla}</span>
@@ -83,6 +83,9 @@ export default function EntryPage() {
                   src={module.image}
                   alt={`Ilustracao do modulo ${module.sigla}`}
                   className="landing-module-visual__image"
+                  loading={index < 2 ? "eager" : "lazy"}
+                  fetchPriority={index < 2 ? "high" : "low"}
+                  decoding="async"
                 />
               </div>
               <div className="landing-module-card__body">

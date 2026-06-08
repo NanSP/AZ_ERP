@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import verticalLogo from "../assets/verticalLogo.png";
 import "../pages/Login/login.css";
+
+const verticalLogo = "/branding/verticalLogo.webp";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
