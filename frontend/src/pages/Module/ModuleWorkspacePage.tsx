@@ -58,6 +58,7 @@ import { InspectionsPage, NonConformitiesPage } from "../Qm";
 import ClientsPage from "../Sd/ClientsPage";
 import ContractsPage from "../Sd/ContractsPage";
 import OpportunitiesPage from "../Sd/OpportunitiesPage";
+import OrderItemsPage from "../Sd/OrderItemsPage";
 import SalesOrdersPage from "../Sd/OrdersPage";
 import PermissionsPage from "../Sys/PermissionsPage";
 import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
@@ -221,6 +222,8 @@ export default function ModuleWorkspacePage() {
   const isContractsPilot =
     resource.schema === "sd" && resource.entity === "contratos";
   const isSalesOrdersPilot = resource.schema === "sd" && resource.entity === "pedidos";
+  const isOrderItemsPilot =
+    resource.schema === "sd" && resource.entity === "pedidoItens";
 
   if (!hasReadAccess) {
     return (
@@ -423,6 +426,8 @@ export default function ModuleWorkspacePage() {
             <ContractsPage embedded />
           ) : isSalesOrdersPilot ? (
             <SalesOrdersPage embedded />
+          ) : isOrderItemsPilot ? (
+            <OrderItemsPage embedded />
           ) : (
             <ModuleCrud
               schema={resource.schema}
