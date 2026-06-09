@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, useEffect } from "react";
 
 import type {
   AuthSession,
@@ -14,25 +14,58 @@ import {
   changeTenantPassword,
   loginMaster,
   loginTenant,
+  getMe,
 } from "../services/authService";
+import { setAuthToken } from "../services/api";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(() => loadSession());
 
+  // Ao montar, tentamos popular a sessão consultando o endpoint /auth/me.
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const me = await getMe();
+        if (mounted && me) {
+          saveSession(me);
+          setAuthToken(me.token ?? null);
+          setSession(me);
+        }
+      } catch {
+        // sem sessão — estado inicial fica nulo
+      } finally {
+        if (mounted) setReady(true);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const [ready, setReady] = useState(false);
+
   const loginMasterAction = async (payload: MasterLoginPayload) => {
     const next = await loginMaster(payload);
+    // Caso o backend retorne token (legacy), armazenamos em memória.
     saveSession(next);
+    setAuthToken(next.token ?? null);
     setSession(next);
   };
 
   const loginTenantAction = async (payload: TenantLoginPayload) => {
     const next = await loginTenant(payload);
     saveSession(next);
+    setAuthToken(next.token ?? null);
     setSession(next);
   };
 
   const logout = () => {
+    // Chamar endpoint de logout seria ideal para revogar refresh token no servidor.
     clearSession();
+    setAuthToken(null);
     setSession(null);
   };
 
@@ -49,6 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     saveSession(updated);
     setSession(updated);
   };
+
+  if (!ready) return null;
 
   const value = {
     session,
