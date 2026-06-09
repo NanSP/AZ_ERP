@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   listResource,
   createResource,
@@ -32,7 +32,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     return Array.from(keys);
   }, [items]);
 
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -44,11 +44,11 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [entity, label, schema]);
 
   useEffect(() => {
     void loadData();
-  }, [schema, entity]);
+  }, [loadData]);
 
   async function handleCreate() {
     let body: GenericItem;

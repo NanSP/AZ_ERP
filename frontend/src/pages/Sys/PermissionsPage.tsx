@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import PermissionTable from "../../components/Sys/PermissionTable";
@@ -85,15 +85,12 @@ export default function PermissionsPage({
   );
   const isMasterScope = session?.scope === "master";
   const canRead = isMasterScope || permissionSet.has("sys:permissoes:read");
-  const canCreate =
-    isMasterScope || permissionSet.has("sys:permissoes:create");
-  const canUpdate =
-    isMasterScope || permissionSet.has("sys:permissoes:update");
-  const canDelete =
-    isMasterScope || permissionSet.has("sys:permissoes:delete");
+  const canCreate = isMasterScope || permissionSet.has("sys:permissoes:create");
+  const canUpdate = isMasterScope || permissionSet.has("sys:permissoes:update");
+  const canDelete = isMasterScope || permissionSet.has("sys:permissoes:delete");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
 
-  async function loadPermissions() {
+  const loadPermissions = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -116,16 +113,16 @@ export default function PermissionsPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar as permissoes."),
+        getErrorMessage(err, "Não foi possivel carregar as permissões."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadPermissions();
-  }, [canRead]);
+  }, [loadPermissions]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -171,8 +168,8 @@ export default function PermissionsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar permissoes."
-          : "Seu perfil nao possui permissao para criar permissoes.",
+          ? "Seu perfil não possui permissão para atualizar permissões."
+          : "Seu perfil não possui permissão para criar permissões.",
       );
       return;
     }
@@ -187,22 +184,24 @@ export default function PermissionsPage({
         ? await updateResource("sys", "permissoes", selected.id, payload)
         : await createResource("sys", "permissoes", payload);
 
-      const saved = normalizePermission(response.data as Record<string, unknown>);
+      const saved = normalizePermission(
+        response.data as Record<string, unknown>,
+      );
       await loadPermissions();
       setSelected(saved);
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Permissao atualizada com sucesso."
-          : "Permissao criada com sucesso.",
+          ? "Permissão atualizada com sucesso."
+          : "Permissão criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a permissao."
-            : "Nao foi possivel criar a permissao.",
+            ? "Não foi possivel atualizar a permissão."
+            : "Não foi possivel criar a permissão.",
         ),
       );
     } finally {
@@ -212,17 +211,17 @@ export default function PermissionsPage({
 
   async function handleDelete(item: Permission) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir permissoes.");
+      setError("Seu perfil não possui permissão para excluir permissões.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a permissao para exclusao.");
+      setError("Não foi possivel identificar a permissão para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a permissao "${item.nome}"?`,
+      `Deseja excluir a permissão "${item.nome}"?`,
     );
 
     if (!confirmed) {
@@ -242,9 +241,9 @@ export default function PermissionsPage({
         setDraft({ ...emptyPermission });
       }
 
-      setSuccess("Permissao excluida com sucesso.");
+      setSuccess("Permissão excluída com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a permissao."));
+      setError(getErrorMessage(err, "Não foi possivel excluir a permissão."));
     } finally {
       setSaving(false);
     }
@@ -262,9 +261,9 @@ export default function PermissionsPage({
         <header className="permissions-page__header">
           <div>
             <span className="permissions-page__eyebrow">SYS</span>
-            <h2 className="permissions-page__title">Permissoes</h2>
+            <h2 className="permissions-page__title">Permissões</h2>
             <p className="permissions-page__subtitle">
-              Gerencie a matriz de autorizacoes por modulo, recurso e acao.
+              Gerencie a matriz de autorizações por módulo, recurso e ação.
             </p>
           </div>
 
@@ -283,7 +282,7 @@ export default function PermissionsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova permissao
+              Nova permissão
             </button>
           </div>
         </header>
@@ -312,7 +311,7 @@ export default function PermissionsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova permissao
+              Nova permissão
             </button>
           </div>
         </div>
@@ -328,8 +327,8 @@ export default function PermissionsPage({
         <div className="permissions-page__alert permissions-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

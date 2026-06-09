@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import AccountsPayableTable from "../../components/Fi/AccountsPayableTable";
@@ -130,10 +130,13 @@ export default function AccountsPayablePage({
   const [draft, setDraft] = useState<AccountPayable>(emptyAccount);
   const [companyOptions, setCompanyOptions] = useState<RelatedOption[]>([]);
   const [supplierOptions, setSupplierOptions] = useState<RelatedOption[]>([]);
-  const [costCenterOptions, setCostCenterOptions] = useState<RelatedOption[]>([]);
+  const [costCenterOptions, setCostCenterOptions] = useState<RelatedOption[]>(
+    [],
+  );
   const [companyAccess, setCompanyAccess] = useState<RelatedAccess>("idle");
   const [supplierAccess, setSupplierAccess] = useState<RelatedAccess>("idle");
-  const [costCenterAccess, setCostCenterAccess] = useState<RelatedAccess>("idle");
+  const [costCenterAccess, setCostCenterAccess] =
+    useState<RelatedAccess>("idle");
   const isBusy = loading || saving;
   const permissionSet = useMemo(
     () => new Set(session?.permissoes ?? []),
@@ -155,7 +158,7 @@ export default function AccountsPayablePage({
     isMasterScope || permissionSet.has("fi:centros_custo:read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
 
-  async function loadAccountsPayable() {
+  const loadAccountsPayable = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -178,17 +181,14 @@ export default function AccountsPayablePage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel carregar as contas a pagar.",
-        ),
+        getErrorMessage(err, "Não foi possivel carregar as contas a pagar."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadCompanies() {
+  const loadCompanies = useCallback(async () => {
     if (!canReadCompanies) {
       setCompanyOptions([]);
       setCompanyAccess("unavailable");
@@ -212,9 +212,9 @@ export default function AccountsPayablePage({
       setCompanyOptions([]);
       setCompanyAccess("unavailable");
     }
-  }
+  }, [canReadCompanies]);
 
-  async function loadSuppliers() {
+  const loadSuppliers = useCallback(async () => {
     if (!canReadPartners) {
       setSupplierOptions([]);
       setSupplierAccess("unavailable");
@@ -242,9 +242,9 @@ export default function AccountsPayablePage({
       setSupplierOptions([]);
       setSupplierAccess("unavailable");
     }
-  }
+  }, [canReadPartners]);
 
-  async function loadCostCenters() {
+  const loadCostCenters = useCallback(async () => {
     if (!canReadCostCenters) {
       setCostCenterOptions([]);
       setCostCenterAccess("unavailable");
@@ -268,23 +268,23 @@ export default function AccountsPayablePage({
       setCostCenterOptions([]);
       setCostCenterAccess("unavailable");
     }
-  }
+  }, [canReadCostCenters]);
 
   useEffect(() => {
     void loadAccountsPayable();
-  }, [canRead]);
+  }, [loadAccountsPayable]);
 
   useEffect(() => {
     void loadCompanies();
-  }, [canReadCompanies]);
+  }, [loadCompanies]);
 
   useEffect(() => {
     void loadSuppliers();
-  }, [canReadPartners]);
+  }, [loadSuppliers]);
 
   useEffect(() => {
     void loadCostCenters();
-  }, [canReadCostCenters]);
+  }, [loadCostCenters]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -336,8 +336,8 @@ export default function AccountsPayablePage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar contas a pagar."
-          : "Seu perfil nao possui permissao para criar contas a pagar.",
+          ? "Seu perfil nao possui permissão para atualizar contas a pagar."
+          : "Seu perfil nao possui permissão para criar contas a pagar.",
       );
       return;
     }
@@ -366,8 +366,8 @@ export default function AccountsPayablePage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a conta a pagar."
-            : "Nao foi possivel criar a conta a pagar.",
+            ? "Não foi possivel atualizar a conta a pagar."
+            : "Não foi possivel criar a conta a pagar.",
         ),
       );
     } finally {
@@ -377,12 +377,12 @@ export default function AccountsPayablePage({
 
   async function handleDelete(item: AccountPayable) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir contas a pagar.");
+      setError("Seu perfil não possui permissao para excluir contas a pagar.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a conta a pagar para exclusao.");
+      setError("Não foi possivel identificar a conta a pagar para exclusão.");
       return;
     }
 
@@ -410,7 +410,7 @@ export default function AccountsPayablePage({
       setSuccess("Conta a pagar excluida com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir a conta a pagar."),
+        getErrorMessage(err, "Não foi possivel excluir a conta a pagar."),
       );
     } finally {
       setSaving(false);

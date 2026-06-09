@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import NotificationForm from "../../components/Portal/NotificationForm";
@@ -39,7 +39,7 @@ const notificationsResource = {
   schema: "portal",
   entity: "notificacoes",
   label: "Notificacoes",
-  description: "Mensagens e notificacoes internas.",
+  description: "Mensagens e notificações internas.",
 } as const;
 
 const usersResource = {
@@ -53,7 +53,7 @@ const sessionsResource = {
   schema: "portal",
   entity: "sessoes",
   label: "Sessoes",
-  description: "Controle de sessoes e atividade.",
+  description: "Controle de sessões e atividade.",
 } as const;
 
 const emptyNotification: Notification = {
@@ -138,7 +138,9 @@ export default function NotificationsPage({
   const [draft, setDraft] = useState<Notification>(emptyNotification);
   const [userOptions, setUserOptions] = useState<UserOption[]>([]);
   const [userAccess, setUserAccess] = useState<UserAccess>("idle");
-  const [activeSessionUserIds, setActiveSessionUserIds] = useState<number[]>([]);
+  const [activeSessionUserIds, setActiveSessionUserIds] = useState<number[]>(
+    [],
+  );
   const [sessionAccess, setSessionAccess] = useState<SessionAccess>("idle");
   const canRead = canAccessResourceAction(
     session,
@@ -175,13 +177,12 @@ export default function NotificationsPage({
     !Number.isNaN(selectedUserId) &&
     (selectedUserId === session?.userId ||
       activeSessionUserIds.includes(selectedUserId));
-  const canToggleReadState =
-    !draft.lida && selectedUserHasActiveSession;
+  const canToggleReadState = !draft.lida && selectedUserHasActiveSession;
   const canSaveReadState =
     !draft.lida ||
     (selectedUserHasActiveSession && draft.dataLeitura.trim() !== "");
 
-  async function loadActiveSessions() {
+  const loadActiveSessions = useCallback(async () => {
     if (!canReadSessions) {
       setActiveSessionUserIds([]);
       setSessionAccess("unavailable");
@@ -203,9 +204,9 @@ export default function NotificationsPage({
       setActiveSessionUserIds([]);
       setSessionAccess("unavailable");
     }
-  }
+  }, [canReadSessions]);
 
-  async function loadNotifications() {
+  const loadNotifications = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -228,14 +229,14 @@ export default function NotificationsPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar as notificacoes."),
+        getErrorMessage(err, "Não foi possivel carregar as notificações."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUserOptions([]);
       setUserAccess("unavailable");
@@ -255,19 +256,19 @@ export default function NotificationsPage({
       setUserOptions([]);
       setUserAccess("unavailable");
     }
-  }
-
-  useEffect(() => {
-    void loadNotifications();
-  }, [canRead]);
-
-  useEffect(() => {
-    void loadUsers();
   }, [canReadUsers]);
 
   useEffect(() => {
+    void loadNotifications();
+  }, [loadNotifications]);
+
+  useEffect(() => {
+    void loadUsers();
+  }, [loadUsers]);
+
+  useEffect(() => {
     void loadActiveSessions();
-  }, [canReadSessions]);
+  }, [loadActiveSessions]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -313,15 +314,15 @@ export default function NotificationsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar notificacoes."
-          : "Seu perfil nao possui permissao para criar notificacoes.",
+          ? "Seu perfil não possui permissão para atualizar notificações."
+          : "Seu perfil não possui permissão para criar notificações.",
       );
       return;
     }
 
     if (draft.lida && !canSaveReadState) {
       setError(
-        "Para marcar a notificacao como lida, o usuario precisa possuir uma sessao ativa e informar a data de leitura.",
+        "Para marcar a notificação como lida, o usuário precisa possuir uma sessão ativa e informar a data de leitura.",
       );
       return;
     }
@@ -336,22 +337,24 @@ export default function NotificationsPage({
         ? await updateResource("portal", "notificacoes", selected.id, payload)
         : await createResource("portal", "notificacoes", payload);
 
-      const saved = normalizeNotification(response.data as Record<string, unknown>);
+      const saved = normalizeNotification(
+        response.data as Record<string, unknown>,
+      );
       await loadNotifications();
       setSelected(saved);
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Notificacao atualizada com sucesso."
-          : "Notificacao criada com sucesso.",
+          ? "Notificação atualizada com sucesso."
+          : "Notificação criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a notificacao."
-            : "Nao foi possivel criar a notificacao.",
+            ? "Não foi possivel atualizar a notificação."
+            : "Não foi possivel criar a notificação.",
         ),
       );
     } finally {
@@ -361,22 +364,22 @@ export default function NotificationsPage({
 
   async function handleDelete(item: Notification) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir notificacoes.");
+      setError("Seu perfil não possui permissão para excluir notificações.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a notificacao para exclusao.");
+      setError("Não foi possivel identificar a notificação para exclusão.");
       return;
     }
 
     if (item.lida) {
-      setError("Notificacoes ja lidas nao podem ser excluidas.");
+      setError("Notificações ja lidas nao podem ser excluidas.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a notificacao "${item.titulo || item.id}"?`,
+      `Deseja excluir a notificação "${item.titulo || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -396,11 +399,9 @@ export default function NotificationsPage({
         setDraft({ ...emptyNotification });
       }
 
-      setSuccess("Notificacao excluida com sucesso.");
+      setSuccess("Notificação excluída com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir a notificacao."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir a notificação."));
     } finally {
       setSaving(false);
     }
@@ -418,9 +419,10 @@ export default function NotificationsPage({
         <header className="notifications-page__header">
           <div>
             <span className="notifications-page__eyebrow">PORTAL</span>
-            <h2 className="notifications-page__title">Notificacoes</h2>
+            <h2 className="notifications-page__title">Notificações</h2>
             <p className="notifications-page__subtitle">
-              Gerencie mensagens internas, estados de leitura e contexto de notificacao por usuario.
+              Gerencie mensagens internas, estados de leitura e contexto de
+              notificação por usuário.
             </p>
           </div>
 
@@ -439,7 +441,7 @@ export default function NotificationsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova notificacao
+              Nova notificação
             </button>
           </div>
         </header>
@@ -468,7 +470,7 @@ export default function NotificationsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova notificacao
+              Nova notificação
             </button>
           </div>
         </div>
@@ -484,8 +486,8 @@ export default function NotificationsPage({
         <div className="notifications-page__alert notifications-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}
@@ -514,9 +516,9 @@ export default function NotificationsPage({
           canToggleReadState={canToggleReadState}
           readStateHint={
             draft.lida && !selectedUserHasActiveSession
-              ? "Somente usuarios com sessao ativa podem ter a notificacao marcada como lida."
+              ? "Somente usuários com sessão ativa podem ter a notificação marcada como lida."
               : sessionAccess === "unavailable" && draft.usuario.trim() !== ""
-                ? "Nao foi possivel validar sessoes ativas deste usuario nesta rodada."
+                ? "Não foi possível validar sessões ativas deste usuário nesta rodada."
                 : null
           }
           saving={saving}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ProfileTable from "../../components/Sys/ProfileTable";
@@ -81,7 +81,7 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
   const canDelete = isMasterScope || permissionSet.has("sys:perfis:delete");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
 
-  async function loadProfiles() {
+  const loadProfiles = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -103,15 +103,15 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os perfis."));
+      setError(getErrorMessage(err, "Não foi possivel carregar os perfis."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadProfiles();
-  }, [canRead]);
+  }, [loadProfiles]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -157,8 +157,8 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar perfis."
-          : "Seu perfil nao possui permissao para criar perfis.",
+          ? "Seu perfil não possui permissão para atualizar perfis."
+          : "Seu perfil não possui permissão para criar perfis.",
       );
       return;
     }
@@ -187,8 +187,8 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o perfil."
-            : "Nao foi possivel criar o perfil.",
+            ? "Não foi possivel atualizar o perfil."
+            : "Não foi possivel criar o perfil.",
         ),
       );
     } finally {
@@ -198,18 +198,16 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
 
   async function handleDelete(item: Profile) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir perfis.");
+      setError("Seu perfil não possui permissão para excluir perfis.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o perfil para exclusao.");
+      setError("Não foi possivel identificar o perfil para exclusão.");
       return;
     }
 
-    const confirmed = window.confirm(
-      `Deseja excluir o perfil "${item.nome}"?`,
-    );
+    const confirmed = window.confirm(`Deseja excluir o perfil "${item.nome}"?`);
 
     if (!confirmed) {
       return;
@@ -228,9 +226,9 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
         setDraft({ ...emptyProfile });
       }
 
-      setSuccess("Perfil excluido com sucesso.");
+      setSuccess("Perfil excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o perfil."));
+      setError(getErrorMessage(err, "Não foi possivel excluir o perfil."));
     } finally {
       setSaving(false);
     }
@@ -249,7 +247,7 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
             <h2 className="profiles-page__title">Perfis</h2>
             <p className="profiles-page__subtitle">
               Gerencie perfis de acesso, niveis operacionais e regras de
-              atribuicao.
+              atribuição.
             </p>
           </div>
 
@@ -313,8 +311,8 @@ export default function ProfilesPage({ embedded = false }: ProfilesPageProps) {
         <div className="profiles-page__alert profiles-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

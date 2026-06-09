@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import SlaConfigForm from "../../components/Sm/SlaConfigForm";
@@ -29,7 +29,7 @@ const slaResource = {
   schema: "sm",
   entity: "slaConfig",
   label: "SLA",
-  description: "Configuracao de niveis de servico.",
+  description: "Configuração de niveis de serviço.",
 } as const;
 
 const emptySlaConfig: SlaConfigEntry = {
@@ -99,7 +99,7 @@ export default function SlaConfigPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadItems() {
+  const loadItems = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -115,24 +115,26 @@ export default function SlaConfigPage({
     try {
       const response = await listResource("sm", "slaConfig");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeEntry(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeEntry(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
       setError(
         getErrorMessage(
           err,
-          "Nao foi possivel carregar as configuracoes de SLA.",
+          "Não foi possivel carregar as configurações de SLA.",
         ),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadItems();
-  }, [canRead]);
+  }, [loadItems]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -178,8 +180,8 @@ export default function SlaConfigPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar configuracoes de SLA."
-          : "Seu perfil nao possui permissao para criar configuracoes de SLA.",
+          ? "Seu perfil não possui permissão para atualizar configurações de SLA."
+          : "Seu perfil não possui permissão para criar configurações de SLA.",
       );
       return;
     }
@@ -200,16 +202,16 @@ export default function SlaConfigPage({
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Configuracao de SLA atualizada com sucesso."
-          : "Configuracao de SLA criada com sucesso.",
+          ? "Configuração de SLA atualizada com sucesso."
+          : "Configuração de SLA criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a configuracao de SLA."
-            : "Nao foi possivel criar a configuracao de SLA.",
+            ? "Não foi possivel atualizar a configuração de SLA."
+            : "Não foi possivel criar a configuração de SLA.",
         ),
       );
     } finally {
@@ -220,18 +222,18 @@ export default function SlaConfigPage({
   async function handleDelete(item: SlaConfigEntry) {
     if (!canDelete) {
       setError(
-        "Seu perfil nao possui permissao para excluir configuracoes de SLA.",
+        "Seu perfil não possui permissão para excluir configurações de SLA.",
       );
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a configuracao para exclusao.");
+      setError("Não foi possivel identificar a configuração para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a configuracao de SLA "${item.tipoServico} / ${item.prioridade}"?`,
+      `Deseja excluir a configuração de SLA "${item.tipoServico} / ${item.prioridade}"?`,
     );
 
     if (!confirmed) {
@@ -251,13 +253,10 @@ export default function SlaConfigPage({
         setDraft({ ...emptySlaConfig });
       }
 
-      setSuccess("Configuracao de SLA excluida com sucesso.");
+      setSuccess("Configuração de SLA excluída com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel excluir a configuracao de SLA.",
-        ),
+        getErrorMessage(err, "Não foi possivel excluir a configuração de SLA."),
       );
     } finally {
       setSaving(false);
@@ -267,7 +266,9 @@ export default function SlaConfigPage({
   return (
     <div
       className={
-        embedded ? "sla-config-page sla-config-page--embedded" : "sla-config-page"
+        embedded
+          ? "sla-config-page sla-config-page--embedded"
+          : "sla-config-page"
       }
     >
       {!embedded ? (
@@ -276,7 +277,8 @@ export default function SlaConfigPage({
             <span className="sla-config-page__eyebrow">SM</span>
             <h2 className="sla-config-page__title">SLA</h2>
             <p className="sla-config-page__subtitle">
-              Configure prioridade e tempos de atendimento e resolucao por tipo de servico.
+              Configure prioridade e tempos de atendimento e resolucao por tipo
+              de servico.
             </p>
           </div>
 

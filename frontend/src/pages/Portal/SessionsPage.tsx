@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import SessionForm from "../../components/Portal/SessionForm";
@@ -37,7 +37,7 @@ const sessionsResource = {
   schema: "portal",
   entity: "sessoes",
   label: "Sessoes",
-  description: "Controle de sessoes e atividade.",
+  description: "Controle de sessões e atividade.",
 } as const;
 
 const usersResource = {
@@ -126,13 +126,21 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
   const [userOptions, setUserOptions] = useState<UserOption[]>([]);
   const [userAccess, setUserAccess] = useState<UserAccess>("idle");
   const canRead = canAccessResourceAction(session, sessionsResource, "read");
-  const canCreate = canAccessResourceAction(session, sessionsResource, "create");
-  const canUpdate = canAccessResourceAction(session, sessionsResource, "update");
+  const canCreate = canAccessResourceAction(
+    session,
+    sessionsResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    sessionsResource,
+    "update",
+  );
   const canReadUsers = canAccessResourceAction(session, usersResource, "read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadSessions() {
+  const loadSessions = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -154,13 +162,13 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as sessoes."));
+      setError(getErrorMessage(err, "Não foi possível carregar as sessões."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUserOptions([]);
       setUserAccess("unavailable");
@@ -180,15 +188,15 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
       setUserOptions([]);
       setUserAccess("unavailable");
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadSessions();
-  }, [canRead]);
+  }, [loadSessions]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -234,8 +242,8 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar sessoes."
-          : "Seu perfil nao possui permissao para criar sessoes.",
+          ? "Seu perfil não possui permissão para atualizar sessões."
+          : "Seu perfil não possui permissão para criar sessões.",
       );
       return;
     }
@@ -256,16 +264,16 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Sessao atualizada com sucesso."
-          : "Sessao criada com sucesso.",
+          ? "Sessão atualizada com sucesso."
+          : "Sessão criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a sessao."
-            : "Nao foi possivel criar a sessao.",
+            ? "Não foi possível atualizar a sessão."
+            : "Não foi possível criar a sessão.",
         ),
       );
     } finally {
@@ -275,15 +283,18 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
 
   return (
     <div
-      className={embedded ? "sessions-page sessions-page--embedded" : "sessions-page"}
+      className={
+        embedded ? "sessions-page sessions-page--embedded" : "sessions-page"
+      }
     >
       {!embedded ? (
         <header className="sessions-page__header">
           <div>
             <span className="sessions-page__eyebrow">PORTAL</span>
-            <h2 className="sessions-page__title">Sessoes</h2>
+            <h2 className="sessions-page__title">Sessões</h2>
             <p className="sessions-page__subtitle">
-              Gerencie token, IP, user-agent, expiracao e encerramento das sessoes do usuario.
+              Gerencie token, IP, user-agent, expiracao e encerramento das
+              sessões do usuario.
             </p>
           </div>
 
@@ -354,7 +365,7 @@ export default function SessionsPage({ embedded = false }: SessionsPageProps) {
         </div>
       ) : null}
       <div className="sessions-page__alert sessions-page__alert--info">
-        Exclusao de sessoes nao e suportada pelo backend deste recurso.
+        Exclusão de sessões nao e suportada pelo backend deste recurso.
       </div>
 
       <div className="sessions-page__layout">

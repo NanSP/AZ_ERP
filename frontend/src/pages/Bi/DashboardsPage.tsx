@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import DashboardForm from "../../components/Bi/DashboardForm";
@@ -35,8 +35,8 @@ const dashboardsResource = {
 const emptyDashboard: DashboardRecord = {
   nome: "",
   descricao: "",
-  layout: "{\n  \"widgets\": []\n}",
-  configuracoes: "{\n  \"tema\": \"corporativo\"\n}",
+  layout: '{\n  "widgets": []\n}',
+  configuracoes: '{\n  "tema": "corporativo"\n}',
 };
 
 function stringifyObject(value: unknown) {
@@ -132,7 +132,7 @@ export default function DashboardsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadDashboards() {
+  const loadDashboards = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -160,11 +160,11 @@ export default function DashboardsPage({
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadDashboards();
-  }, [canRead]);
+  }, [loadDashboards]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -210,8 +210,8 @@ export default function DashboardsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar dashboards."
-          : "Seu perfil nao possui permissao para criar dashboards.",
+          ? "Seu perfil nao possui permissão para atualizar dashboards."
+          : "Seu perfil nao possui permissão para criar dashboards.",
       );
       return;
     }
@@ -226,7 +226,9 @@ export default function DashboardsPage({
         ? await updateResource("bi", "dashboards", selected.id, payload)
         : await createResource("bi", "dashboards", payload);
 
-      const saved = normalizeDashboard(response.data as Record<string, unknown>);
+      const saved = normalizeDashboard(
+        response.data as Record<string, unknown>,
+      );
       await loadDashboards();
       setSelected(saved);
       setDraft({ ...saved });
@@ -240,8 +242,8 @@ export default function DashboardsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o dashboard."
-            : "Nao foi possivel criar o dashboard.",
+            ? "Não foi possivel atualizar o dashboard."
+            : "Não foi possivel criar o dashboard.",
         ),
       );
     } finally {
@@ -251,12 +253,12 @@ export default function DashboardsPage({
 
   async function handleDelete(item: DashboardRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir dashboards.");
+      setError("Seu perfil nao possui permissão para excluir dashboards.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o dashboard para exclusao.");
+      setError("Não foi possível identificar o dashboard para exclusão.");
       return;
     }
 
@@ -277,12 +279,7 @@ export default function DashboardsPage({
       await loadDashboards();
       setSuccess("Dashboard excluido com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel excluir o dashboard.",
-        ),
-      );
+      setError(getErrorMessage(err, "Não foi possivel excluir o dashboard."));
     } finally {
       setSaving(false);
     }
@@ -290,7 +287,11 @@ export default function DashboardsPage({
 
   return (
     <div
-      className={embedded ? "dashboards-page dashboards-page--embedded" : "dashboards-page"}
+      className={
+        embedded
+          ? "dashboards-page dashboards-page--embedded"
+          : "dashboards-page"
+      }
     >
       {!embedded ? (
         <header className="dashboards-page__header">
@@ -298,7 +299,8 @@ export default function DashboardsPage({
             <span className="dashboards-page__eyebrow">BI</span>
             <h2 className="dashboards-page__title">Dashboards</h2>
             <p className="dashboards-page__subtitle">
-              Organize paineis executivos com layout e configuracoes customizadas.
+              Organize paineis executivos com layout e configurações
+              customizadas.
             </p>
           </div>
 
