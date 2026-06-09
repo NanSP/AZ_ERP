@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useState, type ReactNode } from "react";
 
 import type {
   AuthSession,
@@ -12,6 +6,7 @@ import type {
   MasterLoginPayload,
   TenantLoginPayload,
 } from "./authTypes";
+import { AuthContext } from "./authContext";
 
 import { clearSession, loadSession, saveSession } from "./authStorage";
 import {
@@ -21,23 +16,8 @@ import {
   loginTenant,
 } from "../services/authService";
 
-type AuthContextValue = {
-  session: AuthSession | null;
-  isAuthenticated: boolean;
-  loginMasterAction: (payload: MasterLoginPayload) => Promise<void>;
-  loginTenantAction: (payload: TenantLoginPayload) => Promise<void>;
-  logout: () => void;
-  changePassword: (payload: ChangePasswordPayload) => Promise<void>;
-};
-
-export const AuthContext = createContext<AuthContextValue | null>(null);
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthSession | null>(null);
-
-  useEffect(() => {
-    setSession(loadSession());
-  }, []);
+  const [session, setSession] = useState<AuthSession | null>(() => loadSession());
 
   const loginMasterAction = async (payload: MasterLoginPayload) => {
     const next = await loginMaster(payload);
@@ -70,17 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(updated);
   };
 
-  const value = useMemo(
-    () => ({
-      session,
-      isAuthenticated: !!session?.token,
-      loginMasterAction,
-      loginTenantAction,
-      logout,
-      changePassword,
-    }),
-    [session],
-  );
+  const value = {
+    session,
+    isAuthenticated: !!session?.token,
+    loginMasterAction,
+    loginTenantAction,
+    logout,
+    changePassword,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
