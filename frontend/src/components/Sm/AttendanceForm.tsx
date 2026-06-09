@@ -54,7 +54,8 @@ export default function AttendanceForm({
             {editing ? "Editar atendimento" : "Novo atendimento"}
           </h3>
           <p className="attendance-form__subtitle">
-            Registre a execucao tecnica da ordem, horas gastas e materiais aplicados.
+            Registre a execução técnica da ordem, horas gastas e materiais
+            aplicados.
           </p>
           {editing && value.id ? (
             <p className="attendance-form__meta">
@@ -62,7 +63,7 @@ export default function AttendanceForm({
             </p>
           ) : !canEditFields ? (
             <p className="attendance-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -79,7 +80,7 @@ export default function AttendanceForm({
 
       <div className="attendance-form__grid">
         <label className="attendance-form__field">
-          <span>Ordem de servico</span>
+          <span>Ordem de serviço</span>
           {orderOptions.length > 0 ? (
             <select
               value={value.os}
@@ -96,20 +97,22 @@ export default function AttendanceForm({
           ) : (
             <input
               value={value.os}
-              onChange={(event) => update("os", event.target.value.replace(/\D/g, ""))}
+              onChange={(event) =>
+                update("os", event.target.value.replace(/\D/g, ""))
+              }
               placeholder="ID da OS"
               disabled={!canEditFields}
             />
           )}
           {orderAccess === "unavailable" ? (
             <small className="attendance-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="attendance-form__field">
-          <span>Tecnico</span>
+          <span>Técnico</span>
           {employeeOptions.length > 0 ? (
             <select
               value={value.tecnico}
@@ -129,13 +132,13 @@ export default function AttendanceForm({
               onChange={(event) =>
                 update("tecnico", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do tecnico"
+              placeholder="ID do técnico"
               disabled={!canEditFields}
             />
           )}
           {employeeAccess === "unavailable" ? (
             <small className="attendance-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -163,11 +166,11 @@ export default function AttendanceForm({
         </label>
 
         <label className="attendance-form__field attendance-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descreva a execucao do atendimento"
+            placeholder="Descreva a execução do atendimento"
             disabled={!canEditFields}
           />
         </label>
@@ -179,7 +182,9 @@ export default function AttendanceForm({
             onChange={(event) =>
               update("materiaisUtilizados", event.target.value)
             }
-            placeholder={'{\n  "pecas": ["item-a"],\n  "observacao": "aplicado em campo"\n}'}
+            placeholder={
+              '{\n  "pecas": ["item-a"],\n  "observacao": "aplicado em campo"\n}'
+            }
             disabled={!canEditFields}
           />
           <small className="attendance-form__hint">

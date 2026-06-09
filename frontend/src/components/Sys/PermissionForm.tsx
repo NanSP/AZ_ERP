@@ -72,7 +72,8 @@ export default function PermissionForm({
             {editing ? "Editar permissao" : "Nova permissao"}
           </h3>
           <p className="permission-form__subtitle">
-            Configure a chave funcional de autorizacao por modulo, recurso e acao.
+            Configure a chave funcional de autorização por módulo, recurso e
+            ação.
           </p>
           {editing && value.id ? (
             <p className="permission-form__meta">
@@ -80,7 +81,7 @@ export default function PermissionForm({
             </p>
           ) : !canEditFields ? (
             <p className="permission-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -107,7 +108,7 @@ export default function PermissionForm({
         </label>
 
         <label className="permission-form__field permission-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <textarea
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
@@ -118,7 +119,7 @@ export default function PermissionForm({
         </label>
 
         <label className="permission-form__field">
-          <span>Modulo</span>
+          <span>Módulo</span>
           <select
             value={value.modulo}
             onChange={(event) => update("modulo", event.target.value)}
@@ -145,7 +146,7 @@ export default function PermissionForm({
         </label>
 
         <label className="permission-form__field">
-          <span>Acao</span>
+          <span>Ação</span>
           <select
             value={value.acao}
             onChange={(event) => update("acao", event.target.value)}
@@ -169,8 +170,8 @@ export default function PermissionForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
-            : "Criar permissao"}
+            ? "Salvar alterações"
+            : "Criar permissão"}
       </button>
     </aside>
   );

@@ -39,8 +39,10 @@ export default function AuditForm({
   onSave,
   onReset,
 }: AuditFormProps) {
-  const requiresStartDate = value.status === "em_andamento" || value.status === "concluida";
-  const requiresResponsible = value.status === "em_andamento" || value.status === "concluida";
+  const requiresStartDate =
+    value.status === "em_andamento" || value.status === "concluida";
+  const requiresResponsible =
+    value.status === "em_andamento" || value.status === "concluida";
   const requiresEndDate = value.status === "concluida";
   const plannedMustNotHaveEndDate = value.status === "planejada";
   const datesAreOrdered =
@@ -75,13 +77,16 @@ export default function AuditForm({
             {editing ? "Editar auditoria" : "Nova auditoria"}
           </h3>
           <p className="audit-form__subtitle">
-            Configure o plano, a janela de execucao e o responsavel da auditoria.
+            Configure o plano, a janela de execução e o responsavel da
+            auditoria.
           </p>
           {editing && value.id ? (
-            <p className="audit-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="audit-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="audit-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -98,7 +103,7 @@ export default function AuditForm({
 
       <div className="audit-form__grid">
         <label className="audit-form__field audit-form__field--span-2">
-          <span>Titulo</span>
+          <span>Título</span>
           <input
             value={value.titulo}
             onChange={(event) => update("titulo", event.target.value)}
@@ -149,7 +154,7 @@ export default function AuditForm({
         </label>
 
         <label className="audit-form__field">
-          <span>Data inicio</span>
+          <span>Data início</span>
           <input
             type="date"
             value={value.dataInicio}
@@ -169,16 +174,19 @@ export default function AuditForm({
         </label>
 
         <label className="audit-form__field audit-form__field--span-2">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           {canReadUsers ? (
             <select
               value={value.responsavelId}
               onChange={(event) => update("responsavelId", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Sem responsavel</option>
+              <option value="">Sem responsável</option>
               {users.map((user) => (
-                <option key={user.id ?? user.login} value={String(user.id ?? "")}>
+                <option
+                  key={user.id ?? user.login}
+                  value={String(user.id ?? "")}
+                >
                   {user.nome || user.login}
                 </option>
               ))}
@@ -202,7 +210,7 @@ export default function AuditForm({
 
         {!datesAreOrdered ? (
           <p className="audit-form__hint audit-form__hint--span-2">
-            Data fim nao pode ser anterior a data inicio.
+            Data fim nao pode ser anterior a data início.
           </p>
         ) : null}
         {plannedMustNotHaveEndDate && value.dataFim.trim() !== "" ? (
@@ -222,7 +230,7 @@ export default function AuditForm({
         ) : null}
         {requiresResponsible && value.responsavelId.trim() === "" ? (
           <p className="audit-form__hint audit-form__hint--span-2">
-            Auditoria em execucao exige responsavel.
+            Auditoria em execução exige responsável.
           </p>
         ) : null}
       </div>

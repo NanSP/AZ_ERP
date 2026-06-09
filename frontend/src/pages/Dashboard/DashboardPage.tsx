@@ -15,21 +15,21 @@ export default function DashboardPage() {
   const firstResource = getFirstReadableResource(tenantModules, session);
   const highlights = [
     {
-      label: "Modulos ativos",
+      label: "Módulos ativos",
       value: visibleModules.length.toString().padStart(2, "0"),
-      description: "Dominios operacionais disponiveis para esta sessao.",
+      description: "Domínios operacionais disponíveis para esta sessão.",
     },
     {
-      label: "Recursos visiveis",
+      label: "Recursos visíveis",
       value: visibleModules
         .reduce((acc, module) => acc + module.resources.length, 0)
         .toString(),
-      description: "Recursos liberados pelas permissoes atuais.",
+      description: "Recursos liberados pelas permissões atuais.",
     },
     {
       label: "Workspace",
       value: "ERP",
-      description: "Ambiente centralizado para operacao integrada.",
+      description: "Ambiente centralizado para operação integrada.",
     },
   ];
 
@@ -39,11 +39,11 @@ export default function DashboardPage() {
         <div className="dashboard-hero__content">
           <span className="dashboard-hero__eyebrow">Dashboard</span>
           <h2 className="dashboard-hero__title">
-            Uma operacao inteira, organizada em um unico workspace.
+            Uma operação inteira, organizada em um único workspace.
           </h2>
           <p className="dashboard-hero__text">
-            Navegue pelos modulos do ERP, acesse os principais recursos do
-            tenant e avance pelos fluxos de gestao com uma base unica.
+            Navegue pelos módulos do ERP, acesse os principais recursos do
+            tenant e avance pelos fluxos de gestão com uma base única.
           </p>
         </div>
 
@@ -61,9 +61,9 @@ export default function DashboardPage() {
       <section className="dashboard-section">
         <div className="dashboard-section__head">
           <div>
-            <span className="dashboard-section__eyebrow">Modulos</span>
+            <span className="dashboard-section__eyebrow">Módulos</span>
             <h3 className="dashboard-section__title">
-              Areas principais do ERP
+              Áreas principais do ERP
             </h3>
           </div>
 

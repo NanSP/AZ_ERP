@@ -67,9 +67,10 @@ export default function ActionLogsForm({
     <aside className="action-logs-form">
       <div className="action-logs-page__panel-head">
         <div>
-          <h3 className="action-logs-page__panel-title">Novo log de acao</h3>
+          <h3 className="action-logs-page__panel-title">Novo log de ação</h3>
           <p className="action-logs-page__panel-subtitle">
-            Este recurso e imutavel: o backend permite criar e consultar, mas nao alterar ou excluir.
+            Este recurso e imutável: o backend permite criar e consultar, mas
+            nao alterar ou excluir.
           </p>
         </div>
 
@@ -85,14 +86,14 @@ export default function ActionLogsForm({
 
       <div className="action-logs-page__form-grid">
         <label className="action-logs-page__field">
-          <span>Usuario</span>
+          <span>Usuário</span>
           {users.length > 0 ? (
             <select
               value={value.usuario}
               onChange={(event) => update("usuario", event.target.value)}
               disabled={!canCreate}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {users.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -105,19 +106,19 @@ export default function ActionLogsForm({
               onChange={(event) =>
                 update("usuario", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do usuario"
+              placeholder="ID do usuário"
               disabled={!canCreate}
             />
           )}
           {userAccess === "unavailable" ? (
             <small className="action-logs-page__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="action-logs-page__field">
-          <span>Acao</span>
+          <span>Ação</span>
           <select
             value={value.acao}
             onChange={(event) => update("acao", event.target.value)}
@@ -132,7 +133,7 @@ export default function ActionLogsForm({
         </label>
 
         <label className="action-logs-page__field">
-          <span>Modulo</span>
+          <span>Módulo</span>
           <input
             value={value.modulo}
             onChange={(event) => update("modulo", event.target.value)}

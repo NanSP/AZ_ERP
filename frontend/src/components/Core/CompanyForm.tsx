@@ -54,7 +54,9 @@ export default function CompanyForm({
             Preencha os dados institucionais principais.
           </p>
           {editing && value.id ? (
-            <p className="company-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="company-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : null}
         </div>
 
@@ -70,7 +72,7 @@ export default function CompanyForm({
 
       <div className="company-form__grid">
         <label className="company-form__field">
-          <span>Codigo</span>
+          <span>Código</span>
           <input
             value={value.codigo}
             onChange={(event) => update("codigo", event.target.value)}
@@ -90,11 +92,11 @@ export default function CompanyForm({
         </label>
 
         <label className="company-form__field company-form__field--span-2">
-          <span>Razao social</span>
+          <span>Razão social</span>
           <input
             value={value.razaoSocial}
             onChange={(event) => update("razaoSocial", event.target.value)}
-            placeholder="Razao social da empresa"
+            placeholder="Razão social da empresa"
           />
         </label>
 
@@ -108,34 +110,32 @@ export default function CompanyForm({
         </label>
 
         <label className="company-form__field">
-          <span>Inscricao estadual</span>
+          <span>Inscrição estadual</span>
           <input
             value={value.inscricaoEstadual}
             onChange={(event) =>
               update("inscricaoEstadual", event.target.value)
             }
-            placeholder="Inscricao estadual"
+            placeholder="Inscrição estadual"
           />
         </label>
 
         <label className="company-form__field">
-          <span>Inscricao municipal</span>
+          <span>Inscrição municipal</span>
           <input
             value={value.inscricaoMunicipal}
             onChange={(event) =>
               update("inscricaoMunicipal", event.target.value)
             }
-            placeholder="Inscricao municipal"
+            placeholder="Inscrição municipal"
           />
         </label>
 
         <label className="company-form__field">
-          <span>Regime tributario</span>
+          <span>Regime tributário</span>
           <select
             value={value.regimeTributario}
-            onChange={(event) =>
-              update("regimeTributario", event.target.value)
-            }
+            onChange={(event) => update("regimeTributario", event.target.value)}
           >
             {regimeOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -146,7 +146,7 @@ export default function CompanyForm({
         </label>
 
         <label className="company-form__field">
-          <span>Data de fundacao</span>
+          <span>Data de fundação</span>
           <input
             type="date"
             value={value.dataFundacao}
@@ -155,7 +155,7 @@ export default function CompanyForm({
         </label>
 
         <label className="company-form__field company-form__field--span-2">
-          <span>Situacao</span>
+          <span>Situação</span>
           <select
             value={value.situacao}
             onChange={(event) => update("situacao", event.target.value)}

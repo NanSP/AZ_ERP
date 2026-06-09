@@ -16,8 +16,13 @@ type InspectionsTableProps = {
   onDelete: (item: InspectionEntry) => void;
 };
 
-function resolveProductLabel(productId: string, productOptions: ProductOption[]) {
-  const match = productOptions.find((option) => String(option.id) === productId);
+function resolveProductLabel(
+  productId: string,
+  productOptions: ProductOption[],
+) {
+  const match = productOptions.find(
+    (option) => String(option.id) === productId,
+  );
   return match ? match.label : productId ? `Produto #${productId}` : "-";
 }
 
@@ -25,7 +30,9 @@ function resolveEmployeeLabel(
   employeeId: string,
   employeeOptions: EmployeeOption[],
 ) {
-  const match = employeeOptions.find((option) => String(option.id) === employeeId);
+  const match = employeeOptions.find(
+    (option) => String(option.id) === employeeId,
+  );
   return match ? match.label : employeeId ? `Inspetor #${employeeId}` : "-";
 }
 
@@ -43,8 +50,10 @@ export default function InspectionsTable({
   return (
     <section className="inspections-table">
       <div className="inspections-table__head">
-        <h3 className="inspections-table__title">Inspecoes</h3>
-        <span className="inspections-table__meta">{items.length} registros</span>
+        <h3 className="inspections-table__title">Inspecões</h3>
+        <span className="inspections-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="inspections-table__wrap">
@@ -56,7 +65,7 @@ export default function InspectionsTable({
               <th>Quantidades</th>
               <th>Resultado</th>
               <th>Inspetor</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -64,13 +73,13 @@ export default function InspectionsTable({
             {loading ? (
               <tr>
                 <td colSpan={6} className="inspections-table__empty">
-                  Carregando inspecoes...
+                  Carregando inspecões...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="inspections-table__empty">
-                  Nenhuma inspecao encontrada.
+                  Nenhuma inspeção encontrada.
                 </td>
               </tr>
             ) : (
@@ -81,7 +90,9 @@ export default function InspectionsTable({
                 >
                   <td>
                     <div className="inspections-table__identity">
-                      <strong>{resolveProductLabel(item.produto, productOptions)}</strong>
+                      <strong>
+                        {resolveProductLabel(item.produto, productOptions)}
+                      </strong>
                       <span>Lote: {item.lote || "-"}</span>
                     </div>
                   </td>
@@ -99,7 +110,9 @@ export default function InspectionsTable({
                       <span>{item.dataInspecao || "-"}</span>
                     </div>
                   </td>
-                  <td>{resolveEmployeeLabel(item.inspetor, employeeOptions)}</td>
+                  <td>
+                    {resolveEmployeeLabel(item.inspetor, employeeOptions)}
+                  </td>
                   <td className="inspections-table__actions">
                     {canEdit ? (
                       <button type="button" onClick={() => onSelect(item)}>
@@ -113,7 +126,7 @@ export default function InspectionsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="inspections-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

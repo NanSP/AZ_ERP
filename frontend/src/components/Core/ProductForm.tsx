@@ -71,10 +71,12 @@ export default function ProductForm({
             {editing ? "Editar produto" : "Novo produto"}
           </h3>
           <p className="product-form__subtitle">
-            Preencha os dados centrais do catalogo do item.
+            Preencha os dados centrais do catálogo do item.
           </p>
           {editing && value.id ? (
-            <p className="product-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="product-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : null}
         </div>
 
@@ -90,7 +92,7 @@ export default function ProductForm({
 
       <div className="product-form__grid">
         <label className="product-form__field">
-          <span>Codigo</span>
+          <span>Código</span>
           <input
             value={value.codigo}
             onChange={(event) => update("codigo", event.target.value)}
@@ -99,7 +101,7 @@ export default function ProductForm({
         </label>
 
         <label className="product-form__field">
-          <span>Codigo de barras</span>
+          <span>Código de barras</span>
           <input
             value={value.codigoBarras}
             onChange={(event) => update("codigoBarras", event.target.value)}
@@ -117,11 +119,11 @@ export default function ProductForm({
         </label>
 
         <label className="product-form__field product-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descricao comercial ou tecnica"
+            placeholder="Descrição comercial ou técnica"
           />
         </label>
 
@@ -185,7 +187,7 @@ export default function ProductForm({
         </label>
 
         <label className="product-form__field">
-          <span>Peso liquido</span>
+          <span>Peso líquido</span>
           <input
             value={value.pesoLiquido}
             onChange={(event) => update("pesoLiquido", event.target.value)}
@@ -208,7 +210,7 @@ export default function ProductForm({
         </label>
 
         <label className="product-form__field">
-          <span>Situacao</span>
+          <span>Situação</span>
           <select
             value={value.situacao}
             onChange={(event) => update("situacao", event.target.value)}

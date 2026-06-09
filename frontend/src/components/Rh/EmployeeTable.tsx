@@ -34,8 +34,8 @@ export default function EmployeeTable({
               <th>CPF</th>
               <th>Cargo</th>
               <th>Departamento</th>
-              <th>Situacao</th>
-              <th>Acoes</th>
+              <th>Situação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -93,7 +93,7 @@ export default function EmployeeTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="employee-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

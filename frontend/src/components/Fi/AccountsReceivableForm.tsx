@@ -101,7 +101,7 @@ export default function AccountsReceivableForm({
         )}
         {access === "unavailable" ? (
           <small className="accounts-receivable-form__hint">
-            Lista indisponivel. Informe o ID manualmente.
+            Lista indisponível. Informe o ID manualmente.
           </small>
         ) : null}
       </label>
@@ -124,7 +124,7 @@ export default function AccountsReceivableForm({
             </p>
           ) : !canEditFields ? (
             <p className="accounts-receivable-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -171,7 +171,7 @@ export default function AccountsReceivableForm({
         )}
 
         <label className="accounts-receivable-form__field">
-          <span>Numero do documento</span>
+          <span>Número do documento</span>
           <input
             value={value.numeroDocumento}
             onChange={(event) => update("numeroDocumento", event.target.value)}
@@ -181,11 +181,11 @@ export default function AccountsReceivableForm({
         </label>
 
         <label className="accounts-receivable-form__field accounts-receivable-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descricao do titulo financeiro"
+            placeholder="Descrição do título financeiro"
             disabled={!canEditFields}
           />
         </label>
@@ -221,7 +221,7 @@ export default function AccountsReceivableForm({
         </label>
 
         <label className="accounts-receivable-form__field">
-          <span>Data de emissao</span>
+          <span>Data de emissão</span>
           <input
             type="date"
             value={value.dataEmissao}
@@ -273,11 +273,7 @@ export default function AccountsReceivableForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar conta"}
+        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar conta"}
       </button>
     </aside>
   );

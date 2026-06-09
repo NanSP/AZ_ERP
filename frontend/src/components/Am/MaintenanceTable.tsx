@@ -25,7 +25,9 @@ function resolveEmployeeLabel(
   employeeId: string,
   employeeOptions: EmployeeOption[],
 ) {
-  const match = employeeOptions.find((option) => String(option.id) === employeeId);
+  const match = employeeOptions.find(
+    (option) => String(option.id) === employeeId,
+  );
   return match ? match.label : employeeId ? `Tecnico #${employeeId}` : "-";
 }
 
@@ -43,8 +45,10 @@ export default function MaintenanceTable({
   return (
     <section className="maintenance-table">
       <div className="maintenance-table__head">
-        <h3 className="maintenance-table__title">Manutencoes</h3>
-        <span className="maintenance-table__meta">{items.length} registros</span>
+        <h3 className="maintenance-table__title">Manutenções</h3>
+        <span className="maintenance-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="maintenance-table__wrap">
@@ -55,8 +59,8 @@ export default function MaintenanceTable({
               <th>Tipo</th>
               <th>Datas</th>
               <th>Custos</th>
-              <th>Tecnico</th>
-              <th>Acoes</th>
+              <th>Técnico</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -64,13 +68,13 @@ export default function MaintenanceTable({
             {loading ? (
               <tr>
                 <td colSpan={6} className="maintenance-table__empty">
-                  Carregando manutencoes...
+                  Carregando manutenções...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="maintenance-table__empty">
-                  Nenhuma manutencao encontrada.
+                  Nenhuma manutenção encontrada.
                 </td>
               </tr>
             ) : (
@@ -81,20 +85,22 @@ export default function MaintenanceTable({
                 >
                   <td>
                     <div className="maintenance-table__identity">
-                      <strong>{resolveAssetLabel(item.ativo, assetOptions)}</strong>
+                      <strong>
+                        {resolveAssetLabel(item.ativo, assetOptions)}
+                      </strong>
                       <span>ID #{item.ativo || "-"}</span>
                     </div>
                   </td>
                   <td>{item.tipoManutencao || "-"}</td>
                   <td>
                     <div className="maintenance-table__details">
-                      <span>Solicitacao: {item.dataSolicitacao || "-"}</span>
-                      <span>Execucao: {item.dataExecucao || "-"}</span>
+                      <span>Solicitação: {item.dataSolicitacao || "-"}</span>
+                      <span>Execução: {item.dataExecucao || "-"}</span>
                     </div>
                   </td>
                   <td>
                     <div className="maintenance-table__details">
-                      <span>Mao de obra: {item.custoMaoObra || "0"}</span>
+                      <span>Mão de obra: {item.custoMaoObra || "0"}</span>
                       <span>Material: {item.custoMaterial || "0"}</span>
                       <span>Total: {item.custoTotal || "0"}</span>
                     </div>
@@ -113,7 +119,7 @@ export default function MaintenanceTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="maintenance-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -65,14 +65,15 @@ export default function AddressForm({
       <div className="address-form__head">
         <div>
           <h3 className="address-form__title">
-            {editing ? "Editar endereco" : "Novo endereco"}
+            {editing ? "Editar endereço" : "Novo endereço"}
           </h3>
           <p className="address-form__subtitle">
-            Defina o vinculo da entidade e os dados principais do endereco.
+            Defina o vinculo da entidade e os dados principais do endereço.
           </p>
           {editing && value.id ? (
             <p className="address-form__meta">
-              Registro selecionado: #{value.id}. O vinculo da entidade fica travado na edicao.
+              Registro selecionado: #{value.id}. O vinculo da entidade fica
+              travado na edição.
             </p>
           ) : null}
         </div>
@@ -132,7 +133,7 @@ export default function AddressForm({
         )}
 
         <label className="address-form__field">
-          <span>Tipo de endereco</span>
+          <span>Tipo de endereço</span>
           <select
             value={value.tipoEndereco}
             onChange={(event) => update("tipoEndereco", event.target.value)}
@@ -166,11 +167,11 @@ export default function AddressForm({
         </label>
 
         <label className="address-form__field">
-          <span>Numero</span>
+          <span>Número</span>
           <input
             value={value.numero}
             onChange={(event) => update("numero", event.target.value)}
-            placeholder="Numero"
+            placeholder="Número"
           />
         </label>
 
@@ -215,7 +216,9 @@ export default function AddressForm({
           <span>Pais</span>
           <input
             value={value.pais}
-            onChange={(event) => update("pais", event.target.value.toUpperCase())}
+            onChange={(event) =>
+              update("pais", event.target.value.toUpperCase())
+            }
             placeholder="BRASIL"
           />
         </label>
@@ -226,7 +229,7 @@ export default function AddressForm({
             checked={value.principal}
             onChange={(event) => update("principal", event.target.checked)}
           />
-          <span>Marcar como endereco principal</span>
+          <span>Marcar como endereço principal</span>
         </label>
       </div>
 
@@ -239,8 +242,8 @@ export default function AddressForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
-            : "Criar endereco"}
+            ? "Salvar alterações"
+            : "Criar endereço"}
       </button>
     </aside>
   );

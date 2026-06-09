@@ -26,8 +26,7 @@ export default function ErrorLogsForm({
   onReset,
 }: ErrorLogsFormProps) {
   const canSave =
-    value.erroMensagem.trim() !== "" &&
-    value.modulo.trim() !== "";
+    value.erroMensagem.trim() !== "" && value.modulo.trim() !== "";
 
   function update<K extends keyof ErrorLogEntry>(
     field: K,
@@ -45,7 +44,8 @@ export default function ErrorLogsForm({
         <div>
           <h3 className="error-logs-page__panel-title">Novo log de erro</h3>
           <p className="error-logs-page__panel-subtitle">
-            Este recurso e imutavel: o backend permite criar e consultar, mas nao alterar ou excluir.
+            Este recurso e imutável: o backend permite criar e consultar, mas
+            nao alterar ou excluir.
           </p>
         </div>
 
@@ -61,14 +61,14 @@ export default function ErrorLogsForm({
 
       <div className="error-logs-page__form-grid">
         <label className="error-logs-page__field">
-          <span>Usuario</span>
+          <span>Usuário</span>
           {users.length > 0 ? (
             <select
               value={value.usuario}
               onChange={(event) => update("usuario", event.target.value)}
               disabled={!canCreate}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {users.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -81,19 +81,19 @@ export default function ErrorLogsForm({
               onChange={(event) =>
                 update("usuario", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do usuario"
+              placeholder="ID do usuário"
               disabled={!canCreate}
             />
           )}
           {userAccess === "unavailable" ? (
             <small className="error-logs-page__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="error-logs-page__field">
-          <span>Codigo do erro</span>
+          <span>Código do erro</span>
           <input
             value={value.erroCodigo}
             onChange={(event) =>
@@ -105,7 +105,7 @@ export default function ErrorLogsForm({
         </label>
 
         <label className="error-logs-page__field">
-          <span>Modulo</span>
+          <span>Módulo</span>
           <input
             value={value.modulo}
             onChange={(event) => update("modulo", event.target.value)}

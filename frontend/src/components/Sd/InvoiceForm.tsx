@@ -37,8 +37,7 @@ export default function InvoiceForm({
     value.valorTotal.trim() === ""
       ? 0
       : Number(value.valorTotal.replace(",", "."));
-  const needsDueDate =
-    value.status === "paga" || value.status === "vencida";
+  const needsDueDate = value.status === "paga" || value.status === "vencida";
   const canSave =
     value.pedidoId.trim() !== "" &&
     value.numeroFatura.trim() !== "" &&
@@ -76,7 +75,7 @@ export default function InvoiceForm({
             </p>
           ) : !canEditFields ? (
             <p className="invoice-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -106,7 +105,8 @@ export default function InvoiceForm({
                   key={order.id ?? `${order.clienteId}-${order.numeroPedido}`}
                   value={String(order.id ?? "")}
                 >
-                  #{order.id} - {order.numeroPedido || "Sem numero"} / {order.status}
+                  #{order.id} - {order.numeroPedido || "Sem numero"} /{" "}
+                  {order.status}
                 </option>
               ))}
             </select>
@@ -123,7 +123,7 @@ export default function InvoiceForm({
         </label>
 
         <label className="invoice-form__field">
-          <span>Numero da fatura</span>
+          <span>Número da fatura</span>
           <input
             value={value.numeroFatura}
             onChange={(event) => update("numeroFatura", event.target.value)}
@@ -148,7 +148,7 @@ export default function InvoiceForm({
         </label>
 
         <label className="invoice-form__field">
-          <span>Data de emissao</span>
+          <span>Data de emissão</span>
           <input
             type="date"
             value={value.dataEmissao}

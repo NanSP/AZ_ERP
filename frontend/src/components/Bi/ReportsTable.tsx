@@ -16,7 +16,9 @@ function summarize(value: string, limit = 90) {
     return "-";
   }
 
-  return normalized.length > limit ? `${normalized.slice(0, limit)}...` : normalized;
+  return normalized.length > limit
+    ? `${normalized.slice(0, limit)}...`
+    : normalized;
 }
 
 export default function ReportsTable({
@@ -31,7 +33,7 @@ export default function ReportsTable({
   return (
     <section className="reports-table">
       <div className="reports-table__head">
-        <h3 className="reports-table__title">Relatorios</h3>
+        <h3 className="reports-table__title">Relatórios</h3>
         <span className="reports-table__meta">{items.length} registros</span>
       </div>
 
@@ -39,10 +41,10 @@ export default function ReportsTable({
         <table className="reports-table__table">
           <thead>
             <tr>
-              <th>Relatorio</th>
+              <th>Relatório</th>
               <th>SQL</th>
-              <th>Parametros</th>
-              <th>Acoes</th>
+              <th>Parâmetros</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -50,13 +52,13 @@ export default function ReportsTable({
             {loading ? (
               <tr>
                 <td colSpan={4} className="reports-table__empty">
-                  Carregando relatorios...
+                  Carregando relatórios...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="reports-table__empty">
-                  Nenhum relatorio encontrado.
+                  Nenhum relatório encontrado.
                 </td>
               </tr>
             ) : (
@@ -91,7 +93,7 @@ export default function ReportsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="reports-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

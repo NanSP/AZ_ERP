@@ -33,7 +33,7 @@ export default function ClientsTable({
               <th>Base comercial</th>
               <th>Relacionamento</th>
               <th>Porte</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -69,8 +69,12 @@ export default function ClientsTable({
                   </td>
                   <td>
                     <div className="clients-table__details">
-                      <strong>Faturamento: {item.faturamentoAnual || "-"}</strong>
-                      <span>Funcionarios: {item.numeroFuncionarios || "-"}</span>
+                      <strong>
+                        Faturamento: {item.faturamentoAnual || "-"}
+                      </strong>
+                      <span>
+                        Funcionários: {item.numeroFuncionarios || "-"}
+                      </span>
                     </div>
                   </td>
                   <td className="clients-table__actions">
@@ -86,7 +90,7 @@ export default function ClientsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="clients-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

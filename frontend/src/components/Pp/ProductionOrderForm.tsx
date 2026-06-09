@@ -47,7 +47,8 @@ export default function ProductionOrderForm({
   const status = value.status.trim();
   const planned = Number(value.quantidadePlanejada.replace(",", "."));
   const produced = Number(value.quantidadeProduzida.replace(",", "."));
-  const hasPlanned = value.quantidadePlanejada.trim() !== "" && !Number.isNaN(planned);
+  const hasPlanned =
+    value.quantidadePlanejada.trim() !== "" && !Number.isNaN(planned);
   const hasProduced =
     value.quantidadeProduzida.trim() !== "" && !Number.isNaN(produced);
 
@@ -59,7 +60,8 @@ export default function ProductionOrderForm({
     (!hasProduced || produced >= 0) &&
     (!hasProduced || produced <= planned) &&
     (status !== "planejada" || !hasProduced || produced === 0) &&
-    (status !== "em_producao" || (hasProduced && produced > 0 && produced < planned)) &&
+    (status !== "em_producao" ||
+      (hasProduced && produced > 0 && produced < planned)) &&
     (status !== "concluida" || (hasProduced && produced === planned));
 
   function update<K extends keyof ProductionOrder>(
@@ -101,7 +103,7 @@ export default function ProductionOrderForm({
             </p>
           ) : !canEditFields ? (
             <p className="production-order-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -154,7 +156,7 @@ export default function ProductionOrderForm({
           )}
           {productAccess === "unavailable" ? (
             <small className="production-order-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -190,7 +192,7 @@ export default function ProductionOrderForm({
         </label>
 
         <label className="production-order-form__field">
-          <span>Data de emissao</span>
+          <span>Data de emissão</span>
           <input
             type="date"
             value={value.dataEmissao}
@@ -260,7 +262,7 @@ export default function ProductionOrderForm({
         </label>
 
         <label className="production-order-form__field production-order-form__field--span-2">
-          <span>Observacoes</span>
+          <span>Observações</span>
           <textarea
             value={value.observacoes}
             onChange={(event) => update("observacoes", event.target.value)}
@@ -277,11 +279,7 @@ export default function ProductionOrderForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar ordem"}
+        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar ordem"}
       </button>
     </aside>
   );

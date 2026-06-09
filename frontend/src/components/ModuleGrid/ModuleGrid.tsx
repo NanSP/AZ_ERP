@@ -42,7 +42,7 @@ export default function ModuleGrid({ modules }: ModuleGridProps) {
                 to={`/app/module/${firstResource.schema}/${firstResource.entity}`}
                 className="module-grid__action"
               >
-                Abrir modulo
+                Abrir módulo
               </Link>
             ) : (
               <span className="module-grid__action module-grid__action--disabled">

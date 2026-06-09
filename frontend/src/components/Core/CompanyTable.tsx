@@ -26,12 +26,12 @@ export default function CompanyTable({
         <table className="company-table__table">
           <thead>
             <tr>
-              <th>Codigo</th>
-              <th>Razao social</th>
+              <th>Código</th>
+              <th>Razão social</th>
               <th>CNPJ</th>
               <th>Regime</th>
-              <th>Situacao</th>
-              <th>Acoes</th>
+              <th>Situação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 

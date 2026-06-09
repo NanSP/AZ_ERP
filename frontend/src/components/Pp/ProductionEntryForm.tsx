@@ -50,7 +50,9 @@ export default function ProductionEntryForm({
   const canSave =
     value.op.trim() !== "" &&
     value.operador.trim() !== "" &&
-    (!value.dataHoraInicio || !value.dataHoraFim || value.dataHoraFim >= value.dataHoraInicio) &&
+    (!value.dataHoraInicio ||
+      !value.dataHoraFim ||
+      value.dataHoraFim >= value.dataHoraInicio) &&
     !Number.isNaN(produced) &&
     produced >= 0 &&
     !Number.isNaN(scrap) &&
@@ -76,7 +78,7 @@ export default function ProductionEntryForm({
             {editing ? "Editar apontamento" : "Novo apontamento"}
           </h3>
           <p className="production-entry-form__subtitle">
-            Registre operador, janela de trabalho, producao, refugo e paradas.
+            Registre operador, janela de trabalho, produção, refugo e paradas.
           </p>
           {editing && value.id ? (
             <p className="production-entry-form__meta">
@@ -84,7 +86,7 @@ export default function ProductionEntryForm({
             </p>
           ) : !canEditFields ? (
             <p className="production-entry-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -101,7 +103,7 @@ export default function ProductionEntryForm({
 
       <div className="production-entry-form__grid">
         <label className="production-entry-form__field">
-          <span>Ordem de producao</span>
+          <span>Ordem de produção</span>
           {orderOptions.length > 0 ? (
             <select
               value={value.op}
@@ -127,7 +129,7 @@ export default function ProductionEntryForm({
           )}
           {orderAccess === "unavailable" ? (
             <small className="production-entry-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -159,19 +161,19 @@ export default function ProductionEntryForm({
           )}
           {employeeAccess === "unavailable" ? (
             <small className="production-entry-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="production-entry-form__field">
-          <span>Maquina</span>
+          <span>Máquina</span>
           <input
             value={value.maquinaId}
             onChange={(event) =>
               update("maquinaId", event.target.value.replace(/\D/g, ""))
             }
-            placeholder="ID da maquina"
+            placeholder="ID da máquina"
             disabled={!canEditFields}
           />
         </label>
@@ -242,7 +244,7 @@ export default function ProductionEntryForm({
         </label>
 
         <label className="production-entry-form__field production-entry-form__field--span-2">
-          <span>Observacoes</span>
+          <span>Observações</span>
           <textarea
             value={value.observacoes}
             onChange={(event) => update("observacoes", event.target.value)}

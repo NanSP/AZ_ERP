@@ -31,10 +31,10 @@ export default function ProfileTable({
           <thead>
             <tr>
               <th>Perfil</th>
-              <th>Descricao</th>
-              <th>Nivel</th>
+              <th>Descrição</th>
+              <th>Nível</th>
               <th>Criado em</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -63,10 +63,10 @@ export default function ProfileTable({
                       <span>ID #{item.id ?? "-"}</span>
                     </div>
                   </td>
-                  <td>{item.descricao || "Sem descricao"}</td>
+                  <td>{item.descricao || "Sem descrição"}</td>
                   <td>
                     <span className="profile-table__badge">
-                      Nivel {item.nivelAcesso || "1"}
+                      Nível {item.nivelAcesso || "1"}
                     </span>
                   </td>
                   <td>{item.createdAt ? item.createdAt.slice(0, 10) : "-"}</td>
@@ -82,7 +82,9 @@ export default function ProfileTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="profile-table__empty-action">Sem acoes</span>
+                      <span className="profile-table__empty-action">
+                        Sem ações
+                      </span>
                     ) : null}
                   </td>
                 </tr>

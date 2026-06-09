@@ -187,7 +187,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
                   {columns.map((column) => (
                     <th key={column}>{column}</th>
                   ))}
-                  <th>Acoes</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
 

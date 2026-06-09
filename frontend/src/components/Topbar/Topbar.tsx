@@ -19,9 +19,9 @@ export default function Topbar() {
     <div className="topbar">
       <div className="topbar__intro">
         <span className="topbar__eyebrow">ERP Workspace</span>
-        <h1 className="topbar__title">Operacao integrada</h1>
+        <h1 className="topbar__title">Operação integrada</h1>
         <p className="topbar__subtitle">
-          Acesse modulos, acompanhe processos e navegue pelo ecossistema do ERP.
+          Acesse módulos, acompanhe processos e navegue pelo ecossistema do ERP.
         </p>
       </div>
 

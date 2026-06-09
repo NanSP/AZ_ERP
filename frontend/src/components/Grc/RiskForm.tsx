@@ -52,7 +52,8 @@ export default function RiskForm({
     value.probabilidade.trim() !== "" &&
     value.impacto.trim() !== "" &&
     (!riskIsHigh ||
-      (value.responsavelId.trim() !== "" && value.planoMitigacao.trim() !== "")) &&
+      (value.responsavelId.trim() !== "" &&
+        value.planoMitigacao.trim() !== "")) &&
     (!needsResponsibleForPlan || value.responsavelId.trim() !== "");
 
   function update<K extends keyof RiskRecord>(
@@ -73,14 +74,14 @@ export default function RiskForm({
             {editing ? "Editar risco" : "Novo risco"}
           </h3>
           <p className="risk-form__subtitle">
-            Classifique o risco, vincule um responsavel quando necessario e
-            registre a estrategia de mitigacao.
+            Classifique o risco, vincule um responsável quando necessário e
+            registre a estratégia de mitigação.
           </p>
           {editing && value.id ? (
             <p className="risk-form__meta">Registro selecionado: #{value.id}</p>
           ) : !canEditFields ? (
             <p className="risk-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -97,7 +98,7 @@ export default function RiskForm({
 
       <div className="risk-form__grid">
         <label className="risk-form__field">
-          <span>Codigo</span>
+          <span>Código</span>
           <input
             value={value.codigo}
             onChange={(event) => update("codigo", event.target.value)}
@@ -117,7 +118,7 @@ export default function RiskForm({
         </label>
 
         <label className="risk-form__field risk-form__field--span-2">
-          <span>Titulo</span>
+          <span>Título</span>
           <input
             value={value.titulo}
             onChange={(event) => update("titulo", event.target.value)}
@@ -127,7 +128,7 @@ export default function RiskForm({
         </label>
 
         <label className="risk-form__field risk-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <textarea
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
@@ -168,21 +169,24 @@ export default function RiskForm({
         </label>
 
         <label className="risk-form__field">
-          <span>Nivel de risco</span>
+          <span>Nível de risco</span>
           <input value={riskLevel || "-"} disabled />
         </label>
 
         <label className="risk-form__field">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           {canReadUsers ? (
             <select
               value={value.responsavelId}
               onChange={(event) => update("responsavelId", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Sem responsavel</option>
+              <option value="">Sem responsável</option>
               {users.map((user) => (
-                <option key={user.id ?? user.login} value={String(user.id ?? "")}>
+                <option
+                  key={user.id ?? user.login}
+                  value={String(user.id ?? "")}
+                >
                   {user.nome || user.login}
                 </option>
               ))}
@@ -199,27 +203,27 @@ export default function RiskForm({
           )}
           {!canReadUsers ? (
             <small className="risk-form__hint">
-              Sem leitura de usuarios: informe o ID manualmente.
+              Sem leitura de usuários: informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="risk-form__field risk-form__field--span-2">
-          <span>Plano de mitigacao</span>
+          <span>Plano de mitigação</span>
           <textarea
             value={value.planoMitigacao}
             onChange={(event) => update("planoMitigacao", event.target.value)}
-            placeholder="Acoes, responsavel, prazo e contingencias"
+            placeholder="Ações, responsável, prazo e contingências"
             disabled={!canEditFields}
             rows={5}
           />
           {riskIsHigh ? (
             <small className="risk-form__hint">
-              Risco alto exige responsavel e plano de mitigacao.
+              Risco alto exige responsável e plano de mitigação.
             </small>
           ) : needsResponsibleForPlan ? (
             <small className="risk-form__hint">
-              Plano de mitigacao exige responsavel para risco medio.
+              Plano de mitigação exige responsável para risco médio.
             </small>
           ) : null}
         </label>
@@ -231,11 +235,7 @@ export default function RiskForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar risco"}
+        {saving ? "Salvando..." : editing ? "Salvar alterações" : "Criar risco"}
       </button>
     </aside>
   );

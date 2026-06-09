@@ -1,7 +1,4 @@
-import type {
-  SessionEntry,
-  UserOption,
-} from "../../pages/Portal/SessionsPage";
+import type { SessionEntry, UserOption } from "../../pages/Portal/SessionsPage";
 
 type SessionsTableProps = {
   items: SessionEntry[];
@@ -28,7 +25,7 @@ export default function SessionsTable({
   return (
     <section className="sessions-table">
       <div className="sessions-table__head">
-        <h3 className="sessions-table__title">Sessoes</h3>
+        <h3 className="sessions-table__title">Sessões</h3>
         <span className="sessions-table__meta">{items.length} registros</span>
       </div>
 
@@ -36,11 +33,11 @@ export default function SessionsTable({
         <table className="sessions-table__table">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Contexto</th>
               <th>Ciclo</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -48,13 +45,13 @@ export default function SessionsTable({
             {loading ? (
               <tr>
                 <td colSpan={5} className="sessions-table__empty">
-                  Carregando sessoes...
+                  Carregando sessões...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={5} className="sessions-table__empty">
-                  Nenhuma sessao encontrada.
+                  Nenhuma sessão encontrada.
                 </td>
               </tr>
             ) : (
@@ -94,7 +91,7 @@ export default function SessionsTable({
                       </button>
                     ) : (
                       <span className="sessions-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     )}
                   </td>

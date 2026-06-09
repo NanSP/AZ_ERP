@@ -30,23 +30,23 @@ export default function MovementsTable({
         <table className="movements-table__table">
           <thead>
             <tr>
-              <th>Operacao</th>
+              <th>Operação</th>
               <th>Financeiro</th>
               <th>Contexto</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={4} className="movements-table__empty">
-                  Carregando movimentacoes...
+                  Carregando movimentações...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="movements-table__empty">
-                  Nenhuma movimentacao encontrada.
+                  Nenhuma movimentação encontrada.
                 </td>
               </tr>
             ) : (
@@ -72,7 +72,7 @@ export default function MovementsTable({
                     <div className="movements-table__details">
                       <strong>{item.documentoReferencia || "-"}</strong>
                       <span>{item.motivo || "-"}</span>
-                      <span>Usuario #{item.usuarioId || "-"}</span>
+                      <span>Usuário #{item.usuarioId || "-"}</span>
                     </div>
                   </td>
                   <td className="movements-table__actions">
@@ -88,7 +88,7 @@ export default function MovementsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="movements-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

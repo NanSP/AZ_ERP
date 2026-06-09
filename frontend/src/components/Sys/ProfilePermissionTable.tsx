@@ -17,7 +17,11 @@ type ProfilePermissionTableProps = {
   onDelete: (item: ProfilePermissionAssignment) => void;
 };
 
-function resolveLabel(value: string, options: RelatedOption[], fallback: string) {
+function resolveLabel(
+  value: string,
+  options: RelatedOption[],
+  fallback: string,
+) {
   const id = Number(value);
   const match = options.find((option) => option.id === id);
   return match?.label ?? fallback;
@@ -37,8 +41,12 @@ export default function ProfilePermissionTable({
   return (
     <section className="profile-permission-table">
       <div className="profile-permission-table__head">
-        <h3 className="profile-permission-table__title">Lista de vinculacoes</h3>
-        <span className="profile-permission-table__meta">{items.length} registros</span>
+        <h3 className="profile-permission-table__title">
+          Lista de vinculações
+        </h3>
+        <span className="profile-permission-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="profile-permission-table__wrap">
@@ -46,21 +54,21 @@ export default function ProfilePermissionTable({
           <thead>
             <tr>
               <th>Perfil</th>
-              <th>Permissao</th>
-              <th>Acoes</th>
+              <th>Permissão</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={3} className="profile-permission-table__empty">
-                  Carregando vinculacoes...
+                  Carregando vinculações...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={3} className="profile-permission-table__empty">
-                  Nenhuma vinculacao encontrada.
+                  Nenhuma vinculação encontrada.
                 </td>
               </tr>
             ) : (
@@ -80,7 +88,7 @@ export default function ProfilePermissionTable({
                     {resolveLabel(
                       item.permissao,
                       permissionOptions,
-                      `Permissao #${item.permissao || "-"}`,
+                      `Permissão #${item.permissao || "-"}`,
                     )}
                   </td>
                   <td className="profile-permission-table__actions">
@@ -96,7 +104,7 @@ export default function ProfilePermissionTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="profile-permission-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

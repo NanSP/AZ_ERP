@@ -44,8 +44,7 @@ export default function NonConformityForm({
   onReset,
 }: NonConformityFormProps) {
   const canSave =
-    value.inspecao.trim() !== "" &&
-    value.responsavel.trim() !== "";
+    value.inspecao.trim() !== "" && value.responsavel.trim() !== "";
 
   function update<K extends keyof NonConformityEntry>(
     field: K,
@@ -65,7 +64,7 @@ export default function NonConformityForm({
             {editing ? "Editar nao conformidade" : "Nova nao conformidade"}
           </h3>
           <p className="non-conformities-page__panel-subtitle">
-            Registre a ocorrencia, causa, acoes e andamento da tratativa.
+            Registre a ocorrência, causa, ações e andamento da tratativa.
           </p>
           {editing && value.id ? (
             <p className="non-conformities-page__panel-meta">
@@ -73,7 +72,7 @@ export default function NonConformityForm({
             </p>
           ) : !canEditFields ? (
             <p className="non-conformities-page__panel-meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -90,14 +89,14 @@ export default function NonConformityForm({
 
       <div className="non-conformities-page__form-grid">
         <label className="non-conformities-page__field">
-          <span>Inspecao</span>
+          <span>Inspeção</span>
           {inspectionOptions.length > 0 ? (
             <select
               value={value.inspecao}
               onChange={(event) => update("inspecao", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Selecione a inspecao</option>
+              <option value="">Selecione a inspeção</option>
               {inspectionOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -110,26 +109,26 @@ export default function NonConformityForm({
               onChange={(event) =>
                 update("inspecao", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID da inspecao"
+              placeholder="ID da inspeção"
               disabled={!canEditFields}
             />
           )}
           {inspectionAccess === "unavailable" ? (
             <small className="non-conformities-page__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="non-conformities-page__field">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           {employeeOptions.length > 0 ? (
             <select
               value={value.responsavel}
               onChange={(event) => update("responsavel", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Selecione o responsavel</option>
+              <option value="">Selecione o responsável</option>
               {employeeOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -142,19 +141,19 @@ export default function NonConformityForm({
               onChange={(event) =>
                 update("responsavel", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do responsavel"
+              placeholder="ID do responsável"
               disabled={!canEditFields}
             />
           )}
           {employeeAccess === "unavailable" ? (
             <small className="non-conformities-page__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="non-conformities-page__field">
-          <span>Tipo de nao conformidade</span>
+          <span>Tipo de não conformidade</span>
           <input
             value={value.tipoNaoConformidade}
             onChange={(event) =>
@@ -181,7 +180,7 @@ export default function NonConformityForm({
         </label>
 
         <label className="non-conformities-page__field">
-          <span>Data de identificacao</span>
+          <span>Data de identificação</span>
           <input
             type="date"
             value={value.dataIdentificacao}
@@ -193,7 +192,7 @@ export default function NonConformityForm({
         </label>
 
         <label className="non-conformities-page__field">
-          <span>Data de resolucao</span>
+          <span>Data de resolução</span>
           <input
             type="date"
             value={value.dataResolucao}
@@ -203,11 +202,11 @@ export default function NonConformityForm({
         </label>
 
         <label className="non-conformities-page__field non-conformities-page__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <textarea
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descreva a nao conformidade encontrada"
+            placeholder="Descreva a não conformidade encontrada"
             disabled={!canEditFields}
           />
         </label>
@@ -223,17 +222,17 @@ export default function NonConformityForm({
         </label>
 
         <label className="non-conformities-page__field non-conformities-page__field--span-2">
-          <span>Acao imediata</span>
+          <span>Ação imediata</span>
           <textarea
             value={value.acaoImediata}
             onChange={(event) => update("acaoImediata", event.target.value)}
-            placeholder="Acao tomada para conter o problema"
+            placeholder="Ação tomada para conter o problema"
             disabled={!canEditFields}
           />
         </label>
 
         <label className="non-conformities-page__field non-conformities-page__field--span-2">
-          <span>Acao corretiva</span>
+          <span>Ação corretiva</span>
           <textarea
             value={value.acaoCorretiva}
             onChange={(event) => update("acaoCorretiva", event.target.value)}

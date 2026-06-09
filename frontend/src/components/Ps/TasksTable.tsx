@@ -18,8 +18,13 @@ type TasksTableProps = {
   onDelete: (item: Task) => void;
 };
 
-function resolveProjectLabel(projectId: string, projectOptions: ProjectOption[]) {
-  const match = projectOptions.find((option) => String(option.id) === projectId);
+function resolveProjectLabel(
+  projectId: string,
+  projectOptions: ProjectOption[],
+) {
+  const match = projectOptions.find(
+    (option) => String(option.id) === projectId,
+  );
   return match ? match.label : projectId ? `Projeto #${projectId}` : "-";
 }
 
@@ -27,7 +32,9 @@ function resolveParentTaskLabel(
   taskId: string,
   parentTaskOptions: ParentTaskOption[],
 ) {
-  const match = parentTaskOptions.find((option) => String(option.id) === taskId);
+  const match = parentTaskOptions.find(
+    (option) => String(option.id) === taskId,
+  );
   return match ? match.label : taskId ? `Tarefa #${taskId}` : "-";
 }
 
@@ -61,10 +68,10 @@ export default function TasksTable({
             <tr>
               <th>Tarefa</th>
               <th>Contexto</th>
-              <th>Responsavel</th>
+              <th>Responsável</th>
               <th>Progresso</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -95,9 +102,14 @@ export default function TasksTable({
                   </td>
                   <td>
                     <div className="tasks-table__details">
-                      <span>{resolveProjectLabel(item.projeto, projectOptions)}</span>
                       <span>
-                        {resolveParentTaskLabel(item.tarefaPai, parentTaskOptions)}
+                        {resolveProjectLabel(item.projeto, projectOptions)}
+                      </span>
+                      <span>
+                        {resolveParentTaskLabel(
+                          item.tarefaPai,
+                          parentTaskOptions,
+                        )}
                       </span>
                     </div>
                   </td>
@@ -106,7 +118,8 @@ export default function TasksTable({
                     <div className="tasks-table__details">
                       <span>{item.percentualConcluido || "0"}%</span>
                       <span>
-                        {item.horasRealizadas || "0"} / {item.horasEstimadas || "0"} h
+                        {item.horasRealizadas || "0"} /{" "}
+                        {item.horasEstimadas || "0"} h
                       </span>
                     </div>
                   </td>
@@ -135,7 +148,9 @@ export default function TasksTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="tasks-table__empty-action">Sem acoes</span>
+                      <span className="tasks-table__empty-action">
+                        Sem acoes
+                      </span>
                     ) : null}
                   </td>
                 </tr>

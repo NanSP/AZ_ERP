@@ -42,7 +42,7 @@ export default function OrdersTable({
   return (
     <section className="orders-table">
       <div className="orders-table__head">
-        <h3 className="orders-table__title">Ordens de servico</h3>
+        <h3 className="orders-table__title">Ordens de serviço</h3>
         <span className="orders-table__meta">{items.length} registros</span>
       </div>
 
@@ -54,7 +54,7 @@ export default function OrdersTable({
               <th>Relacionamentos</th>
               <th>Agenda</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -62,13 +62,13 @@ export default function OrdersTable({
             {loading ? (
               <tr>
                 <td colSpan={5} className="orders-table__empty">
-                  Carregando ordens de servico...
+                  Carregando ordens de serviço...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={5} className="orders-table__empty">
-                  Nenhuma ordem de servico encontrada.
+                  Nenhuma ordem de serviço encontrada.
                 </td>
               </tr>
             ) : (
@@ -130,7 +130,9 @@ export default function OrdersTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="orders-table__empty-action">Sem acoes</span>
+                      <span className="orders-table__empty-action">
+                        Sem ações
+                      </span>
                     ) : null}
                   </td>
                 </tr>

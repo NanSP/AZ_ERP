@@ -77,7 +77,8 @@ export default function AllocatedResourceForm({
             {editing ? "Editar recurso" : "Novo recurso"}
           </h3>
           <p className="allocated-resource-form__subtitle">
-            Cadastre a alocacao com projeto, tarefa, tipo e valor total calculado.
+            Cadastre a alocação com projeto, tarefa, tipo e valor total
+            calculado.
           </p>
           {editing && value.id ? (
             <p className="allocated-resource-form__meta">
@@ -85,7 +86,7 @@ export default function AllocatedResourceForm({
             </p>
           ) : !canEditFields ? (
             <p className="allocated-resource-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -115,7 +116,7 @@ export default function AllocatedResourceForm({
               }}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {projectOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -134,7 +135,7 @@ export default function AllocatedResourceForm({
           )}
           {projectAccess === "unavailable" ? (
             <small className="allocated-resource-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -147,7 +148,7 @@ export default function AllocatedResourceForm({
               onChange={(event) => update("tarefa", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {taskOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -166,7 +167,7 @@ export default function AllocatedResourceForm({
           )}
           {taskAccess === "unavailable" ? (
             <small className="allocated-resource-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -211,7 +212,7 @@ export default function AllocatedResourceForm({
         </label>
 
         <label className="allocated-resource-form__field">
-          <span>Valor unitario</span>
+          <span>Valor unitário</span>
           <input
             value={value.valorUnitario}
             onChange={(event) =>
@@ -231,7 +232,7 @@ export default function AllocatedResourceForm({
         </label>
 
         <label className="allocated-resource-form__field">
-          <span>Data da alocacao</span>
+          <span>Data da alocação</span>
           <input
             type="date"
             value={value.dataAlocacao}
@@ -250,7 +251,7 @@ export default function AllocatedResourceForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar recurso"}
       </button>
     </aside>

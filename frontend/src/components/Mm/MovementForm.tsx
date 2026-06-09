@@ -75,7 +75,8 @@ export default function MovementForm({
             {editing ? "Editar movimentacao" : "Nova movimentacao"}
           </h3>
           <p className="movement-form__subtitle">
-            Escolha o estoque, tipo de movimento, quantidade e contexto operacional.
+            Escolha o estoque, tipo de movimento, quantidade e contexto
+            operacional.
           </p>
           {editing && value.id ? (
             <p className="movement-form__meta">
@@ -83,7 +84,7 @@ export default function MovementForm({
             </p>
           ) : !canEditFields ? (
             <p className="movement-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -113,7 +114,8 @@ export default function MovementForm({
                   key={stock.id ?? `${stock.produtoId}-${stock.empresaId}`}
                   value={String(stock.id ?? "")}
                 >
-                  #{stock.id} - Produto {stock.produtoId} / Empresa {stock.empresaId}
+                  #{stock.id} - Produto {stock.produtoId} / Empresa{" "}
+                  {stock.empresaId}
                 </option>
               ))}
             </select>
@@ -130,16 +132,19 @@ export default function MovementForm({
         </label>
 
         <label className="movement-form__field">
-          <span>Usuario</span>
+          <span>Usuário</span>
           {canReadUsers ? (
             <select
               value={value.usuarioId}
               onChange={(event) => update("usuarioId", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Selecione um usuario</option>
+              <option value="">Selecione um usuário</option>
               {users.map((user) => (
-                <option key={user.id ?? user.login} value={String(user.id ?? "")}>
+                <option
+                  key={user.id ?? user.login}
+                  value={String(user.id ?? "")}
+                >
                   {user.nome || user.login}
                 </option>
               ))}
@@ -150,7 +155,7 @@ export default function MovementForm({
               onChange={(event) =>
                 update("usuarioId", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do usuario"
+              placeholder="ID do usuário"
               disabled={!canEditFields}
             />
           )}
@@ -184,7 +189,7 @@ export default function MovementForm({
         </label>
 
         <label className="movement-form__field">
-          <span>Valor unitario</span>
+          <span>Valor unitário</span>
           <input
             value={value.valorUnitario}
             onChange={(event) =>
@@ -201,7 +206,7 @@ export default function MovementForm({
         </label>
 
         <label className="movement-form__field movement-form__field--span-2">
-          <span>Documento de referencia</span>
+          <span>Documento de referência</span>
           <input
             value={value.documentoReferencia}
             onChange={(event) =>
@@ -217,7 +222,7 @@ export default function MovementForm({
           <input
             value={value.motivo}
             onChange={(event) => update("motivo", event.target.value)}
-            placeholder="Recebimento, ajuste de saldo, transferencia interna"
+            placeholder="Recebimento, ajuste de saldo, transferência interna"
             disabled={!canEditFields}
           />
         </label>
@@ -232,8 +237,8 @@ export default function MovementForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
-            : "Criar movimentacao"}
+            ? "Salvar alterações"
+            : "Criar movimentação"}
       </button>
     </aside>
   );

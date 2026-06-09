@@ -62,10 +62,11 @@ export default function MaintenanceForm({
       <div className="maintenance-form__head">
         <div>
           <h3 className="maintenance-form__title">
-            {editing ? "Editar manutencao" : "Nova manutencao"}
+            {editing ? "Editar manutenção" : "Nova manutenção"}
           </h3>
           <p className="maintenance-form__subtitle">
-            Registre a manutencao do ativo com custos, tecnico e cronologia de execucao.
+            Registre a manutenção do ativo com custos, técnico e cronologia de
+            execução.
           </p>
           {editing && value.id ? (
             <p className="maintenance-form__meta">
@@ -73,7 +74,7 @@ export default function MaintenanceForm({
             </p>
           ) : !canEditFields ? (
             <p className="maintenance-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -107,20 +108,22 @@ export default function MaintenanceForm({
           ) : (
             <input
               value={value.ativo}
-              onChange={(event) => update("ativo", event.target.value.replace(/\D/g, ""))}
+              onChange={(event) =>
+                update("ativo", event.target.value.replace(/\D/g, ""))
+              }
               placeholder="ID do ativo"
               disabled={!canEditFields}
             />
           )}
           {assetAccess === "unavailable" ? (
             <small className="maintenance-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="maintenance-form__field">
-          <span>Tipo de manutencao</span>
+          <span>Tipo de manutenção</span>
           <select
             value={value.tipoManutencao}
             onChange={(event) => update("tipoManutencao", event.target.value)}
@@ -135,7 +138,7 @@ export default function MaintenanceForm({
         </label>
 
         <label className="maintenance-form__field">
-          <span>Data de solicitacao</span>
+          <span>Data de solicitação</span>
           <input
             type="date"
             value={value.dataSolicitacao}
@@ -145,7 +148,7 @@ export default function MaintenanceForm({
         </label>
 
         <label className="maintenance-form__field">
-          <span>Data de execucao</span>
+          <span>Data de execução</span>
           <input
             type="date"
             value={value.dataExecucao}
@@ -155,11 +158,11 @@ export default function MaintenanceForm({
         </label>
 
         <label className="maintenance-form__field maintenance-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descreva a manutencao"
+            placeholder="Descreva a manutenção"
             disabled={!canEditFields}
           />
         </label>
@@ -169,7 +172,10 @@ export default function MaintenanceForm({
           <input
             value={value.custoMaoObra}
             onChange={(event) =>
-              update("custoMaoObra", event.target.value.replace(/[^0-9.,]/g, ""))
+              update(
+                "custoMaoObra",
+                event.target.value.replace(/[^0-9.,]/g, ""),
+              )
             }
             placeholder="0.00"
             disabled={!canEditFields}
@@ -181,7 +187,10 @@ export default function MaintenanceForm({
           <input
             value={value.custoMaterial}
             onChange={(event) =>
-              update("custoMaterial", event.target.value.replace(/[^0-9.,]/g, ""))
+              update(
+                "custoMaterial",
+                event.target.value.replace(/[^0-9.,]/g, ""),
+              )
             }
             placeholder="0.00"
             disabled={!canEditFields}
@@ -189,14 +198,14 @@ export default function MaintenanceForm({
         </label>
 
         <label className="maintenance-form__field">
-          <span>Tecnico</span>
+          <span>Técnico</span>
           {employeeOptions.length > 0 ? (
             <select
               value={value.tecnico}
               onChange={(event) => update("tecnico", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {employeeOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -206,14 +215,16 @@ export default function MaintenanceForm({
           ) : (
             <input
               value={value.tecnico}
-              onChange={(event) => update("tecnico", event.target.value.replace(/\D/g, ""))}
+              onChange={(event) =>
+                update("tecnico", event.target.value.replace(/\D/g, ""))
+              }
               placeholder="ID do tecnico"
               disabled={!canEditFields}
             />
           )}
           {employeeAccess === "unavailable" ? (
             <small className="maintenance-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -221,7 +232,7 @@ export default function MaintenanceForm({
         <div className="maintenance-form__summary">
           <span>Custo total: {value.custoTotal || "0"}</span>
           <span>
-            Execucao {value.dataExecucao ? "informada" : "nao informada"}
+            Execução {value.dataExecucao ? "informada" : "não informada"}
           </span>
         </div>
       </div>
@@ -235,8 +246,8 @@ export default function MaintenanceForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
-            : "Criar manutencao"}
+            ? "Salvar alterações"
+            : "Criar manutenção"}
       </button>
     </aside>
   );

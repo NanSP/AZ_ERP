@@ -23,7 +23,9 @@ export default function OrderItemsTable({
     <section className="order-items-table">
       <div className="order-items-table__head">
         <h3 className="order-items-table__title">Itens do pedido</h3>
-        <span className="order-items-table__meta">{items.length} registros</span>
+        <span className="order-items-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="order-items-table__wrap">
@@ -33,7 +35,7 @@ export default function OrderItemsTable({
               <th>Vinculos</th>
               <th>Quantidades</th>
               <th>Financeiro</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -68,7 +70,7 @@ export default function OrderItemsTable({
                   </td>
                   <td>
                     <div className="order-items-table__details">
-                      <strong>Unitario: {item.valorUnitario || "-"}</strong>
+                      <strong>Unitário: {item.valorUnitario || "-"}</strong>
                       <span>Desconto: {item.desconto || "-"}</span>
                       <span>Total: {item.valorTotal || "-"}</span>
                     </div>
@@ -86,7 +88,7 @@ export default function OrderItemsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="order-items-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

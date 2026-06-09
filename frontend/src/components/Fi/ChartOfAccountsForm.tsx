@@ -56,7 +56,7 @@ export default function ChartOfAccountsForm({
             {editing ? "Editar conta" : "Nova conta"}
           </h3>
           <p className="chart-of-accounts-form__subtitle">
-            Defina a classificacao contabil e a relacao hierarquica da conta.
+            Defina a classificação contábil e a relação hierárquica da conta.
           </p>
           {editing && value.id ? (
             <p className="chart-of-accounts-form__meta">
@@ -64,7 +64,7 @@ export default function ChartOfAccountsForm({
             </p>
           ) : !canEditFields ? (
             <p className="chart-of-accounts-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -81,7 +81,7 @@ export default function ChartOfAccountsForm({
 
       <div className="chart-of-accounts-form__grid">
         <label className="chart-of-accounts-form__field">
-          <span>Codigo</span>
+          <span> Código </span>
           <input
             value={value.codigo}
             onChange={(event) => update("codigo", event.target.value)}
@@ -158,7 +158,7 @@ export default function ChartOfAccountsForm({
         </label>
 
         <label className="chart-of-accounts-form__field">
-          <span>Situacao</span>
+          <span>Situação</span>
           <select
             value={value.situacao}
             onChange={(event) => update("situacao", event.target.value)}
@@ -179,11 +179,7 @@ export default function ChartOfAccountsForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar conta"}
+        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar conta"}
       </button>
     </aside>
   );

@@ -44,7 +44,8 @@ export default function EcdRecordsForm({
             {editing ? "Editar registro ECD" : "Novo registro ECD"}
           </h3>
           <p className="ecd-records-page__panel-subtitle">
-            Registre blocos ECD com periodo, codigo estruturado e conteudo contabil em JSON.
+            Registre blocos ECD com periodo, codigo estruturado e conteudo
+            contábil em JSON.
           </p>
           {editing && value.id ? (
             <p className="ecd-records-page__panel-meta">

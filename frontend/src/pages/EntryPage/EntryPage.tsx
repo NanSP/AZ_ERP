@@ -66,8 +66,8 @@ export default function EntryPage() {
 
       <section id="modulos" className="landing-section">
         <div className="landing-section__title">
-          <span className="landing-pill landing-pill--light">Modulos</span>
-          <h2>Todo o ecossistema empresarial em um unico ambiente integrado</h2>
+          <span className="landing-pill landing-pill--light">Módulos</span>
+          <h2>Todo o ecossistema empresarial em um único ambiente integrado</h2>
           <p>
             Cada domínio do ERP tem uma representação visual premium,
             monocromática e consistente com o restante da plataforma.

@@ -1,6 +1,4 @@
-import type {
-  UserProfileAssignment,
-} from "../../pages/Sys/UserProfilesPage";
+import type { UserProfileAssignment } from "../../pages/Sys/UserProfilesPage";
 
 type RelatedOption = {
   id: number;
@@ -19,7 +17,11 @@ type UserProfileTableProps = {
   onDelete: (item: UserProfileAssignment) => void;
 };
 
-function resolveLabel(value: string, options: RelatedOption[], fallback: string) {
+function resolveLabel(
+  value: string,
+  options: RelatedOption[],
+  fallback: string,
+) {
   const id = Number(value);
   const match = options.find((option) => option.id === id);
   return match?.label ?? fallback;
@@ -39,18 +41,20 @@ export default function UserProfileTable({
   return (
     <section className="user-profile-table">
       <div className="user-profile-table__head">
-        <h3 className="user-profile-table__title">Lista de vinculacoes</h3>
-        <span className="user-profile-table__meta">{items.length} registros</span>
+        <h3 className="user-profile-table__title">Lista de vinculações</h3>
+        <span className="user-profile-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="user-profile-table__wrap">
         <table className="user-profile-table__table">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Perfil</th>
-              <th>Atribuido em</th>
-              <th>Acoes</th>
+              <th>Atribuído em</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -58,13 +62,13 @@ export default function UserProfileTable({
             {loading ? (
               <tr>
                 <td colSpan={4} className="user-profile-table__empty">
-                  Carregando vinculacoes...
+                  Carregando vinculações...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="user-profile-table__empty">
-                  Nenhuma vinculacao encontrada.
+                  Nenhuma vinculação encontrada.
                 </td>
               </tr>
             ) : (
@@ -77,7 +81,7 @@ export default function UserProfileTable({
                     {resolveLabel(
                       item.usuario,
                       userOptions,
-                      `Usuario #${item.usuario || "-"}`,
+                      `Usuário #${item.usuario || "-"}`,
                     )}
                   </td>
                   <td>
@@ -87,7 +91,11 @@ export default function UserProfileTable({
                       `Perfil #${item.perfil || "-"}`,
                     )}
                   </td>
-                  <td>{item.dataAtribuicao ? item.dataAtribuicao.slice(0, 10) : "-"}</td>
+                  <td>
+                    {item.dataAtribuicao
+                      ? item.dataAtribuicao.slice(0, 10)
+                      : "-"}
+                  </td>
                   <td className="user-profile-table__actions">
                     {canEdit ? (
                       <button type="button" onClick={() => onSelect(item)}>
@@ -101,7 +109,7 @@ export default function UserProfileTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="user-profile-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

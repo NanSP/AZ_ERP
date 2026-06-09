@@ -49,13 +49,13 @@ export default function ChartOfAccountsTable({
         <table className="chart-of-accounts-table__table">
           <thead>
             <tr>
-              <th>Codigo</th>
+              <th>Código</th>
               <th>Nome</th>
               <th>Tipo</th>
               <th>Natureza</th>
               <th>Conta pai</th>
-              <th>Situacao</th>
-              <th>Acoes</th>
+              <th>Situação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -115,7 +115,7 @@ export default function ChartOfAccountsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="chart-of-accounts-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

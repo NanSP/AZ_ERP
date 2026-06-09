@@ -22,7 +22,9 @@ function resolveEmployeeLabel(
   employeeId: string,
   employeeOptions: EmployeeOption[],
 ) {
-  const match = employeeOptions.find((option) => String(option.id) === employeeId);
+  const match = employeeOptions.find(
+    (option) => String(option.id) === employeeId,
+  );
   return match ? match.label : `Colaborador #${employeeId || "-"}`;
 }
 
@@ -39,7 +41,7 @@ export default function BenefitTable({
   return (
     <section className="benefit-table">
       <div className="benefit-table__head">
-        <h3 className="benefit-table__title">Lista de beneficios</h3>
+        <h3 className="benefit-table__title">Lista de benefícios</h3>
         <span className="benefit-table__meta">{items.length} registros</span>
       </div>
 
@@ -50,9 +52,9 @@ export default function BenefitTable({
               <th>Colaborador</th>
               <th>Tipo</th>
               <th>Valor</th>
-              <th>Periodo</th>
+              <th>Período</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -60,13 +62,13 @@ export default function BenefitTable({
             {loading ? (
               <tr>
                 <td colSpan={6} className="benefit-table__empty">
-                  Carregando beneficios...
+                  Carregando benefícios...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="benefit-table__empty">
-                  Nenhum beneficio encontrado.
+                  Nenhum benefício encontrado.
                 </td>
               </tr>
             ) : (
@@ -78,7 +80,10 @@ export default function BenefitTable({
                   <td>
                     <div className="benefit-table__identity">
                       <strong>
-                        {resolveEmployeeLabel(item.colaborador, employeeOptions)}
+                        {resolveEmployeeLabel(
+                          item.colaborador,
+                          employeeOptions,
+                        )}
                       </strong>
                       <span>ID #{item.colaborador || "-"}</span>
                     </div>
@@ -119,7 +124,7 @@ export default function BenefitTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="benefit-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

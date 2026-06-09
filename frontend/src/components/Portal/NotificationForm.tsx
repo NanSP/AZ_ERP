@@ -66,7 +66,7 @@ export default function NotificationForm({
             {editing ? "Editar notificacao" : "Nova notificacao"}
           </h3>
           <p className="notification-form__subtitle">
-            Cadastre a mensagem com usuario, tipo e estado de leitura.
+            Cadastre a mensagem com usuário, tipo e estado de leitura.
           </p>
           {editing && value.id ? (
             <p className="notification-form__meta">
@@ -74,7 +74,7 @@ export default function NotificationForm({
             </p>
           ) : !canEditFields ? (
             <p className="notification-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -91,7 +91,7 @@ export default function NotificationForm({
 
       <div className="notification-form__grid">
         <label className="notification-form__field">
-          <span>Usuario</span>
+          <span>Usuário</span>
           {userOptions.length > 0 ? (
             <select
               value={value.usuario}
@@ -117,7 +117,7 @@ export default function NotificationForm({
           )}
           {userAccess === "unavailable" ? (
             <small className="notification-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -138,11 +138,11 @@ export default function NotificationForm({
         </label>
 
         <label className="notification-form__field notification-form__field--span-2">
-          <span>Titulo</span>
+          <span>Título</span>
           <input
             value={value.titulo}
             onChange={(event) => update("titulo", event.target.value)}
-            placeholder="Titulo da notificacao"
+            placeholder="Título da notificação"
             disabled={!canEditFields}
           />
         </label>
@@ -152,7 +152,7 @@ export default function NotificationForm({
           <input
             value={value.mensagem}
             onChange={(event) => update("mensagem", event.target.value)}
-            placeholder="Conteudo da notificacao"
+            placeholder="Conteúdo da notificação"
             disabled={!canEditFields}
           />
         </label>
@@ -171,7 +171,7 @@ export default function NotificationForm({
             }}
             disabled={!canEditFields || (!value.lida && !canToggleReadState)}
           />
-          <span>Notificacao lida</span>
+          <span>Notificação lida</span>
         </label>
 
         <label className="notification-form__field">

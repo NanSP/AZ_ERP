@@ -18,7 +18,7 @@ export default function AddressTable({
   return (
     <section className="address-table">
       <div className="address-table__head">
-        <h3 className="address-table__title">Lista de enderecos</h3>
+        <h3 className="address-table__title">Lista de endereços</h3>
         <span className="address-table__meta">{items.length} registros</span>
       </div>
 
@@ -30,7 +30,7 @@ export default function AddressTable({
               <th>Tipo</th>
               <th>Local</th>
               <th>Principal</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -38,19 +38,21 @@ export default function AddressTable({
             {loading ? (
               <tr>
                 <td colSpan={5} className="address-table__empty">
-                  Carregando enderecos...
+                  Carregando endereços...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={5} className="address-table__empty">
-                  Nenhum endereco encontrado.
+                  Nenhum endereço encontrado.
                 </td>
               </tr>
             ) : (
               items.map((item) => (
                 <tr
-                  key={item.id ?? `${item.entidadeTipo}-${item.cep}-${item.numero}`}
+                  key={
+                    item.id ?? `${item.entidadeTipo}-${item.cep}-${item.numero}`
+                  }
                   data-selected={item.id === selectedId ? "true" : "false"}
                 >
                   <td>
@@ -78,7 +80,7 @@ export default function AddressTable({
                           : "address-table__badge"
                       }
                     >
-                      {item.principal ? "Principal" : "Secundario"}
+                      {item.principal ? "Principal" : "Secundário"}
                     </span>
                   </td>
                   <td className="address-table__actions">

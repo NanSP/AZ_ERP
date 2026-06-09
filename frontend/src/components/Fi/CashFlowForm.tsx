@@ -58,7 +58,7 @@ export default function CashFlowForm({
             {editing ? "Editar fluxo" : "Novo fluxo"}
           </h3>
           <p className="cash-flow-form__subtitle">
-            Informe valores previstos e realizados para a data de referencia.
+            Informe valores previstos e realizados para a data de referência.
           </p>
           {editing && value.id ? (
             <p className="cash-flow-form__meta">
@@ -66,7 +66,7 @@ export default function CashFlowForm({
             </p>
           ) : !canEditFields ? (
             <p className="cash-flow-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -83,7 +83,7 @@ export default function CashFlowForm({
 
       <div className="cash-flow-form__grid">
         <label className="cash-flow-form__field">
-          <span>Data de referencia</span>
+          <span>Data de referência</span>
           <input
             type="date"
             value={value.dataReferencia}
@@ -131,11 +131,7 @@ export default function CashFlowForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar fluxo"}
+        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar fluxo"}
       </button>
     </aside>
   );

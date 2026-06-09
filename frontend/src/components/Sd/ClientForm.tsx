@@ -66,8 +66,9 @@ export default function ClientForm({
             {editing ? "Editar cliente" : "Novo cliente"}
           </h3>
           <p className="client-form__subtitle">
-            Converta parceiros em registros comerciais e mantenha a classificacao
-            do relacionamento com contexto de origem e porte da conta.
+            Converta parceiros em registros comerciais e mantenha a
+            classificação do relacionamento com contexto de origem e porte da
+            conta.
           </p>
           {editing && value.id ? (
             <p className="client-form__meta">
@@ -75,7 +76,7 @@ export default function ClientForm({
             </p>
           ) : !canEditFields ? (
             <p className="client-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -101,8 +102,12 @@ export default function ClientForm({
             >
               <option value="">Selecione um parceiro</option>
               {partners.map((partner) => (
-                <option key={partner.id ?? partner.codigo} value={String(partner.id ?? "")}>
-                  {partner.codigo || "Sem codigo"} - {partner.nome || "Sem nome"}
+                <option
+                  key={partner.id ?? partner.codigo}
+                  value={String(partner.id ?? "")}
+                >
+                  {partner.codigo || "Sem codigo"} -{" "}
+                  {partner.nome || "Sem nome"}
                 </option>
               ))}
             </select>
@@ -119,7 +124,7 @@ export default function ClientForm({
         </label>
 
         <label className="client-form__field">
-          <span>Classificacao</span>
+          <span>Classificação</span>
           <select
             value={value.classificacao}
             onChange={(event) => update("classificacao", event.target.value)}
@@ -169,7 +174,7 @@ export default function ClientForm({
         </label>
 
         <label className="client-form__field">
-          <span>Numero de funcionarios</span>
+          <span>Número de funcionários</span>
           <input
             value={value.numeroFuncionarios}
             onChange={(event) =>
@@ -193,7 +198,7 @@ export default function ClientForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar cliente"}
       </button>
     </aside>

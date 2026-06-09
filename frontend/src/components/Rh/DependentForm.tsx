@@ -42,9 +42,7 @@ export default function DependentForm({
   onSave,
   onReset,
 }: DependentFormProps) {
-  const canSave =
-    value.colaborador.trim() !== "" &&
-    value.nome.trim() !== "";
+  const canSave = value.colaborador.trim() !== "" && value.nome.trim() !== "";
 
   function update<K extends keyof Dependent>(
     field: K,
@@ -65,7 +63,7 @@ export default function DependentForm({
           </h3>
           <p className="dependent-form__subtitle">
             Vincule o dependente ao colaborador e informe dados cadastrais
-            basicos.
+            básicos.
           </p>
           {editing && value.id ? (
             <p className="dependent-form__meta">
@@ -73,7 +71,7 @@ export default function DependentForm({
             </p>
           ) : !canEditFields ? (
             <p className="dependent-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -116,7 +114,7 @@ export default function DependentForm({
           )}
           {employeeAccess === "unavailable" ? (
             <small className="dependent-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -178,7 +176,7 @@ export default function DependentForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar dependente"}
       </button>
     </aside>

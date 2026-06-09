@@ -22,7 +22,7 @@ export default function SlaConfigsTable({
   return (
     <section className="sla-table">
       <div className="sla-table__head">
-        <h3 className="sla-table__title">Configuracoes de SLA</h3>
+        <h3 className="sla-table__title">Configurações de SLA</h3>
         <span className="sla-table__meta">{items.length} registros</span>
       </div>
 
@@ -30,11 +30,11 @@ export default function SlaConfigsTable({
         <table className="sla-table__table">
           <thead>
             <tr>
-              <th>Servico</th>
+              <th>Serviço</th>
               <th>Prioridade</th>
               <th>Atendimento</th>
-              <th>Resolucao</th>
-              <th>Acoes</th>
+              <th>Resolução</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -42,13 +42,13 @@ export default function SlaConfigsTable({
             {loading ? (
               <tr>
                 <td colSpan={5} className="sla-table__empty">
-                  Carregando configuracoes de SLA...
+                  Carregando configurações de SLA...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={5} className="sla-table__empty">
-                  Nenhuma configuracao de SLA encontrada.
+                  Nenhuma configuração de SLA encontrada.
                 </td>
               </tr>
             ) : (
@@ -77,7 +77,7 @@ export default function SlaConfigsTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="sla-table__empty-action">Sem acoes</span>
+                      <span className="sla-table__empty-action">Sem ações</span>
                     ) : null}
                   </td>
                 </tr>

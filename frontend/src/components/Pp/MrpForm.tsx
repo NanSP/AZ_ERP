@@ -1,4 +1,8 @@
-import type { MrpItem, ProductAccess, ProductOption } from "../../pages/Pp/MrpPage";
+import type {
+  MrpItem,
+  ProductAccess,
+  ProductOption,
+} from "../../pages/Pp/MrpPage";
 
 type MrpFormProps = {
   value: MrpItem;
@@ -64,14 +68,14 @@ export default function MrpForm({
             {editing ? "Editar MRP" : "Novo MRP"}
           </h3>
           <p className="mrp-form__subtitle">
-            Informe o cenario de demanda e estoque. O backend calcula as
+            Informe o cenário de demanda e estoque. O backend calcula as
             necessidades automaticamente.
           </p>
           {editing && value.id ? (
             <p className="mrp-form__meta">Registro selecionado: #{value.id}</p>
           ) : !canEditFields ? (
             <p className="mrp-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -114,13 +118,13 @@ export default function MrpForm({
           )}
           {productAccess === "unavailable" ? (
             <small className="mrp-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="mrp-form__field">
-          <span>Periodo</span>
+          <span>Período</span>
           <input
             type="date"
             value={value.periodo}
@@ -160,7 +164,7 @@ export default function MrpForm({
         </label>
 
         <label className="mrp-form__field">
-          <span>Estoque de seguranca</span>
+          <span>Estoque de segurança</span>
           <input
             value={value.estoqueSeguranca}
             onChange={(event) =>
@@ -190,7 +194,7 @@ export default function MrpForm({
             <strong>{value.necessidadeCompra || "-"}</strong>
           </div>
           <div className="mrp-form__summary-card">
-            <span>Necessidade de producao</span>
+            <span>Necessidade de produção</span>
             <strong>{value.necessidadeProducao || "-"}</strong>
           </div>
         </div>
@@ -202,11 +206,7 @@ export default function MrpForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar MRP"}
+        {saving ? "Salvando..." : editing ? "Salvar alterações" : "Criar MRP"}
       </button>
     </aside>
   );

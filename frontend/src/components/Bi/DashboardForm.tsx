@@ -41,7 +41,7 @@ export default function DashboardForm({
             {editing ? "Editar dashboard" : "Novo dashboard"}
           </h3>
           <p className="dashboard-form__subtitle">
-            Configure nome, descricao, layout e parametros do painel.
+            Configure nome, descrição, layout e parametros do painel.
           </p>
           {editing && value.id ? (
             <p className="dashboard-form__meta">
@@ -49,7 +49,7 @@ export default function DashboardForm({
             </p>
           ) : !canEditFields ? (
             <p className="dashboard-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -76,7 +76,7 @@ export default function DashboardForm({
         </label>
 
         <label className="dashboard-form__field dashboard-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
@@ -97,7 +97,7 @@ export default function DashboardForm({
         </label>
 
         <label className="dashboard-form__field dashboard-form__field--span-2">
-          <span>Configuracoes (JSON)</span>
+          <span>Configurações (JSON)</span>
           <textarea
             value={value.configuracoes}
             onChange={(event) => update("configuracoes", event.target.value)}
@@ -117,7 +117,7 @@ export default function DashboardForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar dashboard"}
       </button>
     </aside>

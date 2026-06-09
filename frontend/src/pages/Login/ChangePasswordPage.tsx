@@ -27,7 +27,7 @@ export default function ChangePasswordPage() {
       <div className="auth-badge">Primeiro acesso</div>
       <h1 className="auth-title">Atualize sua senha</h1>
       <p className="auth-subtitle">
-        Antes de continuar, defina uma nova credencial para sua sessao.
+        Antes de continuar, defina uma nova credencial para sua sessão.
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit}>

@@ -46,7 +46,9 @@ export default function ContractForm({
     valorTotal >= 0 &&
     (value.status !== "vigente" || value.dataInicio.trim() !== "") &&
     (!needsEndDate || value.dataFim.trim() !== "") &&
-    (!value.dataInicio || !value.dataFim || value.dataFim >= value.dataInicio) &&
+    (!value.dataInicio ||
+      !value.dataFim ||
+      value.dataFim >= value.dataInicio) &&
     (value.status !== "vigente" || value.dataFim.trim() === "");
 
   function update<K extends keyof ContractRecord>(
@@ -73,8 +75,8 @@ export default function ContractForm({
             {editing ? "Editar contrato" : "Novo contrato"}
           </h3>
           <p className="contract-form__subtitle">
-            Vincule o contrato a um cliente comercial, defina vigencia,
-            numeracao formal e status do acordo.
+            Vincule o contrato a um cliente comercial, defina vigência,
+            numeração formal e status do acordo.
           </p>
           {editing && value.id ? (
             <p className="contract-form__meta">
@@ -82,7 +84,7 @@ export default function ContractForm({
             </p>
           ) : !canEditFields ? (
             <p className="contract-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -129,7 +131,7 @@ export default function ContractForm({
         </label>
 
         <label className="contract-form__field">
-          <span>Numero do contrato</span>
+          <span>Número do contrato</span>
           <input
             value={value.numeroContrato}
             onChange={(event) => update("numeroContrato", event.target.value)}

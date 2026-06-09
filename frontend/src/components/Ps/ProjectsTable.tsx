@@ -16,8 +16,13 @@ type ProjectsTableProps = {
   onDelete: (item: Project) => void;
 };
 
-function resolvePartnerLabel(clienteId: string, partnerOptions: PartnerOption[]) {
-  const match = partnerOptions.find((option) => String(option.id) === clienteId);
+function resolvePartnerLabel(
+  clienteId: string,
+  partnerOptions: PartnerOption[],
+) {
+  const match = partnerOptions.find(
+    (option) => String(option.id) === clienteId,
+  );
   return match ? match.label : clienteId ? `Cliente #${clienteId}` : "-";
 }
 
@@ -49,11 +54,11 @@ export default function ProjectsTable({
           <thead>
             <tr>
               <th>Projeto</th>
-              <th>Responsaveis</th>
+              <th>Responsáveis</th>
               <th>Cronograma</th>
-              <th>Orcamento</th>
+              <th>Orçamento</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -84,14 +89,21 @@ export default function ProjectsTable({
                   </td>
                   <td>
                     <div className="projects-table__details">
-                      <span>{resolvePartnerLabel(item.cliente, partnerOptions)}</span>
+                      <span>
+                        {resolvePartnerLabel(item.cliente, partnerOptions)}
+                      </span>
                       <span>{resolveUserLabel(item.gerente, userOptions)}</span>
                     </div>
                   </td>
                   <td>
                     <div className="projects-table__details">
-                      <span>Inicio: {item.dataInicio || item.dataPrevistaInicio || "-"}</span>
-                      <span>Fim: {item.dataFim || item.dataPrevistaFim || "-"}</span>
+                      <span>
+                        Inicio:{" "}
+                        {item.dataInicio || item.dataPrevistaInicio || "-"}
+                      </span>
+                      <span>
+                        Fim: {item.dataFim || item.dataPrevistaFim || "-"}
+                      </span>
                     </div>
                   </td>
                   <td>
@@ -125,7 +137,9 @@ export default function ProjectsTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="projects-table__empty-action">Sem acoes</span>
+                      <span className="projects-table__empty-action">
+                        Sem acoes
+                      </span>
                     ) : null}
                   </td>
                 </tr>

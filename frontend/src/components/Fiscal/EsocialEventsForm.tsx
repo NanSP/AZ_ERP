@@ -51,7 +51,8 @@ export default function EsocialEventsForm({
             {editing ? "Editar evento eSocial" : "Novo evento eSocial"}
           </h3>
           <p className="esocial-events-page__panel-subtitle">
-            Registre eventos fiscais com periodo de apuracao, conteudo estruturado e fluxo de envio.
+            Registre eventos fiscais com periodo de apuracao, conteudo
+            estruturado e fluxo de envio.
           </p>
           {editing && value.id ? (
             <p className="esocial-events-page__panel-meta">
@@ -59,7 +60,7 @@ export default function EsocialEventsForm({
             </p>
           ) : !canEditFields ? (
             <p className="esocial-events-page__panel-meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -76,7 +77,7 @@ export default function EsocialEventsForm({
 
       <div className="esocial-events-page__form-grid">
         <label className="esocial-events-page__field">
-          <span>Periodo de apuracao</span>
+          <span>Periodo de apuração</span>
           <input
             type="date"
             value={value.periodoApuracao}
@@ -123,7 +124,7 @@ export default function EsocialEventsForm({
         </label>
 
         <label className="esocial-events-page__field esocial-events-page__field--span-2">
-          <span>Conteudo</span>
+          <span>Conteúdo</span>
           <textarea
             value={value.conteudo}
             onChange={(event) => update("conteudo", event.target.value)}

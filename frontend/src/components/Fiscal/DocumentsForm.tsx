@@ -76,7 +76,8 @@ export default function DocumentsForm({
             {editing ? "Editar documento" : "Novo documento"}
           </h3>
           <p className="documents-page__panel-subtitle">
-            Registre documentos fiscais com cliente, pedido, chave de acesso e situacao operacional.
+            Registre documentos fiscais com cliente, pedido, chave de acesso e
+            situação operacional.
           </p>
           {editing && value.id ? (
             <p className="documents-page__panel-meta">
@@ -84,7 +85,7 @@ export default function DocumentsForm({
             </p>
           ) : !canEditFields ? (
             <p className="documents-page__panel-meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -131,21 +132,21 @@ export default function DocumentsForm({
         </label>
 
         <label className="documents-page__field">
-          <span>Numero</span>
+          <span>Número</span>
           <input
             value={value.numero}
             onChange={(event) => update("numero", event.target.value)}
-            placeholder="Numero do documento"
+            placeholder="Número do documento"
             disabled={!canEditFields}
           />
         </label>
 
         <label className="documents-page__field">
-          <span>Serie</span>
+          <span>Série</span>
           <input
             value={value.serie}
             onChange={(event) => update("serie", event.target.value)}
-            placeholder="Serie"
+            placeholder="Série"
             disabled={!canEditFields}
           />
         </label>
@@ -167,7 +168,7 @@ export default function DocumentsForm({
         </label>
 
         <label className="documents-page__field">
-          <span>Data de emissao</span>
+          <span>Data de emissão</span>
           <input
             type="date"
             value={value.dataEmissao}
@@ -181,10 +182,7 @@ export default function DocumentsForm({
           <input
             value={value.valorTotal}
             onChange={(event) =>
-              update(
-                "valorTotal",
-                event.target.value.replace(/[^0-9.,]/g, ""),
-              )
+              update("valorTotal", event.target.value.replace(/[^0-9.,]/g, ""))
             }
             placeholder="0,00"
             disabled={!canEditFields}
@@ -216,7 +214,7 @@ export default function DocumentsForm({
               onChange={(event) => update("cliente", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {clients.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -235,7 +233,7 @@ export default function DocumentsForm({
           )}
           {clientAccess === "unavailable" ? (
             <small className="documents-page__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>

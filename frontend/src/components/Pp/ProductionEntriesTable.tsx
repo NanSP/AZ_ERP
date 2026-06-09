@@ -49,10 +49,10 @@ export default function ProductionEntriesTable({
         <table className="production-entries-table__table">
           <thead>
             <tr>
-              <th>Execucao</th>
+              <th>Execução</th>
               <th>Janela</th>
               <th>Quantidade</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -72,16 +72,25 @@ export default function ProductionEntriesTable({
             ) : (
               items.map((item) => (
                 <tr
-                  key={item.id ?? `${item.op}-${item.createdAt ?? item.dataHoraInicio}`}
+                  key={
+                    item.id ??
+                    `${item.op}-${item.createdAt ?? item.dataHoraInicio}`
+                  }
                   data-selected={item.id === selectedId ? "true" : "false"}
                 >
                   <td>
                     <div className="production-entries-table__details">
-                      <strong>{resolveLabel(item.op, orderOptions, "OP")}</strong>
+                      <strong>
+                        {resolveLabel(item.op, orderOptions, "OP")}
+                      </strong>
                       <span>
-                        {resolveLabel(item.operador, employeeOptions, "Operador")}
+                        {resolveLabel(
+                          item.operador,
+                          employeeOptions,
+                          "Operador",
+                        )}
                       </span>
-                      <span>Maquina: {item.maquinaId || "-"}</span>
+                      <span>Máquina: {item.maquinaId || "-"}</span>
                     </div>
                   </td>
                   <td>
@@ -110,7 +119,7 @@ export default function ProductionEntriesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="production-entries-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

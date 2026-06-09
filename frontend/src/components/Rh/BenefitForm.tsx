@@ -57,7 +57,7 @@ export default function BenefitForm({
             {editing ? "Editar beneficio" : "Novo beneficio"}
           </h3>
           <p className="benefit-form__subtitle">
-            Configure o beneficio do colaborador com vigencia, valor e status.
+            Configure o benefício do colaborador com vigência, valor e status.
           </p>
           {editing && value.id ? (
             <p className="benefit-form__meta">
@@ -65,7 +65,7 @@ export default function BenefitForm({
             </p>
           ) : !canEditFields ? (
             <p className="benefit-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -108,13 +108,13 @@ export default function BenefitForm({
           )}
           {employeeAccess === "unavailable" ? (
             <small className="benefit-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="benefit-form__field">
-          <span>Tipo de beneficio</span>
+          <span>Tipo de benefício</span>
           <select
             value={value.tipoBeneficio}
             onChange={(event) => update("tipoBeneficio", event.target.value)}
@@ -167,7 +167,7 @@ export default function BenefitForm({
             onChange={(event) => update("ativo", event.target.checked)}
             disabled={!canEditFields}
           />
-          <span>Beneficio ativo</span>
+          <span>Benefício ativo</span>
         </label>
       </div>
 

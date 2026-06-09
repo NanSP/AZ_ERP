@@ -30,7 +30,7 @@ export default function ContactTable({
               <th>Tipo</th>
               <th>Valor</th>
               <th>Principal</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -69,7 +69,7 @@ export default function ContactTable({
                           : "contact-table__badge"
                       }
                     >
-                      {item.principal ? "Principal" : "Secundario"}
+                      {item.principal ? "Principal" : "Secundário"}
                     </span>
                   </td>
                   <td className="contact-table__actions">

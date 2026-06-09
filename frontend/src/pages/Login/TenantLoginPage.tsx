@@ -28,13 +28,13 @@ export default function TenantLoginPage() {
       <div className="auth-badge auth-badge--light">Acesso tenant</div>
       <h1 className="auth-title">Entrar no ambiente operacional</h1>
       <p className="auth-subtitle">
-        Informe o codigo do tenant e siga para a rotina do cliente.
+        Informe o código do tenant e siga para a rotina do cliente.
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-field">
           <label className="auth-label" htmlFor="tenant-code">
-            Codigo do tenant
+            Código do tenant
           </label>
           <input
             id="tenant-code"
@@ -80,7 +80,8 @@ export default function TenantLoginPage() {
       {erro && <p className="auth-error">{erro}</p>}
 
       <p className="auth-helper">
-        Precisa acessar a camada administrativa? <Link to="/login">Ir para o login master</Link>
+        Precisa acessar a camada administrativa?{" "}
+        <Link to="/login">Ir para o login master</Link>
       </p>
     </AuthLayout>
   );

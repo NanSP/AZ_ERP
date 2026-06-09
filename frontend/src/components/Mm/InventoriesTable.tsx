@@ -23,7 +23,9 @@ export default function InventoriesTable({
     <section className="inventories-table">
       <div className="inventories-table__head">
         <h3 className="inventories-table__title">Inventarios</h3>
-        <span className="inventories-table__meta">{items.length} registros</span>
+        <span className="inventories-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="inventories-table__wrap">
@@ -31,22 +33,22 @@ export default function InventoriesTable({
           <thead>
             <tr>
               <th>Ciclo</th>
-              <th>Calendario</th>
+              <th>Calendário</th>
               <th>Contexto</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
                 <td colSpan={4} className="inventories-table__empty">
-                  Carregando inventarios...
+                  Carregando inventários...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="inventories-table__empty">
-                  Nenhum inventario encontrado.
+                  Nenhum inventário encontrado.
                 </td>
               </tr>
             ) : (
@@ -63,13 +65,13 @@ export default function InventoriesTable({
                   </td>
                   <td>
                     <div className="inventories-table__details">
-                      <strong>Inicio: {item.dataInicio || "-"}</strong>
+                      <strong>Início: {item.dataInicio || "-"}</strong>
                       <span>Fim: {item.dataFim || "-"}</span>
                     </div>
                   </td>
                   <td>
                     <div className="inventories-table__details">
-                      <strong>Observacoes</strong>
+                      <strong>Observações</strong>
                       <span>{item.observacoes || "-"}</span>
                     </div>
                   </td>
@@ -86,7 +88,7 @@ export default function InventoriesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="inventories-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

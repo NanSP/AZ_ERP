@@ -37,7 +37,8 @@ export default function MetricForm({
     value.nome.trim() !== "" &&
     value.categoria.trim() !== "" &&
     (!formulaRequired || value.formula.trim() !== "") &&
-    (value.meta.trim() === "" || (!Number.isNaN(metaNumber) && metaNumber >= 0));
+    (value.meta.trim() === "" ||
+      (!Number.isNaN(metaNumber) && metaNumber >= 0));
 
   function update<K extends keyof MetricRecord>(
     field: K,
@@ -57,13 +58,15 @@ export default function MetricForm({
             {editing ? "Editar metrica" : "Nova metrica"}
           </h3>
           <p className="metric-form__subtitle">
-            Estruture o indicador com contexto, formula, unidade e meta.
+            Estruture o indicador com contexto, fórmula, unidade e meta.
           </p>
           {editing && value.id ? (
-            <p className="metric-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="metric-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="metric-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -105,7 +108,7 @@ export default function MetricForm({
         </label>
 
         <label className="metric-form__field metric-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
@@ -115,7 +118,7 @@ export default function MetricForm({
         </label>
 
         <label className="metric-form__field metric-form__field--span-2">
-          <span>Formula</span>
+          <span>Fórmula</span>
           <textarea
             value={value.formula}
             onChange={(event) => update("formula", event.target.value)}
@@ -125,7 +128,7 @@ export default function MetricForm({
           />
           {formulaRequired ? (
             <small className="metric-form__hint">
-              Formula obrigatoria para categorias financeira e operacional.
+              Fórmula obrigatoria para categorias financeira e operacional.
             </small>
           ) : null}
         </label>

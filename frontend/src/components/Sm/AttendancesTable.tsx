@@ -40,7 +40,9 @@ export default function AttendancesTable({
     <section className="attendances-table">
       <div className="attendances-table__head">
         <h3 className="attendances-table__title">Atendimentos</h3>
-        <span className="attendances-table__meta">{items.length} registros</span>
+        <span className="attendances-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="attendances-table__wrap">
@@ -51,7 +53,7 @@ export default function AttendancesTable({
               <th>Relacionamentos</th>
               <th>Horas</th>
               <th>Materiais</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -110,7 +112,7 @@ export default function AttendancesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="attendances-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -33,10 +33,10 @@ export default function EsocialEventsTable({
           <thead>
             <tr>
               <th>Evento</th>
-              <th>Apuracao</th>
+              <th>Apuração</th>
               <th>Status</th>
-              <th>Conteudo</th>
-              <th>Acoes</th>
+              <th>Conteúdo</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -89,7 +89,7 @@ export default function EsocialEventsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="esocial-events-page__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

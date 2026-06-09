@@ -26,12 +26,12 @@ export default function ProductTable({
         <table className="product-table__table">
           <thead>
             <tr>
-              <th>Codigo</th>
+              <th>Código</th>
               <th>Nome</th>
               <th>Tipo</th>
               <th>Unidade</th>
-              <th>Situacao</th>
-              <th>Acoes</th>
+              <th>Situação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -58,7 +58,7 @@ export default function ProductTable({
                   <td>
                     <div className="product-table__identity">
                       <strong>{item.nome || "-"}</strong>
-                      <span>{item.codigoBarras || "Sem codigo de barras"}</span>
+                      <span>{item.codigoBarras || "Sem código de barras"}</span>
                     </div>
                   </td>
                   <td>{item.tipoItem || "-"}</td>

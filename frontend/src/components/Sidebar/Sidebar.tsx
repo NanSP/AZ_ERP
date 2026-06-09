@@ -12,13 +12,13 @@ export default function Sidebar() {
     <div className="sidebar">
       <div className="sidebar__header">
         <span className="sidebar__eyebrow">Workspace</span>
-        <h2 className="sidebar__title">Modulos</h2>
+        <h2 className="sidebar__title">Módulos</h2>
         <p className="sidebar__subtitle">
-          Navegue pelos dominios operacionais do ERP.
+          Navegue pelos domínios operacionais do ERP.
         </p>
       </div>
 
-      <nav className="sidebar__nav" aria-label="Modulos do tenant">
+      <nav className="sidebar__nav" aria-label="Módulos do tenant">
         {visibleModules.map((module) => (
           <section key={module.sigla} className="sidebar__group">
             <div className="sidebar__group-head">

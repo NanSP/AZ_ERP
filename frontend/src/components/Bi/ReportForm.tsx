@@ -55,13 +55,16 @@ export default function ReportForm({
             {editing ? "Editar relatorio" : "Novo relatorio"}
           </h3>
           <p className="report-form__subtitle">
-            Defina o tipo, a query SQL e os parametros operacionais do relatorio.
+            Defina o tipo, a query SQL e os parametros operacionais do
+            relatório.
           </p>
           {editing && value.id ? (
-            <p className="report-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="report-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="report-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -103,11 +106,11 @@ export default function ReportForm({
         </label>
 
         <label className="report-form__field report-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Explique o objetivo do relatorio"
+            placeholder="Explique o objetivo do relatório"
             disabled={!canEditFields}
           />
         </label>
@@ -123,8 +126,8 @@ export default function ReportForm({
           />
           {sqlRequired ? (
             <small className="report-form__hint">
-              Query SQL obrigatoria para tabela, grafico e customizado. O backend
-              aceita apenas comandos iniciados por SELECT.
+              Query SQL obrigatória para tabela, gráfico e customizado. O
+              backend aceita apenas comandos iniciados por SELECT.
             </small>
           ) : null}
         </label>

@@ -33,9 +33,9 @@ export default function EfdRecordsTable({
           <thead>
             <tr>
               <th>Registro</th>
-              <th>Periodo</th>
-              <th>Conteudo</th>
-              <th>Acoes</th>
+              <th>Período</th>
+              <th>Conteúdo</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -82,7 +82,7 @@ export default function EfdRecordsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="efd-records-page__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -23,19 +23,21 @@ export default function CostCenterTable({
     <section className="cost-center-table">
       <div className="cost-center-table__head">
         <h3 className="cost-center-table__title">Lista de centros</h3>
-        <span className="cost-center-table__meta">{items.length} registros</span>
+        <span className="cost-center-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="cost-center-table__wrap">
         <table className="cost-center-table__table">
           <thead>
             <tr>
-              <th>Codigo</th>
+              <th>Código</th>
               <th>Nome</th>
               <th>Tipo</th>
-              <th>Responsavel</th>
+              <th>Responsável</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -86,7 +88,7 @@ export default function CostCenterTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="cost-center-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

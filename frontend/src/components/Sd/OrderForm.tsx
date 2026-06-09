@@ -58,13 +58,15 @@ export default function OrderForm({
           </h3>
           <p className="order-form__subtitle">
             Estruture o pedido comercial com cliente, datas, pagamento e status.
-            Os totais serao consolidados pelos itens do pedido.
+            Os totais serão consolidados pelos itens do pedido.
           </p>
           {editing && value.id ? (
-            <p className="order-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="order-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="order-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -111,7 +113,7 @@ export default function OrderForm({
         </label>
 
         <label className="order-form__field">
-          <span>Numero do pedido</span>
+          <span>Número do pedido</span>
           <input
             value={value.numeroPedido}
             onChange={(event) => update("numeroPedido", event.target.value)}
@@ -166,7 +168,7 @@ export default function OrderForm({
         </label>
 
         <label className="order-form__field order-form__field--span-2">
-          <span>Condicoes de pagamento</span>
+          <span>Condições de pagamento</span>
           <input
             value={value.condicoesPagamento}
             onChange={(event) =>
@@ -178,11 +180,11 @@ export default function OrderForm({
         </label>
 
         <label className="order-form__field order-form__field--span-2">
-          <span>Observacoes</span>
+          <span>Observações</span>
           <textarea
             value={value.observacoes}
             onChange={(event) => update("observacoes", event.target.value)}
-            placeholder="Instrucoes de entrega, premissas comerciais e observacoes internas"
+            placeholder="Instruções de entrega, premissas comerciais e observações internas"
             disabled={!canEditFields}
             rows={5}
           />

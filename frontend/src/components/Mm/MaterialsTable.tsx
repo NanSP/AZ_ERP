@@ -31,9 +31,9 @@ export default function MaterialsTable({
           <thead>
             <tr>
               <th>Produto</th>
-              <th>Classificacao</th>
+              <th>Classificação</th>
               <th>Detalhes</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -88,7 +88,7 @@ export default function MaterialsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="materials-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

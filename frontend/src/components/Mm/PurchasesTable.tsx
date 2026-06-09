@@ -33,7 +33,7 @@ export default function PurchasesTable({
               <th>Fornecedor</th>
               <th>Prazo</th>
               <th>Financeiro</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -87,7 +87,7 @@ export default function PurchasesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="purchases-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

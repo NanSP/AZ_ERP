@@ -31,9 +31,9 @@ export default function InvoicesTable({
           <thead>
             <tr>
               <th>Documento</th>
-              <th>Calendario</th>
+              <th>Calendário</th>
               <th>Financeiro</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +63,7 @@ export default function InvoicesTable({
                   </td>
                   <td>
                     <div className="invoices-table__details">
-                      <strong>Emissao: {item.dataEmissao || "-"}</strong>
+                      <strong>Emissão: {item.dataEmissao || "-"}</strong>
                       <span>Vencimento: {item.dataVencimento || "-"}</span>
                     </div>
                   </td>
@@ -86,7 +86,7 @@ export default function InvoicesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="invoices-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

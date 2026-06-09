@@ -37,9 +37,7 @@ export default function OrderItemForm({
       ? 0
       : Number(value.valorUnitario.replace(",", "."));
   const desconto =
-    value.desconto.trim() === ""
-      ? 0
-      : Number(value.desconto.replace(",", "."));
+    value.desconto.trim() === "" ? 0 : Number(value.desconto.replace(",", "."));
   const subtotal =
     Number.isFinite(quantidade) && Number.isFinite(valorUnitario)
       ? quantidade * valorUnitario
@@ -77,8 +75,8 @@ export default function OrderItemForm({
             {editing ? "Editar item do pedido" : "Novo item do pedido"}
           </h3>
           <p className="order-item-form__subtitle">
-            Associe produto e pedido, informe quantidade, desconto e acompanhe
-            o valor final calculado por item.
+            Associe produto e pedido, informe quantidade, desconto e acompanhe o
+            valor final calculado por item.
           </p>
           {editing && value.id ? (
             <p className="order-item-form__meta">
@@ -86,7 +84,7 @@ export default function OrderItemForm({
             </p>
           ) : !canEditFields ? (
             <p className="order-item-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -116,7 +114,8 @@ export default function OrderItemForm({
                   key={order.id ?? `${order.clienteId}-${order.numeroPedido}`}
                   value={String(order.id ?? "")}
                 >
-                  #{order.id} - {order.numeroPedido || "Sem numero"} / {order.status}
+                  #{order.id} - {order.numeroPedido || "Sem numero"} /{" "}
+                  {order.status}
                 </option>
               ))}
             </select>
@@ -146,7 +145,8 @@ export default function OrderItemForm({
                   key={product.id ?? product.codigo}
                   value={String(product.id ?? "")}
                 >
-                  {product.codigo || "Sem codigo"} - {product.nome || "Sem nome"}
+                  {product.codigo || "Sem codigo"} -{" "}
+                  {product.nome || "Sem nome"}
                 </option>
               ))}
             </select>
@@ -175,7 +175,7 @@ export default function OrderItemForm({
         </label>
 
         <label className="order-item-form__field">
-          <span>Valor unitario</span>
+          <span>Valor unitário</span>
           <input
             value={value.valorUnitario}
             onChange={(event) =>

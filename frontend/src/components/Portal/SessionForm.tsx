@@ -54,13 +54,15 @@ export default function SessionForm({
             {editing ? "Editar sessao" : "Nova sessao"}
           </h3>
           <p className="session-form__subtitle">
-            Cadastre o contexto tecnico e o ciclo de vida da sessao.
+            Cadastre o contexto técnico e o ciclo de vida da sessao.
           </p>
           {editing && value.id ? (
-            <p className="session-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="session-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="session-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -77,7 +79,7 @@ export default function SessionForm({
 
       <div className="session-form__grid">
         <label className="session-form__field">
-          <span>Usuario</span>
+          <span>Usuário</span>
           {userOptions.length > 0 ? (
             <select
               value={value.usuario}
@@ -103,13 +105,13 @@ export default function SessionForm({
           )}
           {userAccess === "unavailable" ? (
             <small className="session-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="session-form__field">
-          <span>Token da sessao</span>
+          <span>Token da sessão</span>
           <input
             value={value.tokenSessao}
             onChange={(event) => update("tokenSessao", event.target.value)}
@@ -159,7 +161,7 @@ export default function SessionForm({
         </label>
 
         <label className="session-form__field session-form__field--span-2">
-          <span>Expiracao</span>
+          <span>Expiração</span>
           <input
             type="datetime-local"
             value={value.expiracao}
@@ -178,8 +180,8 @@ export default function SessionForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
-            : "Criar sessao"}
+            ? "Salvar alterações"
+            : "Criar sessão"}
       </button>
     </aside>
   );
