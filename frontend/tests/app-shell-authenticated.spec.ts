@@ -175,7 +175,7 @@ test("authenticated user can create, update and delete parceiro with mocked api"
 
   await page.getByRole("button", { name: /novo parceiro/i }).click();
   await page.getByLabel("Codigo").fill("PAR-002");
-  await page.getByLabel("Nome").fill("Parceiro Playwright");
+  await page.getByLabel("Nome", { exact: true }).fill("Parceiro Playwright");
   await page.getByLabel("Documento").fill("99887766554");
   await page.getByRole("button", { name: /criar parceiro/i }).click();
 
@@ -186,7 +186,7 @@ test("authenticated user can create, update and delete parceiro with mocked api"
     .locator("tr", { has: page.getByText("Parceiro Playwright") })
     .getByRole("button", { name: /editar/i })
     .click();
-  await page.getByLabel("Nome").fill("Parceiro Playwright Atualizado");
+  await page.getByLabel("Nome", { exact: true }).fill("Parceiro Playwright Atualizado");
   await page.getByRole("button", { name: /salvar alteracoes/i }).click();
 
   await expect(
