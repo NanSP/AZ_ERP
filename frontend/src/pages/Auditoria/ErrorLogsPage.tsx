@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ErrorLogsForm from "../../components/Auditoria/ErrorLogsForm";
@@ -121,14 +121,14 @@ export default function ErrorLogsPage({
     [session?.permissoes],
   );
   const isMasterScope = session?.scope === "master";
-  const canRead = isMasterScope || permissionSet.has("auditoria:log_erros:read");
+  const canRead =
+    isMasterScope || permissionSet.has("auditoria:log_erros:read");
   const canCreate =
     isMasterScope || permissionSet.has("auditoria:log_erros:create");
-  const canReadUsers =
-    isMasterScope || permissionSet.has("sys:usuarios:read");
+  const canReadUsers = isMasterScope || permissionSet.has("sys:usuarios:read");
   const isBusy = loading || saving;
 
-  async function loadLogs() {
+  const loadLogs = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setLoading(false);
@@ -142,17 +142,21 @@ export default function ErrorLogsPage({
     try {
       const response = await listResource("auditoria", "logErros");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeEntry(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeEntry(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os logs de erro."));
+      setError(
+        getErrorMessage(err, "Não foi possivel carregar os logs de erro."),
+      );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUsers([]);
       setUserAccess("unavailable");
@@ -176,15 +180,15 @@ export default function ErrorLogsPage({
       setUsers([]);
       setUserAccess("unavailable");
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadLogs();
-  }, [canRead]);
+  }, [loadLogs]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -194,7 +198,13 @@ export default function ErrorLogsPage({
     }
 
     return items.filter((item) =>
-      [item.erroMensagem, item.modulo, item.url, item.ipAddress, item.erroCodigo]
+      [
+        item.erroMensagem,
+        item.modulo,
+        item.url,
+        item.ipAddress,
+        item.erroCodigo,
+      ]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalized)),
     );
@@ -216,7 +226,7 @@ export default function ErrorLogsPage({
 
   async function handleSave() {
     if (!canCreate) {
-      setError("Seu perfil nao possui permissao para criar logs de erro.");
+      setError("Seu perfil nao possui permissão para criar logs de erro.");
       return;
     }
 
@@ -231,9 +241,7 @@ export default function ErrorLogsPage({
       setDraft({ ...emptyEntry });
       setSuccess("Log de erro criado com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel criar o log de erro."),
-      );
+      setError(getErrorMessage(err, "Não foi possivel criar o log de erro."));
     } finally {
       setSaving(false);
     }
@@ -242,7 +250,9 @@ export default function ErrorLogsPage({
   return (
     <div
       className={
-        embedded ? "error-logs-page error-logs-page--embedded" : "error-logs-page"
+        embedded
+          ? "error-logs-page error-logs-page--embedded"
+          : "error-logs-page"
       }
     >
       {!embedded ? (
@@ -251,7 +261,8 @@ export default function ErrorLogsPage({
             <span className="error-logs-page__eyebrow">AUDITORIA</span>
             <h2 className="error-logs-page__title">Log de erros</h2>
             <p className="error-logs-page__subtitle">
-              Registre erros de aplicacao com contexto tecnico, URL e rastreabilidade operacional.
+              Registre erros de aplicação com contexto técnico, URL e
+              rastreabilidade operacional.
             </p>
           </div>
 
@@ -313,7 +324,10 @@ export default function ErrorLogsPage({
       ) : null}
       {!canRead || !canCreate ? (
         <div className="error-logs-page__alert error-logs-page__alert--info">
-          {[canRead ? null : "leitura desabilitada", canCreate ? null : "criacao desabilitada"]
+          {[
+            canRead ? null : "leitura desabilitada",
+            canCreate ? null : "criacao desabilitada",
+          ]
             .filter(Boolean)
             .join(" · ")}
         </div>

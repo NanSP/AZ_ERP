@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import AttendanceForm from "../../components/Sm/AttendanceForm";
@@ -136,7 +136,7 @@ function getErrorMessage(error: unknown, fallback: string) {
   }
 
   if (error instanceof SyntaxError) {
-    return "Materiais utilizados deve conter um JSON valido.";
+    return "Materiais utilizados deve conter um JSON válido.";
   }
 
   return fallback;
@@ -188,7 +188,11 @@ export default function AttendancesPage({
     attendancesResource,
     "delete",
   );
-  const canReadOrders = canAccessResourceAction(session, ordersResource, "read");
+  const canReadOrders = canAccessResourceAction(
+    session,
+    ordersResource,
+    "read",
+  );
   const canReadEmployees = canAccessResourceAction(
     session,
     employeesResource,
@@ -197,7 +201,7 @@ export default function AttendancesPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadAttendances() {
+  const loadAttendances = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -220,14 +224,14 @@ export default function AttendancesPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os atendimentos."),
+        getErrorMessage(err, "Não foi possível carregar os atendimentos."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     if (!canReadOrders) {
       setOrderOptions([]);
       setOrderAccess("unavailable");
@@ -247,9 +251,9 @@ export default function AttendancesPage({
       setOrderOptions([]);
       setOrderAccess("unavailable");
     }
-  }
+  }, [canReadOrders]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -260,7 +264,9 @@ export default function AttendancesPage({
       const response = await listResource("rh", "colaboradores");
       const nextItems = Array.isArray(response.data)
         ? response.data
-            .map((item) => mapOption(item as Record<string, unknown>, "Tecnico"))
+            .map((item) =>
+              mapOption(item as Record<string, unknown>, "Tecnico"),
+            )
             .filter((item): item is EmployeeOption => item !== null)
         : [];
       setEmployeeOptions(nextItems);
@@ -269,19 +275,19 @@ export default function AttendancesPage({
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadAttendances();
-  }, [canRead]);
+  }, [loadAttendances]);
 
   useEffect(() => {
     void loadOrders();
-  }, [canReadOrders]);
+  }, [loadOrders]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -327,8 +333,8 @@ export default function AttendancesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar atendimentos."
-          : "Seu perfil nao possui permissao para criar atendimentos.",
+          ? "Seu perfil não possui permissão para atualizar atendimentos."
+          : "Seu perfil não possui permissão para criar atendimentos.",
       );
       return;
     }
@@ -343,7 +349,9 @@ export default function AttendancesPage({
         ? await updateResource("sm", "atendimentos", selected.id, payload)
         : await createResource("sm", "atendimentos", payload);
 
-      const saved = normalizeAttendance(response.data as Record<string, unknown>);
+      const saved = normalizeAttendance(
+        response.data as Record<string, unknown>,
+      );
       await loadAttendances();
       setSelected(saved);
       setDraft({ ...saved });
@@ -357,8 +365,8 @@ export default function AttendancesPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o atendimento."
-            : "Nao foi possivel criar o atendimento.",
+            ? "Não foi possível atualizar o atendimento."
+            : "Não foi possível criar o atendimento.",
         ),
       );
     } finally {
@@ -368,12 +376,12 @@ export default function AttendancesPage({
 
   async function handleDelete(item: Attendance) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir atendimentos.");
+      setError("Seu perfil não possui permissão para excluir atendimentos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o atendimento para exclusao.");
+      setError("Não foi possível identificar o atendimento para exclusão.");
       return;
     }
 
@@ -398,11 +406,9 @@ export default function AttendancesPage({
         setDraft({ ...emptyAttendance });
       }
 
-      setSuccess("Atendimento excluido com sucesso.");
+      setSuccess("Atendimento excluído com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o atendimento."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir o atendimento."));
     } finally {
       setSaving(false);
     }
@@ -422,7 +428,8 @@ export default function AttendancesPage({
             <span className="attendances-page__eyebrow">SM</span>
             <h2 className="attendances-page__title">Atendimentos</h2>
             <p className="attendances-page__subtitle">
-              Registre execucao tecnica, horas gastas e materiais utilizados por ordem de servico.
+              Registre execução técnica, horas gastas e materiais utilizados por
+              ordem de serviço.
             </p>
           </div>
 
@@ -431,7 +438,7 @@ export default function AttendancesPage({
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por OS, tecnico, descricao ou horas"
+              placeholder="Buscar por OS, técnico, descrição ou horas"
               className="attendances-page__search"
               disabled={isBusy || !canRead}
             />
@@ -451,7 +458,7 @@ export default function AttendancesPage({
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por OS, tecnico, descricao ou horas"
+            placeholder="Buscar por OS, técnico, descrição ou horas"
             className="attendances-page__search"
             disabled={isBusy || !canRead}
           />
@@ -486,8 +493,8 @@ export default function AttendancesPage({
         <div className="attendances-page__alert attendances-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

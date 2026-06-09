@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import AuditForm from "../../components/Grc/AuditForm";
@@ -130,7 +130,7 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadAudits() {
+  const loadAudits = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -152,13 +152,15 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as auditorias."));
+      setError(
+        getErrorMessage(err, "Não foi possível carregar as auditorias."),
+      );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUsers([]);
       return;
@@ -167,21 +169,23 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
     try {
       const response = await listResource("sys", "usuarios");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeUser(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeUser(item as Record<string, unknown>),
+          )
         : [];
       setUsers(nextItems);
     } catch {
       setUsers([]);
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadAudits();
-  }, [canRead]);
+  }, [loadAudits]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -227,8 +231,8 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar auditorias."
-          : "Seu perfil nao possui permissao para criar auditorias.",
+          ? "Seu perfil não possui permissão para atualizar auditorias."
+          : "Seu perfil não possui permissão para criar auditorias.",
       );
       return;
     }
@@ -257,8 +261,8 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a auditoria."
-            : "Nao foi possivel criar a auditoria.",
+            ? "Não foi possível atualizar a auditoria."
+            : "Não foi possível criar a auditoria.",
         ),
       );
     } finally {
@@ -268,12 +272,12 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
 
   async function handleDelete(item: AuditRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir auditorias.");
+      setError("Seu perfil não possui permissão para excluir auditorias.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a auditoria para exclusao.");
+      setError("Não foi possível identificar a auditoria para exclusão.");
       return;
     }
 
@@ -294,22 +298,24 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
       await loadAudits();
       setSuccess("Auditoria excluida com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a auditoria."));
+      setError(getErrorMessage(err, "Não foi possível excluir a auditoria."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "audits-page audits-page--embedded" : "audits-page"}>
+    <div
+      className={embedded ? "audits-page audits-page--embedded" : "audits-page"}
+    >
       {!embedded ? (
         <header className="audits-page__header">
           <div>
             <span className="audits-page__eyebrow">GRC</span>
             <h2 className="audits-page__title">Auditorias</h2>
             <p className="audits-page__subtitle">
-              Planeje auditorias internas, externas e regulatorias com
-              periodo, escopo, responsavel e status de execucao.
+              Planeje auditorias internas, externas e regulatórias com periodo,
+              escopo, responsável e status de execução.
             </p>
           </div>
 
@@ -373,8 +379,8 @@ export default function AuditsPage({ embedded = false }: AuditsPageProps) {
         <div className="audits-page__alert audits-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

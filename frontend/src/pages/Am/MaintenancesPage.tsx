@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import MaintenanceForm from "../../components/Am/MaintenanceForm";
 import MaintenanceTable from "../../components/Am/MaintenanceTable";
@@ -55,9 +55,7 @@ const emptyMaintenance: MaintenanceEntry = {
   tecnico: "",
 };
 
-function normalizeMaintenance(
-  data: Record<string, unknown>,
-): MaintenanceEntry {
+function normalizeMaintenance(data: Record<string, unknown>): MaintenanceEntry {
   return {
     id: typeof data.id === "number" ? data.id : undefined,
     ativo: data.ativo == null ? "" : String(data.ativo),
@@ -66,8 +64,7 @@ function normalizeMaintenance(
     dataExecucao: String(data.dataExecucao ?? ""),
     descricao: String(data.descricao ?? ""),
     custoMaoObra: data.custoMaoObra == null ? "" : String(data.custoMaoObra),
-    custoMaterial:
-      data.custoMaterial == null ? "" : String(data.custoMaterial),
+    custoMaterial: data.custoMaterial == null ? "" : String(data.custoMaterial),
     custoTotal: data.custoTotal == null ? "" : String(data.custoTotal),
     tecnico: data.tecnico == null ? "" : String(data.tecnico),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
@@ -134,7 +131,7 @@ export default function MaintenancesPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadMaintenances() {
+  const loadMaintenances = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -156,13 +153,15 @@ export default function MaintenancesPage({
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as manutencoes."));
+      setError(
+        getErrorMessage(err, "Não foi possível carregar as manutenções."),
+      );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadAssets() {
+  const loadAssets = useCallback(async () => {
     if (!canReadAssets) {
       setAssetOptions([]);
       setAssetAccess("unavailable");
@@ -186,9 +185,9 @@ export default function MaintenancesPage({
       setAssetOptions([]);
       setAssetAccess("unavailable");
     }
-  }
+  }, [canReadAssets]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -212,19 +211,19 @@ export default function MaintenancesPage({
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadMaintenances();
-  }, [canRead]);
+  }, [loadMaintenances]);
 
   useEffect(() => {
     void loadAssets();
-  }, [canReadAssets]);
+  }, [loadAssets]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -282,8 +281,8 @@ export default function MaintenancesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar manutencoes."
-          : "Seu perfil nao possui permissao para criar manutencoes.",
+          ? "Seu perfil não possui permissão para atualizar manutenções."
+          : "Seu perfil não possui permissão para criar manutenções.",
       );
       return;
     }
@@ -298,22 +297,24 @@ export default function MaintenancesPage({
         ? await updateResource("am", "manutencoes", selected.id, payload)
         : await createResource("am", "manutencoes", payload);
 
-      const saved = normalizeMaintenance(response.data as Record<string, unknown>);
+      const saved = normalizeMaintenance(
+        response.data as Record<string, unknown>,
+      );
       await loadMaintenances();
       setSelected(saved);
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Manutencao atualizada com sucesso."
-          : "Manutencao criada com sucesso.",
+          ? "Manutenção atualizada com sucesso."
+          : "Manutenção criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a manutencao."
-            : "Nao foi possivel criar a manutencao.",
+            ? "Não foi possível atualizar a manutenção."
+            : "Não foi possível criar a manutenção.",
         ),
       );
     } finally {
@@ -323,17 +324,17 @@ export default function MaintenancesPage({
 
   async function handleDelete(item: MaintenanceEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir manutencoes.");
+      setError("Seu perfil não possui permissão para excluir manutenções.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a manutencao para exclusao.");
+      setError("Não foi possível identificar a manutenção para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a manutencao "${item.tipoManutencao || item.id}"?`,
+      `Deseja excluir a manutenção "${item.tipoManutencao || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -353,11 +354,9 @@ export default function MaintenancesPage({
         setDraft({ ...emptyMaintenance });
       }
 
-      setSuccess("Manutencao excluida com sucesso.");
+      setSuccess("Manutenção excluída com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir a manutencao."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir a manutenção."));
     } finally {
       setSaving(false);
     }
@@ -375,9 +374,10 @@ export default function MaintenancesPage({
         <header className="maintenances-page__header">
           <div>
             <span className="maintenances-page__eyebrow">AM</span>
-            <h2 className="maintenances-page__title">Manutencoes</h2>
+            <h2 className="maintenances-page__title">Manutenções</h2>
             <p className="maintenances-page__subtitle">
-              Controle manutencoes preventivas, corretivas e preditivas dos ativos.
+              Controle manutenções preventivas, corretivas e preditivas dos
+              ativos.
             </p>
           </div>
 
@@ -396,7 +396,7 @@ export default function MaintenancesPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova manutencao
+              Nova manutenção
             </button>
           </div>
         </header>
@@ -425,7 +425,7 @@ export default function MaintenancesPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova manutencao
+              Nova manutenção
             </button>
           </div>
         </div>

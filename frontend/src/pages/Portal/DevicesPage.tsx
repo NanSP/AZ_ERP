@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import DeviceForm from "../../components/Portal/DeviceForm";
@@ -136,7 +136,7 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadDevices() {
+  const loadDevices = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -159,14 +159,14 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os dispositivos."),
+        getErrorMessage(err, "Não foi possivel carregar os dispositivos."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUserOptions([]);
       setUserAccess("unavailable");
@@ -186,15 +186,15 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
       setUserOptions([]);
       setUserAccess("unavailable");
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadDevices();
-  }, [canRead]);
+  }, [loadDevices]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -240,8 +240,8 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar dispositivos."
-          : "Seu perfil nao possui permissao para criar dispositivos.",
+          ? "Seu perfil não possui permissão para atualizar dispositivos."
+          : "Seu perfil não possui permissão para criar dispositivos.",
       );
       return;
     }
@@ -270,8 +270,8 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o dispositivo."
-            : "Nao foi possivel criar o dispositivo.",
+            ? "Não foi possivel atualizar o dispositivo."
+            : "Não foi possivel criar o dispositivo.",
         ),
       );
     } finally {
@@ -281,12 +281,12 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
 
   async function handleDelete(item: Device) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir dispositivos.");
+      setError("Seu perfil não possui permissão para excluir dispositivos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o dispositivo para exclusao.");
+      setError("Não foi possivel identificar o dispositivo para exclusão.");
       return;
     }
 
@@ -296,9 +296,7 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
     }
 
     if (item.ultimoAcesso.trim() !== "") {
-      setError(
-        "Dispositivos com historico de acesso nao podem ser excluidos.",
-      );
+      setError("Dispositivos com histórico de acesso não podem ser excluidos.");
       return;
     }
 
@@ -325,9 +323,7 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
 
       setSuccess("Dispositivo excluido com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o dispositivo."),
-      );
+      setError(getErrorMessage(err, "Não foi possivel excluir o dispositivo."));
     } finally {
       setSaving(false);
     }
@@ -335,7 +331,9 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
 
   return (
     <div
-      className={embedded ? "devices-page devices-page--embedded" : "devices-page"}
+      className={
+        embedded ? "devices-page devices-page--embedded" : "devices-page"
+      }
     >
       {!embedded ? (
         <header className="devices-page__header">
@@ -343,7 +341,8 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
             <span className="devices-page__eyebrow">PORTAL</span>
             <h2 className="devices-page__title">Dispositivos</h2>
             <p className="devices-page__subtitle">
-              Gerencie device ID, plataforma, push token, ultimo acesso e estado do dispositivo.
+              Gerencie device ID, plataforma, push token, ultimo acesso e estado
+              do dispositivo.
             </p>
           </div>
 
@@ -407,8 +406,8 @@ export default function DevicesPage({ embedded = false }: DevicesPageProps) {
         <div className="devices-page__alert devices-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ControlForm from "../../components/Grc/ControlForm";
@@ -58,8 +58,7 @@ function normalizeControl(data: Record<string, unknown>): ControlRecord {
     descricao: String(data.descricao ?? ""),
     tipoControle: String(data.tipoControle ?? "preventivo"),
     frequencia: String(data.frequencia ?? "mensal"),
-    responsavelId:
-      data.responsavel == null ? "" : String(data.responsavel),
+    responsavelId: data.responsavel == null ? "" : String(data.responsavel),
     efetivo: Boolean(data.efetivo),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
   };
@@ -120,14 +119,26 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
   const [selected, setSelected] = useState<ControlRecord | null>(null);
   const [draft, setDraft] = useState<ControlRecord>(emptyControl);
   const canRead = canAccessResourceAction(session, controlsResource, "read");
-  const canCreate = canAccessResourceAction(session, controlsResource, "create");
-  const canUpdate = canAccessResourceAction(session, controlsResource, "update");
-  const canDelete = canAccessResourceAction(session, controlsResource, "delete");
+  const canCreate = canAccessResourceAction(
+    session,
+    controlsResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    controlsResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    controlsResource,
+    "delete",
+  );
   const canReadUsers = canAccessResourceAction(session, usersResource, "read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadControls() {
+  const loadControls = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -149,13 +160,13 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os controles."));
+      setError(getErrorMessage(err, "Não foi possível carregar os controles."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUsers([]);
       return;
@@ -164,21 +175,23 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
     try {
       const response = await listResource("sys", "usuarios");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeUser(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeUser(item as Record<string, unknown>),
+          )
         : [];
       setUsers(nextItems);
     } catch {
       setUsers([]);
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadControls();
-  }, [canRead]);
+  }, [loadControls]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -224,8 +237,8 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar controles."
-          : "Seu perfil nao possui permissao para criar controles.",
+          ? "Seu perfil não possui permissão para atualizar controles."
+          : "Seu perfil não possui permissão para criar controles.",
       );
       return;
     }
@@ -254,8 +267,8 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o controle."
-            : "Nao foi possivel criar o controle.",
+            ? "Não foi possível atualizar o controle."
+            : "Não foi possível criar o controle.",
         ),
       );
     } finally {
@@ -265,12 +278,12 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
 
   async function handleDelete(item: ControlRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir controles.");
+      setError("Seu perfil não possui permissão para excluir controles.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o controle para exclusao.");
+      setError("Não foi possível identificar o controle para exclusão.");
       return;
     }
 
@@ -289,9 +302,9 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
     try {
       await deleteResource("grc", "controles", item.id);
       await loadControls();
-      setSuccess("Controle excluido com sucesso.");
+      setSuccess("Controle excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o controle."));
+      setError(getErrorMessage(err, "Não foi possível excluir o controle."));
     } finally {
       setSaving(false);
     }
@@ -299,7 +312,9 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
 
   return (
     <div
-      className={embedded ? "controls-page controls-page--embedded" : "controls-page"}
+      className={
+        embedded ? "controls-page controls-page--embedded" : "controls-page"
+      }
     >
       {!embedded ? (
         <header className="controls-page__header">
@@ -308,7 +323,7 @@ export default function ControlsPage({ embedded = false }: ControlsPageProps) {
             <h2 className="controls-page__title">Controles</h2>
             <p className="controls-page__subtitle">
               Formalize controles preventivos, detectivos e corretivos com
-              frequencia, responsavel e status de efetividade.
+              frequência, responsável e status de efetividade.
             </p>
           </div>
 

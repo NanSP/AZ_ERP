@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ProductionOrderForm from "../../components/Pp/ProductionOrderForm";
@@ -185,7 +185,7 @@ export default function ProductionOrdersPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadProductionOrders() {
+  const loadProductionOrders = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -210,15 +210,15 @@ export default function ProductionOrdersPage({
       setError(
         getErrorMessage(
           err,
-          "Nao foi possivel carregar as ordens de producao.",
+          "Não foi possível carregar as ordens de produção.",
         ),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProductOptions([]);
       setProductAccess("unavailable");
@@ -238,15 +238,15 @@ export default function ProductionOrdersPage({
       setProductOptions([]);
       setProductAccess("unavailable");
     }
-  }
+  }, [canReadProducts]);
 
   useEffect(() => {
     void loadProductionOrders();
-  }, [canRead]);
+  }, [loadProductionOrders]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -292,8 +292,8 @@ export default function ProductionOrdersPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar ordens de producao."
-          : "Seu perfil nao possui permissao para criar ordens de producao.",
+          ? "Seu perfil não possui permissão para atualizar ordens de produção."
+          : "Seu perfil não possui permissão para criar ordens de produção.",
       );
       return;
     }
@@ -316,16 +316,16 @@ export default function ProductionOrdersPage({
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Ordem de producao atualizada com sucesso."
-          : "Ordem de producao criada com sucesso.",
+          ? "Ordem de produção atualizada com sucesso."
+          : "Ordem de produção criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a ordem de producao."
-            : "Nao foi possivel criar a ordem de producao.",
+            ? "Não foi possível atualizar a ordem de produção."
+            : "Não foi possível criar a ordem de produção.",
         ),
       );
     } finally {
@@ -335,17 +335,21 @@ export default function ProductionOrdersPage({
 
   async function handleDelete(item: ProductionOrder) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir ordens de producao.");
+      setError(
+        "Seu perfil não possui permissão para excluir ordens de produção.",
+      );
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a ordem de producao para exclusao.");
+      setError(
+        "Não foi possível identificar a ordem de produção para exclusão.",
+      );
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a ordem de producao "${item.numeroOp || item.id}"?`,
+      `Deseja excluir a ordem de produção "${item.numeroOp || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -365,13 +369,10 @@ export default function ProductionOrdersPage({
         setDraft({ ...emptyProductionOrder });
       }
 
-      setSuccess("Ordem de producao excluida com sucesso.");
+      setSuccess("Ordem de produção excluída com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel excluir a ordem de producao.",
-        ),
+        getErrorMessage(err, "Não foi possível excluir a ordem de produção."),
       );
     } finally {
       setSaving(false);
@@ -390,10 +391,12 @@ export default function ProductionOrdersPage({
         <header className="production-orders-page__header">
           <div>
             <span className="production-orders-page__eyebrow">PP</span>
-            <h2 className="production-orders-page__title">Ordens de Producao</h2>
+            <h2 className="production-orders-page__title">
+              Ordens de Produção
+            </h2>
             <p className="production-orders-page__subtitle">
               Planeje, acompanhe quantidades, datas e evolucao operacional da
-              producao.
+              produção.
             </p>
           </div>
 
@@ -447,7 +450,9 @@ export default function ProductionOrdersPage({
         </div>
       )}
 
-      {error ? <div className="production-orders-page__alert">{error}</div> : null}
+      {error ? (
+        <div className="production-orders-page__alert">{error}</div>
+      ) : null}
       {success ? (
         <div className="production-orders-page__alert production-orders-page__alert--success">
           {success}
@@ -457,8 +462,8 @@ export default function ProductionOrdersPage({
         <div className="production-orders-page__alert production-orders-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

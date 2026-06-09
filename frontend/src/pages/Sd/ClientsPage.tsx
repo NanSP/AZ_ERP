@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ClientForm from "../../components/Sd/ClientForm";
@@ -143,7 +143,7 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadClients() {
+  const loadClients = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -165,13 +165,13 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os clientes."));
+      setError(getErrorMessage(err, "Não foi possível carregar os clientes."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadPartners() {
+  const loadPartners = useCallback(async () => {
     if (!canReadPartners) {
       setPartners([]);
       return;
@@ -188,15 +188,15 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
     } catch {
       setPartners([]);
     }
-  }
+  }, [canReadPartners]);
 
   useEffect(() => {
     void loadClients();
-  }, [canRead]);
+  }, [loadClients]);
 
   useEffect(() => {
     void loadPartners();
-  }, [canReadPartners]);
+  }, [loadPartners]);
 
   const partnerOptions = useMemo(() => {
     const selectedPartnerId = selected?.parceiroId ?? "";
@@ -264,8 +264,8 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar clientes."
-          : "Seu perfil nao possui permissao para criar clientes.",
+          ? "Seu perfil não possui permissão para atualizar clientes."
+          : "Seu perfil não possui permissão para criar clientes.",
       );
       return;
     }
@@ -294,8 +294,8 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o cliente."
-            : "Nao foi possivel criar o cliente.",
+            ? "Não foi possível atualizar o cliente."
+            : "Não foi possível criar o cliente.",
         ),
       );
     } finally {
@@ -305,18 +305,16 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
 
   async function handleDelete(item: ClientRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir clientes.");
+      setError("Seu perfil não possui permissão para excluir clientes.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o cliente para exclusao.");
+      setError("Não foi possível identificar o cliente para exclusão.");
       return;
     }
 
-    const confirmed = window.confirm(
-      `Deseja excluir o cliente "${item.id}"?`,
-    );
+    const confirmed = window.confirm(`Deseja excluir o cliente "${item.id}"?`);
 
     if (!confirmed) {
       return;
@@ -329,16 +327,20 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
     try {
       await deleteResource("sd", "clientes", item.id);
       await loadClients();
-      setSuccess("Cliente excluido com sucesso.");
+      setSuccess("Cliente excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o cliente."));
+      setError(getErrorMessage(err, "Não foi possível excluir o cliente."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "clients-page clients-page--embedded" : "clients-page"}>
+    <div
+      className={
+        embedded ? "clients-page clients-page--embedded" : "clients-page"
+      }
+    >
       {!embedded ? (
         <header className="clients-page__header">
           <div>
@@ -355,7 +357,7 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por parceiro, classificacao, origem, website ou porte"
+              placeholder="Buscar por parceiro, classificação, origem, website ou porte"
               className="clients-page__search"
               disabled={isBusy || !canRead}
             />
@@ -375,7 +377,7 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por parceiro, classificacao, origem, website ou porte"
+            placeholder="Buscar por parceiro, classificação, origem, website ou porte"
             className="clients-page__search"
             disabled={isBusy || !canRead}
           />
@@ -410,8 +412,8 @@ export default function ClientsPage({ embedded = false }: ClientsPageProps) {
         <div className="clients-page__alert clients-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import InventoryForm from "../../components/Mm/InventoryForm";
@@ -30,7 +30,7 @@ const inventoriesResource = {
   schema: "mm",
   entity: "inventarios",
   label: "Inventarios",
-  description: "Inventarios fisicos e ajustes.",
+  description: "Inventários fisicos e ajustes.",
 } as const;
 
 const emptyInventory: InventoryRecord = {
@@ -106,7 +106,7 @@ export default function InventoriesPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadInventories() {
+  const loadInventories = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -129,16 +129,16 @@ export default function InventoriesPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os inventarios."),
+        getErrorMessage(err, "Não foi possível carregar os inventários."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadInventories();
-  }, [canRead]);
+  }, [loadInventories]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -196,8 +196,8 @@ export default function InventoriesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar inventarios."
-          : "Seu perfil nao possui permissao para criar inventarios.",
+          ? "Seu perfil não possui permissão para atualizar inventários."
+          : "Seu perfil não possui permissão para criar inventários.",
       );
       return;
     }
@@ -212,22 +212,24 @@ export default function InventoriesPage({
         ? await updateResource("mm", "inventarios", selected.id, payload)
         : await createResource("mm", "inventarios", payload);
 
-      const saved = normalizeInventory(response.data as Record<string, unknown>);
+      const saved = normalizeInventory(
+        response.data as Record<string, unknown>,
+      );
       await loadInventories();
       setSelected(saved);
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Inventario atualizado com sucesso."
-          : "Inventario criado com sucesso.",
+          ? "Inventário atualizado com sucesso."
+          : "Inventário criado com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o inventario."
-            : "Nao foi possivel criar o inventario.",
+            ? "Não foi possível atualizar o inventário."
+            : "Não foi possível criar o inventário.",
         ),
       );
     } finally {
@@ -237,17 +239,17 @@ export default function InventoriesPage({
 
   async function handleDelete(item: InventoryRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir inventarios.");
+      setError("Seu perfil não possui permissão para excluir inventários.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o inventario para exclusao.");
+      setError("Não foi possível identificar o inventário para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir o inventario "${item.id}"?`,
+      `Deseja excluir o inventário "${item.id}"?`,
     );
 
     if (!confirmed) {
@@ -261,9 +263,9 @@ export default function InventoriesPage({
     try {
       await deleteResource("mm", "inventarios", item.id);
       await loadInventories();
-      setSuccess("Inventario excluido com sucesso.");
+      setSuccess("Inventário excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o inventario."));
+      setError(getErrorMessage(err, "Não foi possível excluir o inventário."));
     } finally {
       setSaving(false);
     }
@@ -281,9 +283,9 @@ export default function InventoriesPage({
         <header className="inventories-page__header">
           <div>
             <span className="inventories-page__eyebrow">MM</span>
-            <h2 className="inventories-page__title">Inventarios</h2>
+            <h2 className="inventories-page__title">Inventários</h2>
             <p className="inventories-page__subtitle">
-              Planeje contagens fisicas, acompanhe inventarios em andamento e
+              Planeje contagens fisicas, acompanhe inventários em andamento e
               feche ciclos anuais, rotativos ou por amostragem.
             </p>
           </div>

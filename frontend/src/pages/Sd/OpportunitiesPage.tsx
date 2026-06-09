@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import OpportunityForm from "../../components/Sd/OpportunityForm";
@@ -65,14 +65,17 @@ const emptyOpportunity: OpportunityRecord = {
   responsavelId: "",
 };
 
-function normalizeOpportunity(data: Record<string, unknown>): OpportunityRecord {
+function normalizeOpportunity(
+  data: Record<string, unknown>,
+): OpportunityRecord {
   return {
     id: typeof data.id === "number" ? data.id : undefined,
     clienteId: data.cliente == null ? "" : String(data.cliente),
     titulo: String(data.titulo ?? ""),
     descricao: String(data.descricao ?? ""),
     valorEstimado: data.valorEstimado == null ? "" : String(data.valorEstimado),
-    probabilidade: data.probabilidade == null ? "50" : String(data.probabilidade),
+    probabilidade:
+      data.probabilidade == null ? "50" : String(data.probabilidade),
     estagio: String(data.estagio ?? "prospeccao"),
     dataPrevistaFechamento:
       data.dataPrevistaFechamento == null
@@ -190,12 +193,16 @@ export default function OpportunitiesPage({
     opportunitiesResource,
     "delete",
   );
-  const canReadClients = canAccessResourceAction(session, clientsResource, "read");
+  const canReadClients = canAccessResourceAction(
+    session,
+    clientsResource,
+    "read",
+  );
   const canReadUsers = canAccessResourceAction(session, usersResource, "read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadOpportunities() {
+  const loadOpportunities = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -218,14 +225,14 @@ export default function OpportunitiesPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar as oportunidades."),
+        getErrorMessage(err, "Não foi possível carregar as oportunidades."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadClients() {
+  const loadClients = useCallback(async () => {
     if (!canReadClients) {
       setClients([]);
       return;
@@ -242,9 +249,9 @@ export default function OpportunitiesPage({
     } catch {
       setClients([]);
     }
-  }
+  }, [canReadClients]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUsers([]);
       return;
@@ -253,25 +260,27 @@ export default function OpportunitiesPage({
     try {
       const response = await listResource("sys", "usuarios");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeUser(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeUser(item as Record<string, unknown>),
+          )
         : [];
       setUsers(nextItems);
     } catch {
       setUsers([]);
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadOpportunities();
-  }, [canRead]);
+  }, [loadOpportunities]);
 
   useEffect(() => {
     void loadClients();
-  }, [canReadClients]);
+  }, [loadClients]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const clientOptions = useMemo(() => clients, [clients]);
   const userOptions = useMemo(
@@ -344,8 +353,8 @@ export default function OpportunitiesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar oportunidades."
-          : "Seu perfil nao possui permissao para criar oportunidades.",
+          ? "Seu perfil não possui permissão para atualizar oportunidades."
+          : "Seu perfil não possui permissão para criar oportunidades.",
       );
       return;
     }
@@ -360,7 +369,9 @@ export default function OpportunitiesPage({
         ? await updateResource("sd", "oportunidades", selected.id, payload)
         : await createResource("sd", "oportunidades", payload);
 
-      const saved = normalizeOpportunity(response.data as Record<string, unknown>);
+      const saved = normalizeOpportunity(
+        response.data as Record<string, unknown>,
+      );
       await loadOpportunities();
       setSelected(saved);
       setDraft({ ...saved });
@@ -374,8 +385,8 @@ export default function OpportunitiesPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a oportunidade."
-            : "Nao foi possivel criar a oportunidade.",
+            ? "Não foi possível atualizar a oportunidade."
+            : "Não foi possível criar a oportunidade.",
         ),
       );
     } finally {
@@ -385,12 +396,12 @@ export default function OpportunitiesPage({
 
   async function handleDelete(item: OpportunityRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir oportunidades.");
+      setError("Seu perfil não possui permissão para excluir oportunidades.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a oportunidade para exclusao.");
+      setError("Não foi possível identificar a oportunidade para exclusão.");
       return;
     }
 
@@ -409,10 +420,10 @@ export default function OpportunitiesPage({
     try {
       await deleteResource("sd", "oportunidades", item.id);
       await loadOpportunities();
-      setSuccess("Oportunidade excluida com sucesso.");
+      setSuccess("Oportunidade excluída com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir a oportunidade."),
+        getErrorMessage(err, "Não foi possível excluir a oportunidade."),
       );
     } finally {
       setSaving(false);
@@ -498,8 +509,8 @@ export default function OpportunitiesPage({
         <div className="opportunities-page__alert opportunities-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import RiskForm from "../../components/Grc/RiskForm";
@@ -69,11 +69,11 @@ function normalizeRisk(data: Record<string, unknown>): RiskRecord {
     titulo: String(data.titulo ?? ""),
     descricao: String(data.descricao ?? ""),
     categoria: String(data.categoria ?? ""),
-    probabilidade: data.probabilidade == null ? "1" : String(data.probabilidade),
+    probabilidade:
+      data.probabilidade == null ? "1" : String(data.probabilidade),
     impacto: data.impacto == null ? "1" : String(data.impacto),
     nivelRisco: String(data.nivelRisco ?? "baixo"),
-    responsavelId:
-      responsavel?.id == null ? "" : String(responsavel.id),
+    responsavelId: responsavel?.id == null ? "" : String(responsavel.id),
     planoMitigacao: String(data.planoMitigacao ?? ""),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
   };
@@ -165,7 +165,7 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadRisks() {
+  const loadRisks = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -181,17 +181,19 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
     try {
       const response = await listResource("grc", "riscos");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeRisk(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeRisk(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os riscos."));
+      setError(getErrorMessage(err, "Não foi possivel carregar os riscos."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUsers([]);
       return;
@@ -200,21 +202,23 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
     try {
       const response = await listResource("sys", "usuarios");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeUser(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeUser(item as Record<string, unknown>),
+          )
         : [];
       setUsers(nextItems);
     } catch {
       setUsers([]);
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadRisks();
-  }, [canRead]);
+  }, [loadRisks]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -263,8 +267,8 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar riscos."
-          : "Seu perfil nao possui permissao para criar riscos.",
+          ? "Seu perfil não possui permissão para atualizar riscos."
+          : "Seu perfil não possui permissão para criar riscos.",
       );
       return;
     }
@@ -293,8 +297,8 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o risco."
-            : "Nao foi possivel criar o risco.",
+            ? "Não foi possível atualizar o risco."
+            : "Não foi possível criar o risco.",
         ),
       );
     } finally {
@@ -304,12 +308,12 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
 
   async function handleDelete(item: RiskRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir riscos.");
+      setError("Seu perfil não possui permissão para excluir riscos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o risco para exclusao.");
+      setError("Não foi possível identificar o risco para exclusão.");
       return;
     }
 
@@ -328,16 +332,18 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
     try {
       await deleteResource("grc", "riscos", item.id);
       await loadRisks();
-      setSuccess("Risco excluido com sucesso.");
+      setSuccess("Risco excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o risco."));
+      setError(getErrorMessage(err, "Não foi possível excluir o risco."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "risks-page risks-page--embedded" : "risks-page"}>
+    <div
+      className={embedded ? "risks-page risks-page--embedded" : "risks-page"}
+    >
       {!embedded ? (
         <header className="risks-page__header">
           <div>
@@ -345,7 +351,7 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
             <h2 className="risks-page__title">Riscos</h2>
             <p className="risks-page__subtitle">
               Estruture riscos, pontue probabilidade e impacto e acompanhe o
-              nivel calculado com plano de mitigacao.
+              nível calculado com plano de mitigação.
             </p>
           </div>
 
@@ -409,8 +415,8 @@ export default function RisksPage({ embedded = false }: RisksPageProps) {
         <div className="risks-page__alert risks-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

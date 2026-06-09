@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import InvoiceForm from "../../components/Sd/InvoiceForm";
@@ -120,14 +120,30 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
   const [selected, setSelected] = useState<InvoiceRecord | null>(null);
   const [draft, setDraft] = useState<InvoiceRecord>(emptyInvoice);
   const canRead = canAccessResourceAction(session, invoicesResource, "read");
-  const canCreate = canAccessResourceAction(session, invoicesResource, "create");
-  const canUpdate = canAccessResourceAction(session, invoicesResource, "update");
-  const canDelete = canAccessResourceAction(session, invoicesResource, "delete");
-  const canReadOrders = canAccessResourceAction(session, ordersResource, "read");
+  const canCreate = canAccessResourceAction(
+    session,
+    invoicesResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    invoicesResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    invoicesResource,
+    "delete",
+  );
+  const canReadOrders = canAccessResourceAction(
+    session,
+    ordersResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadInvoices() {
+  const loadInvoices = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -149,13 +165,13 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as faturas."));
+      setError(getErrorMessage(err, "Não foi possível carregar as faturas."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     if (!canReadOrders) {
       setOrders([]);
       return;
@@ -172,15 +188,15 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
     } catch {
       setOrders([]);
     }
-  }
+  }, [canReadOrders]);
 
   useEffect(() => {
     void loadInvoices();
-  }, [canRead]);
+  }, [loadInvoices]);
 
   useEffect(() => {
     void loadOrders();
-  }, [canReadOrders]);
+  }, [loadOrders]);
 
   const orderOptions = useMemo(() => {
     const selectedOrderId = selected?.pedidoId ?? "";
@@ -252,8 +268,8 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar faturas."
-          : "Seu perfil nao possui permissao para criar faturas.",
+          ? "Seu perfil não possui permissão para atualizar faturas."
+          : "Seu perfil não possui permissão para criar faturas.",
       );
       return;
     }
@@ -283,8 +299,8 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a fatura."
-            : "Nao foi possivel criar a fatura.",
+            ? "Não foi possível atualizar a fatura."
+            : "Não foi possível criar a fatura.",
         ),
       );
     } finally {
@@ -294,12 +310,12 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
 
   async function handleDelete(item: InvoiceRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir faturas.");
+      setError("Seu perfil não possui permissão para excluir faturas.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a fatura para exclusao.");
+      setError("Não foi possível identificar a fatura para exclusão.");
       return;
     }
 
@@ -319,16 +335,20 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
       await deleteResource("sd", "faturas", item.id);
       await loadInvoices();
       await loadOrders();
-      setSuccess("Fatura excluida com sucesso.");
+      setSuccess("Fatura excluída com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a fatura."));
+      setError(getErrorMessage(err, "Não foi possível excluir a fatura."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "invoices-page invoices-page--embedded" : "invoices-page"}>
+    <div
+      className={
+        embedded ? "invoices-page invoices-page--embedded" : "invoices-page"
+      }
+    >
       {!embedded ? (
         <header className="invoices-page__header">
           <div>
@@ -345,7 +365,7 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por numero, pedido, status, emissao ou vencimento"
+              placeholder="Buscar por numero, pedido, status, emissão ou vencimento"
               className="invoices-page__search"
               disabled={isBusy || !canRead}
             />
@@ -365,7 +385,7 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por numero, pedido, status, emissao ou vencimento"
+            placeholder="Buscar por numero, pedido, status, emissão ou vencimento"
             className="invoices-page__search"
             disabled={isBusy || !canRead}
           />
@@ -400,8 +420,8 @@ export default function InvoicesPage({ embedded = false }: InvoicesPageProps) {
         <div className="invoices-page__alert invoices-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

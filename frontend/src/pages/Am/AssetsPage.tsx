@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import AssetForm from "../../components/Am/AssetForm";
@@ -74,7 +74,8 @@ function normalizeAsset(data: Record<string, unknown>): Asset {
     tipoAtivo: String(data.tipoAtivo ?? ""),
     localizacao: String(data.localizacao ?? ""),
     dataAquisicao: String(data.dataAquisicao ?? ""),
-    valorAquisicao: data.valorAquisicao == null ? "" : String(data.valorAquisicao),
+    valorAquisicao:
+      data.valorAquisicao == null ? "" : String(data.valorAquisicao),
     valorAtual: data.valorAtual == null ? "" : String(data.valorAtual),
     vidaUtilAnos: data.vidaUtilAnos == null ? "" : String(data.vidaUtilAnos),
     taxaDepreciacao:
@@ -105,7 +106,8 @@ function toRequestPayload(asset: Asset) {
       asset.vidaUtilAnos.trim() === "" ? null : Number(asset.vidaUtilAnos),
     taxaDepreciacao: toNullableNumber(asset.taxaDepreciacao),
     dataDepreciacao: asset.dataDepreciacao.trim() || null,
-    fornecedor: asset.fornecedor.trim() === "" ? null : Number(asset.fornecedor),
+    fornecedor:
+      asset.fornecedor.trim() === "" ? null : Number(asset.fornecedor),
     responsavel:
       asset.responsavel.trim() === "" ? null : Number(asset.responsavel),
     status: asset.status.trim() || null,
@@ -142,7 +144,8 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
     [session?.permissoes],
   );
   const isMasterScope = session?.scope === "master";
-  const canRead = isMasterScope || permissionSet.has("am:bensPatrimoniais:read");
+  const canRead =
+    isMasterScope || permissionSet.has("am:bensPatrimoniais:read");
   const canCreate =
     isMasterScope || permissionSet.has("am:bensPatrimoniais:create");
   const canUpdate =
@@ -156,7 +159,7 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadAssets() {
+  const loadAssets = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -179,14 +182,14 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os bens patrimoniais."),
+        getErrorMessage(err, "Não foi possivel carregar os bens patrimoniais."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadPartners() {
+  const loadPartners = useCallback(async () => {
     if (!canReadPartners) {
       setPartnerOptions([]);
       setPartnerAccess("unavailable");
@@ -210,9 +213,9 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
       setPartnerOptions([]);
       setPartnerAccess("unavailable");
     }
-  }
+  }, [canReadPartners]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -236,19 +239,19 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadAssets();
-  }, [canRead]);
+  }, [loadAssets]);
 
   useEffect(() => {
     void loadPartners();
-  }, [canReadPartners]);
+  }, [loadPartners]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -300,8 +303,8 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar bens patrimoniais."
-          : "Seu perfil nao possui permissao para criar bens patrimoniais.",
+          ? "Seu perfil não possui permissão para atualizar bens patrimoniais."
+          : "Seu perfil não possui permissão para criar bens patrimoniais.",
       );
       return;
     }
@@ -330,8 +333,8 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o bem patrimonial."
-            : "Nao foi possivel criar o bem patrimonial.",
+            ? "Não foi possível atualizar o bem patrimonial."
+            : "Não foi possível criar o bem patrimonial.",
         ),
       );
     } finally {
@@ -342,13 +345,13 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
   async function handleDelete(item: Asset) {
     if (!canDelete) {
       setError(
-        "Seu perfil nao possui permissao para excluir bens patrimoniais.",
+        "Seu perfil não possui permissão para excluir bens patrimoniais.",
       );
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o bem patrimonial para exclusao.");
+      setError("Não foi possível identificar o bem patrimonial para exclusão.");
       return;
     }
 
@@ -376,10 +379,7 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
       setSuccess("Bem patrimonial excluido com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel excluir o bem patrimonial.",
-        ),
+        getErrorMessage(err, "Não foi possível excluir o bem patrimonial."),
       );
     } finally {
       setSaving(false);
@@ -387,14 +387,16 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
   }
 
   return (
-    <div className={embedded ? "assets-page assets-page--embedded" : "assets-page"}>
+    <div
+      className={embedded ? "assets-page assets-page--embedded" : "assets-page"}
+    >
       {!embedded ? (
         <header className="assets-page__header">
           <div>
             <span className="assets-page__eyebrow">AM</span>
             <h2 className="assets-page__title">Bens Patrimoniais</h2>
             <p className="assets-page__subtitle">
-              Gerencie ativos, valores, depreciacao e responsabilidades
+              Gerencie ativos, valores, depreciação e responsabilidades
               operacionais.
             </p>
           </div>
@@ -459,8 +461,8 @@ export default function AssetsPage({ embedded = false }: AssetsPageProps) {
         <div className="assets-page__alert assets-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

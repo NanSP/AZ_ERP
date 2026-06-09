@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ProfilePermissionTable from "../../components/Sys/ProfilePermissionTable";
@@ -72,12 +72,15 @@ export default function ProfilePermissionsPage({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [selected, setSelected] =
-    useState<ProfilePermissionAssignment | null>(null);
+  const [selected, setSelected] = useState<ProfilePermissionAssignment | null>(
+    null,
+  );
   const [draft, setDraft] =
     useState<ProfilePermissionAssignment>(emptyAssignment);
   const [profileOptions, setProfileOptions] = useState<RelatedOption[]>([]);
-  const [permissionOptions, setPermissionOptions] = useState<RelatedOption[]>([]);
+  const [permissionOptions, setPermissionOptions] = useState<RelatedOption[]>(
+    [],
+  );
   const [profileAccess, setProfileAccess] = useState<RelatedAccess>("idle");
   const [permissionAccess, setPermissionAccess] =
     useState<RelatedAccess>("idle");
@@ -100,7 +103,7 @@ export default function ProfilePermissionsPage({
     isMasterScope || permissionSet.has("sys:permissoes:read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
 
-  async function loadAssignments() {
+  const loadAssignments = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -125,15 +128,15 @@ export default function ProfilePermissionsPage({
       setError(
         getErrorMessage(
           err,
-          "Nao foi possivel carregar os vinculos de perfil e permissao.",
+          "Não foi possível carregar os vinculos de perfil e permissão.",
         ),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProfiles() {
+  const loadProfiles = useCallback(async () => {
     if (!canReadProfiles) {
       setProfileOptions([]);
       setProfileAccess("unavailable");
@@ -157,9 +160,9 @@ export default function ProfilePermissionsPage({
       setProfileOptions([]);
       setProfileAccess("unavailable");
     }
-  }
+  }, [canReadProfiles]);
 
-  async function loadPermissions() {
+  const loadPermissions = useCallback(async () => {
     if (!canReadPermissions) {
       setPermissionOptions([]);
       setPermissionAccess("unavailable");
@@ -183,19 +186,19 @@ export default function ProfilePermissionsPage({
       setPermissionOptions([]);
       setPermissionAccess("unavailable");
     }
-  }
+  }, [canReadPermissions]);
 
   useEffect(() => {
     void loadAssignments();
-  }, [canRead]);
+  }, [loadAssignments]);
 
   useEffect(() => {
     void loadProfiles();
-  }, [canReadProfiles]);
+  }, [loadProfiles]);
 
   useEffect(() => {
     void loadPermissions();
-  }, [canReadPermissions]);
+  }, [loadPermissions]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -241,8 +244,8 @@ export default function ProfilePermissionsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar vinculos."
-          : "Seu perfil nao possui permissao para criar vinculos.",
+          ? "Seu perfil não possui permissão para atualizar vinculos."
+          : "Seu perfil não possui permissão para criar vinculos.",
       );
       return;
     }
@@ -257,7 +260,9 @@ export default function ProfilePermissionsPage({
         ? await updateResource("sys", "perfilPermissao", selected.id, payload)
         : await createResource("sys", "perfilPermissao", payload);
 
-      const saved = normalizeAssignment(response.data as Record<string, unknown>);
+      const saved = normalizeAssignment(
+        response.data as Record<string, unknown>,
+      );
       await loadAssignments();
       setSelected(saved);
       setDraft({ ...saved });
@@ -271,8 +276,8 @@ export default function ProfilePermissionsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o vinculo."
-            : "Nao foi possivel criar o vinculo.",
+            ? "Não foi possível atualizar o vinculo."
+            : "Não foi possível criar o vinculo.",
         ),
       );
     } finally {
@@ -282,12 +287,12 @@ export default function ProfilePermissionsPage({
 
   async function handleDelete(item: ProfilePermissionAssignment) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir vinculos.");
+      setError("Seu perfil não possui permissão para excluir vinculos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o vinculo para exclusao.");
+      setError("Não foi possível identificar o vinculo para exclusão.");
       return;
     }
 
@@ -314,7 +319,7 @@ export default function ProfilePermissionsPage({
 
       setSuccess("Vinculo excluido com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o vinculo."));
+      setError(getErrorMessage(err, "Não foi possível excluir o vinculo."));
     } finally {
       setSaving(false);
     }
@@ -332,7 +337,9 @@ export default function ProfilePermissionsPage({
         <header className="profile-permissions-page__header">
           <div>
             <span className="profile-permissions-page__eyebrow">SYS</span>
-            <h2 className="profile-permissions-page__title">Perfil x Permissao</h2>
+            <h2 className="profile-permissions-page__title">
+              Perfil x Permissao
+            </h2>
             <p className="profile-permissions-page__subtitle">
               Gerencie a atribuicao de permissoes aos perfis do tenant.
             </p>

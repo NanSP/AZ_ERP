@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import BenefitForm from "../../components/Rh/BenefitForm";
@@ -105,7 +105,7 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadBenefits() {
+  const loadBenefits = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -127,13 +127,15 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os beneficios."));
+      setError(
+        getErrorMessage(err, "Não foi possível carregar os benefícios."),
+      );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -157,15 +159,15 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadBenefits();
-  }, [canRead]);
+  }, [loadBenefits]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -175,7 +177,13 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
     }
 
     return items.filter((item) =>
-      [item.colaborador, item.tipoBeneficio, item.valor, item.dataInicio, item.dataFim]
+      [
+        item.colaborador,
+        item.tipoBeneficio,
+        item.valor,
+        item.dataInicio,
+        item.dataFim,
+      ]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalized)),
     );
@@ -211,8 +219,8 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar beneficios."
-          : "Seu perfil nao possui permissao para criar beneficios.",
+          ? "Seu perfil não possui permissão para atualizar benefícios."
+          : "Seu perfil não possui permissão para criar benefícios.",
       );
       return;
     }
@@ -233,16 +241,16 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Beneficio atualizado com sucesso."
-          : "Beneficio criado com sucesso.",
+          ? "Benefício atualizado com sucesso."
+          : "Benefício criado com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o beneficio."
-            : "Nao foi possivel criar o beneficio.",
+            ? "Não foi possível atualizar o benefício."
+            : "Não foi possível criar o benefício.",
         ),
       );
     } finally {
@@ -252,17 +260,17 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
 
   async function handleDelete(item: Benefit) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir beneficios.");
+      setError("Seu perfil não possui permissão para excluir benefícios.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o beneficio para exclusao.");
+      setError("Não foi possível identificar o benefício para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir o beneficio "${item.tipoBeneficio || item.id}"?`,
+      `Deseja excluir o benefício "${item.tipoBeneficio || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -282,9 +290,9 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
         setDraft({ ...emptyBenefit });
       }
 
-      setSuccess("Beneficio excluido com sucesso.");
+      setSuccess("Benefício excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o beneficio."));
+      setError(getErrorMessage(err, "Não foi possível excluir o benefício."));
     } finally {
       setSaving(false);
     }
@@ -300,9 +308,9 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
         <header className="benefits-page__header">
           <div>
             <span className="benefits-page__eyebrow">RH</span>
-            <h2 className="benefits-page__title">Beneficios</h2>
+            <h2 className="benefits-page__title">Benefícios</h2>
             <p className="benefits-page__subtitle">
-              Gerencie beneficios corporativos por colaborador com vigencia,
+              Gerencie benefícios corporativos por colaborador com vigência,
               valor e controle de status.
             </p>
           </div>
@@ -312,7 +320,7 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por colaborador, tipo, valor ou vigencia"
+              placeholder="Buscar por colaborador, tipo, valor ou vigência"
               className="benefits-page__search"
               disabled={isBusy || !canRead}
             />
@@ -322,7 +330,7 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Novo beneficio
+              Novo benefício
             </button>
           </div>
         </header>
@@ -332,7 +340,7 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por colaborador, tipo, valor ou vigencia"
+            placeholder="Buscar por colaborador, tipo, valor ou vigência"
             className="benefits-page__search"
             disabled={isBusy || !canRead}
           />
@@ -351,7 +359,7 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Novo beneficio
+              Novo benefício
             </button>
           </div>
         </div>
@@ -367,8 +375,8 @@ export default function BenefitsPage({ embedded = false }: BenefitsPageProps) {
         <div className="benefits-page__alert benefits-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

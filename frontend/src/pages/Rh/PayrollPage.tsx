@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import PayrollForm from "../../components/Rh/PayrollForm";
@@ -87,7 +87,8 @@ function toNullableNumber(value: string) {
 
 function toRequestPayload(payroll: PayrollEntry) {
   return {
-    colaborador: payroll.colaborador.trim() === "" ? null : Number(payroll.colaborador),
+    colaborador:
+      payroll.colaborador.trim() === "" ? null : Number(payroll.colaborador),
     competencia: payroll.competencia.trim() || null,
     salarioBase: toNullableNumber(payroll.salarioBase),
     horasNormais: toNullableNumber(payroll.horasNormais),
@@ -140,7 +141,7 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadPayroll() {
+  const loadPayroll = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -162,13 +163,13 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as folhas."));
+      setError(getErrorMessage(err, "Não foi possível carregar as folhas."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -192,15 +193,15 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadPayroll();
-  }, [canRead]);
+  }, [loadPayroll]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -252,8 +253,8 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar folhas."
-          : "Seu perfil nao possui permissao para criar folhas.",
+          ? "Seu perfil não possui permissão para atualizar folhas."
+          : "Seu perfil não possui permissão para criar folhas.",
       );
       return;
     }
@@ -282,8 +283,8 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a folha."
-            : "Nao foi possivel criar a folha.",
+            ? "Não foi possível atualizar a folha."
+            : "Não foi possível criar a folha.",
         ),
       );
     } finally {
@@ -293,17 +294,17 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
 
   async function handleDelete(item: PayrollEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir folhas.");
+      setError("Seu perfil não possui permissão para excluir folhas.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a folha para exclusao.");
+      setError("Não foi possível identificar a folha para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a folha da competencia "${item.competencia || item.id}"?`,
+      `Deseja excluir a folha da competência "${item.competencia || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -325,7 +326,7 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
 
       setSuccess("Folha excluida com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a folha."));
+      setError(getErrorMessage(err, "Não foi possível excluir a folha."));
     } finally {
       setSaving(false);
     }
@@ -333,7 +334,9 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
 
   return (
     <div
-      className={embedded ? "payroll-page payroll-page--embedded" : "payroll-page"}
+      className={
+        embedded ? "payroll-page payroll-page--embedded" : "payroll-page"
+      }
     >
       {!embedded ? (
         <header className="payroll-page__header">
@@ -341,8 +344,8 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
             <span className="payroll-page__eyebrow">RH</span>
             <h2 className="payroll-page__title">Folha de Pagamento</h2>
             <p className="payroll-page__subtitle">
-              Gere e acompanhe a folha do colaborador com calculo automatico de
-              horas, bruto e liquido.
+              Gere e acompanhe a folha do colaborador com cálculo automático de
+              horas, bruto e líquido.
             </p>
           </div>
 
@@ -351,7 +354,7 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por colaborador, competencia, status ou valores"
+              placeholder="Buscar por colaborador, competência, status ou valores"
               className="payroll-page__search"
               disabled={isBusy || !canRead}
             />
@@ -371,7 +374,7 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por colaborador, competencia, status ou valores"
+            placeholder="Buscar por colaborador, competência, status ou valores"
             className="payroll-page__search"
             disabled={isBusy || !canRead}
           />
@@ -406,8 +409,8 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
         <div className="payroll-page__alert payroll-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

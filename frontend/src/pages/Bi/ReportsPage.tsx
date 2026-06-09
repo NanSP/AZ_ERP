@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ReportForm from "../../components/Bi/ReportForm";
@@ -38,7 +38,7 @@ const emptyReport: ReportRecord = {
   descricao: "",
   tipoRelatorio: "tabela",
   querySql: "SELECT * FROM bi.metricas LIMIT 100",
-  parametros: "{\n  \"periodo\": \"2026-06\"\n}",
+  parametros: '{\n  "periodo": "2026-06"\n}',
 };
 
 function stringifyObject(value: unknown) {
@@ -161,7 +161,7 @@ function exportReportsPdf(items: ReportRecord[]) {
   const popup = window.open("", "_blank", "width=1200,height=900");
 
   if (!popup) {
-    window.alert("Nao foi possivel abrir a janela de impressao do PDF.");
+    window.alert("Não foi possível abrir a janela de impressão do PDF.");
     return;
   }
 
@@ -234,7 +234,7 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadReports() {
+  const loadReports = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -257,16 +257,16 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os relatorios."),
+        getErrorMessage(err, "Não foi possível carregar os relatórios."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadReports();
-  }, [canRead]);
+  }, [loadReports]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -318,8 +318,8 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar relatorios."
-          : "Seu perfil nao possui permissao para criar relatorios.",
+          ? "Seu perfil não possui permissão para atualizar relatórios."
+          : "Seu perfil não possui permissão para criar relatórios.",
       );
       return;
     }
@@ -340,16 +340,16 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Relatorio atualizado com sucesso."
-          : "Relatorio criado com sucesso.",
+          ? "Relatório atualizado com sucesso."
+          : "Relatório criado com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o relatorio."
-            : "Nao foi possivel criar o relatorio.",
+            ? "Não foi possível atualizar o relatório."
+            : "Não foi possível criar o relatório.",
         ),
       );
     } finally {
@@ -359,17 +359,17 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
 
   async function handleDelete(item: ReportRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir relatorios.");
+      setError("Seu perfil não possui permissão para excluir relatórios.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o relatorio para exclusao.");
+      setError("Não foi possível identificar o relatório para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir o relatorio "${item.nome || item.id}"?`,
+      `Deseja excluir o relatório "${item.nome || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -383,11 +383,9 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
     try {
       await deleteResource("bi", "relatorios", item.id);
       await loadReports();
-      setSuccess("Relatorio excluido com sucesso.");
+      setSuccess("Relatório excluído com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o relatorio."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir o relatório."));
     } finally {
       setSaving(false);
     }
@@ -402,14 +400,19 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
   }
 
   return (
-    <div className={embedded ? "reports-page reports-page--embedded" : "reports-page"}>
+    <div
+      className={
+        embedded ? "reports-page reports-page--embedded" : "reports-page"
+      }
+    >
       {!embedded ? (
         <header className="reports-page__header">
           <div>
             <span className="reports-page__eyebrow">BI</span>
-            <h2 className="reports-page__title">Relatorios</h2>
+            <h2 className="reports-page__title">Relatórios</h2>
             <p className="reports-page__subtitle">
-              Estruture consultas gerenciais e exporte a listagem atual em CSV ou PDF.
+              Estruture consultas gerenciais e exporte a listagem atual em CSV
+              ou PDF.
             </p>
           </div>
 
@@ -444,7 +447,7 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Novo relatorio
+              Novo relatório
             </button>
           </div>
         </header>
@@ -489,7 +492,7 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Novo relatorio
+              Novo relatório
             </button>
           </div>
         </div>
@@ -505,16 +508,16 @@ export default function ReportsPage({ embedded = false }: ReportsPageProps) {
         <div className="reports-page__alert reports-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
-            "exclusao nao suportada pelo backend",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
+            "exclusão não suportada pelo backend",
           ]
             .filter(Boolean)
             .join(" - ")}
         </div>
       ) : (
         <div className="reports-page__alert reports-page__alert--info">
-          Exclusao nao suportada pelo backend.
+          Exclusão não suportada pelo backend.
         </div>
       )}
 

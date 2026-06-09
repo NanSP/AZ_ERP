@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import CostCenterForm from "../../components/Fi/CostCenterForm";
@@ -91,7 +91,7 @@ export default function CostCentersPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadCostCenters() {
+  const loadCostCenters = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -119,11 +119,11 @@ export default function CostCentersPage({
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadCostCenters();
-  }, [canRead]);
+  }, [loadCostCenters]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();

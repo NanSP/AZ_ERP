@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import PartnerTable from "../../components/Core/PartnerTable";
 import PartnerForm from "../../components/Core/PartnerForm";
@@ -90,9 +90,7 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-export default function PartnersPage({
-  embedded = false,
-}: PartnersPageProps) {
+export default function PartnersPage({ embedded = false }: PartnersPageProps) {
   const [items, setItems] = useState<Partner[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -103,7 +101,7 @@ export default function PartnersPage({
   const [draft, setDraft] = useState<Partner>(emptyPartner);
   const isBusy = loading || saving;
 
-  async function loadPartners() {
+  const loadPartners = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -116,17 +114,15 @@ export default function PartnersPage({
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel carregar os parceiros."),
-      );
+      setError(getErrorMessage(err, "Não foi possivel carregar os parceiros."));
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     void loadPartners();
-  }, []);
+  }, [loadPartners]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -189,8 +185,8 @@ export default function PartnersPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o parceiro."
-            : "Nao foi possivel criar o parceiro.",
+            ? "Não foi possivel atualizar o parceiro."
+            : "Não foi possivel criar o parceiro.",
         ),
       );
     } finally {
@@ -200,7 +196,7 @@ export default function PartnersPage({
 
   async function handleDelete(item: Partner) {
     if (!item.id) {
-      setError("Nao foi possivel identificar o parceiro para exclusao.");
+      setError("Não foi possível identificar o parceiro para exclusão.");
       return;
     }
 
@@ -227,9 +223,7 @@ export default function PartnersPage({
 
       setSuccess("Parceiro excluido com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o parceiro."),
-      );
+      setError(getErrorMessage(err, "Não foi possivel excluir o parceiro."));
     } finally {
       setSaving(false);
     }
@@ -238,9 +232,7 @@ export default function PartnersPage({
   return (
     <div
       className={
-        embedded
-          ? "partners-page partners-page--embedded"
-          : "partners-page"
+        embedded ? "partners-page partners-page--embedded" : "partners-page"
       }
     >
       {!embedded ? (

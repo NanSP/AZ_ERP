@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import BankMovementForm from "../../components/Fi/BankMovementForm";
@@ -115,7 +115,7 @@ export default function BankMovementsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadMovements() {
+  const loadMovements = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -140,17 +140,17 @@ export default function BankMovementsPage({
       setError(
         getErrorMessage(
           err,
-          "Nao foi possivel carregar as movimentacoes bancarias.",
+          "Não foi possivel carregar as movimentações bancárias.",
         ),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadMovements();
-  }, [canRead]);
+  }, [loadMovements]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -203,8 +203,8 @@ export default function BankMovementsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar movimentacoes bancarias."
-          : "Seu perfil nao possui permissao para criar movimentacoes bancarias.",
+          ? "Seu perfil nao possui permissão para atualizar movimentações bancárias."
+          : "Seu perfil nao possui permissão para criar movimentações bancárias.",
       );
       return;
     }
@@ -230,16 +230,16 @@ export default function BankMovementsPage({
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Movimentacao bancaria atualizada com sucesso."
-          : "Movimentacao bancaria criada com sucesso.",
+          ? "Movimentação bancária atualizada com sucesso."
+          : "Movimentação bancária criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a movimentacao bancaria."
-            : "Nao foi possivel criar a movimentacao bancaria.",
+            ? "Não foi possivel atualizar a movimentação bancária."
+            : "Não foi possivel criar a movimentação bancária.",
         ),
       );
     } finally {
@@ -250,20 +250,20 @@ export default function BankMovementsPage({
   async function handleDelete(item: BankMovement) {
     if (!canDelete) {
       setError(
-        "Seu perfil nao possui permissao para excluir movimentacoes bancarias.",
+        "Seu perfil nao possui permissão para excluir movimentações bancárias.",
       );
       return;
     }
 
     if (!item.id) {
       setError(
-        "Nao foi possivel identificar a movimentacao bancaria para exclusao.",
+        "Não foi possivel identificar a movimentação bancária para exclusão.",
       );
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a movimentacao "${item.id}"?`,
+      `Deseja excluir a movimentação "${item.id}"?`,
     );
 
     if (!confirmed) {
@@ -283,12 +283,12 @@ export default function BankMovementsPage({
         setDraft({ ...emptyMovement });
       }
 
-      setSuccess("Movimentacao bancaria excluida com sucesso.");
+      setSuccess("Movimentação bancária excluída com sucesso.");
     } catch (err) {
       setError(
         getErrorMessage(
           err,
-          "Nao foi possivel excluir a movimentacao bancaria.",
+          "Não foi possivel excluir a movimentação bancária.",
         ),
       );
     } finally {
@@ -309,11 +309,11 @@ export default function BankMovementsPage({
           <div>
             <span className="bank-movements-page__eyebrow">FI</span>
             <h2 className="bank-movements-page__title">
-              Movimentacoes Bancarias
+              Movimentações Bancárias
             </h2>
             <p className="bank-movements-page__subtitle">
-              Registre creditos, debitos e transferencias com controle de
-              conciliacao e documento vinculado.
+              Registre creditos, debitos e transferências com controle de
+              conciliação e documento vinculado.
             </p>
           </div>
 
@@ -332,7 +332,7 @@ export default function BankMovementsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova movimentacao
+              Nova movimentação
             </button>
           </div>
         </header>
@@ -361,15 +361,13 @@ export default function BankMovementsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova movimentacao
+              Nova movimentação
             </button>
           </div>
         </div>
       )}
 
-      {error ? (
-        <div className="bank-movements-page__alert">{error}</div>
-      ) : null}
+      {error ? <div className="bank-movements-page__alert">{error}</div> : null}
       {success ? (
         <div className="bank-movements-page__alert bank-movements-page__alert--success">
           {success}

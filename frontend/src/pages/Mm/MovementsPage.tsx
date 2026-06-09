@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import MovementForm from "../../components/Mm/MovementForm";
@@ -69,8 +69,7 @@ function normalizeMovement(data: Record<string, unknown>): MovementRecord {
     estoqueId: data.estoque == null ? "" : String(data.estoque),
     tipoMovimento: String(data.tipoMovimento ?? "entrada"),
     quantidade: data.quantidade == null ? "" : String(data.quantidade),
-    valorUnitario:
-      data.valorUnitario == null ? "" : String(data.valorUnitario),
+    valorUnitario: data.valorUnitario == null ? "" : String(data.valorUnitario),
     valorTotal: data.valorTotal == null ? "" : String(data.valorTotal),
     documentoReferencia: String(data.documentoReferencia ?? ""),
     motivo: String(data.motivo ?? ""),
@@ -91,8 +90,7 @@ function normalizeStock(data: Record<string, unknown>): StockRecord {
       data.quantidadeMinima == null ? "" : String(data.quantidadeMinima),
     quantidadeMaxima:
       data.quantidadeMaxima == null ? "" : String(data.quantidadeMaxima),
-    valorUnitario:
-      data.valorUnitario == null ? "" : String(data.valorUnitario),
+    valorUnitario: data.valorUnitario == null ? "" : String(data.valorUnitario),
     dataValidade: data.dataValidade == null ? "" : String(data.dataValidade),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
   };
@@ -150,7 +148,9 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-export default function MovementsPage({ embedded = false }: MovementsPageProps) {
+export default function MovementsPage({
+  embedded = false,
+}: MovementsPageProps) {
   const { session } = useAuth();
   const [items, setItems] = useState<MovementRecord[]>([]);
   const [stocks, setStocks] = useState<StockRecord[]>([]);
@@ -163,15 +163,31 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
   const [selected, setSelected] = useState<MovementRecord | null>(null);
   const [draft, setDraft] = useState<MovementRecord>(emptyMovement);
   const canRead = canAccessResourceAction(session, movementsResource, "read");
-  const canCreate = canAccessResourceAction(session, movementsResource, "create");
-  const canUpdate = canAccessResourceAction(session, movementsResource, "update");
-  const canDelete = canAccessResourceAction(session, movementsResource, "delete");
-  const canReadStocks = canAccessResourceAction(session, stocksResource, "read");
+  const canCreate = canAccessResourceAction(
+    session,
+    movementsResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    movementsResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    movementsResource,
+    "delete",
+  );
+  const canReadStocks = canAccessResourceAction(
+    session,
+    stocksResource,
+    "read",
+  );
   const canReadUsers = canAccessResourceAction(session, usersResource, "read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadMovements() {
+  const loadMovements = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -194,14 +210,14 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar as movimentacoes."),
+        getErrorMessage(err, "Não foi possível carregar as movimentações."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadStocks() {
+  const loadStocks = useCallback(async () => {
     if (!canReadStocks) {
       setStocks([]);
       return;
@@ -218,9 +234,9 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
     } catch {
       setStocks([]);
     }
-  }
+  }, [canReadStocks]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUsers([]);
       return;
@@ -229,25 +245,27 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
     try {
       const response = await listResource("sys", "usuarios");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeUser(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeUser(item as Record<string, unknown>),
+          )
         : [];
       setUsers(nextItems);
     } catch {
       setUsers([]);
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadMovements();
-  }, [canRead]);
+  }, [loadMovements]);
 
   useEffect(() => {
     void loadStocks();
-  }, [canReadStocks]);
+  }, [loadStocks]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -309,8 +327,8 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar movimentacoes."
-          : "Seu perfil nao possui permissao para criar movimentacoes.",
+          ? "Seu perfil não possui permissão para atualizar movimentações."
+          : "Seu perfil não possui permissão para criar movimentações.",
       );
       return;
     }
@@ -332,16 +350,16 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Movimentacao atualizada com sucesso."
-          : "Movimentacao criada com sucesso.",
+          ? "Movimentação atualizada com sucesso."
+          : "Movimentação criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a movimentacao."
-            : "Nao foi possivel criar a movimentacao.",
+            ? "Não foi possível atualizar a movimentação."
+            : "Não foi possível criar a movimentação.",
         ),
       );
     } finally {
@@ -351,17 +369,17 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
 
   async function handleDelete(item: MovementRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir movimentacoes.");
+      setError("Seu perfil não possui permissão para excluir movimentações.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a movimentacao para exclusao.");
+      setError("Não foi possível identificar a movimentação para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a movimentacao "${item.id}"?`,
+      `Deseja excluir a movimentação "${item.id}"?`,
     );
 
     if (!confirmed) {
@@ -376,10 +394,10 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
       await deleteResource("mm", "movimentacoes", item.id);
       await loadMovements();
       await loadStocks();
-      setSuccess("Movimentacao excluida com sucesso.");
+      setSuccess("Movimentação excluída com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir a movimentacao."),
+        getErrorMessage(err, "Não foi possível excluir a movimentação."),
       );
     } finally {
       setSaving(false);
@@ -387,14 +405,18 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
   }
 
   return (
-    <div className={embedded ? "movements-page movements-page--embedded" : "movements-page"}>
+    <div
+      className={
+        embedded ? "movements-page movements-page--embedded" : "movements-page"
+      }
+    >
       {!embedded ? (
         <header className="movements-page__header">
           <div>
             <span className="movements-page__eyebrow">MM</span>
-            <h2 className="movements-page__title">Movimentacoes</h2>
+            <h2 className="movements-page__title">Movimentações</h2>
             <p className="movements-page__subtitle">
-              Registre entradas, saidas, transferencias, ajustes e inventarios
+              Registre entradas, saidas, transferências, ajustes e inventários
               com reflexo direto no saldo do estoque.
             </p>
           </div>
@@ -414,7 +436,7 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova movimentacao
+              Nova movimentação
             </button>
           </div>
         </header>
@@ -459,8 +481,8 @@ export default function MovementsPage({ embedded = false }: MovementsPageProps) 
         <div className="movements-page__alert movements-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import EmployeeForm from "../../components/Rh/EmployeeForm";
@@ -160,7 +160,7 @@ export default function EmployeesPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -183,16 +183,16 @@ export default function EmployeesPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os colaboradores."),
+        getErrorMessage(err, "Não foi possível carregar os colaboradores."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canRead]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -246,8 +246,8 @@ export default function EmployeesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar colaboradores."
-          : "Seu perfil nao possui permissao para criar colaboradores.",
+          ? "Seu perfil não possui permissão para atualizar colaboradores."
+          : "Seu perfil não possui permissão para criar colaboradores.",
       );
       return;
     }
@@ -276,8 +276,8 @@ export default function EmployeesPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o colaborador."
-            : "Nao foi possivel criar o colaborador.",
+            ? "Não foi possível atualizar o colaborador."
+            : "Não foi possível criar o colaborador.",
         ),
       );
     } finally {
@@ -287,12 +287,12 @@ export default function EmployeesPage({
 
   async function handleDelete(item: Employee) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir colaboradores.");
+      setError("Seu perfil não possui permissão para excluir colaboradores.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o colaborador para exclusao.");
+      setError("Não foi possível identificar o colaborador para exclusão.");
       return;
     }
 
@@ -319,9 +319,7 @@ export default function EmployeesPage({
 
       setSuccess("Colaborador excluido com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o colaborador."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir o colaborador."));
     } finally {
       setSaving(false);
     }
@@ -340,7 +338,7 @@ export default function EmployeesPage({
             <h2 className="employees-page__title">Colaboradores</h2>
             <p className="employees-page__subtitle">
               Gerencie o cadastro funcional de pessoas com dados pessoais,
-              contratuais e situacao atual.
+              contratuais e situação atual.
             </p>
           </div>
 
@@ -349,7 +347,7 @@ export default function EmployeesPage({
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por nome, CPF, cargo, departamento ou situacao"
+              placeholder="Buscar por nome, CPF, cargo, departamento ou situação"
               className="employees-page__search"
               disabled={isBusy || !canRead}
             />
@@ -369,7 +367,7 @@ export default function EmployeesPage({
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por nome, CPF, cargo, departamento ou situacao"
+            placeholder="Buscar por nome, CPF, cargo, departamento ou situação"
             className="employees-page__search"
             disabled={isBusy || !canRead}
           />
@@ -404,8 +402,8 @@ export default function EmployeesPage({
         <div className="employees-page__alert employees-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

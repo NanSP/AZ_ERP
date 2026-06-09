@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import EcdRecordsForm from "../../components/Fiscal/EcdRecordsForm";
@@ -123,7 +123,7 @@ export default function EcdRecordsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadRecords() {
+  const loadRecords = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -146,16 +146,16 @@ export default function EcdRecordsPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os registros ECD."),
+        getErrorMessage(err, "Não foi possível carregar os registros ECD."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadRecords();
-  }, [canRead]);
+  }, [loadRecords]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -201,8 +201,8 @@ export default function EcdRecordsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar registros ECD."
-          : "Seu perfil nao possui permissao para criar registros ECD.",
+          ? "Seu perfil não possui permissão para atualizar registros ECD."
+          : "Seu perfil não possui permissão para criar registros ECD.",
       );
       return;
     }
@@ -231,8 +231,8 @@ export default function EcdRecordsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o registro ECD."
-            : "Nao foi possivel criar o registro ECD.",
+            ? "Não foi possível atualizar o registro ECD."
+            : "Não foi possível criar o registro ECD.",
         ),
       );
     } finally {
@@ -242,12 +242,12 @@ export default function EcdRecordsPage({
 
   async function handleDelete(item: EcdRecordEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir registros ECD.");
+      setError("Seu perfil não possui permissão para excluir registros ECD.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o registro ECD para exclusao.");
+      setError("Não foi possível identificar o registro ECD para exclusão.");
       return;
     }
 
@@ -275,7 +275,7 @@ export default function EcdRecordsPage({
       setSuccess("Registro ECD excluido com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir o registro ECD."),
+        getErrorMessage(err, "Não foi possível excluir o registro ECD."),
       );
     } finally {
       setSaving(false);
@@ -285,7 +285,9 @@ export default function EcdRecordsPage({
   return (
     <div
       className={
-        embedded ? "ecd-records-page ecd-records-page--embedded" : "ecd-records-page"
+        embedded
+          ? "ecd-records-page ecd-records-page--embedded"
+          : "ecd-records-page"
       }
     >
       {!embedded ? (
@@ -294,7 +296,8 @@ export default function EcdRecordsPage({
             <span className="ecd-records-page__eyebrow">FISCAL</span>
             <h2 className="ecd-records-page__title">Registros ECD</h2>
             <p className="ecd-records-page__subtitle">
-              Gerencie registros ECD com periodo de apuracao, codigo estruturado e conteudo contabil em JSON.
+              Gerencie registros ECD com periodo de apuração, codigo estruturado
+              e conteudo contábil em JSON.
             </p>
           </div>
 
@@ -358,8 +361,8 @@ export default function EcdRecordsPage({
         <div className="ecd-records-page__alert ecd-records-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

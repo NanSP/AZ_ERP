@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import AllocatedResourceForm from "../../components/Ps/AllocatedResourceForm";
@@ -86,8 +86,7 @@ function normalizeAllocatedResource(
     tipoRecurso: String(data.tipoRecurso ?? "humano"),
     recursoId: data.recursoId == null ? "" : String(data.recursoId),
     quantidade: data.quantidade == null ? "" : String(data.quantidade),
-    valorUnitario:
-      data.valorUnitario == null ? "" : String(data.valorUnitario),
+    valorUnitario: data.valorUnitario == null ? "" : String(data.valorUnitario),
     valorTotal: data.valorTotal == null ? "" : String(data.valorTotal),
     dataAlocacao: String(data.dataAlocacao ?? ""),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
@@ -122,7 +121,9 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-function normalizeProjectOption(data: Record<string, unknown>): ProjectOption | null {
+function normalizeProjectOption(
+  data: Record<string, unknown>,
+): ProjectOption | null {
   if (typeof data.id !== "number") {
     return null;
   }
@@ -190,7 +191,7 @@ export default function AllocatedResourcesPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadAllocatedResources() {
+  const loadAllocatedResources = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -213,17 +214,14 @@ export default function AllocatedResourcesPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel carregar os recursos alocados.",
-        ),
+        getErrorMessage(err, "Não foi possível carregar os recursos alocados."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProjects() {
+  const loadProjects = useCallback(async () => {
     if (!canReadProjects) {
       setProjectOptions([]);
       setProjectAccess("unavailable");
@@ -234,7 +232,9 @@ export default function AllocatedResourcesPage({
       const response = await listResource("ps", "projetos");
       const nextItems = Array.isArray(response.data)
         ? response.data
-            .map((item) => normalizeProjectOption(item as Record<string, unknown>))
+            .map((item) =>
+              normalizeProjectOption(item as Record<string, unknown>),
+            )
             .filter((item): item is ProjectOption => item !== null)
         : [];
       setProjectOptions(nextItems);
@@ -243,9 +243,9 @@ export default function AllocatedResourcesPage({
       setProjectOptions([]);
       setProjectAccess("unavailable");
     }
-  }
+  }, [canReadProjects]);
 
-  async function loadTasks() {
+  const loadTasks = useCallback(async () => {
     if (!canReadTasks) {
       setTaskOptions([]);
       setTaskAccess("unavailable");
@@ -265,19 +265,19 @@ export default function AllocatedResourcesPage({
       setTaskOptions([]);
       setTaskAccess("unavailable");
     }
-  }
+  }, [canReadTasks]);
 
   useEffect(() => {
     void loadAllocatedResources();
-  }, [canRead]);
+  }, [loadAllocatedResources]);
 
   useEffect(() => {
     void loadProjects();
-  }, [canReadProjects]);
+  }, [loadProjects]);
 
   useEffect(() => {
     void loadTasks();
-  }, [canReadTasks]);
+  }, [loadTasks]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -335,8 +335,8 @@ export default function AllocatedResourcesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar recursos alocados."
-          : "Seu perfil nao possui permissao para criar recursos alocados.",
+          ? "Seu perfil não possui permissão para atualizar recursos alocados."
+          : "Seu perfil não possui permissão para criar recursos alocados.",
       );
       return;
     }
@@ -348,12 +348,7 @@ export default function AllocatedResourcesPage({
     try {
       const payload = toRequestPayload(draft);
       const response = selected?.id
-        ? await updateResource(
-            "ps",
-            "recursosAlocados",
-            selected.id,
-            payload,
-          )
+        ? await updateResource("ps", "recursosAlocados", selected.id, payload)
         : await createResource("ps", "recursosAlocados", payload);
 
       const saved = normalizeAllocatedResource(
@@ -372,8 +367,8 @@ export default function AllocatedResourcesPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o recurso alocado."
-            : "Nao foi possivel criar o recurso alocado.",
+            ? "Não foi possível atualizar o recurso alocado."
+            : "Não foi possível criar o recurso alocado.",
         ),
       );
     } finally {
@@ -384,15 +379,13 @@ export default function AllocatedResourcesPage({
   async function handleDelete(item: AllocatedResource) {
     if (!canDelete) {
       setError(
-        "Seu perfil nao possui permissao para excluir recursos alocados.",
+        "Seu perfil não possui permissão para excluir recursos alocados.",
       );
       return;
     }
 
     if (!item.id) {
-      setError(
-        "Nao foi possivel identificar o recurso alocado para exclusao.",
-      );
+      setError("Não foi possível identificar o recurso alocado para exclusão.");
       return;
     }
 
@@ -420,10 +413,7 @@ export default function AllocatedResourcesPage({
       setSuccess("Recurso alocado excluido com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel excluir o recurso alocado.",
-        ),
+        getErrorMessage(err, "Não foi possível excluir o recurso alocado."),
       );
     } finally {
       setSaving(false);
@@ -446,7 +436,8 @@ export default function AllocatedResourcesPage({
               Recursos Alocados
             </h2>
             <p className="allocated-resources-page__subtitle">
-              Gerencie alocacao de recursos humanos, materiais e financeiros em projetos e tarefas.
+              Gerencie alocação de recursos humanos, materiais e financeiros em
+              projetos e tarefas.
             </p>
           </div>
 

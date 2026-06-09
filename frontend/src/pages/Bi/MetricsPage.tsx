@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import MetricForm from "../../components/Bi/MetricForm";
@@ -96,7 +96,7 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadMetrics() {
+  const loadMetrics = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -118,15 +118,15 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as metricas."));
+      setError(getErrorMessage(err, "Não foi possível carregar as métricas."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadMetrics();
-  }, [canRead]);
+  }, [loadMetrics]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -172,8 +172,8 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar metricas."
-          : "Seu perfil nao possui permissao para criar metricas.",
+          ? "Seu perfil não possui permissão para atualizar métricas."
+          : "Seu perfil não possui permissão para criar métricas.",
       );
       return;
     }
@@ -194,16 +194,16 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Metrica atualizada com sucesso."
-          : "Metrica criada com sucesso.",
+          ? "Métrica atualizada com sucesso."
+          : "Métrica criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a metrica."
-            : "Nao foi possivel criar a metrica.",
+            ? "Não foi possível atualizar a métrica."
+            : "Não foi possível criar a métrica.",
         ),
       );
     } finally {
@@ -213,17 +213,17 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
 
   async function handleDelete(item: MetricRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir metricas.");
+      setError("Seu perfil não possui permissão para excluir métricas.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a metrica para exclusao.");
+      setError("Não foi possível identificar a métrica para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a metrica "${item.nome || item.id}"?`,
+      `Deseja excluir a métrica "${item.nome || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -237,25 +237,27 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
     try {
       await deleteResource("bi", "metricas", item.id);
       await loadMetrics();
-      setSuccess("Metrica excluida com sucesso.");
+      setSuccess("Métrica excluída com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir a metrica."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir a métrica."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "metrics-page metrics-page--embedded" : "metrics-page"}>
+    <div
+      className={
+        embedded ? "metrics-page metrics-page--embedded" : "metrics-page"
+      }
+    >
       {!embedded ? (
         <header className="metrics-page__header">
           <div>
             <span className="metrics-page__eyebrow">BI</span>
-            <h2 className="metrics-page__title">Metricas</h2>
+            <h2 className="metrics-page__title">Métricas</h2>
             <p className="metrics-page__subtitle">
-              Defina indicadores, categoria analitica, formula, unidade e meta.
+              Defina indicadores, categoria analítica, fórmula, unidade e meta.
             </p>
           </div>
 
@@ -274,7 +276,7 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova metrica
+              Nova métrica
             </button>
           </div>
         </header>
@@ -303,7 +305,7 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova metrica
+              Nova métrica
             </button>
           </div>
         </div>
@@ -319,8 +321,8 @@ export default function MetricsPage({ embedded = false }: MetricsPageProps) {
         <div className="metrics-page__alert metrics-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

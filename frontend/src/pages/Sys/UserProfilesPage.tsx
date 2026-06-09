@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import UserProfileTable from "../../components/Sys/UserProfileTable";
@@ -87,8 +87,7 @@ export default function UserProfilesPage({
     [session?.permissoes],
   );
   const isMasterScope = session?.scope === "master";
-  const canRead =
-    isMasterScope || permissionSet.has("sys:usuario_perfil:read");
+  const canRead = isMasterScope || permissionSet.has("sys:usuario_perfil:read");
   const canCreate =
     isMasterScope || permissionSet.has("sys:usuario_perfil:create");
   const canUpdate =
@@ -96,11 +95,10 @@ export default function UserProfilesPage({
   const canDelete =
     isMasterScope || permissionSet.has("sys:usuario_perfil:delete");
   const canReadUsers = isMasterScope || permissionSet.has("sys:usuarios:read");
-  const canReadProfiles =
-    isMasterScope || permissionSet.has("sys:perfis:read");
+  const canReadProfiles = isMasterScope || permissionSet.has("sys:perfis:read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
 
-  async function loadAssignments() {
+  const loadAssignments = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -125,15 +123,15 @@ export default function UserProfilesPage({
       setError(
         getErrorMessage(
           err,
-          "Nao foi possivel carregar os vinculos de usuario e perfil.",
+          "Não foi possível carregar os vinculos de usuário e perfil.",
         ),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUserOptions([]);
       setUserAccess("unavailable");
@@ -157,9 +155,9 @@ export default function UserProfilesPage({
       setUserOptions([]);
       setUserAccess("unavailable");
     }
-  }
+  }, [canReadUsers]);
 
-  async function loadProfiles() {
+  const loadProfiles = useCallback(async () => {
     if (!canReadProfiles) {
       setProfileOptions([]);
       setProfileAccess("unavailable");
@@ -183,19 +181,19 @@ export default function UserProfilesPage({
       setProfileOptions([]);
       setProfileAccess("unavailable");
     }
-  }
+  }, [canReadProfiles]);
 
   useEffect(() => {
     void loadAssignments();
-  }, [canRead]);
+  }, [loadAssignments]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   useEffect(() => {
     void loadProfiles();
-  }, [canReadProfiles]);
+  }, [loadProfiles]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -241,8 +239,8 @@ export default function UserProfilesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar vinculos."
-          : "Seu perfil nao possui permissao para criar vinculos.",
+          ? "Seu perfil não possui permissão para atualizar vinculos."
+          : "Seu perfil não possui permissão para criar vinculos.",
       );
       return;
     }
@@ -257,7 +255,9 @@ export default function UserProfilesPage({
         ? await updateResource("sys", "usuarioPerfil", selected.id, payload)
         : await createResource("sys", "usuarioPerfil", payload);
 
-      const saved = normalizeAssignment(response.data as Record<string, unknown>);
+      const saved = normalizeAssignment(
+        response.data as Record<string, unknown>,
+      );
       await loadAssignments();
       setSelected(saved);
       setDraft({ ...saved });
@@ -271,8 +271,8 @@ export default function UserProfilesPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o vinculo."
-            : "Nao foi possivel criar o vinculo.",
+            ? "Não foi possível atualizar o vinculo."
+            : "Não foi possível criar o vinculo.",
         ),
       );
     } finally {
@@ -282,17 +282,17 @@ export default function UserProfilesPage({
 
   async function handleDelete(item: UserProfileAssignment) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir vinculos.");
+      setError("Seu perfil não possui permissão para excluir vinculos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o vinculo para exclusao.");
+      setError("Não foi possível identificar o vinculo para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir o vinculo do usuario #${item.usuario} com o perfil #${item.perfil}?`,
+      `Deseja excluir o vinculo do usuário #${item.usuario} com o perfil #${item.perfil}?`,
     );
 
     if (!confirmed) {
@@ -314,7 +314,7 @@ export default function UserProfilesPage({
 
       setSuccess("Vinculo excluido com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o vinculo."));
+      setError(getErrorMessage(err, "Não foi possível excluir o vinculo."));
     } finally {
       setSaving(false);
     }
@@ -334,7 +334,7 @@ export default function UserProfilesPage({
             <span className="user-profiles-page__eyebrow">SYS</span>
             <h2 className="user-profiles-page__title">Usuario x Perfil</h2>
             <p className="user-profiles-page__subtitle">
-              Gerencie atribuicoes de perfis aos usuarios do tenant.
+              Gerencie atribuições de perfis aos usuários do tenant.
             </p>
           </div>
 
@@ -398,8 +398,8 @@ export default function UserProfilesPage({
         <div className="user-profiles-page__alert user-profiles-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

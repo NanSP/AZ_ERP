@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import BomForm from "../../components/Pp/BomForm";
@@ -71,8 +71,7 @@ function normalizeBom(data: Record<string, unknown>): BomItem {
     nivel: data.nivel == null ? "0" : String(data.nivel),
     tempoPreparacao:
       data.tempoPreparacao == null ? "" : String(data.tempoPreparacao),
-    tempoProducao:
-      data.tempoProducao == null ? "" : String(data.tempoProducao),
+    tempoProducao: data.tempoProducao == null ? "" : String(data.tempoProducao),
     roteiro: data.roteiro == null ? "" : String(data.roteiro),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
   };
@@ -147,7 +146,7 @@ export default function BomPage({ embedded = false }: BomPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadBomItems() {
+  const loadBomItems = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -163,17 +162,19 @@ export default function BomPage({ embedded = false }: BomPageProps) {
     try {
       const response = await listResource("pp", "bom");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeBom(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeBom(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar a BOM."));
+      setError(getErrorMessage(err, "Não foi possível carregar a BOM."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProductOptions([]);
       setProductAccess("unavailable");
@@ -193,15 +194,15 @@ export default function BomPage({ embedded = false }: BomPageProps) {
       setProductOptions([]);
       setProductAccess("unavailable");
     }
-  }
+  }, [canReadProducts]);
 
   useEffect(() => {
     void loadBomItems();
-  }, [canRead]);
+  }, [loadBomItems]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -247,8 +248,8 @@ export default function BomPage({ embedded = false }: BomPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar a BOM."
-          : "Seu perfil nao possui permissao para criar a BOM.",
+          ? "Seu perfil não possui permissão para atualizar a BOM."
+          : "Seu perfil não possui permissão para criar a BOM.",
       );
       return;
     }
@@ -277,8 +278,8 @@ export default function BomPage({ embedded = false }: BomPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a BOM."
-            : "Nao foi possivel criar a BOM.",
+            ? "Não foi possível atualizar a BOM."
+            : "Não foi possível criar a BOM.",
         ),
       );
     } finally {
@@ -288,17 +289,17 @@ export default function BomPage({ embedded = false }: BomPageProps) {
 
   async function handleDelete(item: BomItem) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir a BOM.");
+      setError("Seu perfil não possui permissão para excluir a BOM.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a BOM para exclusao.");
+      setError("Não foi possível identificar a BOM para exclusão.");
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a composicao BOM #${item.id}?`,
+      `Deseja excluir a composição BOM #${item.id}?`,
     );
 
     if (!confirmed) {
@@ -318,9 +319,9 @@ export default function BomPage({ embedded = false }: BomPageProps) {
         setDraft({ ...emptyBom });
       }
 
-      setSuccess("BOM excluida com sucesso.");
+      setSuccess("BOM excluída com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a BOM."));
+      setError(getErrorMessage(err, "Não foi possível excluir a BOM."));
     } finally {
       setSaving(false);
     }
@@ -334,7 +335,7 @@ export default function BomPage({ embedded = false }: BomPageProps) {
             <span className="bom-page__eyebrow">PP</span>
             <h2 className="bom-page__title">BOM</h2>
             <p className="bom-page__subtitle">
-              Estruture produto pai, componentes, niveis e tempos da composicao
+              Estruture produto pai, componentes, níveis e tempos da composição
               produtiva.
             </p>
           </div>
@@ -354,7 +355,7 @@ export default function BomPage({ embedded = false }: BomPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova composicao
+              Nova composição
             </button>
           </div>
         </header>
@@ -383,7 +384,7 @@ export default function BomPage({ embedded = false }: BomPageProps) {
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova composicao
+              Nova composição
             </button>
           </div>
         </div>
@@ -399,8 +400,8 @@ export default function BomPage({ embedded = false }: BomPageProps) {
         <div className="bom-page__alert bom-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

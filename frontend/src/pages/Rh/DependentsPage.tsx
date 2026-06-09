@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import DependentForm from "../../components/Rh/DependentForm";
@@ -55,7 +55,9 @@ function normalizeDependent(data: Record<string, unknown>): Dependent {
 function toRequestPayload(dependent: Dependent) {
   return {
     colaborador:
-      dependent.colaborador.trim() === "" ? null : Number(dependent.colaborador),
+      dependent.colaborador.trim() === ""
+        ? null
+        : Number(dependent.colaborador),
     nome: dependent.nome.trim() || null,
     dataNascimento: dependent.dataNascimento.trim() || null,
     parentesco: dependent.parentesco.trim() || null,
@@ -94,18 +96,15 @@ export default function DependentsPage({
   );
   const isMasterScope = session?.scope === "master";
   const canRead = isMasterScope || permissionSet.has("rh:dependentes:read");
-  const canCreate =
-    isMasterScope || permissionSet.has("rh:dependentes:create");
-  const canUpdate =
-    isMasterScope || permissionSet.has("rh:dependentes:update");
-  const canDelete =
-    isMasterScope || permissionSet.has("rh:dependentes:delete");
+  const canCreate = isMasterScope || permissionSet.has("rh:dependentes:create");
+  const canUpdate = isMasterScope || permissionSet.has("rh:dependentes:update");
+  const canDelete = isMasterScope || permissionSet.has("rh:dependentes:delete");
   const canReadEmployees =
     isMasterScope || permissionSet.has("rh:colaboradores:read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadDependents() {
+  const loadDependents = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -128,14 +127,14 @@ export default function DependentsPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os dependentes."),
+        getErrorMessage(err, "Não foi possível carregar os dependentes."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -159,15 +158,15 @@ export default function DependentsPage({
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadDependents();
-  }, [canRead]);
+  }, [loadDependents]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -213,8 +212,8 @@ export default function DependentsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar dependentes."
-          : "Seu perfil nao possui permissao para criar dependentes.",
+          ? "Seu perfil não possui permissão para atualizar dependentes."
+          : "Seu perfil não possui permissão para criar dependentes.",
       );
       return;
     }
@@ -229,7 +228,9 @@ export default function DependentsPage({
         ? await updateResource("rh", "dependentes", selected.id, payload)
         : await createResource("rh", "dependentes", payload);
 
-      const saved = normalizeDependent(response.data as Record<string, unknown>);
+      const saved = normalizeDependent(
+        response.data as Record<string, unknown>,
+      );
       await loadDependents();
       setSelected(saved);
       setDraft({ ...saved });
@@ -243,8 +244,8 @@ export default function DependentsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o dependente."
-            : "Nao foi possivel criar o dependente.",
+            ? "Não foi possível atualizar o dependente."
+            : "Não foi possível criar o dependente.",
         ),
       );
     } finally {
@@ -254,12 +255,12 @@ export default function DependentsPage({
 
   async function handleDelete(item: Dependent) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir dependentes.");
+      setError("Seu perfil não possui permissão para excluir dependentes.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o dependente para exclusao.");
+      setError("Não foi possível identificar o dependente para exclusão.");
       return;
     }
 
@@ -284,11 +285,9 @@ export default function DependentsPage({
         setDraft({ ...emptyDependent });
       }
 
-      setSuccess("Dependente excluido com sucesso.");
+      setSuccess("Dependente excluído com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o dependente."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir o dependente."));
     } finally {
       setSaving(false);
     }
@@ -373,8 +372,8 @@ export default function DependentsPage({
         <div className="dependents-page__alert dependents-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

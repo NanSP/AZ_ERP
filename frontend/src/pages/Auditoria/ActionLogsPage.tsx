@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ActionLogsForm from "../../components/Auditoria/ActionLogsForm";
@@ -57,7 +57,9 @@ function normalizeEntry(data: Record<string, unknown>): ActionLogEntry {
     tabela: String(data.tabela ?? ""),
     registroId: data.registroId == null ? "" : String(data.registroId),
     dadosAntigos:
-      data.dadosAntigos == null ? "" : JSON.stringify(data.dadosAntigos, null, 2),
+      data.dadosAntigos == null
+        ? ""
+        : JSON.stringify(data.dadosAntigos, null, 2),
     dadosNovos:
       data.dadosNovos == null ? "" : JSON.stringify(data.dadosNovos, null, 2),
     ipAddress: String(data.ipAddress ?? ""),
@@ -88,7 +90,8 @@ function toRequestPayload(entry: ActionLogEntry) {
     modulo: entry.modulo.trim() || null,
     acao: entry.acao.trim() || null,
     tabela: entry.tabela.trim() || null,
-    registroId: entry.registroId.trim() === "" ? null : Number(entry.registroId),
+    registroId:
+      entry.registroId.trim() === "" ? null : Number(entry.registroId),
     dadosAntigos: parseJsonMap(entry.dadosAntigos),
     dadosNovos: parseJsonMap(entry.dadosNovos),
     ipAddress: entry.ipAddress.trim() || null,
@@ -129,14 +132,14 @@ export default function ActionLogsPage({
     [session?.permissoes],
   );
   const isMasterScope = session?.scope === "master";
-  const canRead = isMasterScope || permissionSet.has("auditoria:log_acoes:read");
+  const canRead =
+    isMasterScope || permissionSet.has("auditoria:log_acoes:read");
   const canCreate =
     isMasterScope || permissionSet.has("auditoria:log_acoes:create");
-  const canReadUsers =
-    isMasterScope || permissionSet.has("sys:usuarios:read");
+  const canReadUsers = isMasterScope || permissionSet.has("sys:usuarios:read");
   const isBusy = loading || saving;
 
-  async function loadLogs() {
+  const loadLogs = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setLoading(false);
@@ -150,17 +153,21 @@ export default function ActionLogsPage({
     try {
       const response = await listResource("auditoria", "logAcoes");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeEntry(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeEntry(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os logs de acao."));
+      setError(
+        getErrorMessage(err, "Não foi possivel carregar os logs de acao."),
+      );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUsers([]);
       setUserAccess("unavailable");
@@ -184,15 +191,15 @@ export default function ActionLogsPage({
       setUsers([]);
       setUserAccess("unavailable");
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadLogs();
-  }, [canRead]);
+  }, [loadLogs]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -224,7 +231,7 @@ export default function ActionLogsPage({
 
   async function handleSave() {
     if (!canCreate) {
-      setError("Seu perfil nao possui permissao para criar logs de acao.");
+      setError("Seu perfil não possui permissão para criar logs de acao.");
       return;
     }
 
@@ -237,11 +244,9 @@ export default function ActionLogsPage({
       await createResource("auditoria", "logAcoes", payload);
       await loadLogs();
       setDraft({ ...emptyEntry });
-      setSuccess("Log de acao criado com sucesso.");
+      setSuccess("Log de ação criado com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel criar o log de acao."),
-      );
+      setError(getErrorMessage(err, "Não foi possivel criar o log de ação."));
     } finally {
       setSaving(false);
     }
@@ -250,16 +255,19 @@ export default function ActionLogsPage({
   return (
     <div
       className={
-        embedded ? "action-logs-page action-logs-page--embedded" : "action-logs-page"
+        embedded
+          ? "action-logs-page action-logs-page--embedded"
+          : "action-logs-page"
       }
     >
       {!embedded ? (
         <header className="action-logs-page__header">
           <div>
             <span className="action-logs-page__eyebrow">AUDITORIA</span>
-            <h2 className="action-logs-page__title">Log de acoes</h2>
+            <h2 className="action-logs-page__title">Log de ações</h2>
             <p className="action-logs-page__subtitle">
-              Registre eventos auditaveis com contexto, rastreabilidade e evidencias de alteracao.
+              Registre eventos auditáveis com contexto, rastreabilidade e
+              evidências de alteração.
             </p>
           </div>
 
@@ -268,7 +276,7 @@ export default function ActionLogsPage({
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por modulo, acao, tabela, IP ou user agent"
+              placeholder="Buscar por módulo, ação, tabela, IP ou user agent"
               className="action-logs-page__search"
               disabled={isBusy || !canRead}
             />
@@ -288,7 +296,7 @@ export default function ActionLogsPage({
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por modulo, acao, tabela, IP ou user agent"
+            placeholder="Buscar por módulo, ação, tabela, IP ou user agent"
             className="action-logs-page__search"
             disabled={isBusy || !canRead}
           />
@@ -321,7 +329,10 @@ export default function ActionLogsPage({
       ) : null}
       {!canRead || !canCreate ? (
         <div className="action-logs-page__alert action-logs-page__alert--info">
-          {[canRead ? null : "leitura desabilitada", canCreate ? null : "criacao desabilitada"]
+          {[
+            canRead ? null : "leitura desabilitada",
+            canCreate ? null : "criação desabilitada",
+          ]
             .filter(Boolean)
             .join(" · ")}
         </div>
