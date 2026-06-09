@@ -56,7 +56,9 @@ export default function PartnerForm({
             Preencha os dados centrais do cadastro.
           </p>
           {editing && value.id ? (
-            <p className="partner-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="partner-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : null}
         </div>
 
@@ -136,7 +138,7 @@ export default function PartnerForm({
         </label>
 
         <label className="partner-form__field">
-          <span>Situacao</span>
+          <span>Situação</span>
           <select
             value={value.situacao}
             onChange={(event) => update("situacao", event.target.value)}
@@ -150,7 +152,7 @@ export default function PartnerForm({
         </label>
 
         <label className="partner-form__field">
-          <span>Limite de credito</span>
+          <span>Limite de crédito</span>
           <input
             value={value.limiteCredito}
             onChange={(event) => update("limiteCredito", event.target.value)}
@@ -168,7 +170,7 @@ export default function PartnerForm({
         </label>
 
         <label className="partner-form__field partner-form__field--span-2">
-          <span>Observacoes</span>
+          <span>Observações</span>
           <textarea
             value={value.observacoes}
             onChange={(event) => update("observacoes", event.target.value)}

@@ -22,8 +22,10 @@ export default function BankMovementTable({
   return (
     <section className="bank-movement-table">
       <div className="bank-movement-table__head">
-        <h3 className="bank-movement-table__title">Lista de movimentacoes</h3>
-        <span className="bank-movement-table__meta">{items.length} registros</span>
+        <h3 className="bank-movement-table__title">Lista de movimentações</h3>
+        <span className="bank-movement-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="bank-movement-table__wrap">
@@ -34,9 +36,9 @@ export default function BankMovementTable({
               <th>Tipo</th>
               <th>Valor</th>
               <th>Data</th>
-              <th>Historico</th>
-              <th>Conciliacao</th>
-              <th>Acoes</th>
+              <th>Histórico</th>
+              <th>Conciliação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -44,19 +46,21 @@ export default function BankMovementTable({
             {loading ? (
               <tr>
                 <td colSpan={7} className="bank-movement-table__empty">
-                  Carregando movimentacoes bancarias...
+                  Carregando movimentações bancárias...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={7} className="bank-movement-table__empty">
-                  Nenhuma movimentacao bancaria encontrada.
+                  Nenhuma movimentação bancária encontrada.
                 </td>
               </tr>
             ) : (
               items.map((item) => (
                 <tr
-                  key={item.id ?? `${item.contaBancariaId}-${item.dataMovimento}`}
+                  key={
+                    item.id ?? `${item.contaBancariaId}-${item.dataMovimento}`
+                  }
                   data-selected={item.id === selectedId ? "true" : "false"}
                 >
                   <td>#{item.contaBancariaId || "-"}</td>
@@ -93,7 +97,7 @@ export default function BankMovementTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="bank-movement-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

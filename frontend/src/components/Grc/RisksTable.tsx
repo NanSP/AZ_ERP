@@ -43,9 +43,9 @@ export default function RisksTable({
           <thead>
             <tr>
               <th>Risco</th>
-              <th>Avaliacao</th>
-              <th>Mitigacao</th>
-              <th>Acoes</th>
+              <th>Avaliação</th>
+              <th>Mitigação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -85,7 +85,9 @@ export default function RisksTable({
                   <td>
                     <div className="risks-table__details">
                       <strong>
-                        {item.planoMitigacao.trim() !== "" ? "Com plano" : "Sem plano"}
+                        {item.planoMitigacao.trim() !== ""
+                          ? "Com plano"
+                          : "Sem plano"}
                       </strong>
                       <span>
                         {item.responsavelId.trim() !== ""
@@ -106,7 +108,9 @@ export default function RisksTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="risks-table__empty-action">Sem acoes</span>
+                      <span className="risks-table__empty-action">
+                        Sem ações
+                      </span>
                     ) : null}
                   </td>
                 </tr>

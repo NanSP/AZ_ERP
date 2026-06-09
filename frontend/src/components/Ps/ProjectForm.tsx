@@ -67,13 +67,16 @@ export default function ProjectForm({
             {editing ? "Editar projeto" : "Novo projeto"}
           </h3>
           <p className="project-form__subtitle">
-            Organize cliente, gerente, cronograma, status e orcamento do projeto.
+            Organize cliente, gerente, cronograma, status e orçamento do
+            projeto.
           </p>
           {editing && value.id ? (
-            <p className="project-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="project-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="project-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -90,7 +93,7 @@ export default function ProjectForm({
 
       <div className="project-form__grid">
         <label className="project-form__field">
-          <span>Codigo</span>
+          <span>Código</span>
           <input
             value={value.codigo}
             onChange={(event) => update("codigo", event.target.value)}
@@ -110,11 +113,11 @@ export default function ProjectForm({
         </label>
 
         <label className="project-form__field project-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Escopo ou descricao resumida"
+            placeholder="Escopo ou descrição resumida"
             disabled={!canEditFields}
           />
         </label>
@@ -127,7 +130,7 @@ export default function ProjectForm({
               onChange={(event) => update("cliente", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {partnerOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -146,7 +149,7 @@ export default function ProjectForm({
           )}
           {partnerAccess === "unavailable" ? (
             <small className="project-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -178,7 +181,7 @@ export default function ProjectForm({
           )}
           {userAccess === "unavailable" ? (
             <small className="project-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -226,7 +229,7 @@ export default function ProjectForm({
         </label>
 
         <label className="project-form__field">
-          <span>Orcamento total</span>
+          <span>Orçamento total</span>
           <input
             value={value.orcamentoTotal}
             onChange={(event) =>
@@ -241,7 +244,7 @@ export default function ProjectForm({
         </label>
 
         <label className="project-form__field">
-          <span>Orcamento gasto</span>
+          <span>Orçamento gasto</span>
           <input
             value={value.orcamentoGasto}
             onChange={(event) =>
@@ -295,7 +298,7 @@ export default function ProjectForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar projeto"}
       </button>
     </aside>

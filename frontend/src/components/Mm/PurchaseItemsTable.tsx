@@ -23,7 +23,9 @@ export default function PurchaseItemsTable({
     <section className="purchase-items-table">
       <div className="purchase-items-table__head">
         <h3 className="purchase-items-table__title">Itens de compra</h3>
-        <span className="purchase-items-table__meta">{items.length} registros</span>
+        <span className="purchase-items-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="purchase-items-table__wrap">
@@ -33,7 +35,7 @@ export default function PurchaseItemsTable({
               <th>Vinculos</th>
               <th>Quantidades</th>
               <th>Valores</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -69,7 +71,7 @@ export default function PurchaseItemsTable({
                   </td>
                   <td>
                     <div className="purchase-items-table__details">
-                      <strong>Unitario: {item.valorUnitario || "-"}</strong>
+                      <strong>Unitário: {item.valorUnitario || "-"}</strong>
                       <span>Total: {item.valorTotal || "-"}</span>
                     </div>
                   </td>
@@ -86,7 +88,7 @@ export default function PurchaseItemsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="purchase-items-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

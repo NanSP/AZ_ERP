@@ -57,7 +57,8 @@ export default function ConsentForm({
             {editing ? "Editar consentimento" : "Novo consentimento"}
           </h3>
           <p className="consent-form__subtitle">
-            Registre o titular, a finalidade e a trilha de consentimento e revogacao.
+            Registre o titular, a finalidade e a trilha de consentimento e
+            revogação.
           </p>
           {editing && value.id ? (
             <p className="consent-form__meta">
@@ -65,7 +66,7 @@ export default function ConsentForm({
             </p>
           ) : !canEditFields ? (
             <p className="consent-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -123,13 +124,15 @@ export default function ConsentForm({
           <input
             type="datetime-local"
             value={value.dataConsentimento}
-            onChange={(event) => update("dataConsentimento", event.target.value)}
+            onChange={(event) =>
+              update("dataConsentimento", event.target.value)
+            }
             disabled={!canEditFields}
           />
         </label>
 
         <label className="consent-form__field">
-          <span>Data da revogacao</span>
+          <span>Data da revogação</span>
           <input
             type="datetime-local"
             value={value.dataRevogacao}
@@ -160,7 +163,7 @@ export default function ConsentForm({
 
         {!revogacaoAfterConsentimento ? (
           <p className="consent-form__hint consent-form__hint--span-2">
-            Data de revogacao nao pode ser anterior a data de consentimento.
+            Data de revogação nao pode ser anterior a data de consentimento.
           </p>
         ) : null}
       </div>

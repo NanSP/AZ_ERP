@@ -17,7 +17,11 @@ type AccountsPayableTableProps = {
   onDelete: (item: AccountPayable) => void;
 };
 
-function resolveLabel(value: string, options: RelatedOption[], fallback: string) {
+function resolveLabel(
+  value: string,
+  options: RelatedOption[],
+  fallback: string,
+) {
   const id = Number(value);
   const match = options.find((option) => option.id === id);
   return match?.label ?? fallback;
@@ -53,7 +57,7 @@ export default function AccountsPayableTable({
               <th>Valor</th>
               <th>Status</th>
               <th>Vencimento</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -124,7 +128,7 @@ export default function AccountsPayableTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="accounts-payable-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

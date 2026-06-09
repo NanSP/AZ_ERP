@@ -35,18 +35,20 @@ export default function NotificationsTable({
     <section className="notifications-table">
       <div className="notifications-table__head">
         <h3 className="notifications-table__title">Notificacoes</h3>
-        <span className="notifications-table__meta">{items.length} registros</span>
+        <span className="notifications-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="notifications-table__wrap">
         <table className="notifications-table__table">
           <thead>
             <tr>
-              <th>Notificacao</th>
-              <th>Usuario</th>
+              <th>Notificação</th>
+              <th>Usuário</th>
               <th>Tipo</th>
               <th>Leitura</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -54,13 +56,13 @@ export default function NotificationsTable({
             {loading ? (
               <tr>
                 <td colSpan={5} className="notifications-table__empty">
-                  Carregando notificacoes...
+                  Carregando notificações...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={5} className="notifications-table__empty">
-                  Nenhuma notificacao encontrada.
+                  Nenhuma notificação encontrada.
                 </td>
               </tr>
             ) : (
@@ -109,7 +111,7 @@ export default function NotificationsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="notifications-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -39,11 +39,11 @@ export default function DevicesTable({
         <table className="devices-table__table">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Dispositivo</th>
               <th>Push e acesso</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -70,7 +70,9 @@ export default function DevicesTable({
                   <td>
                     <div className="devices-table__identity">
                       <strong>{item.deviceId || "-"}</strong>
-                      <span>{item.deviceModel || item.devicePlatform || "-"}</span>
+                      <span>
+                        {item.deviceModel || item.devicePlatform || "-"}
+                      </span>
                     </div>
                   </td>
                   <td>
@@ -114,7 +116,7 @@ export default function DevicesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="devices-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

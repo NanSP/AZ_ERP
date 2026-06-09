@@ -101,7 +101,7 @@ export default function AccountsPayableForm({
         )}
         {access === "unavailable" ? (
           <small className="accounts-payable-form__hint">
-            Lista indisponivel. Informe o ID manualmente.
+            Lista indisponível. Informe o ID manualmente.
           </small>
         ) : null}
       </label>
@@ -116,7 +116,7 @@ export default function AccountsPayableForm({
             {editing ? "Editar conta" : "Nova conta"}
           </h3>
           <p className="accounts-payable-form__subtitle">
-            Configure empresa, fornecedor, valores e datas da obrigacao.
+            Configure empresa, fornecedor, valores e datas da obrigação.
           </p>
           {editing && value.id ? (
             <p className="accounts-payable-form__meta">
@@ -124,7 +124,7 @@ export default function AccountsPayableForm({
             </p>
           ) : !canEditFields ? (
             <p className="accounts-payable-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -171,7 +171,7 @@ export default function AccountsPayableForm({
         )}
 
         <label className="accounts-payable-form__field">
-          <span>Numero do documento</span>
+          <span>Número do documento</span>
           <input
             value={value.numeroDocumento}
             onChange={(event) => update("numeroDocumento", event.target.value)}
@@ -181,11 +181,11 @@ export default function AccountsPayableForm({
         </label>
 
         <label className="accounts-payable-form__field accounts-payable-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descricao da obrigacao financeira"
+            placeholder="Descrição da obrigação financeira"
             disabled={!canEditFields}
           />
         </label>
@@ -195,7 +195,10 @@ export default function AccountsPayableForm({
           <input
             value={value.valorOriginal}
             onChange={(event) =>
-              update("valorOriginal", event.target.value.replace(/[^0-9.,]/g, ""))
+              update(
+                "valorOriginal",
+                event.target.value.replace(/[^0-9.,]/g, ""),
+              )
             }
             placeholder="0.00"
             disabled={!canEditFields}
@@ -215,7 +218,7 @@ export default function AccountsPayableForm({
         </label>
 
         <label className="accounts-payable-form__field">
-          <span>Data de emissao</span>
+          <span>Data de emissão</span>
           <input
             type="date"
             value={value.dataEmissao}
@@ -267,11 +270,7 @@ export default function AccountsPayableForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar conta"}
+        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar conta"}
       </button>
     </aside>
   );

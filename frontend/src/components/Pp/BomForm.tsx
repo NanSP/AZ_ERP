@@ -1,4 +1,8 @@
-import type { BomItem, ProductAccess, ProductOption } from "../../pages/Pp/BomPage";
+import type {
+  BomItem,
+  ProductAccess,
+  ProductOption,
+} from "../../pages/Pp/BomPage";
 
 type BomFormProps = {
   value: BomItem;
@@ -62,16 +66,16 @@ export default function BomForm({
       <div className="bom-form__head">
         <div>
           <h3 className="bom-form__title">
-            {editing ? "Editar composicao" : "Nova composicao"}
+            {editing ? "Editar composição" : "Nova composição"}
           </h3>
           <p className="bom-form__subtitle">
-            Defina produto pai, componente, quantidade, hierarquia e tempos.
+            Defina produto pai, componente, quantidade, hierárquia e tempos.
           </p>
           {editing && value.id ? (
             <p className="bom-form__meta">Registro selecionado: #{value.id}</p>
           ) : !canEditFields ? (
             <p className="bom-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -143,7 +147,7 @@ export default function BomForm({
 
         {productAccess === "unavailable" ? (
           <p className="bom-form__hint bom-form__hint--span-2">
-            Lista de produtos indisponivel. Informe os IDs manualmente.
+            Lista de produtos indisponível. Informe os IDs manualmente.
           </p>
         ) : null}
 
@@ -170,7 +174,7 @@ export default function BomForm({
         </label>
 
         <label className="bom-form__field">
-          <span>Nivel</span>
+          <span>Nível</span>
           <input
             value={value.nivel}
             onChange={(event) =>
@@ -194,7 +198,7 @@ export default function BomForm({
         </label>
 
         <label className="bom-form__field">
-          <span>Tempo de preparacao</span>
+          <span>Tempo de preparação</span>
           <input
             value={value.tempoPreparacao}
             onChange={(event) =>
@@ -209,7 +213,7 @@ export default function BomForm({
         </label>
 
         <label className="bom-form__field">
-          <span>Tempo de producao</span>
+          <span>Tempo de produção</span>
           <input
             value={value.tempoProducao}
             onChange={(event) =>
@@ -233,8 +237,8 @@ export default function BomForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
-            : "Criar composicao"}
+            ? "Salvar alterações"
+            : "Criar composição"}
       </button>
     </aside>
   );

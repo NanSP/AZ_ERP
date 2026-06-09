@@ -39,8 +39,8 @@ export default function BomTable({
             <tr>
               <th>Estrutura</th>
               <th>Consumo</th>
-              <th>Operacao</th>
-              <th>Acoes</th>
+              <th>Operação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -54,7 +54,7 @@ export default function BomTable({
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="bom-table__empty">
-                  Nenhuma composicao BOM encontrada.
+                  Nenhuma composição BOM encontrada.
                 </td>
               </tr>
             ) : (
@@ -78,7 +78,7 @@ export default function BomTable({
                     <div className="bom-table__details">
                       <span>Quantidade: {item.quantidade || "-"}</span>
                       <span>Unidade: {item.unidadeMedida || "-"}</span>
-                      <span>Nivel: {item.nivel || "-"}</span>
+                      <span>Nível: {item.nivel || "-"}</span>
                     </div>
                   </td>
                   <td>

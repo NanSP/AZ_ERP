@@ -58,10 +58,12 @@ export default function DeviceForm({
             Cadastre o contexto tecnico do dispositivo e o estado de atividade.
           </p>
           {editing && value.id ? (
-            <p className="device-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="device-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="device-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -78,7 +80,7 @@ export default function DeviceForm({
 
       <div className="device-form__grid">
         <label className="device-form__field">
-          <span>Usuario</span>
+          <span>Usuário</span>
           {userOptions.length > 0 ? (
             <select
               value={value.usuario}
@@ -104,7 +106,7 @@ export default function DeviceForm({
           )}
           {userAccess === "unavailable" ? (
             <small className="device-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -155,7 +157,7 @@ export default function DeviceForm({
         </label>
 
         <label className="device-form__field">
-          <span>Ultimo acesso</span>
+          <span>Último acesso</span>
           <input
             type="datetime-local"
             value={value.ultimoAcesso}
@@ -184,7 +186,7 @@ export default function DeviceForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar dispositivo"}
       </button>
     </aside>

@@ -31,9 +31,9 @@ export default function ControlsTable({
           <thead>
             <tr>
               <th>Controle</th>
-              <th>Operacao</th>
-              <th>Governanca</th>
-              <th>Acoes</th>
+              <th>Operação</th>
+              <th>Governança</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -69,7 +69,9 @@ export default function ControlsTable({
                   </td>
                   <td>
                     <div className="controls-table__details">
-                      <strong>{item.efetivo ? "Efetivo" : "Em definicao"}</strong>
+                      <strong>
+                        {item.efetivo ? "Efetivo" : "Em definicao"}
+                      </strong>
                       <span>
                         {item.responsavelId.trim() !== ""
                           ? `Responsavel #${item.responsavelId}`
@@ -90,7 +92,7 @@ export default function ControlsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="controls-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -32,8 +32,8 @@ export default function AuditsTable({
             <tr>
               <th>Auditoria</th>
               <th>Planejamento</th>
-              <th>Execucao</th>
-              <th>Acoes</th>
+              <th>Execução</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -65,7 +65,7 @@ export default function AuditsTable({
                   <td>
                     <div className="audits-table__details">
                       <strong>{item.status || "-"}</strong>
-                      <span>Inicio: {item.dataInicio || "-"}</span>
+                      <span>Início: {item.dataInicio || "-"}</span>
                       <span>Fim: {item.dataFim || "-"}</span>
                     </div>
                   </td>
@@ -73,8 +73,8 @@ export default function AuditsTable({
                     <div className="audits-table__details">
                       <strong>
                         {item.responsavelId.trim() !== ""
-                          ? `Responsavel #${item.responsavelId}`
-                          : "Sem responsavel"}
+                          ? `Responsável #${item.responsavelId}`
+                          : "Sem responsável"}
                       </strong>
                     </div>
                   </td>
@@ -91,7 +91,7 @@ export default function AuditsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="audits-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

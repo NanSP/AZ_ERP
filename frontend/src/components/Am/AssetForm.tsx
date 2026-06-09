@@ -25,7 +25,7 @@ const statusOptions = [
   { value: "ativo", label: "Ativo" },
   { value: "inativo", label: "Inativo" },
   { value: "baixado", label: "Baixado" },
-  { value: "manutencao", label: "Manutencao" },
+  { value: "manutenção", label: "Manutenção" },
 ];
 
 export default function AssetForm({
@@ -60,13 +60,15 @@ export default function AssetForm({
             {editing ? "Editar bem" : "Novo bem"}
           </h3>
           <p className="asset-form__subtitle">
-            Cadastre o ativo com valores, depreciacao e vinculos operacionais.
+            Cadastre o ativo com valores, depreciacão e vinculos operacionais.
           </p>
           {editing && value.id ? (
-            <p className="asset-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="asset-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="asset-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -103,11 +105,11 @@ export default function AssetForm({
         </label>
 
         <label className="asset-form__field asset-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descricao detalhada"
+            placeholder="Descrição detalhada"
             disabled={!canEditFields}
           />
         </label>
@@ -123,7 +125,7 @@ export default function AssetForm({
         </label>
 
         <label className="asset-form__field">
-          <span>Localizacao</span>
+          <span>Localização</span>
           <input
             value={value.localizacao}
             onChange={(event) => update("localizacao", event.target.value)}
@@ -133,7 +135,7 @@ export default function AssetForm({
         </label>
 
         <label className="asset-form__field">
-          <span>Data de aquisicao</span>
+          <span>Data de aquisição</span>
           <input
             type="date"
             value={value.dataAquisicao}
@@ -143,7 +145,7 @@ export default function AssetForm({
         </label>
 
         <label className="asset-form__field">
-          <span>Data de depreciacao</span>
+          <span>Data de depreciacão</span>
           <input
             type="date"
             value={value.dataDepreciacao}
@@ -153,11 +155,14 @@ export default function AssetForm({
         </label>
 
         <label className="asset-form__field">
-          <span>Valor de aquisicao</span>
+          <span>Valor de aquisição</span>
           <input
             value={value.valorAquisicao}
             onChange={(event) =>
-              update("valorAquisicao", event.target.value.replace(/[^0-9.,]/g, ""))
+              update(
+                "valorAquisicao",
+                event.target.value.replace(/[^0-9.,]/g, ""),
+              )
             }
             placeholder="0.00"
             disabled={!canEditFields}
@@ -181,7 +186,10 @@ export default function AssetForm({
           <input
             value={value.vidaUtilAnos}
             onChange={(event) =>
-              update("vidaUtilAnos", event.target.value.replace(/\D/g, "").slice(0, 3))
+              update(
+                "vidaUtilAnos",
+                event.target.value.replace(/\D/g, "").slice(0, 3),
+              )
             }
             placeholder="Anos"
             disabled={!canEditFields}
@@ -189,7 +197,7 @@ export default function AssetForm({
         </label>
 
         <label className="asset-form__field">
-          <span>Taxa de depreciacao</span>
+          <span>Taxa de depreciação</span>
           <input
             value={value.taxaDepreciacao}
             onChange={(event) =>
@@ -211,7 +219,7 @@ export default function AssetForm({
               onChange={(event) => update("fornecedor", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {partnerOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -236,14 +244,14 @@ export default function AssetForm({
         </label>
 
         <label className="asset-form__field">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           {employeeOptions.length > 0 ? (
             <select
               value={value.responsavel}
               onChange={(event) => update("responsavel", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {employeeOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}

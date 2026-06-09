@@ -80,7 +80,8 @@ export default function StockForm({
             {editing ? "Editar estoque" : "Novo estoque"}
           </h3>
           <p className="stock-form__subtitle">
-            Defina identificacao, saldo, limites operacionais e valor unitario da posicao.
+            Defina identificação, saldo, limites operacionais e valor unitário
+            da posição.
           </p>
           {editing && value.id ? (
             <p className="stock-form__meta">
@@ -88,7 +89,7 @@ export default function StockForm({
             </p>
           ) : !canEditFields ? (
             <p className="stock-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -118,7 +119,8 @@ export default function StockForm({
                   key={product.id ?? product.codigo}
                   value={String(product.id ?? "")}
                 >
-                  {product.codigo || "Sem codigo"} - {product.nome || product.descricao || "Sem descricao"}
+                  {product.codigo || "Sem codigo"} -{" "}
+                  {product.nome || product.descricao || "Sem descricao"}
                 </option>
               ))}
             </select>
@@ -148,7 +150,8 @@ export default function StockForm({
                   key={company.id ?? company.codigo}
                   value={String(company.id ?? "")}
                 >
-                  {company.codigo || "Sem codigo"} - {company.razaoSocial || "Sem nome"}
+                  {company.codigo || "Sem codigo"} -{" "}
+                  {company.razaoSocial || "Sem nome"}
                 </option>
               ))}
             </select>
@@ -165,7 +168,7 @@ export default function StockForm({
         </label>
 
         <label className="stock-form__field">
-          <span>Localizacao</span>
+          <span>Localização</span>
           <input
             value={value.localizacao}
             onChange={(event) => update("localizacao", event.target.value)}
@@ -197,11 +200,14 @@ export default function StockForm({
         </label>
 
         <label className="stock-form__field">
-          <span>Quantidade minima</span>
+          <span>Quantidade mínima</span>
           <input
             value={value.quantidadeMinima}
             onChange={(event) =>
-              update("quantidadeMinima", normalizeDecimalInput(event.target.value))
+              update(
+                "quantidadeMinima",
+                normalizeDecimalInput(event.target.value),
+              )
             }
             placeholder="0"
             disabled={!canEditFields}
@@ -209,11 +215,14 @@ export default function StockForm({
         </label>
 
         <label className="stock-form__field">
-          <span>Quantidade maxima</span>
+          <span>Quantidade máxima</span>
           <input
             value={value.quantidadeMaxima}
             onChange={(event) =>
-              update("quantidadeMaxima", normalizeDecimalInput(event.target.value))
+              update(
+                "quantidadeMaxima",
+                normalizeDecimalInput(event.target.value),
+              )
             }
             placeholder="0"
             disabled={!canEditFields}
@@ -221,7 +230,7 @@ export default function StockForm({
         </label>
 
         <label className="stock-form__field">
-          <span>Valor unitario</span>
+          <span>Valor unitário</span>
           <input
             value={value.valorUnitario}
             onChange={(event) =>
@@ -244,7 +253,7 @@ export default function StockForm({
 
         {quantidadeMaxima > 0 && quantidadeMinima > quantidadeMaxima ? (
           <p className="stock-form__hint stock-form__hint--span-2">
-            Quantidade minima nao pode ser maior que a quantidade maxima.
+            Quantidade mínima não pode ser maior que a quantidade máxima.
           </p>
         ) : null}
       </div>
@@ -258,7 +267,7 @@ export default function StockForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar estoque"}
       </button>
     </aside>

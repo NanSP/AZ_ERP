@@ -16,8 +16,13 @@ type AllocatedResourcesTableProps = {
   onDelete: (item: AllocatedResource) => void;
 };
 
-function resolveProjectLabel(projectId: string, projectOptions: ProjectOption[]) {
-  const match = projectOptions.find((option) => String(option.id) === projectId);
+function resolveProjectLabel(
+  projectId: string,
+  projectOptions: ProjectOption[],
+) {
+  const match = projectOptions.find(
+    (option) => String(option.id) === projectId,
+  );
   return match ? match.label : projectId ? `Projeto #${projectId}` : "-";
 }
 
@@ -52,9 +57,9 @@ export default function AllocatedResourcesTable({
             <tr>
               <th>Contexto</th>
               <th>Recurso</th>
-              <th>Medicao</th>
+              <th>Medição</th>
               <th>Financeiro</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -79,7 +84,9 @@ export default function AllocatedResourcesTable({
                 >
                   <td>
                     <div className="allocated-resources-table__details">
-                      <span>{resolveProjectLabel(item.projeto, projectOptions)}</span>
+                      <span>
+                        {resolveProjectLabel(item.projeto, projectOptions)}
+                      </span>
                       <span>{resolveTaskLabel(item.tarefa, taskOptions)}</span>
                     </div>
                   </td>
@@ -97,7 +104,7 @@ export default function AllocatedResourcesTable({
                   </td>
                   <td>
                     <div className="allocated-resources-table__details">
-                      <span>Unitario: {item.valorUnitario || "0"}</span>
+                      <span>Unitário: {item.valorUnitario || "0"}</span>
                       <span>Total: {item.valorTotal || "0"}</span>
                     </div>
                   </td>
@@ -114,7 +121,7 @@ export default function AllocatedResourcesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="allocated-resources-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

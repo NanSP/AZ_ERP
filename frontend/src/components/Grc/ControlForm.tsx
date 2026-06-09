@@ -41,8 +41,7 @@ export default function ControlForm({
   onSave,
   onReset,
 }: ControlFormProps) {
-  const requiresResponsible =
-    value.codigo.trim() !== "" || value.efetivo;
+  const requiresResponsible = value.codigo.trim() !== "" || value.efetivo;
   const canSave =
     value.descricao.trim() !== "" &&
     value.tipoControle.trim() !== "" &&
@@ -67,8 +66,8 @@ export default function ControlForm({
             {editing ? "Editar controle" : "Novo controle"}
           </h3>
           <p className="control-form__subtitle">
-            Estruture o controle, defina frequencia e formalize a
-            responsabilizacao quando ele entrar em ciclo de governanca.
+            Estruture o controle, defina frequência e formalize a
+            responsabilização quando ele entrar em ciclo de governança.
           </p>
           {editing && value.id ? (
             <p className="control-form__meta">
@@ -76,7 +75,7 @@ export default function ControlForm({
             </p>
           ) : !canEditFields ? (
             <p className="control-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -93,7 +92,7 @@ export default function ControlForm({
 
       <div className="control-form__grid">
         <label className="control-form__field">
-          <span>Codigo</span>
+          <span>Código</span>
           <input
             value={value.codigo}
             onChange={(event) => update("codigo", event.target.value)}
@@ -118,18 +117,18 @@ export default function ControlForm({
         </label>
 
         <label className="control-form__field control-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <textarea
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descreva objetivo, execucao e evidencia esperada"
+            placeholder="Descreva objetivo, execução e evidência esperada"
             disabled={!canEditFields}
             rows={4}
           />
         </label>
 
         <label className="control-form__field">
-          <span>Frequencia</span>
+          <span>Frequência</span>
           <select
             value={value.frequencia}
             onChange={(event) => update("frequencia", event.target.value)}
@@ -144,16 +143,19 @@ export default function ControlForm({
         </label>
 
         <label className="control-form__field">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           {canReadUsers ? (
             <select
               value={value.responsavelId}
               onChange={(event) => update("responsavelId", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Sem responsavel</option>
+              <option value="">Sem responsável</option>
               {users.map((user) => (
-                <option key={user.id ?? user.login} value={String(user.id ?? "")}>
+                <option
+                  key={user.id ?? user.login}
+                  value={String(user.id ?? "")}
+                >
                   {user.nome || user.login}
                 </option>
               ))}
@@ -164,7 +166,7 @@ export default function ControlForm({
               onChange={(event) =>
                 update("responsavelId", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do responsavel"
+              placeholder="ID do responsável"
               disabled={!canEditFields}
             />
           )}
@@ -187,7 +189,7 @@ export default function ControlForm({
 
         {requiresResponsible ? (
           <p className="control-form__hint control-form__hint--span-2">
-            Controle com codigo ou marcado como efetivo exige responsavel.
+            Controle com código ou marcado como efetivo exige responsável.
           </p>
         ) : null}
       </div>
@@ -201,7 +203,7 @@ export default function ControlForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar controle"}
       </button>
     </aside>

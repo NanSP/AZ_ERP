@@ -22,7 +22,7 @@ export default function ActionLogsTable({
   return (
     <section className="action-logs-table">
       <div className="action-logs-page__panel-head">
-        <h3 className="action-logs-page__panel-title">Logs de acao</h3>
+        <h3 className="action-logs-page__panel-title">Logs de ação</h3>
         <span className="action-logs-page__panel-subtitle">
           {items.length} registros
         </span>
@@ -32,7 +32,7 @@ export default function ActionLogsTable({
         <table className="action-logs-page__table">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Contexto</th>
               <th>Rastreabilidade</th>
               <th>Criado em</th>
@@ -43,13 +43,13 @@ export default function ActionLogsTable({
             {loading ? (
               <tr>
                 <td colSpan={4} className="action-logs-page__empty">
-                  Carregando logs de acao...
+                  Carregando logs de ação...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="action-logs-page__empty">
-                  Nenhum log de acao encontrado.
+                  Nenhum log de ação encontrado.
                 </td>
               </tr>
             ) : (
@@ -62,9 +62,7 @@ export default function ActionLogsTable({
                       <span>
                         {item.modulo || "-"} / {item.tabela || "-"}
                       </span>
-                      <span>
-                        Registro: {item.registroId || "-"}
-                      </span>
+                      <span>Registro: {item.registroId || "-"}</span>
                     </div>
                   </td>
                   <td>

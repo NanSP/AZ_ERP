@@ -35,7 +35,7 @@ export default function EcdRecordsTable({
               <th>Registro</th>
               <th>Periodo</th>
               <th>Conteudo</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -82,7 +82,7 @@ export default function EcdRecordsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="ecd-records-page__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

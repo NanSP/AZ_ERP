@@ -40,7 +40,7 @@ export default function MrpTable({
               <th>Produto</th>
               <th>Planejamento</th>
               <th>Resultado</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -65,22 +65,26 @@ export default function MrpTable({
                 >
                   <td>
                     <div className="mrp-table__details">
-                      <strong>{resolveProductLabel(item.produto, productOptions)}</strong>
-                      <span>Periodo: {item.periodo || "-"}</span>
+                      <strong>
+                        {resolveProductLabel(item.produto, productOptions)}
+                      </strong>
+                      <span>Período: {item.periodo || "-"}</span>
                     </div>
                   </td>
                   <td>
                     <div className="mrp-table__details">
                       <span>Demanda: {item.demandaPrevista || "-"}</span>
                       <span>Estoque atual: {item.estoqueAtual || "-"}</span>
-                      <span>Seguranca: {item.estoqueSeguranca || "-"}</span>
+                      <span>
+                        Estoque de segurança: {item.estoqueSeguranca || "-"}
+                      </span>
                       <span>Necessidade: {item.dataNecessidade || "-"}</span>
                     </div>
                   </td>
                   <td>
                     <div className="mrp-table__details">
                       <span>Compra: {item.necessidadeCompra || "-"}</span>
-                      <span>Producao: {item.necessidadeProducao || "-"}</span>
+                      <span>Produção: {item.necessidadeProducao || "-"}</span>
                     </div>
                   </td>
                   <td className="mrp-table__actions">
@@ -95,7 +99,7 @@ export default function MrpTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="mrp-table__empty-action">Sem acoes</span>
+                      <span className="mrp-table__empty-action">Sem ações</span>
                     ) : null}
                   </td>
                 </tr>

@@ -72,7 +72,8 @@ export default function ContactForm({
           </p>
           {editing && value.id ? (
             <p className="contact-form__meta">
-              Registro selecionado: #{value.id}. O vinculo da entidade fica travado na edicao.
+              Registro selecionado: #{value.id}. O vinculo da entidade fica
+              travado na edição.
             </p>
           ) : null}
         </div>
@@ -121,7 +122,9 @@ export default function ContactForm({
           </label>
         ) : (
           <label className="contact-form__field">
-            <span>{showEntitySelect ? "ID da entidade" : "ID da entidade"}</span>
+            <span>
+              {showEntitySelect ? "ID da entidade" : "ID da entidade"}
+            </span>
             <input
               value={value.entidadeId}
               onChange={(event) => update("entidadeId", event.target.value)}
@@ -159,7 +162,7 @@ export default function ContactForm({
         </label>
 
         <label className="contact-form__field contact-form__field--span-2">
-          <span>Observacao</span>
+          <span>Observação</span>
           <input
             value={value.observacao}
             onChange={(event) => update("observacao", event.target.value)}
@@ -186,7 +189,7 @@ export default function ContactForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar contato"}
       </button>
     </aside>

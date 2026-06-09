@@ -57,7 +57,7 @@ export default function MetricHistoryForm({
             {editing ? "Editar historico" : "Novo historico"}
           </h3>
           <p className="metric-history-form__subtitle">
-            Informe a metrica, o periodo e o valor apurado do indicador.
+            Informe a métrica, o periodo e o valor apurado do indicador.
           </p>
           {editing && value.id ? (
             <p className="metric-history-form__meta">
@@ -65,7 +65,7 @@ export default function MetricHistoryForm({
             </p>
           ) : !canEditFields ? (
             <p className="metric-history-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -82,7 +82,7 @@ export default function MetricHistoryForm({
 
       <div className="metric-history-form__grid">
         <label className="metric-history-form__field">
-          <span>Metrica</span>
+          <span>Métrica</span>
           {metricOptions.length > 0 ? (
             <select
               value={value.metrica}
@@ -102,13 +102,13 @@ export default function MetricHistoryForm({
               onChange={(event) =>
                 update("metrica", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID da metrica"
+              placeholder="ID da métrica"
               disabled={!canEditFields}
             />
           )}
           {metricAccess === "unavailable" ? (
             <small className="metric-history-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>

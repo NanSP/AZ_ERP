@@ -45,7 +45,8 @@ export default function PurchaseForm({
     valorTotal >= 0 &&
     (value.dataPrevistaEntrega.trim() === "" ||
       value.dataPrevistaEntrega >= value.dataPedido) &&
-    (value.dataEntrega.trim() === "" || value.dataEntrega >= value.dataPedido) &&
+    (value.dataEntrega.trim() === "" ||
+      value.dataEntrega >= value.dataPedido) &&
     (value.status !== "recebido" || value.dataEntrega.trim() !== "");
 
   function update<K extends keyof PurchaseRecord>(
@@ -74,7 +75,7 @@ export default function PurchaseForm({
             </p>
           ) : !canEditFields ? (
             <p className="purchase-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -100,8 +101,12 @@ export default function PurchaseForm({
             >
               <option value="">Selecione um fornecedor</option>
               {suppliers.map((supplier) => (
-                <option key={supplier.id ?? supplier.codigo} value={String(supplier.id ?? "")}>
-                  {supplier.codigo || "Sem codigo"} - {supplier.nome || "Sem nome"}
+                <option
+                  key={supplier.id ?? supplier.codigo}
+                  value={String(supplier.id ?? "")}
+                >
+                  {supplier.codigo || "Sem codigo"} -{" "}
+                  {supplier.nome || "Sem nome"}
                 </option>
               ))}
             </select>
@@ -132,7 +137,9 @@ export default function PurchaseForm({
           <input
             type="date"
             value={value.dataPrevistaEntrega}
-            onChange={(event) => update("dataPrevistaEntrega", event.target.value)}
+            onChange={(event) =>
+              update("dataPrevistaEntrega", event.target.value)
+            }
             disabled={!canEditFields}
           />
         </label>
@@ -175,17 +182,19 @@ export default function PurchaseForm({
         </label>
 
         <label className="purchase-form__field">
-          <span>Condicoes de pagamento</span>
+          <span>Condições de pagamento</span>
           <input
             value={value.condicoesPagamento}
-            onChange={(event) => update("condicoesPagamento", event.target.value)}
+            onChange={(event) =>
+              update("condicoesPagamento", event.target.value)
+            }
             placeholder="30 dias, boleto, 3x sem juros"
             disabled={!canEditFields}
           />
         </label>
 
         <label className="purchase-form__field purchase-form__field--span-2">
-          <span>Observacoes</span>
+          <span>Observações</span>
           <textarea
             value={value.observacoes}
             onChange={(event) => update("observacoes", event.target.value)}

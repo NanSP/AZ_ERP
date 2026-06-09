@@ -46,7 +46,7 @@ export default function DocumentsTable({
               <th>Relacionamentos</th>
               <th>Valor</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -74,8 +74,8 @@ export default function DocumentsTable({
                       <strong>
                         {item.tipoDocumento || "-"} {item.numero || "-"}
                       </strong>
-                      <span>Serie: {item.serie || "-"}</span>
-                      <span>Emissao: {item.dataEmissao || "-"}</span>
+                      <span>Série: {item.serie || "-"}</span>
+                      <span>Emissão: {item.dataEmissao || "-"}</span>
                     </div>
                   </td>
                   <td>
@@ -106,7 +106,7 @@ export default function DocumentsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="documents-page__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -33,7 +33,7 @@ export default function ConsentsTable({
               <th>Titular</th>
               <th>Finalidade</th>
               <th>Rastreabilidade</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -64,9 +64,7 @@ export default function ConsentsTable({
                   <td>
                     <div className="consents-table__details">
                       <strong>{item.finalidade || "-"}</strong>
-                      <span>
-                        {item.dataRevogacao ? "Revogado" : "Ativo"}
-                      </span>
+                      <span>{item.dataRevogacao ? "Revogado" : "Ativo"}</span>
                     </div>
                   </td>
                   <td>
@@ -89,7 +87,7 @@ export default function ConsentsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="consents-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

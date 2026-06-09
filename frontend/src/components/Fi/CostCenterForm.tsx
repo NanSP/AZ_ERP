@@ -21,9 +21,7 @@ export default function CostCenterForm({
   onSave,
   onReset,
 }: CostCenterFormProps) {
-  const canSave =
-    value.codigo.trim() !== "" &&
-    value.nome.trim() !== "";
+  const canSave = value.codigo.trim() !== "" && value.nome.trim() !== "";
 
   function update<K extends keyof CostCenter>(
     field: K,
@@ -43,7 +41,7 @@ export default function CostCenterForm({
             {editing ? "Editar centro" : "Novo centro"}
           </h3>
           <p className="cost-center-form__subtitle">
-            Cadastre a estrutura base para rateio e classificacao financeira.
+            Cadastre a estrutura base para rateio e classificação financeira.
           </p>
           {editing && value.id ? (
             <p className="cost-center-form__meta">
@@ -51,7 +49,7 @@ export default function CostCenterForm({
             </p>
           ) : !canEditFields ? (
             <p className="cost-center-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -68,7 +66,7 @@ export default function CostCenterForm({
 
       <div className="cost-center-form__grid">
         <label className="cost-center-form__field">
-          <span>Codigo</span>
+          <span>Código</span>
           <input
             value={value.codigo}
             onChange={(event) => update("codigo", event.target.value)}
@@ -98,11 +96,11 @@ export default function CostCenterForm({
         </label>
 
         <label className="cost-center-form__field">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           <input
             value={value.responsavel}
             onChange={(event) => update("responsavel", event.target.value)}
-            placeholder="Nome do responsavel"
+            placeholder="Nome do responsável"
             disabled={!canEditFields}
           />
         </label>
@@ -127,7 +125,7 @@ export default function CostCenterForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar centro"}
       </button>
     </aside>

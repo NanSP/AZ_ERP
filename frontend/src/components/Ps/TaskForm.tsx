@@ -76,13 +76,13 @@ export default function TaskForm({
             {editing ? "Editar tarefa" : "Nova tarefa"}
           </h3>
           <p className="task-form__subtitle">
-            Cadastre a tarefa com projeto, hierarquia, responsavel e progresso.
+            Cadastre a tarefa com projeto, hierárquia, responsável e progresso.
           </p>
           {editing && value.id ? (
             <p className="task-form__meta">Registro selecionado: #{value.id}</p>
           ) : !canEditFields ? (
             <p className="task-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -132,7 +132,7 @@ export default function TaskForm({
           )}
           {projectAccess === "unavailable" ? (
             <small className="task-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -164,7 +164,7 @@ export default function TaskForm({
           )}
           {parentTaskAccess === "unavailable" ? (
             <small className="task-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -180,17 +180,17 @@ export default function TaskForm({
         </label>
 
         <label className="task-form__field task-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <input
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
-            placeholder="Descricao da tarefa"
+            placeholder="Descrição da tarefa"
             disabled={!canEditFields}
           />
         </label>
 
         <label className="task-form__field">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           {userOptions.length > 0 ? (
             <select
               value={value.responsavel}
@@ -216,7 +216,7 @@ export default function TaskForm({
           )}
           {userAccess === "unavailable" ? (
             <small className="task-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>

@@ -44,7 +44,8 @@ export default function EfdRecordsForm({
             {editing ? "Editar registro EFD" : "Novo registro EFD"}
           </h3>
           <p className="efd-records-page__panel-subtitle">
-            Registre blocos EFD com periodo, codigo do registro e conteudo estruturado em JSON.
+            Registre blocos EFD com periodo, código do registro e conteudo
+            estruturado em JSON.
           </p>
           {editing && value.id ? (
             <p className="efd-records-page__panel-meta">
@@ -52,7 +53,7 @@ export default function EfdRecordsForm({
             </p>
           ) : !canEditFields ? (
             <p className="efd-records-page__panel-meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -69,7 +70,7 @@ export default function EfdRecordsForm({
 
       <div className="efd-records-page__form-grid">
         <label className="efd-records-page__field">
-          <span>Periodo</span>
+          <span>Período</span>
           <input
             type="date"
             value={value.periodo}
@@ -95,7 +96,7 @@ export default function EfdRecordsForm({
         </label>
 
         <label className="efd-records-page__field efd-records-page__field--span-2">
-          <span>Conteudo (JSON)</span>
+          <span>Conteúdo (JSON)</span>
           <textarea
             value={value.conteudo}
             onChange={(event) => update("conteudo", event.target.value)}
@@ -114,7 +115,7 @@ export default function EfdRecordsForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar registro"}
       </button>
     </aside>

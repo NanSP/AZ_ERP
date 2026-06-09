@@ -30,10 +30,10 @@ export default function StocksTable({
         <table className="stocks-table__table">
           <thead>
             <tr>
-              <th>Identificacao</th>
+              <th>Identificação</th>
               <th>Saldo</th>
               <th>Planejamento</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -52,7 +52,10 @@ export default function StocksTable({
             ) : (
               items.map((item) => (
                 <tr
-                  key={item.id ?? `${item.produtoId}-${item.empresaId}-${item.localizacao}-${item.lote}`}
+                  key={
+                    item.id ??
+                    `${item.produtoId}-${item.empresaId}-${item.localizacao}-${item.lote}`
+                  }
                   data-selected={item.id === selectedId ? "true" : "false"}
                 >
                   <td>
@@ -88,7 +91,9 @@ export default function StocksTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="stocks-table__empty-action">Sem acoes</span>
+                      <span className="stocks-table__empty-action">
+                        Sem acoes
+                      </span>
                     ) : null}
                   </td>
                 </tr>

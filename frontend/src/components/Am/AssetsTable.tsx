@@ -20,7 +20,9 @@ function resolvePartnerLabel(
   partnerId: string,
   partnerOptions: PartnerOption[],
 ) {
-  const match = partnerOptions.find((option) => String(option.id) === partnerId);
+  const match = partnerOptions.find(
+    (option) => String(option.id) === partnerId,
+  );
   return match ? match.label : partnerId ? `Fornecedor #${partnerId}` : "-";
 }
 
@@ -28,7 +30,9 @@ function resolveEmployeeLabel(
   employeeId: string,
   employeeOptions: EmployeeOption[],
 ) {
-  const match = employeeOptions.find((option) => String(option.id) === employeeId);
+  const match = employeeOptions.find(
+    (option) => String(option.id) === employeeId,
+  );
   return match ? match.label : employeeId ? `Responsavel #${employeeId}` : "-";
 }
 
@@ -59,7 +63,7 @@ export default function AssetsTable({
               <th>Valores</th>
               <th>Vinculos</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -96,14 +100,21 @@ export default function AssetsTable({
                   </td>
                   <td>
                     <div className="assets-table__details">
-                      <span>Aquisicao: {item.valorAquisicao || "0"}</span>
+                      <span>Aquisição: {item.valorAquisicao || "0"}</span>
                       <span>Atual: {item.valorAtual || "0"}</span>
                     </div>
                   </td>
                   <td>
                     <div className="assets-table__details">
-                      <span>{resolvePartnerLabel(item.fornecedor, partnerOptions)}</span>
-                      <span>{resolveEmployeeLabel(item.responsavel, employeeOptions)}</span>
+                      <span>
+                        {resolvePartnerLabel(item.fornecedor, partnerOptions)}
+                      </span>
+                      <span>
+                        {resolveEmployeeLabel(
+                          item.responsavel,
+                          employeeOptions,
+                        )}
+                      </span>
                     </div>
                   </td>
                   <td>
@@ -132,7 +143,7 @@ export default function AssetsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="assets-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

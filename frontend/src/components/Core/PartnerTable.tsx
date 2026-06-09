@@ -26,12 +26,12 @@ export default function PartnerTable({
         <table className="partner-table__table">
           <thead>
             <tr>
-              <th>Codigo</th>
+              <th>Código</th>
               <th>Nome</th>
               <th>Tipo</th>
               <th>Documento</th>
-              <th>Situacao</th>
-              <th>Acoes</th>
+              <th>Situação</th>
+              <th>Ações</th>
             </tr>
           </thead>
 

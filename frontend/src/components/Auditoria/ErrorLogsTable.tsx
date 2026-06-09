@@ -32,7 +32,7 @@ export default function ErrorLogsTable({
         <table className="error-logs-page__table">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Erro</th>
               <th>Contexto</th>
               <th>Criado em</th>
@@ -64,7 +64,7 @@ export default function ErrorLogsTable({
                   </td>
                   <td>
                     <div className="error-logs-page__details">
-                      <span>Modulo: {item.modulo || "-"}</span>
+                      <span>Módulo: {item.modulo || "-"}</span>
                       <span>URL: {item.url || "-"}</span>
                       <span>IP: {item.ipAddress || "-"}</span>
                     </div>

@@ -1,73 +1,124 @@
+import {
+  Suspense,
+  lazy,
+  type ComponentType,
+  type LazyExoticComponent,
+} from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import Breadcrumbs from "../../components/Breadcrumbs/Breadcrumbs";
 import ModuleCrud from "../../components/ModuleCrud/ModuleCrud";
 import { canReadResource } from "../../services/accessControl";
-import AddressesPage from "../Core/AddressesPage";
-import CompaniesPage from "../Core/CompaniesPage";
-import ContactsPage from "../Core/ContactsPage";
-import PartnersPage from "../Core/PartnersPage";
-import ProductsPage from "../Core/ProductsPage";
-import AccountsPayablePage from "../Fi/AccountsPayablePage";
-import CostCentersPage from "../Fi/CostCentersPage";
-import ChartOfAccountsPage from "../Fi/ChartOfAccountsPage";
-import CashFlowPage from "../Fi/CashFlowPage";
-import BankMovementsPage from "../Fi/BankMovementsPage";
-import AccountsReceivablePage from "../Fi/AccountsReceivablePage";
-import {
-  DocumentsPage,
-  EcdRecordsPage,
-  EfdRecordsPage,
-  EsocialEventsPage,
-} from "../Fiscal";
-import { AssetsPage, MaintenancesPage } from "../Am";
-import { ActionLogsPage, ErrorLogsPage } from "../Auditoria";
-import DashboardsPage from "../Bi/DashboardsPage";
-import MetricHistoryPage from "../Bi/MetricHistoryPage";
-import MetricsPage from "../Bi/MetricsPage";
-import ReportsPage from "../Bi/ReportsPage";
-import AuditsPage from "../Grc/AuditsPage";
-import ConsentsPage from "../Grc/ConsentsPage";
-import ControlsPage from "../Grc/ControlsPage";
-import RisksPage from "../Grc/RisksPage";
-import MaterialsPage from "../Mm/MaterialsPage";
-import MovementsPage from "../Mm/MovementsPage";
-import InventoriesPage from "../Mm/InventoriesPage";
-import PurchaseItemsPage from "../Mm/PurchaseItemsPage";
-import PurchasesPage from "../Mm/PurchasesPage";
-import StocksPage from "../Mm/StocksPage";
-import DevicesPage from "../Portal/DevicesPage";
-import NotificationsPage from "../Portal/NotificationsPage";
-import SessionsPage from "../Portal/SessionsPage";
-import AllocatedResourcesPage from "../Ps/AllocatedResourcesPage";
-import ProjectsPage from "../Ps/ProjectsPage";
-import TasksPage from "../Ps/TasksPage";
-import BomPage from "../Pp/BomPage";
-import MrpPage from "../Pp/MrpPage";
-import ProductionEntriesPage from "../Pp/ProductionEntriesPage";
-import ProductionOrdersPage from "../Pp/ProductionOrdersPage";
-import AttendancesPage from "../Sm/AttendancesPage";
-import OrdersPage from "../Sm/OrdersPage";
-import SlaConfigPage from "../Sm/SlaConfigPage";
-import DependentsPage from "../Rh/DependentsPage";
-import EmployeesPage from "../Rh/EmployeesPage";
-import BenefitsPage from "../Rh/BenefitsPage";
-import TimeTrackingPage from "../Rh/TimeTrackingPage";
-import PayrollPage from "../Rh/PayrollPage";
-import { InspectionsPage, NonConformitiesPage } from "../Qm";
-import ClientsPage from "../Sd/ClientsPage";
-import ContractsPage from "../Sd/ContractsPage";
-import InvoicesPage from "../Sd/InvoicesPage";
-import OpportunitiesPage from "../Sd/OpportunitiesPage";
-import OrderItemsPage from "../Sd/OrderItemsPage";
-import SalesOrdersPage from "../Sd/OrdersPage";
-import PermissionsPage from "../Sys/PermissionsPage";
-import ProfilePermissionsPage from "../Sys/ProfilePermissionsPage";
-import ProfilesPage from "../Sys/ProfilesPage";
-import UserProfilesPage from "../Sys/UserProfilesPage";
-import UsersPage from "../Sys/UsersPage";
 import { tenantModules } from "../../services/tenantModules";
 import "./module-workspace.css";
+
+type EmbeddedPageProps = {
+  embedded?: boolean;
+};
+
+type LazyPage = LazyExoticComponent<ComponentType<EmbeddedPageProps>>;
+
+function lazyDefault(
+  factory: () => Promise<{ default: ComponentType<EmbeddedPageProps> }>,
+): LazyPage {
+  return lazy(factory);
+}
+
+function lazyNamed<TModule extends Record<string, unknown>>(
+  factory: () => Promise<TModule>,
+  key: keyof TModule,
+): LazyPage {
+  return lazy(async () => {
+    const module = await factory();
+    return {
+      default: module[key] as ComponentType<EmbeddedPageProps>,
+    };
+  });
+}
+
+const resourcePages: Record<string, LazyPage> = {
+  "core.parceiros": lazyDefault(() => import("../Core/PartnersPage")),
+  "core.empresas": lazyDefault(() => import("../Core/CompaniesPage")),
+  "core.produtos": lazyDefault(() => import("../Core/ProductsPage")),
+  "core.contatos": lazyDefault(() => import("../Core/ContactsPage")),
+  "core.enderecos": lazyDefault(() => import("../Core/AddressesPage")),
+  "sys.usuarios": lazyDefault(() => import("../Sys/UsersPage")),
+  "sys.perfis": lazyDefault(() => import("../Sys/ProfilesPage")),
+  "sys.permissoes": lazyDefault(() => import("../Sys/PermissionsPage")),
+  "sys.usuarioPerfil": lazyDefault(() => import("../Sys/UserProfilesPage")),
+  "sys.perfilPermissao": lazyDefault(
+    () => import("../Sys/ProfilePermissionsPage"),
+  ),
+  "fi.contasPagar": lazyDefault(() => import("../Fi/AccountsPayablePage")),
+  "fi.centrosCusto": lazyDefault(() => import("../Fi/CostCentersPage")),
+  "fi.planoContas": lazyDefault(() => import("../Fi/ChartOfAccountsPage")),
+  "fi.fluxoCaixa": lazyDefault(() => import("../Fi/CashFlowPage")),
+  "fi.movimentacoesBancarias": lazyDefault(
+    () => import("../Fi/BankMovementsPage"),
+  ),
+  "fi.contasReceber": lazyDefault(() => import("../Fi/AccountsReceivablePage")),
+  "fiscal.documentos": lazyNamed(() => import("../Fiscal"), "DocumentsPage"),
+  "fiscal.esocialEventos": lazyNamed(
+    () => import("../Fiscal"),
+    "EsocialEventsPage",
+  ),
+  "fiscal.efdRegistros": lazyNamed(() => import("../Fiscal"), "EfdRecordsPage"),
+  "fiscal.ecdRegistros": lazyNamed(() => import("../Fiscal"), "EcdRecordsPage"),
+  "am.bensPatrimoniais": lazyNamed(() => import("../Am"), "AssetsPage"),
+  "am.manutencoes": lazyNamed(() => import("../Am"), "MaintenancesPage"),
+  "auditoria.logAcoes": lazyNamed(
+    () => import("../Auditoria"),
+    "ActionLogsPage",
+  ),
+  "auditoria.logErros": lazyNamed(
+    () => import("../Auditoria"),
+    "ErrorLogsPage",
+  ),
+  "bi.dashboards": lazyDefault(() => import("../Bi/DashboardsPage")),
+  "bi.metricas": lazyDefault(() => import("../Bi/MetricsPage")),
+  "bi.historicoMetricas": lazyDefault(() => import("../Bi/MetricHistoryPage")),
+  "bi.relatorios": lazyDefault(() => import("../Bi/ReportsPage")),
+  "grc.riscos": lazyDefault(() => import("../Grc/RisksPage")),
+  "grc.controles": lazyDefault(() => import("../Grc/ControlsPage")),
+  "grc.auditorias": lazyDefault(() => import("../Grc/AuditsPage")),
+  "grc.consentimentos": lazyDefault(() => import("../Grc/ConsentsPage")),
+  "mm.materiais": lazyDefault(() => import("../Mm/MaterialsPage")),
+  "mm.estoques": lazyDefault(() => import("../Mm/StocksPage")),
+  "mm.movimentacoes": lazyDefault(() => import("../Mm/MovementsPage")),
+  "mm.compras": lazyDefault(() => import("../Mm/PurchasesPage")),
+  "mm.compraItens": lazyDefault(() => import("../Mm/PurchaseItemsPage")),
+  "mm.inventarios": lazyDefault(() => import("../Mm/InventoriesPage")),
+  "portal.notificacoes": lazyDefault(
+    () => import("../Portal/NotificationsPage"),
+  ),
+  "portal.sessoes": lazyDefault(() => import("../Portal/SessionsPage")),
+  "portal.dispositivos": lazyDefault(() => import("../Portal/DevicesPage")),
+  "ps.projetos": lazyDefault(() => import("../Ps/ProjectsPage")),
+  "ps.tarefas": lazyDefault(() => import("../Ps/TasksPage")),
+  "ps.recursosAlocados": lazyDefault(
+    () => import("../Ps/AllocatedResourcesPage"),
+  ),
+  "pp.ordemProducao": lazyDefault(() => import("../Pp/ProductionOrdersPage")),
+  "pp.bom": lazyDefault(() => import("../Pp/BomPage")),
+  "pp.apontamentos": lazyDefault(() => import("../Pp/ProductionEntriesPage")),
+  "pp.mrp": lazyDefault(() => import("../Pp/MrpPage")),
+  "sm.ordensServico": lazyDefault(() => import("../Sm/OrdersPage")),
+  "sm.atendimentos": lazyDefault(() => import("../Sm/AttendancesPage")),
+  "sm.slaConfig": lazyDefault(() => import("../Sm/SlaConfigPage")),
+  "rh.colaboradores": lazyDefault(() => import("../Rh/EmployeesPage")),
+  "rh.dependentes": lazyDefault(() => import("../Rh/DependentsPage")),
+  "rh.beneficios": lazyDefault(() => import("../Rh/BenefitsPage")),
+  "rh.controleDePonto": lazyDefault(() => import("../Rh/TimeTrackingPage")),
+  "rh.folhaDePagamento": lazyDefault(() => import("../Rh/PayrollPage")),
+  "qm.inspecoes": lazyNamed(() => import("../Qm"), "InspectionsPage"),
+  "qm.naoConformidade": lazyNamed(() => import("../Qm"), "NonConformitiesPage"),
+  "sd.clientes": lazyDefault(() => import("../Sd/ClientsPage")),
+  "sd.oportunidades": lazyDefault(() => import("../Sd/OpportunitiesPage")),
+  "sd.contratos": lazyDefault(() => import("../Sd/ContractsPage")),
+  "sd.pedidos": lazyDefault(() => import("../Sd/OrdersPage")),
+  "sd.pedidoItens": lazyDefault(() => import("../Sd/OrderItemsPage")),
+  "sd.faturas": lazyDefault(() => import("../Sd/InvoicesPage")),
+};
 
 function findResource(schema?: string, entity?: string) {
   for (const module of tenantModules) {
@@ -105,127 +156,8 @@ export default function ModuleWorkspacePage() {
 
   const { module, resource } = match;
   const hasReadAccess = canReadResource(session, resource);
-  const isPartnersPilot =
-    resource.schema === "core" && resource.entity === "parceiros";
-  const isCompaniesPilot =
-    resource.schema === "core" && resource.entity === "empresas";
-  const isProductsPilot =
-    resource.schema === "core" && resource.entity === "produtos";
-  const isContactsPilot =
-    resource.schema === "core" && resource.entity === "contatos";
-  const isAddressesPilot =
-    resource.schema === "core" && resource.entity === "enderecos";
-  const isUsersPilot =
-    resource.schema === "sys" && resource.entity === "usuarios";
-  const isProfilesPilot =
-    resource.schema === "sys" && resource.entity === "perfis";
-  const isPermissionsPilot =
-    resource.schema === "sys" && resource.entity === "permissoes";
-  const isUserProfilesPilot =
-    resource.schema === "sys" && resource.entity === "usuarioPerfil";
-  const isProfilePermissionsPilot =
-    resource.schema === "sys" && resource.entity === "perfilPermissao";
-  const isAccountsPayablePilot =
-    resource.schema === "fi" && resource.entity === "contasPagar";
-  const isCostCentersPilot =
-    resource.schema === "fi" && resource.entity === "centrosCusto";
-  const isChartOfAccountsPilot =
-    resource.schema === "fi" && resource.entity === "planoContas";
-  const isCashFlowPilot =
-    resource.schema === "fi" && resource.entity === "fluxoCaixa";
-  const isBankMovementsPilot =
-    resource.schema === "fi" && resource.entity === "movimentacoesBancarias";
-  const isAssetsPilot =
-    resource.schema === "am" && resource.entity === "bensPatrimoniais";
-  const isMaintenancesPilot =
-    resource.schema === "am" && resource.entity === "manutencoes";
-  const isProjectsPilot =
-    resource.schema === "ps" && resource.entity === "projetos";
-  const isTasksPilot =
-    resource.schema === "ps" && resource.entity === "tarefas";
-  const isAllocatedResourcesPilot =
-    resource.schema === "ps" && resource.entity === "recursosAlocados";
-  const isProductionOrdersPilot =
-    resource.schema === "pp" && resource.entity === "ordemProducao";
-  const isBomPilot = resource.schema === "pp" && resource.entity === "bom";
-  const isProductionEntriesPilot =
-    resource.schema === "pp" && resource.entity === "apontamentos";
-  const isMrpPilot = resource.schema === "pp" && resource.entity === "mrp";
-  const isNotificationsPilot =
-    resource.schema === "portal" && resource.entity === "notificacoes";
-  const isSessionsPilot =
-    resource.schema === "portal" && resource.entity === "sessoes";
-  const isDevicesPilot =
-    resource.schema === "portal" && resource.entity === "dispositivos";
-  const isServiceOrdersPilot =
-    resource.schema === "sm" && resource.entity === "ordensServico";
-  const isAttendancesPilot =
-    resource.schema === "sm" && resource.entity === "atendimentos";
-  const isSlaConfigPilot =
-    resource.schema === "sm" && resource.entity === "slaConfig";
-  const isActionLogsPilot =
-    resource.schema === "auditoria" && resource.entity === "logAcoes";
-  const isErrorLogsPilot =
-    resource.schema === "auditoria" && resource.entity === "logErros";
-  const isInspectionsPilot =
-    resource.schema === "qm" && resource.entity === "inspecoes";
-  const isNonConformitiesPilot =
-    resource.schema === "qm" && resource.entity === "naoConformidade";
-  const isEmployeesPilot =
-    resource.schema === "rh" && resource.entity === "colaboradores";
-  const isDependentsPilot =
-    resource.schema === "rh" && resource.entity === "dependentes";
-  const isBenefitsPilot =
-    resource.schema === "rh" && resource.entity === "beneficios";
-  const isTimeTrackingPilot =
-    resource.schema === "rh" && resource.entity === "controleDePonto";
-  const isPayrollPilot =
-    resource.schema === "rh" && resource.entity === "folhaDePagamento";
-  const isAccountsReceivablePilot =
-    resource.schema === "fi" && resource.entity === "contasReceber";
-  const isDocumentsPilot =
-    resource.schema === "fiscal" && resource.entity === "documentos";
-  const isEsocialEventsPilot =
-    resource.schema === "fiscal" && resource.entity === "esocialEventos";
-  const isEfdRecordsPilot =
-    resource.schema === "fiscal" && resource.entity === "efdRegistros";
-  const isEcdRecordsPilot =
-    resource.schema === "fiscal" && resource.entity === "ecdRegistros";
-  const isDashboardsPilot =
-    resource.schema === "bi" && resource.entity === "dashboards";
-  const isMetricsPilot = resource.schema === "bi" && resource.entity === "metricas";
-  const isMetricHistoryPilot =
-    resource.schema === "bi" && resource.entity === "historicoMetricas";
-  const isReportsPilot =
-    resource.schema === "bi" && resource.entity === "relatorios";
-  const isRisksPilot = resource.schema === "grc" && resource.entity === "riscos";
-  const isControlsPilot =
-    resource.schema === "grc" && resource.entity === "controles";
-  const isAuditsPilot =
-    resource.schema === "grc" && resource.entity === "auditorias";
-  const isConsentsPilot =
-    resource.schema === "grc" && resource.entity === "consentimentos";
-  const isMaterialsPilot =
-    resource.schema === "mm" && resource.entity === "materiais";
-  const isStocksPilot =
-    resource.schema === "mm" && resource.entity === "estoques";
-  const isMovementsPilot =
-    resource.schema === "mm" && resource.entity === "movimentacoes";
-  const isPurchasesPilot =
-    resource.schema === "mm" && resource.entity === "compras";
-  const isPurchaseItemsPilot =
-    resource.schema === "mm" && resource.entity === "compraItens";
-  const isInventoriesPilot =
-    resource.schema === "mm" && resource.entity === "inventarios";
-  const isClientsPilot = resource.schema === "sd" && resource.entity === "clientes";
-  const isOpportunitiesPilot =
-    resource.schema === "sd" && resource.entity === "oportunidades";
-  const isContractsPilot =
-    resource.schema === "sd" && resource.entity === "contratos";
-  const isSalesOrdersPilot = resource.schema === "sd" && resource.entity === "pedidos";
-  const isOrderItemsPilot =
-    resource.schema === "sd" && resource.entity === "pedidoItens";
-  const isInvoicesPilot = resource.schema === "sd" && resource.entity === "faturas";
+  const resourceKey = `${resource.schema}.${resource.entity}`;
+  const ResourcePage = resourcePages[resourceKey];
 
   if (!hasReadAccess) {
     return (
@@ -233,7 +165,7 @@ export default function ModuleWorkspacePage() {
         <span className="module-workspace__eyebrow">Acesso</span>
         <h2 className="module-workspace__title">Recurso indisponivel</h2>
         <p className="module-workspace__description">
-          Sua sessao nao possui permissao de leitura para este recurso.
+          Sua sessao nao possui permissão de leitura para este recurso.
         </p>
         <Link to="/app" className="module-workspace__back">
           Voltar ao dashboard
@@ -258,7 +190,7 @@ export default function ModuleWorkspacePage() {
 
           <div className="module-workspace__hero-copy">
             <span className="module-workspace__eyebrow">
-              Workspace do modulo
+              Workspace do módulo
             </span>
             <h2 className="module-workspace__title">{resource.label}</h2>
             <p className="module-workspace__description">
@@ -294,8 +226,8 @@ export default function ModuleWorkspacePage() {
       <section className="module-workspace__panel">
         <div className="module-workspace__panel-head">
           <div>
-            <span className="module-workspace__panel-eyebrow">Operacao</span>
-            <h3 className="module-workspace__panel-title">Gestao do recurso</h3>
+            <span className="module-workspace__panel-eyebrow">Operação</span>
+            <h3 className="module-workspace__panel-title">Gestão do recurso</h3>
           </div>
 
           <p className="module-workspace__panel-text">
@@ -304,134 +236,16 @@ export default function ModuleWorkspacePage() {
         </div>
 
         <div className="module-workspace__crud">
-          {isPartnersPilot ? (
-            <PartnersPage embedded />
-          ) : isCompaniesPilot ? (
-            <CompaniesPage embedded />
-          ) : isProductsPilot ? (
-            <ProductsPage embedded />
-          ) : isContactsPilot ? (
-            <ContactsPage embedded />
-          ) : isAddressesPilot ? (
-            <AddressesPage embedded />
-          ) : isUsersPilot ? (
-            <UsersPage embedded />
-          ) : isProfilesPilot ? (
-            <ProfilesPage embedded />
-          ) : isPermissionsPilot ? (
-            <PermissionsPage embedded />
-          ) : isUserProfilesPilot ? (
-            <UserProfilesPage embedded />
-          ) : isProfilePermissionsPilot ? (
-            <ProfilePermissionsPage embedded />
-          ) : isAccountsPayablePilot ? (
-            <AccountsPayablePage embedded />
-          ) : isCostCentersPilot ? (
-            <CostCentersPage embedded />
-          ) : isChartOfAccountsPilot ? (
-            <ChartOfAccountsPage embedded />
-          ) : isCashFlowPilot ? (
-            <CashFlowPage embedded />
-          ) : isBankMovementsPilot ? (
-            <BankMovementsPage embedded />
-          ) : isAssetsPilot ? (
-            <AssetsPage embedded />
-          ) : isMaintenancesPilot ? (
-            <MaintenancesPage embedded />
-          ) : isProjectsPilot ? (
-            <ProjectsPage embedded />
-          ) : isTasksPilot ? (
-            <TasksPage embedded />
-          ) : isAllocatedResourcesPilot ? (
-            <AllocatedResourcesPage embedded />
-          ) : isProductionOrdersPilot ? (
-            <ProductionOrdersPage embedded />
-          ) : isBomPilot ? (
-            <BomPage embedded />
-          ) : isProductionEntriesPilot ? (
-            <ProductionEntriesPage embedded />
-          ) : isMrpPilot ? (
-            <MrpPage embedded />
-          ) : isNotificationsPilot ? (
-            <NotificationsPage embedded />
-          ) : isSessionsPilot ? (
-            <SessionsPage embedded />
-          ) : isDevicesPilot ? (
-            <DevicesPage embedded />
-          ) : isServiceOrdersPilot ? (
-            <OrdersPage embedded />
-          ) : isAttendancesPilot ? (
-            <AttendancesPage embedded />
-          ) : isSlaConfigPilot ? (
-            <SlaConfigPage embedded />
-          ) : isActionLogsPilot ? (
-            <ActionLogsPage embedded />
-          ) : isErrorLogsPilot ? (
-            <ErrorLogsPage embedded />
-          ) : isInspectionsPilot ? (
-            <InspectionsPage embedded />
-          ) : isNonConformitiesPilot ? (
-            <NonConformitiesPage embedded />
-          ) : isEmployeesPilot ? (
-            <EmployeesPage embedded />
-          ) : isDependentsPilot ? (
-            <DependentsPage embedded />
-          ) : isBenefitsPilot ? (
-            <BenefitsPage embedded />
-          ) : isTimeTrackingPilot ? (
-            <TimeTrackingPage embedded />
-          ) : isPayrollPilot ? (
-            <PayrollPage embedded />
-          ) : isAccountsReceivablePilot ? (
-            <AccountsReceivablePage embedded />
-          ) : isDocumentsPilot ? (
-            <DocumentsPage embedded />
-          ) : isEsocialEventsPilot ? (
-            <EsocialEventsPage embedded />
-          ) : isEfdRecordsPilot ? (
-            <EfdRecordsPage embedded />
-          ) : isEcdRecordsPilot ? (
-            <EcdRecordsPage embedded />
-          ) : isDashboardsPilot ? (
-            <DashboardsPage embedded />
-          ) : isMetricsPilot ? (
-            <MetricsPage embedded />
-          ) : isMetricHistoryPilot ? (
-            <MetricHistoryPage embedded />
-          ) : isReportsPilot ? (
-            <ReportsPage embedded />
-          ) : isRisksPilot ? (
-            <RisksPage embedded />
-          ) : isControlsPilot ? (
-            <ControlsPage embedded />
-          ) : isAuditsPilot ? (
-            <AuditsPage embedded />
-          ) : isConsentsPilot ? (
-            <ConsentsPage embedded />
-          ) : isMaterialsPilot ? (
-            <MaterialsPage embedded />
-          ) : isStocksPilot ? (
-            <StocksPage embedded />
-          ) : isMovementsPilot ? (
-            <MovementsPage embedded />
-          ) : isPurchasesPilot ? (
-            <PurchasesPage embedded />
-          ) : isPurchaseItemsPilot ? (
-            <PurchaseItemsPage embedded />
-          ) : isInventoriesPilot ? (
-            <InventoriesPage embedded />
-          ) : isClientsPilot ? (
-            <ClientsPage embedded />
-          ) : isOpportunitiesPilot ? (
-            <OpportunitiesPage embedded />
-          ) : isContractsPilot ? (
-            <ContractsPage embedded />
-          ) : isSalesOrdersPilot ? (
-            <SalesOrdersPage embedded />
-          ) : isOrderItemsPilot ? (
-            <OrderItemsPage embedded />
-          ) : isInvoicesPilot ? (
-            <InvoicesPage embedded />
+          {ResourcePage ? (
+            <Suspense
+              fallback={
+                <div className="module-workspace__loading">
+                  Carregando interface do recurso...
+                </div>
+              }
+            >
+              <ResourcePage embedded />
+            </Suspense>
           ) : (
             <ModuleCrud
               schema={resource.schema}

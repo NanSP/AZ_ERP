@@ -82,7 +82,7 @@ export default function PurchaseItemForm({
             </p>
           ) : !canEditFields ? (
             <p className="purchase-item-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -109,7 +109,10 @@ export default function PurchaseItemForm({
               <option value="">Selecione uma compra</option>
               {purchases.map((purchase) => (
                 <option
-                  key={purchase.id ?? `${purchase.fornecedorId}-${purchase.dataPedido}`}
+                  key={
+                    purchase.id ??
+                    `${purchase.fornecedorId}-${purchase.dataPedido}`
+                  }
                   value={String(purchase.id ?? "")}
                 >
                   #{purchase.id} - Fornecedor {purchase.fornecedorId || "-"} /{" "}
@@ -143,7 +146,8 @@ export default function PurchaseItemForm({
                   key={product.id ?? product.codigo}
                   value={String(product.id ?? "")}
                 >
-                  {product.codigo || "Sem codigo"} - {product.nome || "Sem nome"}
+                  {product.codigo || "Sem codigo"} -{" "}
+                  {product.nome || "Sem nome"}
                 </option>
               ))}
             </select>
@@ -187,7 +191,7 @@ export default function PurchaseItemForm({
         </label>
 
         <label className="purchase-item-form__field">
-          <span>Valor unitario</span>
+          <span>Valor unitário</span>
           <input
             value={value.valorUnitario}
             onChange={(event) =>

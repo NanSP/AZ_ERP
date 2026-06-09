@@ -16,7 +16,9 @@ function summarizeJson(value: string) {
     return "-";
   }
 
-  return normalized.length > 100 ? `${normalized.slice(0, 100)}...` : normalized;
+  return normalized.length > 100
+    ? `${normalized.slice(0, 100)}...`
+    : normalized;
 }
 
 export default function DashboardsTable({
@@ -41,8 +43,8 @@ export default function DashboardsTable({
             <tr>
               <th>Painel</th>
               <th>Layout</th>
-              <th>Configuracoes</th>
-              <th>Acoes</th>
+              <th>Configurações</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -90,7 +92,7 @@ export default function DashboardsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="dashboards-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

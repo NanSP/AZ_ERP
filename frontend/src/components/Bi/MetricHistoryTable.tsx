@@ -32,18 +32,20 @@ export default function MetricHistoryTable({
   return (
     <section className="metric-history-table">
       <div className="metric-history-table__head">
-        <h3 className="metric-history-table__title">Historico de metricas</h3>
-        <span className="metric-history-table__meta">{items.length} registros</span>
+        <h3 className="metric-history-table__title">Histórico de métricas</h3>
+        <span className="metric-history-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="metric-history-table__wrap">
         <table className="metric-history-table__table">
           <thead>
             <tr>
-              <th>Metrica</th>
+              <th>Métrica</th>
               <th>Periodo</th>
               <th>Valor</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -57,7 +59,7 @@ export default function MetricHistoryTable({
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="metric-history-table__empty">
-                  Nenhum historico encontrado.
+                  Nenhum histórico encontrado.
                 </td>
               </tr>
             ) : (
@@ -82,7 +84,7 @@ export default function MetricHistoryTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="metric-history-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -70,10 +70,10 @@ export default function InventoryForm({
       <div className="inventory-form__head">
         <div>
           <h3 className="inventory-form__title">
-            {editing ? "Editar inventario" : "Novo inventario"}
+            {editing ? "Editar inventário" : "Novo inventário"}
           </h3>
           <p className="inventory-form__subtitle">
-            Organize o periodo da contagem, defina o tipo de inventario e
+            Organize o período da contagem, defina o tipo de inventário e
             acompanhe a etapa operacional do ciclo.
           </p>
           {editing && value.id ? (
@@ -82,7 +82,7 @@ export default function InventoryForm({
             </p>
           ) : !canEditFields ? (
             <p className="inventory-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -99,7 +99,7 @@ export default function InventoryForm({
 
       <div className="inventory-form__grid">
         <label className="inventory-form__field">
-          <span>Data de inicio</span>
+          <span>Data de início</span>
           <input
             type="date"
             value={value.dataInicio}
@@ -119,12 +119,10 @@ export default function InventoryForm({
         </label>
 
         <label className="inventory-form__field">
-          <span>Tipo de inventario</span>
+          <span>Tipo de inventário</span>
           <select
             value={value.tipoInventario}
-            onChange={(event) =>
-              update("tipoInventario", event.target.value)
-            }
+            onChange={(event) => update("tipoInventario", event.target.value)}
             disabled={!canEditFields}
           >
             {inventoryTypeOptions.map((option) => (
@@ -151,7 +149,7 @@ export default function InventoryForm({
         </label>
 
         <label className="inventory-form__field inventory-form__field--span-2">
-          <span>Observacoes</span>
+          <span>Observações</span>
           <textarea
             value={value.observacoes}
             onChange={(event) => update("observacoes", event.target.value)}

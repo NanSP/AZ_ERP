@@ -55,7 +55,7 @@ export default function MaterialForm({
             {editing ? "Editar material" : "Novo material"}
           </h3>
           <p className="material-form__subtitle">
-            Vincule o produto e detalhe classificacao, especificacao tecnica e
+            Vincule o produto e detalhe classificação, especificação técnica e
             requisitos de armazenamento.
           </p>
           {editing && value.id ? (
@@ -64,7 +64,7 @@ export default function MaterialForm({
             </p>
           ) : !canEditFields ? (
             <p className="material-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -94,7 +94,8 @@ export default function MaterialForm({
                   key={product.id ?? product.codigo}
                   value={String(product.id ?? "")}
                 >
-                  {product.codigo || "Sem codigo"} - {product.descricao || "Sem descricao"}
+                  {product.codigo || "Sem codigo"} -{" "}
+                  {product.descricao || "Sem descricao"}
                 </option>
               ))}
             </select>
@@ -171,7 +172,7 @@ export default function MaterialForm({
         </label>
 
         <label className="material-form__field">
-          <span>Condicao de armazenamento</span>
+          <span>Condição de armazenamento</span>
           <input
             value={value.condicaoArmazenamento}
             onChange={(event) =>
@@ -193,7 +194,7 @@ export default function MaterialForm({
         </label>
 
         <label className="material-form__field material-form__field--span-2">
-          <span>Especificacoes tecnicas</span>
+          <span>Especificações técnicas</span>
           <textarea
             value={value.especificacoesTecnicas}
             onChange={(event) =>

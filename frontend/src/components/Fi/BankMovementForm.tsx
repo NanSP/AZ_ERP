@@ -47,7 +47,7 @@ export default function BankMovementForm({
             {editing ? "Editar movimentacao" : "Nova movimentacao"}
           </h3>
           <p className="bank-movement-form__subtitle">
-            Informe a conta, o tipo, o valor e o estado de conciliacao.
+            Informe a conta, o tipo, o valor e o estado de conciliação.
           </p>
           {editing && value.id ? (
             <p className="bank-movement-form__meta">
@@ -55,7 +55,7 @@ export default function BankMovementForm({
             </p>
           ) : !canEditFields ? (
             <p className="bank-movement-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -121,11 +121,11 @@ export default function BankMovementForm({
         </label>
 
         <label className="bank-movement-form__field bank-movement-form__field--span-2">
-          <span>Historico</span>
+          <span>Histórico</span>
           <input
             value={value.historico}
             onChange={(event) => update("historico", event.target.value)}
-            placeholder="Descricao da movimentacao"
+            placeholder="Descrição da movimentação"
             disabled={!canEditFields}
           />
         </label>
@@ -156,11 +156,11 @@ export default function BankMovementForm({
             }}
             disabled={!canEditFields}
           />
-          <span>Movimentacao conciliada</span>
+          <span>Movimentação conciliada</span>
         </label>
 
         <label className="bank-movement-form__field">
-          <span>Data de conciliacao</span>
+          <span>Data de conciliação</span>
           <input
             type="date"
             value={value.dataConciliacao}

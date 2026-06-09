@@ -40,9 +40,9 @@ export default function MetricsTable({
           <thead>
             <tr>
               <th>Indicador</th>
-              <th>Formula</th>
+              <th>Fórmula</th>
               <th>Meta</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -50,13 +50,13 @@ export default function MetricsTable({
             {loading ? (
               <tr>
                 <td colSpan={4} className="metrics-table__empty">
-                  Carregando metricas...
+                  Carregando métricas...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={4} className="metrics-table__empty">
-                  Nenhuma metrica encontrada.
+                  Nenhuma métrica encontrada.
                 </td>
               </tr>
             ) : (
@@ -94,7 +94,7 @@ export default function MetricsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="metrics-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

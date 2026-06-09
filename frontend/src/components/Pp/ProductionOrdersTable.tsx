@@ -32,7 +32,7 @@ export default function ProductionOrdersTable({
   return (
     <section className="production-orders-table">
       <div className="production-orders-table__head">
-        <h3 className="production-orders-table__title">Ordens de producao</h3>
+        <h3 className="production-orders-table__title">Ordens de produção</h3>
         <span className="production-orders-table__meta">
           {items.length} registros
         </span>
@@ -47,7 +47,7 @@ export default function ProductionOrdersTable({
               <th>Quantidades</th>
               <th>Datas</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -55,13 +55,13 @@ export default function ProductionOrdersTable({
             {loading ? (
               <tr>
                 <td colSpan={6} className="production-orders-table__empty">
-                  Carregando ordens de producao...
+                  Carregando ordens de produção...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="production-orders-table__empty">
-                  Nenhuma ordem de producao encontrada.
+                  Nenhuma ordem de produção encontrada.
                 </td>
               </tr>
             ) : (
@@ -85,7 +85,7 @@ export default function ProductionOrdersTable({
                   </td>
                   <td>
                     <div className="production-orders-table__details">
-                      <span>Emissao: {item.dataEmissao || "-"}</span>
+                      <span>Emissão: {item.dataEmissao || "-"}</span>
                       <span>Prevista: {item.dataPrevista || "-"}</span>
                       <span>Fim: {item.dataFim || "-"}</span>
                     </div>
@@ -118,7 +118,7 @@ export default function ProductionOrdersTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="production-orders-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -36,7 +36,7 @@ export default function CashFlowTable({
               <th>Realizado</th>
               <th>Saldo previsto</th>
               <th>Saldo real</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -88,7 +88,7 @@ export default function CashFlowTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="cash-flow-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>
