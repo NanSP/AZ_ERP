@@ -289,6 +289,16 @@ export default function AttendancesPage({
     void loadEmployees();
   }, [loadEmployees]);
 
+  const orderLabelMap = useMemo(
+    () => new Map(orderOptions.map((option) => [String(option.id), option.label])),
+    [orderOptions],
+  );
+  const employeeLabelMap = useMemo(
+    () =>
+      new Map(employeeOptions.map((option) => [String(option.id), option.label])),
+    [employeeOptions],
+  );
+
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
@@ -297,11 +307,18 @@ export default function AttendancesPage({
     }
 
     return items.filter((item) =>
-      [item.descricao, item.os, item.tecnico, item.horasGastas]
+      [
+        item.descricao,
+        item.os,
+        orderLabelMap.get(item.os) ?? "",
+        item.tecnico,
+        employeeLabelMap.get(item.tecnico) ?? "",
+        item.horasGastas,
+      ]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalized)),
     );
-  }, [items, query]);
+  }, [employeeLabelMap, items, orderLabelMap, query]);
 
   function handleCreateNew() {
     if (!canCreate) {

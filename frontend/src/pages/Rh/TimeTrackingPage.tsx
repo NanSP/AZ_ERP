@@ -187,6 +187,12 @@ export default function TimeTrackingPage({
     void loadEmployees();
   }, [loadEmployees]);
 
+  const employeeLabelMap = useMemo(
+    () =>
+      new Map(employeeOptions.map((option) => [String(option.id), option.label])),
+    [employeeOptions],
+  );
+
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
@@ -197,6 +203,7 @@ export default function TimeTrackingPage({
     return items.filter((item) =>
       [
         item.colaborador,
+        employeeLabelMap.get(item.colaborador) ?? "",
         item.data,
         item.horaEntrada,
         item.horaSaida,
@@ -206,7 +213,7 @@ export default function TimeTrackingPage({
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalized)),
     );
-  }, [items, query]);
+  }, [employeeLabelMap, items, query]);
 
   function handleCreateNew() {
     if (!canCreate) {

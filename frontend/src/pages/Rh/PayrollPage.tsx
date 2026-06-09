@@ -203,6 +203,12 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
     void loadEmployees();
   }, [loadEmployees]);
 
+  const employeeLabelMap = useMemo(
+    () =>
+      new Map(employeeOptions.map((option) => [String(option.id), option.label])),
+    [employeeOptions],
+  );
+
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
@@ -213,6 +219,7 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
     return items.filter((item) =>
       [
         item.colaborador,
+        employeeLabelMap.get(item.colaborador) ?? "",
         item.competencia,
         item.status,
         item.valorBruto,
@@ -221,7 +228,7 @@ export default function PayrollPage({ embedded = false }: PayrollPageProps) {
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalized)),
     );
-  }, [items, query]);
+  }, [employeeLabelMap, items, query]);
 
   function handleCreateNew() {
     if (!canCreate) {

@@ -328,6 +328,22 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
     void loadEmployees();
   }, [loadEmployees]);
 
+  const partnerLabelMap = useMemo(
+    () =>
+      new Map(partnerOptions.map((option) => [String(option.id), option.label])),
+    [partnerOptions],
+  );
+  const productLabelMap = useMemo(
+    () =>
+      new Map(productOptions.map((option) => [String(option.id), option.label])),
+    [productOptions],
+  );
+  const employeeLabelMap = useMemo(
+    () =>
+      new Map(employeeOptions.map((option) => [String(option.id), option.label])),
+    [employeeOptions],
+  );
+
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
 
@@ -336,11 +352,28 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
     }
 
     return items.filter((item) =>
-      [item.numeroOs, item.tipoServico, item.status, item.descricaoProblema]
+      [
+        item.numeroOs,
+        item.cliente,
+        partnerLabelMap.get(item.cliente) ?? "",
+        item.produto,
+        productLabelMap.get(item.produto) ?? "",
+        item.tecnico,
+        employeeLabelMap.get(item.tecnico) ?? "",
+        item.tipoServico,
+        item.status,
+        item.descricaoProblema,
+      ]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalized)),
     );
-  }, [items, query]);
+  }, [
+    employeeLabelMap,
+    items,
+    partnerLabelMap,
+    productLabelMap,
+    query,
+  ]);
 
   function handleCreateNew() {
     if (!canCreate) {
