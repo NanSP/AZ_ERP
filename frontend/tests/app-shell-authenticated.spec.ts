@@ -1,7 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-const SESSION_KEY = "az_erp_session";
-
 function createTenantSession() {
   return {
     token: "test-token",
@@ -22,12 +20,13 @@ function createTenantSession() {
 }
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(
-    ({ key, session }) => {
-      window.localStorage.setItem(key, JSON.stringify(session));
-    },
-    { key: SESSION_KEY, session: createTenantSession() },
-  );
+  await page.route("**/auth/me", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(createTenantSession()),
+    });
+  });
 });
 
 test("authenticated user can access dashboard and core/parceiros workspace", async ({

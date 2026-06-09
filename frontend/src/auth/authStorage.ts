@@ -1,23 +1,20 @@
 import type { AuthSession } from "./authTypes";
 
-const SESSION_KEY = "az_erp_session";
+// Nota: após migração para cookie HttpOnly, não persistiremos tokens em
+// armazenamento do navegador acessível por scripts. Mantemos uma API mínima
+// em memória para compatibilidade interna durante a transição.
+// interna durante a transição.
+
+let inMemorySession: AuthSession | null = null;
 
 export function loadSession(): AuthSession | null {
-  const raw = localStorage.getItem(SESSION_KEY);
-  if (!raw) return null;
-
-  try {
-    return JSON.parse(raw) as AuthSession;
-  } catch {
-    localStorage.removeItem(SESSION_KEY);
-    return null;
-  }
+  return inMemorySession;
 }
 
 export function saveSession(session: AuthSession): void {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  inMemorySession = session;
 }
 
 export function clearSession(): void {
-  localStorage.removeItem(SESSION_KEY);
+  inMemorySession = null;
 }

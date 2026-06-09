@@ -64,3 +64,21 @@ export async function changeTenantPassword(
     },
   });
 }
+
+export async function getMe(): Promise<AuthSession | null> {
+  const { data } = await api.get("/auth/me");
+  if (!data) return null;
+
+  return {
+    token: data.token,
+    scope: data.scope,
+    login: data.login,
+    userId: data.userId,
+    role: data.role,
+    tenantId: data.tenantId,
+    tenantCode: data.tenantCode,
+    perfis: data.perfis,
+    permissoes: data.permissoes,
+    passwordChangeRequired: data.passwordChangeRequired ?? false,
+  };
+}
