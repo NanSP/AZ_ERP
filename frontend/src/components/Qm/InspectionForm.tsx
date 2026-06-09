@@ -71,10 +71,11 @@ export default function InspectionForm({
       <div className="inspection-form__head">
         <div>
           <h3 className="inspection-form__title">
-            {editing ? "Editar inspecao" : "Nova inspecao"}
+            {editing ? "Editar inspeção" : "Nova inspeção"}
           </h3>
           <p className="inspection-form__subtitle">
-            Registre a inspecao com resultado, quantidades e rastreabilidade do lote.
+            Registre a inspeção com resultado, quantidades e rastreabilidade do
+            lote.
           </p>
           {editing && value.id ? (
             <p className="inspection-form__meta">
@@ -82,7 +83,7 @@ export default function InspectionForm({
             </p>
           ) : !canEditFields ? (
             <p className="inspection-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -106,7 +107,7 @@ export default function InspectionForm({
               onChange={(event) => update("produto", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Nao vincular</option>
+              <option value="">Não vincular</option>
               {productOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -116,20 +117,22 @@ export default function InspectionForm({
           ) : (
             <input
               value={value.produto}
-              onChange={(event) => update("produto", event.target.value.replace(/\D/g, ""))}
+              onChange={(event) =>
+                update("produto", event.target.value.replace(/\D/g, ""))
+              }
               placeholder="ID do produto"
               disabled={!canEditFields}
             />
           )}
           {productAccess === "unavailable" ? (
             <small className="inspection-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="inspection-form__field">
-          <span>Tipo de inspecao</span>
+          <span>Tipo de inspeção</span>
           <select
             value={value.tipoInspecao}
             onChange={(event) => update("tipoInspecao", event.target.value)}
@@ -154,7 +157,7 @@ export default function InspectionForm({
         </label>
 
         <label className="inspection-form__field">
-          <span>Data da inspecao</span>
+          <span>Data da inspeção</span>
           <input
             type="date"
             value={value.dataInspecao}
@@ -241,24 +244,26 @@ export default function InspectionForm({
           ) : (
             <input
               value={value.inspetor}
-              onChange={(event) => update("inspetor", event.target.value.replace(/\D/g, ""))}
+              onChange={(event) =>
+                update("inspetor", event.target.value.replace(/\D/g, ""))
+              }
               placeholder="ID do inspetor"
               disabled={!canEditFields}
             />
           )}
           {employeeAccess === "unavailable" ? (
             <small className="inspection-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="inspection-form__field inspection-form__field--span-2">
-          <span>Observacoes</span>
+          <span>Observações</span>
           <input
             value={value.observacoes}
             onChange={(event) => update("observacoes", event.target.value)}
-            placeholder="Observacoes da inspecao"
+            placeholder="Observações da inspeção"
             disabled={!canEditFields}
           />
         </label>
@@ -270,7 +275,11 @@ export default function InspectionForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar inspecao"}
+        {saving
+          ? "Salvando..."
+          : editing
+            ? "Salvar alteracoes"
+            : "Criar inspecao"}
       </button>
     </aside>
   );

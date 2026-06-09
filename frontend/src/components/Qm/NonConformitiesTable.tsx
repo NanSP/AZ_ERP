@@ -30,7 +30,9 @@ function resolveEmployeeLabel(
   employeeId: string,
   employeeOptions: EmployeeOption[],
 ) {
-  const match = employeeOptions.find((option) => String(option.id) === employeeId);
+  const match = employeeOptions.find(
+    (option) => String(option.id) === employeeId,
+  );
   return match ? match.label : employeeId ? `Responsavel #${employeeId}` : "-";
 }
 
@@ -49,7 +51,7 @@ export default function NonConformitiesTable({
     <section className="non-conformities-table">
       <div className="non-conformities-page__panel-head">
         <h3 className="non-conformities-page__panel-title">
-          Nao conformidades
+          Não conformidades
         </h3>
         <span className="non-conformities-page__panel-subtitle">
           {items.length} registros
@@ -60,12 +62,12 @@ export default function NonConformitiesTable({
         <table className="non-conformities-page__table">
           <thead>
             <tr>
-              <th>Inspecao</th>
+              <th>Inspeção</th>
               <th>Tipo</th>
               <th>Status</th>
-              <th>Responsavel</th>
+              <th>Responsável</th>
               <th>Datas</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -73,13 +75,13 @@ export default function NonConformitiesTable({
             {loading ? (
               <tr>
                 <td colSpan={6} className="non-conformities-page__empty">
-                  Carregando nao conformidades...
+                  Carregando não conformidades...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={6} className="non-conformities-page__empty">
-                  Nenhuma nao conformidade encontrada.
+                  Nenhuma não conformidade encontrada.
                 </td>
               </tr>
             ) : (
@@ -91,7 +93,10 @@ export default function NonConformitiesTable({
                   <td>
                     <div className="non-conformities-page__identity">
                       <strong>
-                        {resolveInspectionLabel(item.inspecao, inspectionOptions)}
+                        {resolveInspectionLabel(
+                          item.inspecao,
+                          inspectionOptions,
+                        )}
                       </strong>
                       <span>{item.descricao || "-"}</span>
                     </div>
@@ -120,7 +125,7 @@ export default function NonConformitiesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="non-conformities-page__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -22,7 +22,7 @@ export default function UserTable({
   return (
     <section className="user-table">
       <div className="user-table__head">
-        <h3 className="user-table__title">Lista de usuarios</h3>
+        <h3 className="user-table__title">Lista de usuários</h3>
         <span className="user-table__meta">{items.length} registros</span>
       </div>
 
@@ -30,12 +30,12 @@ export default function UserTable({
         <table className="user-table__table">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Login</th>
               <th>Tipo</th>
               <th>Status</th>
               <th>Tentativas</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -90,7 +90,9 @@ export default function UserTable({
                       </button>
                     ) : null}
                     {!canEdit && !canDelete ? (
-                      <span className="user-table__empty-action">Sem acoes</span>
+                      <span className="user-table__empty-action">
+                        Sem acoes
+                      </span>
                     ) : null}
                   </td>
                 </tr>

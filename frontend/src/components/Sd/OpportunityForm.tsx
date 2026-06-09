@@ -1,7 +1,5 @@
 import type { User } from "../../pages/Sys/UsersPage";
-import type {
-  ClientRecord,
-} from "../../pages/Sd/ClientsPage";
+import type { ClientRecord } from "../../pages/Sd/ClientsPage";
 import type { OpportunityRecord } from "../../pages/Sd/OpportunitiesPage";
 
 type OpportunityFormProps = {
@@ -77,10 +75,7 @@ export default function OpportunityForm({
       [field]: fieldValue,
     };
 
-    if (
-      field === "estagio" &&
-      fieldValue !== "fechado_perdido"
-    ) {
+    if (field === "estagio" && fieldValue !== "fechado_perdido") {
       nextValue.motivoPerda = "";
     }
 
@@ -114,7 +109,7 @@ export default function OpportunityForm({
             </p>
           ) : !canEditFields ? (
             <p className="opportunity-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -161,26 +156,29 @@ export default function OpportunityForm({
         </label>
 
         <label className="opportunity-form__field opportunity-form__field--span-2">
-          <span>Titulo</span>
+          <span>Título</span>
           <input
             value={value.titulo}
             onChange={(event) => update("titulo", event.target.value)}
-            placeholder="Expansao de contrato, nova proposta, renovacao anual"
+            placeholder="Expansão de contrato, nova proposta, renovação anual"
             disabled={!canEditFields}
           />
         </label>
 
         <label className="opportunity-form__field">
-          <span>Responsavel</span>
+          <span>Responsável</span>
           {canReadUsers ? (
             <select
               value={value.responsavelId}
               onChange={(event) => update("responsavelId", event.target.value)}
               disabled={!canEditFields}
             >
-              <option value="">Selecione um responsavel</option>
+              <option value="">Selecione um responsável</option>
               {users.map((user) => (
-                <option key={user.id ?? user.login} value={String(user.id ?? "")}>
+                <option
+                  key={user.id ?? user.login}
+                  value={String(user.id ?? "")}
+                >
                   {user.nome || user.login}
                 </option>
               ))}
@@ -191,14 +189,14 @@ export default function OpportunityForm({
               onChange={(event) =>
                 update("responsavelId", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do responsavel"
+              placeholder="ID do responsável"
               disabled={!canEditFields}
             />
           )}
         </label>
 
         <label className="opportunity-form__field">
-          <span>Estagio</span>
+          <span>Estágio</span>
           <select
             value={value.estagio}
             onChange={(event) => update("estagio", event.target.value)}
@@ -262,7 +260,7 @@ export default function OpportunityForm({
         </label>
 
         <label className="opportunity-form__field opportunity-form__field--span-2">
-          <span>Descricao</span>
+          <span>Descrição</span>
           <textarea
             value={value.descricao}
             onChange={(event) => update("descricao", event.target.value)}
@@ -282,7 +280,7 @@ export default function OpportunityForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar oportunidade"}
       </button>
     </aside>

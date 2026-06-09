@@ -23,17 +23,19 @@ export default function OpportunitiesTable({
     <section className="opportunities-table">
       <div className="opportunities-table__head">
         <h3 className="opportunities-table__title">Oportunidades</h3>
-        <span className="opportunities-table__meta">{items.length} registros</span>
+        <span className="opportunities-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="opportunities-table__wrap">
         <table className="opportunities-table__table">
           <thead>
             <tr>
-              <th>Negociacao</th>
+              <th>Negociação</th>
               <th>Pipeline</th>
-              <th>Previsao</th>
-              <th>Acoes</th>
+              <th>Previsão</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -59,12 +61,12 @@ export default function OpportunitiesTable({
                     <div className="opportunities-table__details">
                       <strong>{item.titulo || "-"}</strong>
                       <span>Cliente #{item.clienteId || "-"}</span>
-                      <span>Responsavel #{item.responsavelId || "-"}</span>
+                      <span>Responsável #{item.responsavelId || "-"}</span>
                     </div>
                   </td>
                   <td>
                     <div className="opportunities-table__details">
-                      <strong>Estagio: {item.estagio || "-"}</strong>
+                      <strong>Estágio: {item.estagio || "-"}</strong>
                       <span>Probabilidade: {item.probabilidade || "-"}%</span>
                       <span>{item.motivoPerda || "-"}</span>
                     </div>
@@ -72,7 +74,9 @@ export default function OpportunitiesTable({
                   <td>
                     <div className="opportunities-table__details">
                       <strong>Valor: {item.valorEstimado || "-"}</strong>
-                      <span>Fechamento: {item.dataPrevistaFechamento || "-"}</span>
+                      <span>
+                        Fechamento: {item.dataPrevistaFechamento || "-"}
+                      </span>
                     </div>
                   </td>
                   <td className="opportunities-table__actions">
@@ -88,7 +92,7 @@ export default function OpportunitiesTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="opportunities-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

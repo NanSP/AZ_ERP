@@ -33,7 +33,7 @@ export default function OrdersTable({
               <th>Comercial</th>
               <th>Calendario</th>
               <th>Financeiro</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -88,7 +88,7 @@ export default function OrdersTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="orders-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

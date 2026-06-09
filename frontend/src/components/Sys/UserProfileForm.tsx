@@ -1,6 +1,4 @@
-import type {
-  UserProfileAssignment,
-} from "../../pages/Sys/UserProfilesPage";
+import type { UserProfileAssignment } from "../../pages/Sys/UserProfilesPage";
 
 type RelatedOption = {
   id: number;
@@ -58,7 +56,7 @@ export default function UserProfileForm({
             {editing ? "Editar vinculo" : "Novo vinculo"}
           </h3>
           <p className="user-profile-form__subtitle">
-            Associe um perfil existente a um usuario ativo do tenant.
+            Associe um perfil existente a um usuário ativo do tenant.
           </p>
           {editing && value.id ? (
             <p className="user-profile-form__meta">
@@ -66,7 +64,7 @@ export default function UserProfileForm({
             </p>
           ) : !canEditFields ? (
             <p className="user-profile-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -83,14 +81,14 @@ export default function UserProfileForm({
 
       <div className="user-profile-form__grid">
         <label className="user-profile-form__field">
-          <span>Usuario</span>
+          <span>Usuário</span>
           {userOptions.length > 0 ? (
             <select
               value={value.usuario}
               onChange={(event) => update("usuario", event.target.value)}
               disabled={!canEditFields || editing}
             >
-              <option value="">Selecione um usuario</option>
+              <option value="">Selecione um usuário</option>
               {userOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -103,13 +101,13 @@ export default function UserProfileForm({
               onChange={(event) =>
                 update("usuario", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID do usuario"
+              placeholder="ID do usuário"
               disabled={!canEditFields || editing}
             />
           )}
           {userAccess === "unavailable" ? (
             <small className="user-profile-form__hint">
-              Lista de usuarios indisponivel. Informe o ID manualmente.
+              Lista de usuários indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -141,7 +139,7 @@ export default function UserProfileForm({
           )}
           {profileAccess === "unavailable" ? (
             <small className="user-profile-form__hint">
-              Lista de perfis indisponivel. Informe o ID manualmente.
+              Lista de perfis indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -156,7 +154,7 @@ export default function UserProfileForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar vinculo"}
       </button>
     </aside>

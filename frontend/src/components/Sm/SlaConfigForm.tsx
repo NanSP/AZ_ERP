@@ -48,13 +48,13 @@ export default function SlaConfigForm({
             {editing ? "Editar SLA" : "Novo SLA"}
           </h3>
           <p className="sla-form__subtitle">
-            Relacione prioridade e tempos esperados ao tipo de servico.
+            Relacione prioridade e tempos esperados ao tipo de serviço.
           </p>
           {editing && value.id ? (
             <p className="sla-form__meta">Registro selecionado: #{value.id}</p>
           ) : !canEditFields ? (
             <p className="sla-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -71,7 +71,7 @@ export default function SlaConfigForm({
 
       <div className="sla-form__grid">
         <label className="sla-form__field sla-form__field--span-2">
-          <span>Tipo de servico</span>
+          <span>Tipo de serviço</span>
           <input
             value={value.tipoServico}
             onChange={(event) => update("tipoServico", event.target.value)}
@@ -111,7 +111,7 @@ export default function SlaConfigForm({
         </label>
 
         <label className="sla-form__field">
-          <span>Tempo de resolucao (h)</span>
+          <span>Tempo de resolução (h)</span>
           <input
             value={value.tempoResolucaoHoras}
             onChange={(event) =>

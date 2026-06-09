@@ -56,7 +56,7 @@ export default function ProfilePermissionForm({
             {editing ? "Editar vinculo" : "Novo vinculo"}
           </h3>
           <p className="profile-permission-form__subtitle">
-            Associe permissoes existentes a perfis do tenant.
+            Associe permissões existentes a perfis do tenant.
           </p>
           {editing && value.id ? (
             <p className="profile-permission-form__meta">
@@ -64,7 +64,7 @@ export default function ProfilePermissionForm({
             </p>
           ) : !canEditFields ? (
             <p className="profile-permission-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -107,20 +107,20 @@ export default function ProfilePermissionForm({
           )}
           {profileAccess === "unavailable" ? (
             <small className="profile-permission-form__hint">
-              Lista de perfis indisponivel. Informe o ID manualmente.
+              Lista de perfis indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="profile-permission-form__field">
-          <span>Permissao</span>
+          <span>Permissão</span>
           {permissionOptions.length > 0 ? (
             <select
               value={value.permissao}
               onChange={(event) => update("permissao", event.target.value)}
               disabled={!canEditFields || editing}
             >
-              <option value="">Selecione uma permissao</option>
+              <option value="">Selecione uma permissão</option>
               {permissionOptions.map((option) => (
                 <option key={option.id} value={String(option.id)}>
                   {option.label}
@@ -133,13 +133,13 @@ export default function ProfilePermissionForm({
               onChange={(event) =>
                 update("permissao", event.target.value.replace(/\D/g, ""))
               }
-              placeholder="ID da permissao"
+              placeholder="ID da permissão"
               disabled={!canEditFields || editing}
             />
           )}
           {permissionAccess === "unavailable" ? (
             <small className="profile-permission-form__hint">
-              Lista de permissoes indisponivel. Informe o ID manualmente.
+              Lista de permissões indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -154,7 +154,7 @@ export default function ProfilePermissionForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar vinculo"}
       </button>
     </aside>

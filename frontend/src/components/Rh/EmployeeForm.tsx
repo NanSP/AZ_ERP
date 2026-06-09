@@ -29,7 +29,8 @@ export default function EmployeeForm({
   onSave,
   onReset,
 }: EmployeeFormProps) {
-  const canSave = value.nome.trim() !== "" && value.cpf.replace(/\D/g, "").length === 11;
+  const canSave =
+    value.nome.trim() !== "" && value.cpf.replace(/\D/g, "").length === 11;
 
   function update<K extends keyof Employee>(field: K, fieldValue: Employee[K]) {
     onChange({
@@ -75,7 +76,7 @@ export default function EmployeeForm({
             </p>
           ) : !canEditFields ? (
             <p className="employee-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -134,13 +135,13 @@ export default function EmployeeForm({
           "Estado civil",
           "estadoCivil",
           value.estadoCivil,
-          "Solteiro, casado..."
+          "Solteiro, casado...",
         )}
         {renderField(
           "Nacionalidade",
           "nacionalidade",
           value.nacionalidade,
-          "Brasileira"
+          "Brasileira",
         )}
         {renderField(
           "Email pessoal",
@@ -200,11 +201,11 @@ export default function EmployeeForm({
           "Departamento",
           "departamento",
           value.departamento,
-          "Departamento"
+          "Departamento",
         )}
 
         <label className="employee-form__field">
-          <span>Salario</span>
+          <span>Salário</span>
           <input
             value={value.salario}
             onChange={(event) =>
@@ -219,7 +220,7 @@ export default function EmployeeForm({
           "Tipo de contrato",
           "tipoContrato",
           value.tipoContrato,
-          "CLT, PJ, estagio..."
+          "CLT, PJ, estagio...",
         )}
 
         <label className="employee-form__field">
@@ -238,7 +239,7 @@ export default function EmployeeForm({
         </label>
 
         <label className="employee-form__field">
-          <span>Situacao</span>
+          <span>Situação</span>
           <select
             value={value.situacao}
             onChange={(event) => update("situacao", event.target.value)}
@@ -262,7 +263,7 @@ export default function EmployeeForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
+            ? "Salvar alterações"
             : "Criar colaborador"}
       </button>
     </aside>

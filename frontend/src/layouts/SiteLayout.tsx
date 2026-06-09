@@ -7,10 +7,10 @@ const standaloneLogo = "/branding/standaloneLogo.webp";
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Modulos", href: "/#modulos" },
-  { label: "Beneficios", href: "/#beneficios" },
+  { label: "Módulos", href: "/#modulos" },
+  { label: "Benefícios", href: "/#beneficios" },
   { label: "Tecnologia", href: "/#tecnologia" },
-  { label: "Precos", href: "/#pricing" },
+  { label: "Preços", href: "/#pricing" },
   { label: "Contato", href: "/#contato" },
 ];
 
@@ -78,13 +78,13 @@ export default function SiteLayout() {
 
           <div className="site-footer__column">
             <h4>Produto</h4>
-            <a href="/#modulos">Modulos</a>
-            <a href="/#beneficios">Beneficios</a>
+            <a href="/#modulos">Módulos</a>
+            <a href="/#beneficios">Benefícios</a>
             <a href="/#tecnologia">Tecnologia</a>
           </div>
 
           <div className="site-footer__column">
-            <h4>Modulos</h4>
+            <h4>Módulos</h4>
             <a href="/#modulos">Financeiro</a>
             <a href="/#modulos">Supply Chain</a>
             <a href="/#modulos">Recursos Humanos</a>
@@ -107,7 +107,7 @@ export default function SiteLayout() {
           <div className="site-footer__column">
             <h4>Legal</h4>
             <a href="/#legal">Politica de Privacidade</a>
-            <a href="/#legal">Termos de Servico</a>
+            <a href="/#legal">Termos de Serviço</a>
             <a href="/#legal">LGPD</a>
           </div>
         </div>

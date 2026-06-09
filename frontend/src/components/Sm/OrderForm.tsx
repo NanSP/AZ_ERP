@@ -74,13 +74,16 @@ export default function OrderForm({
             {editing ? "Editar ordem" : "Nova ordem"}
           </h3>
           <p className="order-form__subtitle">
-            Organize atendimento, agenda, tecnico responsavel e status operacional.
+            Organize atendimento, agenda, tecnico responsável e status
+            operacional.
           </p>
           {editing && value.id ? (
-            <p className="order-form__meta">Registro selecionado: #{value.id}</p>
+            <p className="order-form__meta">
+              Registro selecionado: #{value.id}
+            </p>
           ) : !canEditFields ? (
             <p className="order-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -97,7 +100,7 @@ export default function OrderForm({
 
       <div className="order-form__grid">
         <label className="order-form__field">
-          <span>Numero OS</span>
+          <span>Número OS</span>
           <input
             value={value.numeroOs}
             onChange={(event) => update("numeroOs", event.target.value)}
@@ -107,7 +110,7 @@ export default function OrderForm({
         </label>
 
         <label className="order-form__field">
-          <span>Tipo de servico</span>
+          <span>Tipo de serviço</span>
           <input
             value={value.tipoServico}
             onChange={(event) => update("tipoServico", event.target.value)}
@@ -117,10 +120,12 @@ export default function OrderForm({
         </label>
 
         <label className="order-form__field order-form__field--span-2">
-          <span>Descricao do problema</span>
+          <span>Descrição do problema</span>
           <input
             value={value.descricaoProblema}
-            onChange={(event) => update("descricaoProblema", event.target.value)}
+            onChange={(event) =>
+              update("descricaoProblema", event.target.value)
+            }
             placeholder="Detalhe o chamado ou problema reportado"
             disabled={!canEditFields}
           />
@@ -153,7 +158,7 @@ export default function OrderForm({
           )}
           {partnerAccess === "unavailable" ? (
             <small className="order-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -185,13 +190,13 @@ export default function OrderForm({
           )}
           {productAccess === "unavailable" ? (
             <small className="order-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="order-form__field">
-          <span>Tecnico</span>
+          <span>Técnico</span>
           {employeeOptions.length > 0 ? (
             <select
               value={value.tecnico}
@@ -217,7 +222,7 @@ export default function OrderForm({
           )}
           {employeeAccess === "unavailable" ? (
             <small className="order-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -299,11 +304,7 @@ export default function OrderForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving
-          ? "Salvando..."
-          : editing
-            ? "Salvar alteracoes"
-            : "Criar ordem"}
+        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar ordem"}
       </button>
     </aside>
   );

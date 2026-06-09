@@ -52,7 +52,7 @@ export default function DependentTable({
               <th>Parentesco</th>
               <th>CPF</th>
               <th>Nascimento</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -99,7 +99,7 @@ export default function DependentTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="dependent-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

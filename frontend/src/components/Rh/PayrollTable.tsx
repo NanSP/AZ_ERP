@@ -15,7 +15,9 @@ function resolveEmployeeLabel(
   employeeId: string,
   employeeOptions: EmployeeOption[],
 ) {
-  const match = employeeOptions.find((option) => String(option.id) === employeeId);
+  const match = employeeOptions.find(
+    (option) => String(option.id) === employeeId,
+  );
   return match ? match.label : `Colaborador #${employeeId || "-"}`;
 }
 
@@ -41,11 +43,11 @@ export default function PayrollTable({
           <thead>
             <tr>
               <th>Colaborador</th>
-              <th>Competencia</th>
+              <th>Competência</th>
               <th>Horas</th>
               <th>Valores</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -71,7 +73,10 @@ export default function PayrollTable({
                   <td>
                     <div className="payroll-table__identity">
                       <strong>
-                        {resolveEmployeeLabel(item.colaborador, employeeOptions)}
+                        {resolveEmployeeLabel(
+                          item.colaborador,
+                          employeeOptions,
+                        )}
                       </strong>
                       <span>ID #{item.colaborador || "-"}</span>
                     </div>
@@ -120,7 +125,7 @@ export default function PayrollTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="payroll-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

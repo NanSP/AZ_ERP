@@ -58,8 +58,8 @@ export default function PayrollForm({
             {editing ? "Editar folha" : "Nova folha"}
           </h3>
           <p className="payroll-form__subtitle">
-            Informe a competencia e os valores. Horas podem ser herdadas do ponto
-            quando deixadas em branco.
+            Informe a competência e os valores. Horas podem ser herdadas do
+            ponto quando deixadas em branco.
           </p>
           {editing && value.id ? (
             <p className="payroll-form__meta">
@@ -67,7 +67,7 @@ export default function PayrollForm({
             </p>
           ) : !canEditFields ? (
             <p className="payroll-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -110,13 +110,13 @@ export default function PayrollForm({
           )}
           {employeeAccess === "unavailable" ? (
             <small className="payroll-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
 
         <label className="payroll-form__field">
-          <span>Competencia</span>
+          <span>Competência</span>
           <input
             type="date"
             value={value.competencia}
@@ -126,7 +126,7 @@ export default function PayrollForm({
         </label>
 
         <label className="payroll-form__field">
-          <span>Salario base</span>
+          <span>Salário base</span>
           <input
             value={value.salarioBase}
             onChange={(event) =>
@@ -142,7 +142,10 @@ export default function PayrollForm({
           <input
             value={value.horasNormais}
             onChange={(event) =>
-              update("horasNormais", event.target.value.replace(/[^0-9.,]/g, ""))
+              update(
+                "horasNormais",
+                event.target.value.replace(/[^0-9.,]/g, ""),
+              )
             }
             placeholder="Vazio = calcular pelo ponto"
             disabled={!canEditFields}
@@ -215,7 +218,7 @@ export default function PayrollForm({
           <span>Horas normais: {value.valorHorasNormais || "0"}</span>
           <span>Horas extras: {value.valorHorasExtras || "0"}</span>
           <span>Bruto: {value.valorBruto || "0"}</span>
-          <span>Liquido: {value.valorLiquido || "0"}</span>
+          <span>Líquido: {value.valorLiquido || "0"}</span>
         </div>
       </div>
 
@@ -225,7 +228,7 @@ export default function PayrollForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar folha"}
+        {saving ? "Salvando..." : editing ? "Salvar alterações" : "Criar folha"}
       </button>
     </aside>
   );

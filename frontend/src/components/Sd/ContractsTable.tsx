@@ -30,10 +30,10 @@ export default function ContractsTable({
         <table className="contracts-table__table">
           <thead>
             <tr>
-              <th>Formalizacao</th>
-              <th>Vigencia</th>
+              <th>Formalização</th>
+              <th>Vigência</th>
               <th>Comercial</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -87,7 +87,7 @@ export default function ContractsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="contracts-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

@@ -22,7 +22,7 @@ export default function PermissionTable({
   return (
     <section className="permission-table">
       <div className="permission-table__head">
-        <h3 className="permission-table__title">Lista de permissoes</h3>
+        <h3 className="permission-table__title">Lista de permissões</h3>
         <span className="permission-table__meta">{items.length} registros</span>
       </div>
 
@@ -30,11 +30,11 @@ export default function PermissionTable({
         <table className="permission-table__table">
           <thead>
             <tr>
-              <th>Permissao</th>
+              <th>Permissão</th>
               <th>Escopo</th>
-              <th>Acao</th>
+              <th>Ação</th>
               <th>Criado em</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -42,13 +42,13 @@ export default function PermissionTable({
             {loading ? (
               <tr>
                 <td colSpan={5} className="permission-table__empty">
-                  Carregando permissoes...
+                  Carregando permissões...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
                 <td colSpan={5} className="permission-table__empty">
-                  Nenhuma permissao encontrada.
+                  Nenhuma permissão encontrada.
                 </td>
               </tr>
             ) : (
@@ -60,7 +60,7 @@ export default function PermissionTable({
                   <td>
                     <div className="permission-table__identity">
                       <strong>{item.nome || "-"}</strong>
-                      <span>{item.descricao || "Sem descricao"}</span>
+                      <span>{item.descricao || "Sem descrição"}</span>
                     </div>
                   </td>
                   <td>
@@ -88,7 +88,7 @@ export default function PermissionTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="permission-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>

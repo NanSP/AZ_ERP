@@ -52,7 +52,8 @@ export default function TimeTrackingForm({
             {editing ? "Editar ponto" : "Novo ponto"}
           </h3>
           <p className="time-tracking-form__subtitle">
-            Registre a jornada do colaborador e acompanhe horas e atrasos calculados.
+            Registre a jornada do colaborador e acompanhe horas e atrasos
+            calculados.
           </p>
           {editing && value.id ? (
             <p className="time-tracking-form__meta">
@@ -60,7 +61,7 @@ export default function TimeTrackingForm({
             </p>
           ) : !canEditFields ? (
             <p className="time-tracking-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -103,7 +104,7 @@ export default function TimeTrackingForm({
           )}
           {employeeAccess === "unavailable" ? (
             <small className="time-tracking-form__hint">
-              Lista indisponivel. Informe o ID manualmente.
+              Lista indisponível. Informe o ID manualmente.
             </small>
           ) : null}
         </label>
@@ -129,7 +130,7 @@ export default function TimeTrackingForm({
         </label>
 
         <label className="time-tracking-form__field">
-          <span>Saida para almoco</span>
+          <span>Saída para almoço</span>
           <input
             type="time"
             value={value.horaSaidaAlmoco}
@@ -139,7 +140,7 @@ export default function TimeTrackingForm({
         </label>
 
         <label className="time-tracking-form__field">
-          <span>Retorno do almoco</span>
+          <span>Retorno do almoço</span>
           <input
             type="time"
             value={value.horaRetornoAlmoco}
@@ -151,7 +152,7 @@ export default function TimeTrackingForm({
         </label>
 
         <label className="time-tracking-form__field">
-          <span>Hora de saida</span>
+          <span>Hora de saída</span>
           <input
             type="time"
             value={value.horaSaida}
@@ -173,7 +174,7 @@ export default function TimeTrackingForm({
         onClick={onSave}
         disabled={saving || !canSave || !canSubmit}
       >
-        {saving ? "Salvando..." : editing ? "Salvar alteracoes" : "Criar ponto"}
+        {saving ? "Salvando..." : editing ? "Salvar alterações" : "Criar ponto"}
       </button>
     </aside>
   );

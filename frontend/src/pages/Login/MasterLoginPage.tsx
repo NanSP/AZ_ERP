@@ -27,7 +27,7 @@ export default function MasterLoginPage() {
       <div className="auth-badge">Acesso master</div>
       <h1 className="auth-title">Entrar na camada administrativa</h1>
       <p className="auth-subtitle">
-        Acesse tenants, configuracoes e operacoes centrais da plataforma.
+        Acesse tenants, configurações e operações centrais da plataforma.
       </p>
 
       <form className="auth-form" onSubmit={handleSubmit}>

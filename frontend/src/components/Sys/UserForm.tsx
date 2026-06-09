@@ -61,7 +61,7 @@ export default function UserForm({
             <p className="user-form__meta">Registro selecionado: #{value.id}</p>
           ) : !canEditFields ? (
             <p className="user-form__meta">
-              Seu perfil possui acesso limitado para alteracoes neste recurso.
+              Seu perfil possui acesso limitado para alterações neste recurso.
             </p>
           ) : null}
         </div>
@@ -114,7 +114,9 @@ export default function UserForm({
             type="password"
             value={value.senha}
             onChange={(event) => update("senha", event.target.value)}
-            placeholder={editing ? "Preencha apenas para trocar" : "Minimo 6 caracteres"}
+            placeholder={
+              editing ? "Preencha apenas para trocar" : "Minimo 6 caracteres"
+            }
             disabled={!canEditFields}
           />
         </label>
@@ -130,7 +132,7 @@ export default function UserForm({
         </label>
 
         <label className="user-form__field">
-          <span>Tipo de usuario</span>
+          <span>Tipo de usuário</span>
           <select
             value={value.tipoUsuario}
             onChange={(event) => update("tipoUsuario", event.target.value)}
@@ -160,7 +162,7 @@ export default function UserForm({
         </label>
 
         <label className="user-form__field">
-          <span>Expiracao da senha</span>
+          <span>Expiração da senha</span>
           <input
             type="date"
             value={value.expiracaoSenha}
@@ -191,8 +193,8 @@ export default function UserForm({
         {saving
           ? "Salvando..."
           : editing
-            ? "Salvar alteracoes"
-            : "Criar usuario"}
+            ? "Salvar alterações"
+            : "Criar usuário"}
       </button>
     </aside>
   );

@@ -18,7 +18,9 @@ function resolveEmployeeLabel(
   employeeId: string,
   employeeOptions: EmployeeOption[],
 ) {
-  const match = employeeOptions.find((option) => String(option.id) === employeeId);
+  const match = employeeOptions.find(
+    (option) => String(option.id) === employeeId,
+  );
   return match ? match.label : `Colaborador #${employeeId || "-"}`;
 }
 
@@ -36,7 +38,9 @@ export default function TimeTrackingTable({
     <section className="time-tracking-table">
       <div className="time-tracking-table__head">
         <h3 className="time-tracking-table__title">Registros de ponto</h3>
-        <span className="time-tracking-table__meta">{items.length} registros</span>
+        <span className="time-tracking-table__meta">
+          {items.length} registros
+        </span>
       </div>
 
       <div className="time-tracking-table__wrap">
@@ -48,7 +52,7 @@ export default function TimeTrackingTable({
               <th>Jornada</th>
               <th>Horas</th>
               <th>Atrasos</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
 
@@ -74,7 +78,10 @@ export default function TimeTrackingTable({
                   <td>
                     <div className="time-tracking-table__identity">
                       <strong>
-                        {resolveEmployeeLabel(item.colaborador, employeeOptions)}
+                        {resolveEmployeeLabel(
+                          item.colaborador,
+                          employeeOptions,
+                        )}
                       </strong>
                       <span>ID #{item.colaborador || "-"}</span>
                     </div>
@@ -87,7 +94,7 @@ export default function TimeTrackingTable({
                         Almoco: {item.horaSaidaAlmoco || "-"} /{" "}
                         {item.horaRetornoAlmoco || "-"}
                       </span>
-                      <span>Saida: {item.horaSaida || "-"}</span>
+                      <span>Saída: {item.horaSaida || "-"}</span>
                     </div>
                   </td>
                   <td>
@@ -110,7 +117,7 @@ export default function TimeTrackingTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="time-tracking-table__empty-action">
-                        Sem acoes
+                        Sem ações
                       </span>
                     ) : null}
                   </td>
