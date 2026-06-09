@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ChartOfAccountsForm from "../../components/Fi/ChartOfAccountsForm";
@@ -100,7 +100,7 @@ export default function ChartOfAccountsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadAccounts() {
+  const loadAccounts = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -128,11 +128,11 @@ export default function ChartOfAccountsPage({
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadAccounts();
-  }, [canRead]);
+  }, [loadAccounts]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();

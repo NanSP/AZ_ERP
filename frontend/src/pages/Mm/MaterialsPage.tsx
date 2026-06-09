@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import MaterialForm from "../../components/Mm/MaterialForm";
@@ -118,7 +118,9 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-export default function MaterialsPage({ embedded = false }: MaterialsPageProps) {
+export default function MaterialsPage({
+  embedded = false,
+}: MaterialsPageProps) {
   const { session } = useAuth();
   const [items, setItems] = useState<MaterialRecord[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -130,14 +132,30 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
   const [selected, setSelected] = useState<MaterialRecord | null>(null);
   const [draft, setDraft] = useState<MaterialRecord>(emptyMaterial);
   const canRead = canAccessResourceAction(session, materialsResource, "read");
-  const canCreate = canAccessResourceAction(session, materialsResource, "create");
-  const canUpdate = canAccessResourceAction(session, materialsResource, "update");
-  const canDelete = canAccessResourceAction(session, materialsResource, "delete");
-  const canReadProducts = canAccessResourceAction(session, productsResource, "read");
+  const canCreate = canAccessResourceAction(
+    session,
+    materialsResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    materialsResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    materialsResource,
+    "delete",
+  );
+  const canReadProducts = canAccessResourceAction(
+    session,
+    productsResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadMaterials() {
+  const loadMaterials = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -159,13 +177,13 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os materiais."));
+      setError(getErrorMessage(err, "Não foi possível carregar os materiais."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProducts([]);
       return;
@@ -182,15 +200,15 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
     } catch {
       setProducts([]);
     }
-  }
+  }, [canReadProducts]);
 
   useEffect(() => {
     void loadMaterials();
-  }, [canRead]);
+  }, [loadMaterials]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -243,8 +261,8 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar materiais."
-          : "Seu perfil nao possui permissao para criar materiais.",
+          ? "Seu perfil não possui permissão para atualizar materiais."
+          : "Seu perfil não possui permissão para criar materiais.",
       );
       return;
     }
@@ -273,8 +291,8 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o material."
-            : "Nao foi possivel criar o material.",
+            ? "Não foi possível atualizar o material."
+            : "Não foi possível criar o material.",
         ),
       );
     } finally {
@@ -284,12 +302,12 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
 
   async function handleDelete(item: MaterialRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir materiais.");
+      setError("Seu perfil não possui permissão para excluir materiais.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o material para exclusao.");
+      setError("Não foi possível identificar o material para exclusão.");
       return;
     }
 
@@ -308,16 +326,20 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
     try {
       await deleteResource("mm", "materiais", item.id);
       await loadMaterials();
-      setSuccess("Material excluido com sucesso.");
+      setSuccess("Material excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o material."));
+      setError(getErrorMessage(err, "Não foi possível excluir o material."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "materials-page materials-page--embedded" : "materials-page"}>
+    <div
+      className={
+        embedded ? "materials-page materials-page--embedded" : "materials-page"
+      }
+    >
       {!embedded ? (
         <header className="materials-page__header">
           <div>
@@ -325,7 +347,7 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
             <h2 className="materials-page__title">Materiais</h2>
             <p className="materials-page__subtitle">
               Estruture materiais, insumos e componentes vinculados ao catalogo
-              de produtos, com classificacao tecnica e cuidados de armazenagem.
+              de produtos, com classificação tecnica e cuidados de armazenagem.
             </p>
           </div>
 
@@ -389,8 +411,8 @@ export default function MaterialsPage({ embedded = false }: MaterialsPageProps) 
         <div className="materials-page__alert materials-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import PurchaseItemForm from "../../components/Mm/PurchaseItemForm";
@@ -59,14 +59,15 @@ const emptyPurchaseItem: PurchaseItemRecord = {
   quantidadeRecebida: "",
 };
 
-function normalizePurchaseItem(data: Record<string, unknown>): PurchaseItemRecord {
+function normalizePurchaseItem(
+  data: Record<string, unknown>,
+): PurchaseItemRecord {
   return {
     id: typeof data.id === "number" ? data.id : undefined,
     compraId: data.compras == null ? "" : String(data.compras),
     produtoId: data.produtos == null ? "" : String(data.produtos),
     quantidade: data.quantidade == null ? "" : String(data.quantidade),
-    valorUnitario:
-      data.valorUnitario == null ? "" : String(data.valorUnitario),
+    valorUnitario: data.valorUnitario == null ? "" : String(data.valorUnitario),
     valorTotal: data.valorTotal == null ? "" : String(data.valorTotal),
     quantidadeRecebida:
       data.quantidadeRecebida == null ? "" : String(data.quantidadeRecebida),
@@ -102,8 +103,7 @@ function normalizeProduct(data: Record<string, unknown>): Product {
     ncm: String(data.ncm ?? ""),
     cest: String(data.cest ?? ""),
     pesoBruto: data.pesoBruto == null ? "" : String(data.pesoBruto ?? ""),
-    pesoLiquido:
-      data.pesoLiquido == null ? "" : String(data.pesoLiquido ?? ""),
+    pesoLiquido: data.pesoLiquido == null ? "" : String(data.pesoLiquido ?? ""),
     origem: String(data.origem ?? ""),
     situacao: String(data.situacao ?? "ativo"),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
@@ -190,7 +190,7 @@ export default function PurchaseItemsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadItems() {
+  const loadItems = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -213,14 +213,14 @@ export default function PurchaseItemsPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os itens de compra."),
+        getErrorMessage(err, "Não foi possivel carregar os itens de compra."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadPurchases() {
+  const loadPurchases = useCallback(async () => {
     if (!canReadPurchases) {
       setPurchases([]);
       return;
@@ -237,9 +237,9 @@ export default function PurchaseItemsPage({
     } catch {
       setPurchases([]);
     }
-  }
+  }, [canReadPurchases]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProducts([]);
       return;
@@ -256,19 +256,19 @@ export default function PurchaseItemsPage({
     } catch {
       setProducts([]);
     }
-  }
+  }, [canReadProducts]);
 
   useEffect(() => {
     void loadItems();
-  }, [canRead]);
+  }, [loadItems]);
 
   useEffect(() => {
     void loadPurchases();
-  }, [canReadPurchases]);
+  }, [loadPurchases]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   const purchaseOptions = useMemo(
     () =>
@@ -350,8 +350,8 @@ export default function PurchaseItemsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar itens de compra."
-          : "Seu perfil nao possui permissao para criar itens de compra.",
+          ? "Seu perfil não possui permissão para atualizar itens de compra."
+          : "Seu perfil não possui permissão para criar itens de compra.",
       );
       return;
     }
@@ -383,8 +383,8 @@ export default function PurchaseItemsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o item de compra."
-            : "Nao foi possivel criar o item de compra.",
+            ? "Não foi possível atualizar o item de compra."
+            : "Não foi possível criar o item de compra.",
         ),
       );
     } finally {
@@ -394,12 +394,12 @@ export default function PurchaseItemsPage({
 
   async function handleDelete(item: PurchaseItemRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir itens de compra.");
+      setError("Seu perfil não possui permissão para excluir itens de compra.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o item de compra para exclusao.");
+      setError("Não foi possível identificar o item de compra para exclusão.");
       return;
     }
 
@@ -422,7 +422,7 @@ export default function PurchaseItemsPage({
       setSuccess("Item de compra excluido com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir o item de compra."),
+        getErrorMessage(err, "Não foi possível excluir o item de compra."),
       );
     } finally {
       setSaving(false);
@@ -508,8 +508,8 @@ export default function PurchaseItemsPage({
         <div className="purchase-items-page__alert purchase-items-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

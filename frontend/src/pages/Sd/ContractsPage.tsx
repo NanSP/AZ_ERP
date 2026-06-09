@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ContractForm from "../../components/Sd/ContractForm";
@@ -109,7 +109,9 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-export default function ContractsPage({ embedded = false }: ContractsPageProps) {
+export default function ContractsPage({
+  embedded = false,
+}: ContractsPageProps) {
   const { session } = useAuth();
   const [items, setItems] = useState<ContractRecord[]>([]);
   const [clients, setClients] = useState<ClientRecord[]>([]);
@@ -121,14 +123,30 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
   const [selected, setSelected] = useState<ContractRecord | null>(null);
   const [draft, setDraft] = useState<ContractRecord>(emptyContract);
   const canRead = canAccessResourceAction(session, contractsResource, "read");
-  const canCreate = canAccessResourceAction(session, contractsResource, "create");
-  const canUpdate = canAccessResourceAction(session, contractsResource, "update");
-  const canDelete = canAccessResourceAction(session, contractsResource, "delete");
-  const canReadClients = canAccessResourceAction(session, clientsResource, "read");
+  const canCreate = canAccessResourceAction(
+    session,
+    contractsResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    contractsResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    contractsResource,
+    "delete",
+  );
+  const canReadClients = canAccessResourceAction(
+    session,
+    clientsResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadContracts() {
+  const loadContracts = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -150,13 +168,13 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os contratos."));
+      setError(getErrorMessage(err, "Não foi possivel carregar os contratos."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadClients() {
+  const loadClients = useCallback(async () => {
     if (!canReadClients) {
       setClients([]);
       return;
@@ -173,15 +191,15 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
     } catch {
       setClients([]);
     }
-  }
+  }, [canReadClients]);
 
   useEffect(() => {
     void loadContracts();
-  }, [canRead]);
+  }, [loadContracts]);
 
   useEffect(() => {
     void loadClients();
-  }, [canReadClients]);
+  }, [loadClients]);
 
   const clientOptions = useMemo(() => clients, [clients]);
 
@@ -241,8 +259,8 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar contratos."
-          : "Seu perfil nao possui permissao para criar contratos.",
+          ? "Seu perfil não possui permissão para atualizar contratos."
+          : "Seu perfil não possui permissão para criar contratos.",
       );
       return;
     }
@@ -271,8 +289,8 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o contrato."
-            : "Nao foi possivel criar o contrato.",
+            ? "Não foi possível atualizar o contrato."
+            : "Não foi possível criar o contrato.",
         ),
       );
     } finally {
@@ -282,12 +300,12 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
 
   async function handleDelete(item: ContractRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir contratos.");
+      setError("Seu perfil não possui permissão para excluir contratos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o contrato para exclusao.");
+      setError("Não foi possível identificar o contrato para exclusão.");
       return;
     }
 
@@ -308,7 +326,7 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
       await loadContracts();
       setSuccess("Contrato excluido com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o contrato."));
+      setError(getErrorMessage(err, "Não foi possível excluir o contrato."));
     } finally {
       setSaving(false);
     }
@@ -316,7 +334,9 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
 
   return (
     <div
-      className={embedded ? "contracts-page contracts-page--embedded" : "contracts-page"}
+      className={
+        embedded ? "contracts-page contracts-page--embedded" : "contracts-page"
+      }
     >
       {!embedded ? (
         <header className="contracts-page__header">
@@ -325,7 +345,7 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
             <h2 className="contracts-page__title">Contratos</h2>
             <p className="contracts-page__subtitle">
               Formalize acordos comerciais a partir dos clientes do CRM, com
-              numero de contrato, vigencia, valor total e status operacional.
+              numero de contrato, vigência, valor total e status operacional.
             </p>
           </div>
 
@@ -389,8 +409,8 @@ export default function ContractsPage({ embedded = false }: ContractsPageProps) 
         <div className="contracts-page__alert contracts-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

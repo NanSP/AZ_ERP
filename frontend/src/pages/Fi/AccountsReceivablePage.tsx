@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import AccountsReceivableForm from "../../components/Fi/AccountsReceivableForm";
@@ -156,7 +156,7 @@ export default function AccountsReceivablePage({
     isMasterScope || permissionSet.has("fi:centros_custo:read");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
 
-  async function loadAccountsReceivable() {
+  const loadAccountsReceivable = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -187,9 +187,9 @@ export default function AccountsReceivablePage({
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadCompanies() {
+  const loadCompanies = useCallback(async () => {
     if (!canReadCompanies) {
       setCompanyOptions([]);
       setCompanyAccess("unavailable");
@@ -213,9 +213,9 @@ export default function AccountsReceivablePage({
       setCompanyOptions([]);
       setCompanyAccess("unavailable");
     }
-  }
+  }, [canReadCompanies]);
 
-  async function loadClients() {
+  const loadClients = useCallback(async () => {
     if (!canReadPartners) {
       setClientOptions([]);
       setClientAccess("unavailable");
@@ -243,9 +243,9 @@ export default function AccountsReceivablePage({
       setClientOptions([]);
       setClientAccess("unavailable");
     }
-  }
+  }, [canReadPartners]);
 
-  async function loadCostCenters() {
+  const loadCostCenters = useCallback(async () => {
     if (!canReadCostCenters) {
       setCostCenterOptions([]);
       setCostCenterAccess("unavailable");
@@ -269,23 +269,23 @@ export default function AccountsReceivablePage({
       setCostCenterOptions([]);
       setCostCenterAccess("unavailable");
     }
-  }
+  }, [canReadCostCenters]);
 
   useEffect(() => {
     void loadAccountsReceivable();
-  }, [canRead]);
+  }, [loadAccountsReceivable]);
 
   useEffect(() => {
     void loadCompanies();
-  }, [canReadCompanies]);
+  }, [loadCompanies]);
 
   useEffect(() => {
     void loadClients();
-  }, [canReadPartners]);
+  }, [loadClients]);
 
   useEffect(() => {
     void loadCostCenters();
-  }, [canReadCostCenters]);
+  }, [loadCostCenters]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import PurchaseForm from "../../components/Mm/PurchaseForm";
@@ -93,7 +93,8 @@ function toRequestPayload(item: PurchaseRecord) {
   const normalizedValue = item.valorTotal.trim();
 
   return {
-    fornecedor: item.fornecedorId.trim() === "" ? null : Number(item.fornecedorId),
+    fornecedor:
+      item.fornecedorId.trim() === "" ? null : Number(item.fornecedorId),
     dataPedido: item.dataPedido.trim() || null,
     dataPrevistaEntrega: item.dataPrevistaEntrega.trim() || null,
     dataEntrega: item.dataEntrega.trim() || null,
@@ -117,7 +118,9 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-export default function PurchasesPage({ embedded = false }: PurchasesPageProps) {
+export default function PurchasesPage({
+  embedded = false,
+}: PurchasesPageProps) {
   const { session } = useAuth();
   const [items, setItems] = useState<PurchaseRecord[]>([]);
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -129,14 +132,30 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
   const [selected, setSelected] = useState<PurchaseRecord | null>(null);
   const [draft, setDraft] = useState<PurchaseRecord>(emptyPurchase);
   const canRead = canAccessResourceAction(session, purchasesResource, "read");
-  const canCreate = canAccessResourceAction(session, purchasesResource, "create");
-  const canUpdate = canAccessResourceAction(session, purchasesResource, "update");
-  const canDelete = canAccessResourceAction(session, purchasesResource, "delete");
-  const canReadPartners = canAccessResourceAction(session, partnersResource, "read");
+  const canCreate = canAccessResourceAction(
+    session,
+    purchasesResource,
+    "create",
+  );
+  const canUpdate = canAccessResourceAction(
+    session,
+    purchasesResource,
+    "update",
+  );
+  const canDelete = canAccessResourceAction(
+    session,
+    purchasesResource,
+    "delete",
+  );
+  const canReadPartners = canAccessResourceAction(
+    session,
+    partnersResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadPurchases() {
+  const loadPurchases = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -158,13 +177,13 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as compras."));
+      setError(getErrorMessage(err, "Não foi possível carregar as compras."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadPartners() {
+  const loadPartners = useCallback(async () => {
     if (!canReadPartners) {
       setPartners([]);
       return;
@@ -181,15 +200,15 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
     } catch {
       setPartners([]);
     }
-  }
+  }, [canReadPartners]);
 
   useEffect(() => {
     void loadPurchases();
-  }, [canRead]);
+  }, [loadPurchases]);
 
   useEffect(() => {
     void loadPartners();
-  }, [canReadPartners]);
+  }, [loadPartners]);
 
   const supplierOptions = useMemo(
     () =>
@@ -250,8 +269,8 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar compras."
-          : "Seu perfil nao possui permissao para criar compras.",
+          ? "Seu perfil não possui permissão para atualizar compras."
+          : "Seu perfil não possui permissão para criar compras.",
       );
       return;
     }
@@ -280,8 +299,8 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a compra."
-            : "Nao foi possivel criar a compra.",
+            ? "Não foi possível atualizar a compra."
+            : "Não foi possível criar a compra.",
         ),
       );
     } finally {
@@ -291,18 +310,16 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
 
   async function handleDelete(item: PurchaseRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir compras.");
+      setError("Seu perfil não possui permissão para excluir compras.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a compra para exclusao.");
+      setError("Não foi possível identificar a compra para exclusão.");
       return;
     }
 
-    const confirmed = window.confirm(
-      `Deseja excluir a compra "${item.id}"?`,
-    );
+    const confirmed = window.confirm(`Deseja excluir a compra "${item.id}"?`);
 
     if (!confirmed) {
       return;
@@ -317,14 +334,18 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
       await loadPurchases();
       setSuccess("Compra excluida com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a compra."));
+      setError(getErrorMessage(err, "Não foi possível excluir a compra."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "purchases-page purchases-page--embedded" : "purchases-page"}>
+    <div
+      className={
+        embedded ? "purchases-page purchases-page--embedded" : "purchases-page"
+      }
+    >
       {!embedded ? (
         <header className="purchases-page__header">
           <div>
@@ -332,7 +353,7 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
             <h2 className="purchases-page__title">Compras</h2>
             <p className="purchases-page__subtitle">
               Registre pedidos de compra, acompanhe status de recebimento e
-              organize condicoes comerciais com fornecedores.
+              organize condições comerciais com fornecedores.
             </p>
           </div>
 
@@ -396,8 +417,8 @@ export default function PurchasesPage({ embedded = false }: PurchasesPageProps) 
         <div className="purchases-page__alert purchases-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

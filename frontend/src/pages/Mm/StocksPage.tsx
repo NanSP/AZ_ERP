@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import StockForm from "../../components/Mm/StockForm";
@@ -77,8 +77,7 @@ function normalizeStock(data: Record<string, unknown>): StockRecord {
       data.quantidadeMinima == null ? "" : String(data.quantidadeMinima),
     quantidadeMaxima:
       data.quantidadeMaxima == null ? "" : String(data.quantidadeMaxima),
-    valorUnitario:
-      data.valorUnitario == null ? "" : String(data.valorUnitario),
+    valorUnitario: data.valorUnitario == null ? "" : String(data.valorUnitario),
     dataValidade: data.dataValidade == null ? "" : String(data.dataValidade),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
   };
@@ -170,12 +169,20 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
   const canCreate = canAccessResourceAction(session, stocksResource, "create");
   const canUpdate = canAccessResourceAction(session, stocksResource, "update");
   const canDelete = canAccessResourceAction(session, stocksResource, "delete");
-  const canReadProducts = canAccessResourceAction(session, productsResource, "read");
-  const canReadCompanies = canAccessResourceAction(session, companiesResource, "read");
+  const canReadProducts = canAccessResourceAction(
+    session,
+    productsResource,
+    "read",
+  );
+  const canReadCompanies = canAccessResourceAction(
+    session,
+    companiesResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadStocks() {
+  const loadStocks = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -197,13 +204,13 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os estoques."));
+      setError(getErrorMessage(err, "Não foi possível carregar os estoques."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProducts([]);
       return;
@@ -220,9 +227,9 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
     } catch {
       setProducts([]);
     }
-  }
+  }, [canReadProducts]);
 
-  async function loadCompanies() {
+  const loadCompanies = useCallback(async () => {
     if (!canReadCompanies) {
       setCompanies([]);
       return;
@@ -239,19 +246,19 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
     } catch {
       setCompanies([]);
     }
-  }
+  }, [canReadCompanies]);
 
   useEffect(() => {
     void loadStocks();
-  }, [canRead]);
+  }, [loadStocks]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   useEffect(() => {
     void loadCompanies();
-  }, [canReadCompanies]);
+  }, [loadCompanies]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -303,8 +310,8 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar estoques."
-          : "Seu perfil nao possui permissao para criar estoques.",
+          ? "Seu perfil não possui permissão para atualizar estoques."
+          : "Seu perfil não possui permissão para criar estoques.",
       );
       return;
     }
@@ -333,8 +340,8 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o estoque."
-            : "Nao foi possivel criar o estoque.",
+            ? "Não foi possível atualizar o estoque."
+            : "Não foi possível criar o estoque.",
         ),
       );
     } finally {
@@ -344,12 +351,12 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
 
   async function handleDelete(item: StockRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir estoques.");
+      setError("Seu perfil não possui permissão para excluir estoques.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o estoque para exclusao.");
+      setError("Não foi possível identificar o estoque para exclusão.");
       return;
     }
 
@@ -370,22 +377,24 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
       await loadStocks();
       setSuccess("Estoque excluido com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o estoque."));
+      setError(getErrorMessage(err, "Não foi possível excluir o estoque."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "stocks-page stocks-page--embedded" : "stocks-page"}>
+    <div
+      className={embedded ? "stocks-page stocks-page--embedded" : "stocks-page"}
+    >
       {!embedded ? (
         <header className="stocks-page__header">
           <div>
             <span className="stocks-page__eyebrow">MM</span>
             <h2 className="stocks-page__title">Estoques</h2>
             <p className="stocks-page__subtitle">
-              Gerencie posicoes de estoque por produto, empresa, lote e localizacao,
-              com limites, valor unitario e validade.
+              Gerencie posições de estoque por produto, empresa, lote e
+              localização, com limites, valor unitário e validade.
             </p>
           </div>
 
@@ -394,7 +403,7 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por produto, empresa, localizacao, lote ou validade"
+              placeholder="Buscar por produto, empresa, localização, lote ou validade"
               className="stocks-page__search"
               disabled={isBusy || !canRead}
             />
@@ -414,7 +423,7 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por produto, empresa, localizacao, lote ou validade"
+            placeholder="Buscar por produto, empresa, localização, lote ou validade"
             className="stocks-page__search"
             disabled={isBusy || !canRead}
           />
@@ -449,8 +458,8 @@ export default function StocksPage({ embedded = false }: StocksPageProps) {
         <div className="stocks-page__alert stocks-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

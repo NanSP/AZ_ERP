@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import OrderForm from "../../components/Sd/OrderForm";
@@ -136,11 +136,15 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
   const canCreate = canAccessResourceAction(session, ordersResource, "create");
   const canUpdate = canAccessResourceAction(session, ordersResource, "update");
   const canDelete = canAccessResourceAction(session, ordersResource, "delete");
-  const canReadClients = canAccessResourceAction(session, clientsResource, "read");
+  const canReadClients = canAccessResourceAction(
+    session,
+    clientsResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -162,13 +166,13 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os pedidos."));
+      setError(getErrorMessage(err, "Não foi possível carregar os pedidos."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadClients() {
+  const loadClients = useCallback(async () => {
     if (!canReadClients) {
       setClients([]);
       return;
@@ -185,15 +189,15 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
     } catch {
       setClients([]);
     }
-  }
+  }, [canReadClients]);
 
   useEffect(() => {
     void loadOrders();
-  }, [canRead]);
+  }, [loadOrders]);
 
   useEffect(() => {
     void loadClients();
-  }, [canReadClients]);
+  }, [loadClients]);
 
   const clientOptions = useMemo(() => clients, [clients]);
 
@@ -248,8 +252,8 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar pedidos."
-          : "Seu perfil nao possui permissao para criar pedidos.",
+          ? "Seu perfil não possui permissão para atualizar pedidos."
+          : "Seu perfil não possui permissão para criar pedidos.",
       );
       return;
     }
@@ -278,8 +282,8 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o pedido."
-            : "Nao foi possivel criar o pedido.",
+            ? "Não foi possível atualizar o pedido."
+            : "Não foi possível criar o pedido.",
         ),
       );
     } finally {
@@ -289,12 +293,12 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
 
   async function handleDelete(item: OrderRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir pedidos.");
+      setError("Seu perfil não possui permissão para excluir pedidos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o pedido para exclusao.");
+      setError("Não foi possível identificar o pedido para exclusão.");
       return;
     }
 
@@ -315,14 +319,16 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       await loadOrders();
       setSuccess("Pedido excluido com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o pedido."));
+      setError(getErrorMessage(err, "Não foi possível excluir o pedido."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "orders-page orders-page--embedded" : "orders-page"}>
+    <div
+      className={embedded ? "orders-page orders-page--embedded" : "orders-page"}
+    >
       {!embedded ? (
         <header className="orders-page__header">
           <div>
@@ -359,7 +365,7 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por cliente, numero, status, pagamento ou observacoes"
+            placeholder="Buscar por cliente, número, status, pagamento ou observações"
             className="orders-page__search"
             disabled={isBusy || !canRead}
           />
@@ -394,8 +400,8 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
         <div className="orders-page__alert orders-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

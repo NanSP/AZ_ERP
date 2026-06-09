@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import OrderItemForm from "../../components/Sd/OrderItemForm";
@@ -65,8 +65,7 @@ function normalizeOrderItem(data: Record<string, unknown>): OrderItemRecord {
     pedidoId: data.pedido == null ? "" : String(data.pedido),
     produtoId: data.produto == null ? "" : String(data.produto),
     quantidade: data.quantidade == null ? "" : String(data.quantidade),
-    valorUnitario:
-      data.valorUnitario == null ? "" : String(data.valorUnitario),
+    valorUnitario: data.valorUnitario == null ? "" : String(data.valorUnitario),
     valorTotal: data.valorTotal == null ? "" : String(data.valorTotal),
     desconto: data.desconto == null ? "" : String(data.desconto),
     createdAt: data.createdAt == null ? undefined : String(data.createdAt),
@@ -171,7 +170,11 @@ export default function OrderItemsPage({
     orderItemsResource,
     "delete",
   );
-  const canReadOrders = canAccessResourceAction(session, ordersResource, "read");
+  const canReadOrders = canAccessResourceAction(
+    session,
+    ordersResource,
+    "read",
+  );
   const canReadProducts = canAccessResourceAction(
     session,
     productsResource,
@@ -180,7 +183,7 @@ export default function OrderItemsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadOrderItems() {
+  const loadOrderItems = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -203,14 +206,14 @@ export default function OrderItemsPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os itens do pedido."),
+        getErrorMessage(err, "Não foi possível carregar os itens do pedido."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     if (!canReadOrders) {
       setOrders([]);
       return;
@@ -227,9 +230,9 @@ export default function OrderItemsPage({
     } catch {
       setOrders([]);
     }
-  }
+  }, [canReadOrders]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProducts([]);
       return;
@@ -246,19 +249,19 @@ export default function OrderItemsPage({
     } catch {
       setProducts([]);
     }
-  }
+  }, [canReadProducts]);
 
   useEffect(() => {
     void loadOrderItems();
-  }, [canRead]);
+  }, [loadOrderItems]);
 
   useEffect(() => {
     void loadOrders();
-  }, [canReadOrders]);
+  }, [loadOrders]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   const orderOptions = useMemo(
     () =>
@@ -332,7 +335,9 @@ export default function OrderItemsPage({
       Number.isFinite(quantidade) &&
       Number.isFinite(valorUnitario) &&
       Number.isFinite(desconto)
-        ? (Math.round((quantidade * valorUnitario - desconto) * 100) / 100).toString()
+        ? (
+            Math.round((quantidade * valorUnitario - desconto) * 100) / 100
+          ).toString()
         : "";
 
     setDraft({
@@ -345,8 +350,8 @@ export default function OrderItemsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar itens do pedido."
-          : "Seu perfil nao possui permissao para criar itens do pedido.",
+          ? "Seu perfil não possui permissão para atualizar itens do pedido."
+          : "Seu perfil não possui permissão para criar itens do pedido.",
       );
       return;
     }
@@ -361,7 +366,9 @@ export default function OrderItemsPage({
         ? await updateResource("sd", "pedidoItens", selected.id, payload)
         : await createResource("sd", "pedidoItens", payload);
 
-      const saved = normalizeOrderItem(response.data as Record<string, unknown>);
+      const saved = normalizeOrderItem(
+        response.data as Record<string, unknown>,
+      );
       await loadOrderItems();
       await loadOrders();
       setSelected(saved);
@@ -376,8 +383,8 @@ export default function OrderItemsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o item do pedido."
-            : "Nao foi possivel criar o item do pedido.",
+            ? "Não foi possível atualizar o item do pedido."
+            : "Não foi possível criar o item do pedido.",
         ),
       );
     } finally {
@@ -387,12 +394,12 @@ export default function OrderItemsPage({
 
   async function handleDelete(item: OrderItemRecord) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir itens do pedido.");
+      setError("Seu perfil não possui permissão para excluir itens do pedido.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o item do pedido para exclusao.");
+      setError("Não foi possível identificar o item do pedido para exclusão .");
       return;
     }
 
@@ -415,7 +422,7 @@ export default function OrderItemsPage({
       setSuccess("Item do pedido excluido com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir o item do pedido."),
+        getErrorMessage(err, "Não foi possível excluir o item do pedido."),
       );
     } finally {
       setSaving(false);
@@ -501,8 +508,8 @@ export default function OrderItemsPage({
         <div className="order-items-page__alert order-items-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

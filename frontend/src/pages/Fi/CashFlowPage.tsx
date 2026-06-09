@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import CashFlowForm from "../../components/Fi/CashFlowForm";
@@ -120,7 +120,7 @@ export default function CashFlowPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadCashFlow() {
+  const loadCashFlow = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -148,11 +148,11 @@ export default function CashFlowPage({
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadCashFlow();
-  }, [canRead]);
+  }, [loadCashFlow]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
