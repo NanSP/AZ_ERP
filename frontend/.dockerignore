@@ -1,0 +1,7 @@
+node_modules
+dist
+playwright-report
+test-results
+preview.err.log
+preview.out.log
+npm-debug.log*
