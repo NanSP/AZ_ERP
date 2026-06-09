@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import TimeTrackingForm from "../../components/Rh/TimeTrackingForm";
@@ -67,7 +67,8 @@ function normalizeEntry(data: Record<string, unknown>): TimeTrackingEntry {
 
 function toRequestPayload(entry: TimeTrackingEntry) {
   return {
-    colaborador: entry.colaborador.trim() === "" ? null : Number(entry.colaborador),
+    colaborador:
+      entry.colaborador.trim() === "" ? null : Number(entry.colaborador),
     data: entry.data.trim() || null,
     horaEntrada: entry.horaEntrada.trim() || null,
     horaSaidaAlmoco: entry.horaSaidaAlmoco.trim() || null,
@@ -119,7 +120,7 @@ export default function TimeTrackingPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadEntries() {
+  const loadEntries = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -142,14 +143,17 @@ export default function TimeTrackingPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os registros de ponto."),
+        getErrorMessage(
+          err,
+          "Não foi possível carregar os registros de ponto.",
+        ),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -173,15 +177,15 @@ export default function TimeTrackingPage({
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadEntries();
-  }, [canRead]);
+  }, [loadEntries]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -234,8 +238,8 @@ export default function TimeTrackingPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar registros de ponto."
-          : "Seu perfil nao possui permissao para criar registros de ponto.",
+          ? "Seu perfil não possui permissão para atualizar registros de ponto."
+          : "Seu perfil não possui permissão para criar registros de ponto.",
       );
       return;
     }
@@ -264,8 +268,8 @@ export default function TimeTrackingPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o registro de ponto."
-            : "Nao foi possivel criar o registro de ponto.",
+            ? "Não foi possível atualizar o registro de ponto."
+            : "Não foi possível criar o registro de ponto.",
         ),
       );
     } finally {
@@ -275,12 +279,16 @@ export default function TimeTrackingPage({
 
   async function handleDelete(item: TimeTrackingEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir registros de ponto.");
+      setError(
+        "Seu perfil não possui permissão para excluir registros de ponto.",
+      );
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o registro de ponto para exclusao.");
+      setError(
+        "Não foi possível identificar o registro de ponto para exclusão.",
+      );
       return;
     }
 
@@ -305,10 +313,10 @@ export default function TimeTrackingPage({
         setDraft({ ...emptyEntry });
       }
 
-      setSuccess("Registro de ponto excluido com sucesso.");
+      setSuccess("Registro de ponto excluído com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir o registro de ponto."),
+        getErrorMessage(err, "Não foi possível excluir o registro de ponto."),
       );
     } finally {
       setSaving(false);
@@ -329,7 +337,7 @@ export default function TimeTrackingPage({
             <span className="time-tracking-page__eyebrow">RH</span>
             <h2 className="time-tracking-page__title">Controle de Ponto</h2>
             <p className="time-tracking-page__subtitle">
-              Registre a jornada dos colaboradores com calculo automatico de
+              Registre a jornada dos colaboradores com cálculo automático de
               horas trabalhadas, extras e atrasos.
             </p>
           </div>
@@ -394,8 +402,8 @@ export default function TimeTrackingPage({
         <div className="time-tracking-page__alert time-tracking-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

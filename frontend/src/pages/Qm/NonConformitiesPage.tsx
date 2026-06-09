@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import NonConformityForm from "../../components/Qm/NonConformityForm";
 import NonConformitiesTable from "../../components/Qm/NonConformitiesTable";
@@ -119,14 +119,13 @@ export default function NonConformitiesPage({
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<NonConformityEntry | null>(null);
   const [draft, setDraft] = useState<NonConformityEntry>(emptyEntry);
-  const [inspectionOptions, setInspectionOptions] = useState<InspectionOption[]>(
-    [],
-  );
+  const [inspectionOptions, setInspectionOptions] = useState<
+    InspectionOption[]
+  >([]);
   const [inspectionAccess, setInspectionAccess] =
     useState<InspectionAccess>("idle");
   const [employeeOptions, setEmployeeOptions] = useState<EmployeeOption[]>([]);
-  const [employeeAccess, setEmployeeAccess] =
-    useState<EmployeeAccess>("idle");
+  const [employeeAccess, setEmployeeAccess] = useState<EmployeeAccess>("idle");
   const permissionSet = useMemo(
     () => new Set(session?.permissoes ?? []),
     [session?.permissoes],
@@ -147,7 +146,7 @@ export default function NonConformitiesPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadNonConformities() {
+  const loadNonConformities = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -170,17 +169,14 @@ export default function NonConformitiesPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel carregar as nao conformidades.",
-        ),
+        getErrorMessage(err, "Não foi possível carregar as não conformidades."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadInspections() {
+  const loadInspections = useCallback(async () => {
     if (!canReadInspections) {
       setInspectionOptions([]);
       setInspectionAccess("unavailable");
@@ -204,9 +200,9 @@ export default function NonConformitiesPage({
       setInspectionOptions([]);
       setInspectionAccess("unavailable");
     }
-  }
+  }, [canReadInspections]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -230,19 +226,19 @@ export default function NonConformitiesPage({
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadNonConformities();
-  }, [canRead]);
+  }, [loadNonConformities]);
 
   useEffect(() => {
     void loadInspections();
-  }, [canReadInspections]);
+  }, [loadInspections]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -287,9 +283,7 @@ export default function NonConformitiesPage({
 
   function handleChange(next: NonConformityEntry) {
     const patched =
-      next.status !== "resolvida"
-        ? { ...next, dataResolucao: "" }
-        : next;
+      next.status !== "resolvida" ? { ...next, dataResolucao: "" } : next;
     setDraft(patched);
   }
 
@@ -297,8 +291,8 @@ export default function NonConformitiesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar nao conformidades."
-          : "Seu perfil nao possui permissao para criar nao conformidades.",
+          ? "Seu perfil não possui permissão para atualizar não conformidades."
+          : "Seu perfil não possui permissão para criar não conformidades.",
       );
       return;
     }
@@ -310,12 +304,7 @@ export default function NonConformitiesPage({
     try {
       const payload = toRequestPayload(draft);
       const response = selected?.id
-        ? await updateResource(
-            "qm",
-            "naoConformidade",
-            selected.id,
-            payload,
-          )
+        ? await updateResource("qm", "naoConformidade", selected.id, payload)
         : await createResource("qm", "naoConformidade", payload);
 
       const saved = normalizeEntry(response.data as Record<string, unknown>);
@@ -324,16 +313,16 @@ export default function NonConformitiesPage({
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Nao conformidade atualizada com sucesso."
-          : "Nao conformidade criada com sucesso.",
+          ? "Não conformidade atualizada com sucesso."
+          : "Não conformidade criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a nao conformidade."
-            : "Nao foi possivel criar a nao conformidade.",
+            ? "Não foi possível atualizar a não conformidade."
+            : "Não foi possível criar a não conformidade.",
         ),
       );
     } finally {
@@ -343,17 +332,21 @@ export default function NonConformitiesPage({
 
   async function handleDelete(item: NonConformityEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir nao conformidades.");
+      setError(
+        "Seu perfil não possui permissão para excluir não conformidades.",
+      );
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a nao conformidade para exclusao.");
+      setError(
+        "Não foi possível identificar a não conformidade para exclusão.",
+      );
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a nao conformidade "${item.tipoNaoConformidade || item.id}"?`,
+      `Deseja excluir a não conformidade "${item.tipoNaoConformidade || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -373,13 +366,10 @@ export default function NonConformitiesPage({
         setDraft({ ...emptyEntry });
       }
 
-      setSuccess("Nao conformidade excluida com sucesso.");
+      setSuccess("Não conformidade excluída com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel excluir a nao conformidade.",
-        ),
+        getErrorMessage(err, "Não foi possível excluir a não conformidade."),
       );
     } finally {
       setSaving(false);
@@ -398,11 +388,10 @@ export default function NonConformitiesPage({
         <header className="non-conformities-page__header">
           <div>
             <span className="non-conformities-page__eyebrow">QM</span>
-            <h2 className="non-conformities-page__title">
-              Nao conformidades
-            </h2>
+            <h2 className="non-conformities-page__title">Não conformidades</h2>
             <p className="non-conformities-page__subtitle">
-              Registre, acompanhe e resolva ocorrencias de qualidade ligadas as inspecoes.
+              Registre, acompanhe e resolva ocorrências de qualidade ligadas as
+              inspeções.
             </p>
           </div>
 
@@ -421,7 +410,7 @@ export default function NonConformitiesPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova nao conformidade
+              Nova não conformidade
             </button>
           </div>
         </header>
@@ -450,13 +439,15 @@ export default function NonConformitiesPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova nao conformidade
+              Nova não conformidade
             </button>
           </div>
         </div>
       )}
 
-      {error ? <div className="non-conformities-page__alert">{error}</div> : null}
+      {error ? (
+        <div className="non-conformities-page__alert">{error}</div>
+      ) : null}
       {success ? (
         <div className="non-conformities-page__alert non-conformities-page__alert--success">
           {success}
@@ -466,8 +457,8 @@ export default function NonConformitiesPage({
         <div className="non-conformities-page__alert non-conformities-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

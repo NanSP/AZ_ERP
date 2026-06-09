@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import InspectionForm from "../../components/Qm/InspectionForm";
 import InspectionsTable from "../../components/Qm/InspectionsTable";
@@ -141,7 +141,7 @@ export default function InspectionsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadInspections() {
+  const loadInspections = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -163,13 +163,13 @@ export default function InspectionsPage({
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as inspecoes."));
+      setError(getErrorMessage(err, "Não foi possível carregar as inspecoes."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProductOptions([]);
       setProductAccess("unavailable");
@@ -193,9 +193,9 @@ export default function InspectionsPage({
       setProductOptions([]);
       setProductAccess("unavailable");
     }
-  }
+  }, [canReadProducts]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -219,19 +219,19 @@ export default function InspectionsPage({
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadInspections();
-  }, [canRead]);
+  }, [loadInspections]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -283,8 +283,8 @@ export default function InspectionsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar inspecoes."
-          : "Seu perfil nao possui permissao para criar inspecoes.",
+          ? "Seu perfil não possui permissão para atualizar inspecoes."
+          : "Seu perfil não possui permissão para criar inspecoes.",
       );
       return;
     }
@@ -299,7 +299,9 @@ export default function InspectionsPage({
         ? await updateResource("qm", "inspecoes", selected.id, payload)
         : await createResource("qm", "inspecoes", payload);
 
-      const saved = normalizeInspection(response.data as Record<string, unknown>);
+      const saved = normalizeInspection(
+        response.data as Record<string, unknown>,
+      );
       await loadInspections();
       setSelected(saved);
       setDraft({ ...saved });
@@ -313,8 +315,8 @@ export default function InspectionsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a inspecao."
-            : "Nao foi possivel criar a inspecao.",
+            ? "Não foi possível atualizar a inspecao."
+            : "Não foi possível criar a inspecao.",
         ),
       );
     } finally {
@@ -324,12 +326,12 @@ export default function InspectionsPage({
 
   async function handleDelete(item: InspectionEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir inspecoes.");
+      setError("Seu perfil não possui permissão para excluir inspecoes.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a inspecao para exclusao.");
+      setError("Não foi possível identificar a inspecao para exclusão.");
       return;
     }
 
@@ -356,7 +358,7 @@ export default function InspectionsPage({
 
       setSuccess("Inspecao excluida com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a inspecao."));
+      setError(getErrorMessage(err, "Não foi possível excluir a inspecao."));
     } finally {
       setSaving(false);
     }
@@ -365,16 +367,19 @@ export default function InspectionsPage({
   return (
     <div
       className={
-        embedded ? "inspections-page inspections-page--embedded" : "inspections-page"
+        embedded
+          ? "inspections-page inspections-page--embedded"
+          : "inspections-page"
       }
     >
       {!embedded ? (
         <header className="inspections-page__header">
           <div>
             <span className="inspections-page__eyebrow">QM</span>
-            <h2 className="inspections-page__title">Inspecoes</h2>
+            <h2 className="inspections-page__title">Inspeções</h2>
             <p className="inspections-page__subtitle">
-              Gerencie inspecoes de recebimento, processo, final e expedicao com resultado e rastreabilidade.
+              Gerencie inspeções de recebimento, processo, final e expedição com
+              resultado e rastreabilidade.
             </p>
           </div>
 
@@ -393,7 +398,7 @@ export default function InspectionsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova inspecao
+              Nova inspeção
             </button>
           </div>
         </header>
@@ -422,7 +427,7 @@ export default function InspectionsPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Nova inspecao
+              Nova inspeção
             </button>
           </div>
         </div>
@@ -438,8 +443,8 @@ export default function InspectionsPage({
         <div className="inspections-page__alert inspections-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

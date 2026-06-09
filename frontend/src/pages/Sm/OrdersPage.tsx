@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import OrdersTable from "../../components/Sm/OrdersTable";
@@ -210,7 +210,7 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -226,19 +226,21 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
     try {
       const response = await listResource("sm", "ordensServico");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeOrder(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeOrder(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar as ordens de servico."),
+        getErrorMessage(err, "Não foi possível carregar as ordens de serviço."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadPartners() {
+  const loadPartners = useCallback(async () => {
     if (!canReadPartners) {
       setPartnerOptions([]);
       setPartnerAccess("unavailable");
@@ -249,7 +251,9 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       const response = await listResource("core", "parceiros");
       const nextItems = Array.isArray(response.data)
         ? response.data
-            .map((item) => mapOption(item as Record<string, unknown>, "Cliente"))
+            .map((item) =>
+              mapOption(item as Record<string, unknown>, "Cliente"),
+            )
             .filter((item): item is PartnerOption => item !== null)
         : [];
       setPartnerOptions(nextItems);
@@ -258,9 +262,9 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       setPartnerOptions([]);
       setPartnerAccess("unavailable");
     }
-  }
+  }, [canReadPartners]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProductOptions([]);
       setProductAccess("unavailable");
@@ -271,7 +275,9 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       const response = await listResource("core", "produtos");
       const nextItems = Array.isArray(response.data)
         ? response.data
-            .map((item) => mapOption(item as Record<string, unknown>, "Produto"))
+            .map((item) =>
+              mapOption(item as Record<string, unknown>, "Produto"),
+            )
             .filter((item): item is ProductOption => item !== null)
         : [];
       setProductOptions(nextItems);
@@ -280,9 +286,9 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       setProductOptions([]);
       setProductAccess("unavailable");
     }
-  }
+  }, [canReadProducts]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -293,7 +299,9 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       const response = await listResource("rh", "colaboradores");
       const nextItems = Array.isArray(response.data)
         ? response.data
-            .map((item) => mapOption(item as Record<string, unknown>, "Tecnico"))
+            .map((item) =>
+              mapOption(item as Record<string, unknown>, "Tecnico"),
+            )
             .filter((item): item is EmployeeOption => item !== null)
         : [];
       setEmployeeOptions(nextItems);
@@ -302,23 +310,23 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadOrders();
-  }, [canRead]);
+  }, [loadOrders]);
 
   useEffect(() => {
     void loadPartners();
-  }, [canReadPartners]);
+  }, [loadPartners]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -364,8 +372,8 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar ordens de servico."
-          : "Seu perfil nao possui permissao para criar ordens de servico.",
+          ? "Seu perfil não possui permissão para atualizar ordens de serviço."
+          : "Seu perfil não possui permissão para criar ordens de serviço.",
       );
       return;
     }
@@ -386,16 +394,16 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Ordem de servico atualizada com sucesso."
-          : "Ordem de servico criada com sucesso.",
+          ? "Ordem de serviço atualizada com sucesso."
+          : "Ordem de serviço criada com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a ordem de servico."
-            : "Nao foi possivel criar a ordem de servico.",
+            ? "Não foi possível atualizar a ordem de serviço."
+            : "Não foi possível criar a ordem de serviço.",
         ),
       );
     } finally {
@@ -405,17 +413,21 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
 
   async function handleDelete(item: Order) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir ordens de servico.");
+      setError(
+        "Seu perfil não possui permissão para excluir ordens de serviço.",
+      );
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a ordem de servico para exclusao.");
+      setError(
+        "Não foi possível identificar a ordem de serviço para exclusão.",
+      );
       return;
     }
 
     const confirmed = window.confirm(
-      `Deseja excluir a ordem de servico "${item.numeroOs || item.id}"?`,
+      `Deseja excluir a ordem de serviço "${item.numeroOs || item.id}"?`,
     );
 
     if (!confirmed) {
@@ -435,13 +447,10 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
         setDraft({ ...emptyOrder });
       }
 
-      setSuccess("Ordem de servico excluida com sucesso.");
+      setSuccess("Ordem de serviço excluída com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(
-          err,
-          "Nao foi possivel excluir a ordem de servico.",
-        ),
+        getErrorMessage(err, "Não foi possível excluir a ordem de serviço."),
       );
     } finally {
       setSaving(false);
@@ -449,14 +458,17 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
   }
 
   return (
-    <div className={embedded ? "orders-page orders-page--embedded" : "orders-page"}>
+    <div
+      className={embedded ? "orders-page orders-page--embedded" : "orders-page"}
+    >
       {!embedded ? (
         <header className="orders-page__header">
           <div>
             <span className="orders-page__eyebrow">SM</span>
             <h2 className="orders-page__title">Ordens de Servico</h2>
             <p className="orders-page__subtitle">
-              Gerencie cliente, produto, tecnico, agenda e status das ordens de servico.
+              Gerencie cliente, produto, técnico, agenda e status das ordens de
+              serviço.
             </p>
           </div>
 
@@ -485,7 +497,7 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por OS, tipo de servico, descricao ou status"
+            placeholder="Buscar por OS, tipo de serviço, descrição ou status"
             className="orders-page__search"
             disabled={isBusy || !canRead}
           />
@@ -520,8 +532,8 @@ export default function OrdersPage({ embedded = false }: OrdersPageProps) {
         <div className="orders-page__alert orders-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

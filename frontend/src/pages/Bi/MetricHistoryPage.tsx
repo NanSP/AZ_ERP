@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import MetricHistoryForm from "../../components/Bi/MetricHistoryForm";
@@ -51,9 +51,7 @@ const emptyHistory: MetricHistoryRecord = {
   valorApurado: "",
 };
 
-function normalizeHistory(
-  data: Record<string, unknown>,
-): MetricHistoryRecord {
+function normalizeHistory(data: Record<string, unknown>): MetricHistoryRecord {
   return {
     id: typeof data.id === "number" ? data.id : undefined,
     metrica: data.metrica == null ? "" : String(data.metrica),
@@ -117,11 +115,15 @@ export default function MetricHistoryPage({
   const canCreate = canAccessResourceAction(session, historyResource, "create");
   const canUpdate = canAccessResourceAction(session, historyResource, "update");
   const canDelete = canAccessResourceAction(session, historyResource, "delete");
-  const canReadMetrics = canAccessResourceAction(session, metricsResource, "read");
+  const canReadMetrics = canAccessResourceAction(
+    session,
+    metricsResource,
+    "read",
+  );
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadHistory() {
+  const loadHistory = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -146,15 +148,15 @@ export default function MetricHistoryPage({
       setError(
         getErrorMessage(
           err,
-          "Nao foi possivel carregar o historico de metricas.",
+          "Não foi possível carregar o histórico de métricas.",
         ),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadMetrics() {
+  const loadMetrics = useCallback(async () => {
     if (!canReadMetrics) {
       setMetricOptions([]);
       setMetricAccess("unavailable");
@@ -174,15 +176,15 @@ export default function MetricHistoryPage({
       setMetricOptions([]);
       setMetricAccess("unavailable");
     }
-  }
+  }, [canReadMetrics]);
 
   useEffect(() => {
     void loadHistory();
-  }, [canRead]);
+  }, [loadHistory]);
 
   useEffect(() => {
     void loadMetrics();
-  }, [canReadMetrics]);
+  }, [loadMetrics]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -228,8 +230,8 @@ export default function MetricHistoryPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar historico de metricas."
-          : "Seu perfil nao possui permissao para criar historico de metricas.",
+          ? "Seu perfil não possui permissão para atualizar histórico de métricas."
+          : "Seu perfil não possui permissão para criar histórico de métricas.",
       );
       return;
     }
@@ -250,16 +252,16 @@ export default function MetricHistoryPage({
       setDraft({ ...saved });
       setSuccess(
         selected?.id
-          ? "Historico atualizado com sucesso."
-          : "Historico criado com sucesso.",
+          ? "Histórico atualizado com sucesso."
+          : "Histórico criado com sucesso.",
       );
     } catch (err) {
       setError(
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o historico."
-            : "Nao foi possivel criar o historico.",
+            ? "Não foi possível atualizar o histórico."
+            : "Não foi possível criar o histórico.",
         ),
       );
     } finally {
@@ -270,19 +272,17 @@ export default function MetricHistoryPage({
   async function handleDelete(item: MetricHistoryRecord) {
     if (!canDelete) {
       setError(
-        "Seu perfil nao possui permissao para excluir historico de metricas.",
+        "Seu perfil não possui permissão para excluir histórico de métricas.",
       );
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o historico para exclusao.");
+      setError("Não foi possível identificar o histórico para exclusão.");
       return;
     }
 
-    const confirmed = window.confirm(
-      `Deseja excluir o historico #${item.id}?`,
-    );
+    const confirmed = window.confirm(`Deseja excluir o histórico #${item.id}?`);
 
     if (!confirmed) {
       return;
@@ -295,11 +295,9 @@ export default function MetricHistoryPage({
     try {
       await deleteResource("bi", "historicoMetricas", item.id);
       await loadHistory();
-      setSuccess("Historico excluido com sucesso.");
+      setSuccess("Histórico excluído com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o historico."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir o histórico."));
     } finally {
       setSaving(false);
     }
@@ -317,9 +315,11 @@ export default function MetricHistoryPage({
         <header className="metric-history-page__header">
           <div>
             <span className="metric-history-page__eyebrow">BI</span>
-            <h2 className="metric-history-page__title">Historico de metricas</h2>
+            <h2 className="metric-history-page__title">
+              Histórico de métricas
+            </h2>
             <p className="metric-history-page__subtitle">
-              Registre a evolucao dos indicadores por periodo.
+              Registre a evolução dos indicadores por período.
             </p>
           </div>
 
@@ -338,7 +338,7 @@ export default function MetricHistoryPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Novo historico
+              Novo histórico
             </button>
           </div>
         </header>
@@ -367,7 +367,7 @@ export default function MetricHistoryPage({
               onClick={handleCreateNew}
               disabled={isBusy || !canCreate || !canRead}
             >
-              Novo historico
+              Novo histórico
             </button>
           </div>
         </div>
@@ -383,8 +383,8 @@ export default function MetricHistoryPage({
         <div className="metric-history-page__alert metric-history-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

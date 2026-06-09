@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import DocumentsForm from "../../components/Fiscal/DocumentsForm";
@@ -134,7 +134,7 @@ export default function DocumentsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadDocuments() {
+  const loadDocuments = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -156,13 +156,15 @@ export default function DocumentsPage({
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os documentos."));
+      setError(
+        getErrorMessage(err, "Não foi possível carregar os documentos."),
+      );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadClients() {
+  const loadClients = useCallback(async () => {
     if (!canReadClients) {
       setClients([]);
       setClientAccess("unavailable");
@@ -186,15 +188,15 @@ export default function DocumentsPage({
       setClients([]);
       setClientAccess("unavailable");
     }
-  }
+  }, [canReadClients]);
 
   useEffect(() => {
     void loadDocuments();
-  }, [canRead]);
+  }, [loadDocuments]);
 
   useEffect(() => {
     void loadClients();
-  }, [canReadClients]);
+  }, [loadClients]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -246,8 +248,8 @@ export default function DocumentsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar documentos."
-          : "Seu perfil nao possui permissao para criar documentos.",
+          ? "Seu perfil não possui permissão para atualizar documentos."
+          : "Seu perfil não possui permissão para criar documentos.",
       );
       return;
     }
@@ -276,8 +278,8 @@ export default function DocumentsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o documento."
-            : "Nao foi possivel criar o documento.",
+            ? "Não foi possível atualizar o documento."
+            : "Não foi possível criar o documento.",
         ),
       );
     } finally {
@@ -287,12 +289,12 @@ export default function DocumentsPage({
 
   async function handleDelete(item: DocumentEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir documentos.");
+      setError("Seu perfil não possui permissão para excluir documentos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o documento para exclusao.");
+      setError("Não foi possível identificar o documento para exclusão.");
       return;
     }
 
@@ -319,7 +321,7 @@ export default function DocumentsPage({
 
       setSuccess("Documento excluido com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o documento."));
+      setError(getErrorMessage(err, "Não foi possível excluir o documento."));
     } finally {
       setSaving(false);
     }
@@ -337,7 +339,8 @@ export default function DocumentsPage({
             <span className="documents-page__eyebrow">FISCAL</span>
             <h2 className="documents-page__title">Documentos</h2>
             <p className="documents-page__subtitle">
-              Gerencie documentos fiscais com status, chave de acesso e relacionamento comercial.
+              Gerencie documentos fiscais com status, chave de acesso e
+              relacionamento comercial.
             </p>
           </div>
 
@@ -401,8 +404,8 @@ export default function DocumentsPage({
         <div className="documents-page__alert documents-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" · ")}

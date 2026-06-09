@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import TaskForm from "../../components/Ps/TaskForm";
@@ -149,7 +149,9 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
-function normalizeProjectOption(data: Record<string, unknown>): ProjectOption | null {
+function normalizeProjectOption(
+  data: Record<string, unknown>,
+): ProjectOption | null {
   if (typeof data.id !== "number") {
     return null;
   }
@@ -197,7 +199,9 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
   const [draft, setDraft] = useState<Task>(emptyTask);
   const [projectOptions, setProjectOptions] = useState<ProjectOption[]>([]);
   const [projectAccess, setProjectAccess] = useState<ProjectAccess>("idle");
-  const [parentTaskOptions, setParentTaskOptions] = useState<ParentTaskOption[]>([]);
+  const [parentTaskOptions, setParentTaskOptions] = useState<
+    ParentTaskOption[]
+  >([]);
   const [parentTaskAccess, setParentTaskAccess] =
     useState<ParentTaskAccess>("idle");
   const [userOptions, setUserOptions] = useState<UserOption[]>([]);
@@ -215,7 +219,7 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadTasks() {
+  const loadTasks = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -237,13 +241,13 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar as tarefas."));
+      setError(getErrorMessage(err, "Não foi possível carregar as tarefas."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProjects() {
+  const loadProjects = useCallback(async () => {
     if (!canReadProjects) {
       setProjectOptions([]);
       setProjectAccess("unavailable");
@@ -254,7 +258,9 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
       const response = await listResource("ps", "projetos");
       const nextItems = Array.isArray(response.data)
         ? response.data
-            .map((item) => normalizeProjectOption(item as Record<string, unknown>))
+            .map((item) =>
+              normalizeProjectOption(item as Record<string, unknown>),
+            )
             .filter((item): item is ProjectOption => item !== null)
         : [];
       setProjectOptions(nextItems);
@@ -263,9 +269,9 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
       setProjectOptions([]);
       setProjectAccess("unavailable");
     }
-  }
+  }, [canReadProjects]);
 
-  async function loadParentTasks() {
+  const loadParentTasks = useCallback(async () => {
     if (!canRead) {
       setParentTaskOptions([]);
       setParentTaskAccess("unavailable");
@@ -287,9 +293,9 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
       setParentTaskOptions([]);
       setParentTaskAccess("unavailable");
     }
-  }
+  }, [canRead]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUserOptions([]);
       setUserAccess("unavailable");
@@ -309,23 +315,23 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
       setUserOptions([]);
       setUserAccess("unavailable");
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadTasks();
-  }, [canRead]);
+  }, [loadTasks]);
 
   useEffect(() => {
     void loadProjects();
-  }, [canReadProjects]);
+  }, [loadProjects]);
 
   useEffect(() => {
     void loadParentTasks();
-  }, [canRead]);
+  }, [loadParentTasks]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -387,8 +393,8 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar tarefas."
-          : "Seu perfil nao possui permissao para criar tarefas.",
+          ? "Seu perfil não possui permissão para atualizar tarefas."
+          : "Seu perfil não possui permissão para criar tarefas.",
       );
       return;
     }
@@ -418,8 +424,8 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar a tarefa."
-            : "Nao foi possivel criar a tarefa.",
+            ? "Não foi possível atualizar a tarefa."
+            : "Não foi possível criar a tarefa.",
         ),
       );
     } finally {
@@ -429,12 +435,12 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
 
   async function handleDelete(item: Task) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir tarefas.");
+      setError("Seu perfil não possui permissão para excluir tarefas.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar a tarefa para exclusao.");
+      setError("Não foi possível identificar a tarefa para exclusão.");
       return;
     }
 
@@ -462,21 +468,24 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
 
       setSuccess("Tarefa excluida com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir a tarefa."));
+      setError(getErrorMessage(err, "Não foi possível excluir a tarefa."));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className={embedded ? "tasks-page tasks-page--embedded" : "tasks-page"}>
+    <div
+      className={embedded ? "tasks-page tasks-page--embedded" : "tasks-page"}
+    >
       {!embedded ? (
         <header className="tasks-page__header">
           <div>
             <span className="tasks-page__eyebrow">PS</span>
             <h2 className="tasks-page__title">Tarefas</h2>
             <p className="tasks-page__subtitle">
-              Gerencie tarefas, subtarefas, progresso, responsavel e horas do projeto.
+              Gerencie tarefas, subtarefas, progresso, responsáveis e horas do
+              projeto.
             </p>
           </div>
 
@@ -485,7 +494,7 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por titulo, descricao, status ou progresso"
+              placeholder="Buscar por titulo, descrição, status ou progresso"
               className="tasks-page__search"
               disabled={isBusy || !canRead}
             />
@@ -505,7 +514,7 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por titulo, descricao, status ou progresso"
+            placeholder="Buscar por titulo, descrição, status ou progresso"
             className="tasks-page__search"
             disabled={isBusy || !canRead}
           />
@@ -540,8 +549,8 @@ export default function TasksPage({ embedded = false }: TasksPageProps) {
         <div className="tasks-page__alert tasks-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

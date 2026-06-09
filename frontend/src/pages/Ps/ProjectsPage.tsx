@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ProjectForm from "../../components/Ps/ProjectForm";
@@ -168,7 +168,7 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadProjects() {
+  const loadProjects = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -190,13 +190,13 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar os projetos."));
+      setError(getErrorMessage(err, "Não foi possível carregar os projetos."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadPartners() {
+  const loadPartners = useCallback(async () => {
     if (!canReadPartners) {
       setPartnerOptions([]);
       setPartnerAccess("unavailable");
@@ -220,9 +220,9 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
       setPartnerOptions([]);
       setPartnerAccess("unavailable");
     }
-  }
+  }, [canReadPartners]);
 
-  async function loadUsers() {
+  const loadUsers = useCallback(async () => {
     if (!canReadUsers) {
       setUserOptions([]);
       setUserAccess("unavailable");
@@ -246,19 +246,19 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
       setUserOptions([]);
       setUserAccess("unavailable");
     }
-  }
+  }, [canReadUsers]);
 
   useEffect(() => {
     void loadProjects();
-  }, [canRead]);
+  }, [loadProjects]);
 
   useEffect(() => {
     void loadPartners();
-  }, [canReadPartners]);
+  }, [loadPartners]);
 
   useEffect(() => {
     void loadUsers();
-  }, [canReadUsers]);
+  }, [loadUsers]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -304,8 +304,8 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar projetos."
-          : "Seu perfil nao possui permissao para criar projetos.",
+          ? "Seu perfil não possui permissão para atualizar projetos."
+          : "Seu perfil não possui permissão para criar projetos.",
       );
       return;
     }
@@ -334,8 +334,8 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o projeto."
-            : "Nao foi possivel criar o projeto.",
+            ? "Não foi possível atualizar o projeto."
+            : "Não foi possível criar o projeto.",
         ),
       );
     } finally {
@@ -345,12 +345,12 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
 
   async function handleDelete(item: Project) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir projetos.");
+      setError("Seu perfil não possui permissão para excluir projetos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o projeto para exclusao.");
+      setError("Não foi possível identificar o projeto para exclusão.");
       return;
     }
 
@@ -377,7 +377,7 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
 
       setSuccess("Projeto excluido com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o projeto."));
+      setError(getErrorMessage(err, "Não foi possível excluir o projeto."));
     } finally {
       setSaving(false);
     }
@@ -385,7 +385,9 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
 
   return (
     <div
-      className={embedded ? "projects-page projects-page--embedded" : "projects-page"}
+      className={
+        embedded ? "projects-page projects-page--embedded" : "projects-page"
+      }
     >
       {!embedded ? (
         <header className="projects-page__header">
@@ -393,7 +395,8 @@ export default function ProjectsPage({ embedded = false }: ProjectsPageProps) {
             <span className="projects-page__eyebrow">PS</span>
             <h2 className="projects-page__title">Projetos</h2>
             <p className="projects-page__subtitle">
-              Gerencie escopo, cronograma, orcamento e responsabilidade dos projetos.
+              Gerencie escopo, cronograma, orçamento e responsabilidade dos
+              projetos.
             </p>
           </div>
 

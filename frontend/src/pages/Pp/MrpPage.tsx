@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import MrpForm from "../../components/Pp/MrpForm";
@@ -152,7 +152,7 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadMrpItems() {
+  const loadMrpItems = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -168,17 +168,19 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
     try {
       const response = await listResource("pp", "mrp");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeMrp(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeMrp(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel carregar o MRP."));
+      setError(getErrorMessage(err, "Não foi possível carregar o MRP."));
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     if (!canReadProducts) {
       setProductOptions([]);
       setProductAccess("unavailable");
@@ -198,15 +200,15 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
       setProductOptions([]);
       setProductAccess("unavailable");
     }
-  }
+  }, [canReadProducts]);
 
   useEffect(() => {
     void loadMrpItems();
-  }, [canRead]);
+  }, [loadMrpItems]);
 
   useEffect(() => {
     void loadProducts();
-  }, [canReadProducts]);
+  }, [loadProducts]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -256,8 +258,8 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar o MRP."
-          : "Seu perfil nao possui permissao para criar o MRP.",
+          ? "Seu perfil não possui permissão para atualizar o MRP."
+          : "Seu perfil não possui permissão para criar o MRP.",
       );
       return;
     }
@@ -286,8 +288,8 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o MRP."
-            : "Nao foi possivel criar o MRP.",
+            ? "Não foi possível atualizar o MRP."
+            : "Não foi possível criar o MRP.",
         ),
       );
     } finally {
@@ -297,16 +299,18 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
 
   async function handleDelete(item: MrpItem) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir o MRP.");
+      setError("Seu perfil não possui permissão para excluir o MRP.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o MRP para exclusao.");
+      setError("Não foi possível identificar o MRP para exclusão.");
       return;
     }
 
-    const confirmed = window.confirm(`Deseja excluir o registro MRP #${item.id}?`);
+    const confirmed = window.confirm(
+      `Deseja excluir o registro MRP #${item.id}?`,
+    );
 
     if (!confirmed) {
       return;
@@ -325,9 +329,9 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
         setDraft({ ...emptyMrp });
       }
 
-      setSuccess("MRP excluido com sucesso.");
+      setSuccess("MRP excluído com sucesso.");
     } catch (err) {
-      setError(getErrorMessage(err, "Nao foi possivel excluir o MRP."));
+      setError(getErrorMessage(err, "Não foi possível excluir o MRP."));
     } finally {
       setSaving(false);
     }
@@ -341,7 +345,7 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
             <span className="mrp-page__eyebrow">PP</span>
             <h2 className="mrp-page__title">MRP</h2>
             <p className="mrp-page__subtitle">
-              Planeje demanda, estoque e necessidade de compra ou producao por
+              Planeje demanda, estoque e necessidade de compra ou produção por
               periodo.
             </p>
           </div>
@@ -406,8 +410,8 @@ export default function MrpPage({ embedded = false }: MrpPageProps) {
         <div className="mrp-page__alert mrp-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import ProductionEntryForm from "../../components/Pp/ProductionEntryForm";
@@ -175,7 +175,11 @@ export default function ProductionEntriesPage({
   const canCreate = canAccessResourceAction(session, entriesResource, "create");
   const canUpdate = canAccessResourceAction(session, entriesResource, "update");
   const canDelete = canAccessResourceAction(session, entriesResource, "delete");
-  const canReadOrders = canAccessResourceAction(session, ordersResource, "read");
+  const canReadOrders = canAccessResourceAction(
+    session,
+    ordersResource,
+    "read",
+  );
   const canReadEmployees = canAccessResourceAction(
     session,
     employeesResource,
@@ -184,7 +188,7 @@ export default function ProductionEntriesPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadEntries() {
+  const loadEntries = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -200,19 +204,21 @@ export default function ProductionEntriesPage({
     try {
       const response = await listResource("pp", "apontamentos");
       const nextItems = Array.isArray(response.data)
-        ? response.data.map((item) => normalizeEntry(item as Record<string, unknown>))
+        ? response.data.map((item) =>
+            normalizeEntry(item as Record<string, unknown>),
+          )
         : [];
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os apontamentos."),
+        getErrorMessage(err, "Não foi possível carregar os apontamentos."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     if (!canReadOrders) {
       setOrderOptions([]);
       setOrderAccess("unavailable");
@@ -234,9 +240,9 @@ export default function ProductionEntriesPage({
       setOrderOptions([]);
       setOrderAccess("unavailable");
     }
-  }
+  }, [canReadOrders]);
 
-  async function loadEmployees() {
+  const loadEmployees = useCallback(async () => {
     if (!canReadEmployees) {
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
@@ -258,19 +264,19 @@ export default function ProductionEntriesPage({
       setEmployeeOptions([]);
       setEmployeeAccess("unavailable");
     }
-  }
+  }, [canReadEmployees]);
 
   useEffect(() => {
     void loadEntries();
-  }, [canRead]);
+  }, [loadEntries]);
 
   useEffect(() => {
     void loadOrders();
-  }, [canReadOrders]);
+  }, [loadOrders]);
 
   useEffect(() => {
     void loadEmployees();
-  }, [canReadEmployees]);
+  }, [loadEmployees]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -316,8 +322,8 @@ export default function ProductionEntriesPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar apontamentos."
-          : "Seu perfil nao possui permissao para criar apontamentos.",
+          ? "Seu perfil não possui permissão para atualizar apontamentos."
+          : "Seu perfil não possui permissão para criar apontamentos.",
       );
       return;
     }
@@ -346,8 +352,8 @@ export default function ProductionEntriesPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o apontamento."
-            : "Nao foi possivel criar o apontamento.",
+            ? "Não foi possível atualizar o apontamento."
+            : "Não foi possível criar o apontamento.",
         ),
       );
     } finally {
@@ -357,12 +363,12 @@ export default function ProductionEntriesPage({
 
   async function handleDelete(item: ProductionEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir apontamentos.");
+      setError("Seu perfil não possui permissão para excluir apontamentos.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o apontamento para exclusao.");
+      setError("Não foi possível identificar o apontamento para exclusão.");
       return;
     }
 
@@ -387,11 +393,9 @@ export default function ProductionEntriesPage({
         setDraft({ ...emptyEntry });
       }
 
-      setSuccess("Apontamento excluido com sucesso.");
+      setSuccess("Apontamento excluído com sucesso.");
     } catch (err) {
-      setError(
-        getErrorMessage(err, "Nao foi possivel excluir o apontamento."),
-      );
+      setError(getErrorMessage(err, "Não foi possível excluir o apontamento."));
     } finally {
       setSaving(false);
     }
@@ -411,8 +415,8 @@ export default function ProductionEntriesPage({
             <span className="production-entries-page__eyebrow">PP</span>
             <h2 className="production-entries-page__title">Apontamentos</h2>
             <p className="production-entries-page__subtitle">
-              Registre inicio, fim, operador, producao, refugo e paradas da
-              execucao industrial.
+              Registre inicio, fim, operador, produção, refugo e paradas da
+              execução industrial.
             </p>
           </div>
 
@@ -478,8 +482,8 @@ export default function ProductionEntriesPage({
         <div className="production-entries-page__alert production-entries-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}

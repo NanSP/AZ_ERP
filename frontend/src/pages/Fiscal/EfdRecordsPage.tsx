@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AxiosError } from "axios";
 import { useAuth } from "../../auth/useAuth";
 import EfdRecordsForm from "../../components/Fiscal/EfdRecordsForm";
@@ -123,7 +123,7 @@ export default function EfdRecordsPage({
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
-  async function loadRecords() {
+  const loadRecords = useCallback(async () => {
     if (!canRead) {
       setItems([]);
       setSelected(null);
@@ -146,16 +146,16 @@ export default function EfdRecordsPage({
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel carregar os registros EFD."),
+        getErrorMessage(err, "Não foi possível carregar os registros EFD."),
       );
     } finally {
       setLoading(false);
     }
-  }
+  }, [canRead]);
 
   useEffect(() => {
     void loadRecords();
-  }, [canRead]);
+  }, [loadRecords]);
 
   const filteredItems = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -201,8 +201,8 @@ export default function EfdRecordsPage({
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil nao possui permissao para atualizar registros EFD."
-          : "Seu perfil nao possui permissao para criar registros EFD.",
+          ? "Seu perfil não possui permissão para atualizar registros EFD."
+          : "Seu perfil não possui permissão para criar registros EFD.",
       );
       return;
     }
@@ -231,8 +231,8 @@ export default function EfdRecordsPage({
         getErrorMessage(
           err,
           selected?.id
-            ? "Nao foi possivel atualizar o registro EFD."
-            : "Nao foi possivel criar o registro EFD.",
+            ? "Não foi possível atualizar o registro EFD."
+            : "Não foi possível criar o registro EFD.",
         ),
       );
     } finally {
@@ -242,12 +242,12 @@ export default function EfdRecordsPage({
 
   async function handleDelete(item: EfdRecordEntry) {
     if (!canDelete) {
-      setError("Seu perfil nao possui permissao para excluir registros EFD.");
+      setError("Seu perfil não possui permissão para excluir registros EFD.");
       return;
     }
 
     if (!item.id) {
-      setError("Nao foi possivel identificar o registro EFD para exclusao.");
+      setError("Não foi possível identificar o registro EFD para exclusão.");
       return;
     }
 
@@ -275,7 +275,7 @@ export default function EfdRecordsPage({
       setSuccess("Registro EFD excluido com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Nao foi possivel excluir o registro EFD."),
+        getErrorMessage(err, "Não foi possível excluir o registro EFD."),
       );
     } finally {
       setSaving(false);
@@ -285,7 +285,9 @@ export default function EfdRecordsPage({
   return (
     <div
       className={
-        embedded ? "efd-records-page efd-records-page--embedded" : "efd-records-page"
+        embedded
+          ? "efd-records-page efd-records-page--embedded"
+          : "efd-records-page"
       }
     >
       {!embedded ? (
@@ -294,7 +296,8 @@ export default function EfdRecordsPage({
             <span className="efd-records-page__eyebrow">FISCAL</span>
             <h2 className="efd-records-page__title">Registros EFD</h2>
             <p className="efd-records-page__subtitle">
-              Gerencie registros EFD com periodo de apuracao, codigo estruturado e conteudo fiscal em JSON.
+              Gerencie registros EFD com periodo de apuração, codigo estruturado
+              e conteudo fiscal em JSON.
             </p>
           </div>
 
@@ -358,8 +361,8 @@ export default function EfdRecordsPage({
         <div className="efd-records-page__alert efd-records-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criacao desabilitada",
-            canDelete ? null : "exclusao desabilitada",
+            canCreate ? null : "criação desabilitada",
+            canDelete ? null : "exclusão desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}
