@@ -14,6 +14,12 @@ WORKDIR /app
 
 COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar app.jar
 
+RUN groupadd --system app \
+    && useradd --system --gid app --create-home --home-dir /home/app appuser \
+    && chown -R appuser:app /app
+
+USER appuser
+
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
