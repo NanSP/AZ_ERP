@@ -48,7 +48,7 @@ export default function SiteLayout() {
                 <button
                   type="button"
                   className="site-cta site-cta--ghost"
-                  onClick={logout}
+                  onClick={() => void logout()}
                 >
                   Sair
                 </button>

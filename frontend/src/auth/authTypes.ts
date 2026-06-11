@@ -1,7 +1,7 @@
 export type AuthScope = "master" | "tenant";
 
 export type AuthSession = {
-  token: string;
+  token?: string;
   scope: AuthScope;
   login: string;
   userId: number;

@@ -10,8 +10,8 @@ export default function Topbar() {
   const tenantLabel =
     session?.scope === "tenant" ? session.tenantCode || "Tenant" : "Plataforma";
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     navigate("/", { replace: true });
   }
 
@@ -39,7 +39,11 @@ export default function Topbar() {
           </div>
         </div>
 
-        <button type="button" className="topbar__button" onClick={handleLogout}>
+        <button
+          type="button"
+          className="topbar__button"
+          onClick={() => void handleLogout()}
+        >
           Sair
         </button>
       </div>
