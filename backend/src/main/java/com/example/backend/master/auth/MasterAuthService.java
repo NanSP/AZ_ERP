@@ -1,5 +1,6 @@
 package com.example.backend.master.auth;
 
+import com.example.backend.auth.AuthSessionResponseDTO;
 import com.example.backend.auth.ChangePasswordRequestDTO;
 import com.example.backend.auth.PasswordChangeResponseDTO;
 import com.example.backend.master.platform.systemUsers.SystemUsers;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class MasterAuthService {
@@ -131,4 +133,22 @@ public class MasterAuthService {
             throw new ValidacaoException("Nova senha deve ter pelo menos 8 caracteres");
         }
     }
+
+    public AuthSessionResponseDTO me(SecurityUserPrincipal principal) {
+        SystemUsers user = systemUsersRepository.findById(principal.getUserId())
+                .orElseThrow(() -> new ValidacaoException("Usuario autenticado nao encontrado"));
+
+        return new AuthSessionResponseDTO(
+                "master",
+                user.getLogin(),
+                user.getId(),
+                user.getRole(),
+                null,
+                null,
+                List.of(),
+                List.of(),
+                user.isPasswordChangeRequired()
+        );
+    }
+
 }

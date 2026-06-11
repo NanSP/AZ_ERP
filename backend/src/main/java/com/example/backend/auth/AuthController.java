@@ -1,9 +1,11 @@
-package com.example.backend.tenant.auth;
+package com.example.backend.auth;
 
-import com.example.backend.auth.ChangePasswordRequestDTO;
-import com.example.backend.auth.PasswordChangeResponseDTO;
+import com.example.backend.master.auth.AuthRequestDTO;
+import com.example.backend.master.auth.AuthResponseDTO;
+import com.example.backend.master.auth.MasterAuthService;
 import com.example.backend.security.AuthCookieService;
 import com.example.backend.security.SecurityUserPrincipal;
+import com.example.backend.tenant.auth.TenantAuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -11,36 +13,45 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/tenant/auth")
-public class TenantAuthController {
+@RequestMapping("/auth")
+public class AuthController {
 
-    private final TenantAuthService service;
+    private final MasterAuthService service;
+    private final TenantAuthService tenantAuthService;
     private final AuthCookieService authCookieService;
 
-    public TenantAuthController(TenantAuthService service, AuthCookieService authCookieService) {
+    public AuthController(
+            MasterAuthService service,
+            TenantAuthService tenantAuthService,
+            AuthCookieService authCookieService
+    ) {
         this.service = service;
+        this.tenantAuthService = tenantAuthService;
         this.authCookieService = authCookieService;
     }
 
     @PostMapping("/login")
-    public TenantAuthResponseDTO login(
-            @RequestBody TenantAuthRequestDTO data,
+    @ResponseStatus(HttpStatus.OK)
+    public AuthResponseDTO login(
+            @RequestBody AuthRequestDTO data,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        TenantAuthResponseDTO auth = service.login(data);
+        AuthResponseDTO auth = service.login(data);
         authCookieService.attachAuthCookie(response, auth.token(), request);
         return auth;
     }
 
-    @PostMapping("/change-password")
+    @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
-    public PasswordChangeResponseDTO changePassword(
-            @RequestBody ChangePasswordRequestDTO data,
-            Authentication authentication
-    ) {
+    public AuthSessionResponseDTO me(Authentication authentication) {
         SecurityUserPrincipal principal = (SecurityUserPrincipal) authentication.getPrincipal();
-        return service.changePassword(principal, data);
+
+        if ("tenant".equalsIgnoreCase(principal.getScope())) {
+            return tenantAuthService.me(principal);
+        }
+
+        return service.me(principal);
     }
 
     @PostMapping("/logout")

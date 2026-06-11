@@ -5,7 +5,7 @@ public record AuthResponseDTO(
         Long userId,
         String login,
         String role,
-        String contexto,
+        String scope,
         boolean passwordChangeRequired
 ) {
 }
