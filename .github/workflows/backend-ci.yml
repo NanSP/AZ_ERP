@@ -35,9 +35,6 @@ jobs:
   docker-smoke:
     runs-on: ubuntu-latest
     needs: unit-tests
-    env:
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-
     defaults:
       run:
         working-directory: backend
@@ -46,12 +43,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve CI JWT secret
+        run: |
+          if [ -n "${{ secrets.JWT_SECRET }}" ]; then
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> "$GITHUB_ENV"
+          else
+            echo "JWT_SECRET=ci-jwt-secret-please-change-this-in-production-1234567890" >> "$GITHUB_ENV"
+          fi
+
       - name: Start Docker stack
         run: |
-          if [ -z "${JWT_SECRET}" ]; then
-            echo "JWT_SECRET secret is required for docker-smoke"
-            exit 1
-          fi
           docker compose up --build -d
 
       - name: Wait for liveness

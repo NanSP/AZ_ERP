@@ -45,6 +45,8 @@ class OrdensServicoServiceTest {
 
     @Test
     void deveCriarOsComDefaultsENormalizacao() {
+        LocalDate dataAgendamento = LocalDate.now().plusDays(1);
+
         OrdensServicoRequestDTO request = new OrdensServicoRequestDTO(
                 " OS-001 ",
                 1,
@@ -53,7 +55,7 @@ class OrdensServicoServiceTest {
                 " Falha no equipamento ",
                 null,
                 null,
-                LocalDate.of(2026, 6, 10),
+                dataAgendamento,
                 null,
                 null,
                 3,
