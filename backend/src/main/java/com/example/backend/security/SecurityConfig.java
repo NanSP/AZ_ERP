@@ -116,6 +116,7 @@ public class SecurityConfig {
         auth.requestMatchers("/auth/login").permitAll();
         auth.requestMatchers("/tenant/auth/login").permitAll();
         auth.requestMatchers("/auth/me").hasAnyAuthority("SCOPE_MASTER", "SCOPE_TENANT");
+        auth.requestMatchers("/tenant/auth/me").hasAnyAuthority("SCOPE_TENANT");
         auth.requestMatchers("/auth/logout").hasAnyAuthority("SCOPE_MASTER", "SCOPE_TENANT");
         auth.requestMatchers("/tenant/auth/logout").hasAnyAuthority("SCOPE_TENANT");
         auth.requestMatchers("/auth/change-password").hasAnyAuthority("SCOPE_MASTER");

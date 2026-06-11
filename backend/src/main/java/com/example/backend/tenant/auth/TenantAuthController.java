@@ -1,6 +1,7 @@
 package com.example.backend.tenant.auth;
 
 import com.example.backend.auth.ChangePasswordRequestDTO;
+import com.example.backend.auth.AuthSessionResponseDTO;
 import com.example.backend.auth.PasswordChangeResponseDTO;
 import com.example.backend.security.AuthCookieService;
 import com.example.backend.security.SecurityUserPrincipal;
@@ -31,6 +32,13 @@ public class TenantAuthController {
         TenantAuthResponseDTO auth = service.login(data);
         authCookieService.attachAuthCookie(response, auth.token(), request);
         return auth;
+    }
+
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public AuthSessionResponseDTO me(Authentication authentication) {
+        SecurityUserPrincipal principal = (SecurityUserPrincipal) authentication.getPrincipal();
+        return service.me(principal);
     }
 
     @PostMapping("/change-password")
