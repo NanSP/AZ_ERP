@@ -54,7 +54,7 @@ class AuthControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("TOKEN"))
+                .andExpect(jsonPath("$.token").doesNotExist())
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.login").value("admin"))
                 .andExpect(jsonPath("$.scope").value("master"))

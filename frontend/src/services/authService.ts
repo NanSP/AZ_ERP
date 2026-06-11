@@ -9,7 +9,6 @@ import type {
 
 function normalizeSession(data: Record<string, unknown>): AuthSession {
   return {
-    token: typeof data.token === "string" ? data.token : undefined,
     scope: data.scope === "master" ? "master" : "tenant",
     login: String(data.login ?? ""),
     userId: Number(data.userId ?? 0),

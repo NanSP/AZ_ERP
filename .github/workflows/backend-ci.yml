@@ -176,6 +176,7 @@ jobs:
 
           curl --fail-with-body -s \
             -X POST "http://localhost:8080/api/tenant/auth/login" \
+            -c tenant_auth_cookie.txt \
             -H "Content-Type: application/json" \
             -d "${tenant_login_payload}" \
             -o tenant_login_response.json
@@ -183,6 +184,15 @@ jobs:
           grep -q "\"scope\":\"tenant\"" tenant_login_response.json
           grep -q "\"login\":\"admin.ci\"" tenant_login_response.json
           grep -q "\"passwordChangeRequired\":true" tenant_login_response.json
+
+          curl --fail-with-body -s \
+            -X GET "http://localhost:8080/api/tenant/auth/me" \
+            -b tenant_auth_cookie.txt \
+            -o tenant_me_response.json
+
+          grep -q "\"scope\":\"tenant\"" tenant_me_response.json
+          grep -q "\"login\":\"admin.ci\"" tenant_me_response.json
+
           python - <<'PY'
           import json
           from pathlib import Path
@@ -200,7 +210,6 @@ jobs:
               json.dumps(summary, ensure_ascii=False),
               encoding="utf-8",
           )
-          Path("tenant_login_token.txt").write_text(payload["token"], encoding="utf-8")
           PY
 
           tenant_change_payload="$(cat <<EOF
@@ -211,10 +220,9 @@ jobs:
           EOF
           )"
 
-          tenant_token="$(cat tenant_login_token.txt)"
           curl --fail-with-body -s \
             -X POST "http://localhost:8080/api/tenant/auth/change-password" \
-            -H "Authorization: Bearer ${tenant_token}" \
+            -b tenant_auth_cookie.txt \
             -H "Content-Type: application/json" \
             -d "${tenant_change_payload}" \
             -o tenant_change_password_response.json
@@ -232,6 +240,7 @@ jobs:
 
           curl --fail-with-body -s \
             -X POST "http://localhost:8080/api/tenant/auth/login" \
+            -c tenant_auth_cookie.txt \
             -H "Content-Type: application/json" \
             -d "${tenant_second_login_payload}" \
             -o tenant_second_login_response.json
@@ -239,6 +248,15 @@ jobs:
           grep -q "\"scope\":\"tenant\"" tenant_second_login_response.json
           grep -q "\"login\":\"admin.ci\"" tenant_second_login_response.json
           grep -q "\"passwordChangeRequired\":false" tenant_second_login_response.json
+
+          curl --fail-with-body -s \
+            -X GET "http://localhost:8080/api/tenant/auth/me" \
+            -b tenant_auth_cookie.txt \
+            -o tenant_second_me_response.json
+
+          grep -q "\"scope\":\"tenant\"" tenant_second_me_response.json
+          grep -q "\"login\":\"admin.ci\"" tenant_second_me_response.json
+
           python - <<'PY'
           import json
           from pathlib import Path
@@ -258,7 +276,7 @@ jobs:
           )
           PY
 
-          rm tenant_login_response.json tenant_login_token.txt tenant_second_login_response.json
+          rm tenant_login_response.json tenant_me_response.json tenant_second_login_response.json tenant_second_me_response.json tenant_auth_cookie.txt
 
       - name: Print running containers
         if: always()
