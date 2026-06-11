@@ -1,7 +1,10 @@
 package com.example.backend.master.auth;
 
+import com.example.backend.auth.AuthController;
+import com.example.backend.security.AuthCookieService;
 import com.example.backend.shared.exception.GlobalExceptionHandler;
 import com.example.backend.shared.exception.ValidacaoException;
+import com.example.backend.tenant.auth.TenantAuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,12 +26,18 @@ class AuthControllerIntegrationTest {
     @Mock
     private MasterAuthService service;
 
+    @Mock
+    private TenantAuthService tenantAuthService;
+
+    @Mock
+    private AuthCookieService authCookieService;
+
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new AuthController(service))
+        mockMvc = MockMvcBuilders.standaloneSetup(new AuthController(service, tenantAuthService, authCookieService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
         objectMapper = new ObjectMapper().findAndRegisterModules();
@@ -48,7 +57,7 @@ class AuthControllerIntegrationTest {
                 .andExpect(jsonPath("$.token").value("TOKEN"))
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.login").value("admin"))
-                .andExpect(jsonPath("$.contexto").value("master"))
+                .andExpect(jsonPath("$.scope").value("master"))
                 .andExpect(jsonPath("$.passwordChangeRequired").value(true));
     }
 
