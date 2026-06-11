@@ -11,7 +11,7 @@ export type AuthContextValue = {
   isAuthenticated: boolean;
   loginMasterAction: (payload: MasterLoginPayload) => Promise<void>;
   loginTenantAction: (payload: TenantLoginPayload) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   changePassword: (payload: ChangePasswordPayload) => Promise<void>;
 };
 

@@ -12,14 +12,27 @@ import { clearSession, loadSession, saveSession } from "./authStorage";
 import {
   changeMasterPassword,
   changeTenantPassword,
+  logoutMaster,
+  logoutTenant,
   loginMaster,
   loginTenant,
   getMe,
 } from "../services/authService";
-import { setAuthToken } from "../services/api";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(() => loadSession());
+  const [ready, setReady] = useState(false);
+
+  function commitSession(next: AuthSession | null) {
+    if (next) {
+      saveSession(next);
+      setSession(next);
+      return;
+    }
+
+    clearSession();
+    setSession(null);
+  }
 
   // Ao montar, tentamos popular a sessão consultando o endpoint /auth/me.
   useEffect(() => {
@@ -28,13 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         const me = await getMe();
-        if (mounted && me) {
-          saveSession(me);
-          setAuthToken(me.token ?? null);
-          setSession(me);
+        if (mounted) {
+          commitSession(me);
         }
       } catch {
-        // sem sessão — estado inicial fica nulo
+        if (mounted) {
+          commitSession(null);
+        }
       } finally {
         if (mounted) setReady(true);
       }
@@ -45,49 +58,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const [ready, setReady] = useState(false);
-
   const loginMasterAction = async (payload: MasterLoginPayload) => {
     const next = await loginMaster(payload);
-    // Caso o backend retorne token (legacy), armazenamos em memória.
-    saveSession(next);
-    setAuthToken(next.token ?? null);
-    setSession(next);
+    const me = await getMe();
+    commitSession(me ?? next);
   };
 
   const loginTenantAction = async (payload: TenantLoginPayload) => {
     const next = await loginTenant(payload);
-    saveSession(next);
-    setAuthToken(next.token ?? null);
-    setSession(next);
+    const me = await getMe();
+    commitSession(me ?? next);
   };
 
-  const logout = () => {
-    // Chamar endpoint de logout seria ideal para revogar refresh token no servidor.
-    clearSession();
-    setAuthToken(null);
-    setSession(null);
+  const logout = async () => {
+    try {
+      if (session?.scope === "master") {
+        await logoutMaster();
+      } else if (session?.scope === "tenant") {
+        await logoutTenant();
+      }
+    } catch {
+      // Mesmo com falha remota, limpamos o estado local para encerrar a sessão no frontend.
+    } finally {
+      commitSession(null);
+    }
   };
 
   const changePassword = async (payload: ChangePasswordPayload) => {
     if (!session) throw new Error("Sessao nao encontrada");
 
     if (session.scope === "master") {
-      await changeMasterPassword(session.token, payload);
+      await changeMasterPassword(payload);
     } else {
-      await changeTenantPassword(session.token, payload);
+      await changeTenantPassword(payload);
     }
 
-    const updated = { ...session, passwordChangeRequired: false };
-    saveSession(updated);
-    setSession(updated);
+    const me = await getMe();
+    commitSession(
+      me
+        ? { ...me, passwordChangeRequired: false }
+        : { ...session, passwordChangeRequired: false },
+    );
   };
 
   if (!ready) return null;
 
   const value = {
     session,
-    isAuthenticated: !!session?.token,
+    isAuthenticated: !!session,
     loginMasterAction,
     loginTenantAction,
     logout,

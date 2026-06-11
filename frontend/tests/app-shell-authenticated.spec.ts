@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 
 function createTenantSession() {
   return {
-    token: "test-token",
     scope: "tenant",
     login: "qa.tenant",
     userId: 101,
