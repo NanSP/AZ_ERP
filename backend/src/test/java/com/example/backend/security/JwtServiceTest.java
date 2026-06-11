@@ -3,8 +3,6 @@ package com.example.backend.security;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -26,7 +24,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void deveGerarTokenTenantComClaimsCompletas() {
+    void deveGerarTokenTenantComClaimsBasicas() {
         JwtService service = new JwtService(criarProperties());
 
         String token = service.generateTenantToken(
@@ -34,9 +32,7 @@ class JwtServiceTest {
                 "TENANT_A",
                 20L,
                 "joao",
-                "OPERADOR",
-                List.of("ADMIN", "GESTOR"),
-                List.of("sys:usuarios:read", "fi:contas_pagar:update")
+                "OPERADOR"
         );
         DecodedJWT decoded = service.validateToken(token);
 
@@ -44,7 +40,7 @@ class JwtServiceTest {
         assertEquals(2L, service.extractTenantId(token));
         assertEquals("TENANT_A", service.extractTenantCode(token));
         assertEquals(20L, service.extractUserId(token));
-        assertEquals(List.of("ADMIN", "GESTOR"), decoded.getClaim("perfis").asList(String.class));
+        assertEquals("OPERADOR", decoded.getClaim("role").asString());
     }
 
     private JwtProperties criarProperties() {

@@ -52,7 +52,7 @@ class MasterAuthServiceTest {
         assertEquals(10L, response.userId());
         assertEquals("admin.login", response.login());
         assertEquals("MASTER_ADMIN", response.role());
-        assertEquals("master", response.contexto());
+        assertEquals("master", response.scope());
         assertEquals(false, response.passwordChangeRequired());
 
         ArgumentCaptor<SystemUsers> userCaptor = ArgumentCaptor.forClass(SystemUsers.class);

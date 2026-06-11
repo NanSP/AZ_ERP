@@ -115,9 +115,7 @@ class TenantAuthServiceTest {
                 "TENANT_A",
                 10L,
                 "joao",
-                "ADMIN",
-                List.of("ADMIN", "GESTOR"),
-                List.of("sys:usuarios:read", "fi:contas_pagar:update")
+                "ADMIN"
         )).thenReturn("TOKEN_TENANT");
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
@@ -216,9 +214,7 @@ class TenantAuthServiceTest {
                 anyString(),
                 anyLong(),
                 anyString(),
-                anyString(),
-                eq(List.of()),
-                eq(List.of())
+                anyString()
         );
     }
 
@@ -254,9 +250,7 @@ class TenantAuthServiceTest {
                 "TENANT_A",
                 10L,
                 "joao",
-                "ADMIN",
-                List.of(),
-                List.of()
+                "ADMIN"
         )).thenReturn("TOKEN_TENANT");
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {

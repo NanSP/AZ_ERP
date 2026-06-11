@@ -35,4 +35,4 @@ build/
 *.env
 .env
 .env.*
-
+.m2repo

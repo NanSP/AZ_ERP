@@ -1,5 +1,6 @@
 package com.example.backend.tenant.auth;
 
+import com.example.backend.auth.AuthSessionResponseDTO;
 import com.example.backend.auth.ChangePasswordRequestDTO;
 import com.example.backend.auth.PasswordChangeResponseDTO;
 import com.example.backend.security.JwtService;
@@ -109,9 +110,7 @@ public class TenantAuthService {
                         connectionInfo.tenantCode(),
                         userId,
                         login,
-                        role,
-                        perfis,
-                        permissoes
+                        role
                 );
 
                 return new TenantAuthResponseDTO(
@@ -236,5 +235,110 @@ public class TenantAuthService {
         if (data.novaSenha().trim().length() < 8) {
             throw new ValidacaoException("Nova senha deve ter pelo menos 8 caracteres");
         }
+    }
+
+    public AuthSessionResponseDTO me(SecurityUserPrincipal principal) {
+        TenantSessionDetails details = loadTenantSessionDetails(principal.getTenantCode(), principal.getUserId());
+
+        return new AuthSessionResponseDTO(
+                "tenant",
+                details.login(),
+                principal.getUserId(),
+                details.role(),
+                principal.getTenantId(),
+                principal.getTenantCode(),
+                details.perfis(),
+                details.permissoes(),
+                details.passwordChangeRequired()
+        );
+    }
+
+    public SecurityUserPrincipal loadPrincipal(Long tenantId, String tenantCode, Long userId) {
+        TenantSessionDetails details = loadTenantSessionDetails(tenantCode, userId);
+
+        return new SecurityUserPrincipal(
+                userId,
+                details.login(),
+                details.role(),
+                "tenant",
+                tenantId,
+                tenantCode,
+                details.perfis(),
+                details.permissoes()
+        );
+    }
+
+    private TenantSessionDetails loadTenantSessionDetails(String tenantCode, Long userId) {
+        String userSql = """
+                SELECT login, tipo_usuario, status, expiracao_senha
+                FROM sys.usuarios
+                WHERE id = ?
+                """;
+        String perfisSql = """
+                SELECT p.nome
+                FROM sys.usuario_perfil up
+                JOIN sys.perfis p ON p.id = up.perfil_id
+                WHERE up.usuario_id = ?
+                ORDER BY p.nome
+                """;
+        String permissoesSql = """
+                SELECT DISTINCT
+                    pe.modulo,
+                    pe.recurso,
+                    pe.acao
+                FROM sys.usuario_perfil up
+                JOIN sys.perfil_permissao pp ON pp.perfil_id = up.perfil_id
+                JOIN sys.permissoes pe ON pe.id = pp.permissao_id
+                WHERE up.usuario_id = ?
+                ORDER BY pe.modulo, pe.recurso, pe.acao
+                """;
+
+        try (
+                Connection connection = tenantDataSourceRegistry.getOrCreate(tenantCode).getConnection();
+                PreparedStatement userStatement = connection.prepareStatement(userSql);
+                PreparedStatement perfisStatement = connection.prepareStatement(perfisSql);
+                PreparedStatement permissoesStatement = connection.prepareStatement(permissoesSql)
+        ) {
+            userStatement.setLong(1, userId);
+
+            try (ResultSet rs = userStatement.executeQuery()) {
+                if (!rs.next()) {
+                    throw new ValidacaoException("Usuario autenticado do tenant nao encontrado");
+                }
+
+                String login = rs.getString("login");
+                String role = rs.getString("tipo_usuario");
+                String status = rs.getString("status");
+                Date expiracaoSenha = rs.getDate("expiracao_senha");
+
+                if (!"ativo".equalsIgnoreCase(status)) {
+                    throw new ValidacaoException("Usuario inativo");
+                }
+
+                List<String> perfis = carregarPerfis(perfisStatement, userId);
+                List<String> permissoes = carregarPermissoes(permissoesStatement, userId);
+                boolean passwordChangeRequired = expiracaoSenha != null
+                        && !expiracaoSenha.toLocalDate().isAfter(LocalDate.now());
+
+                return new TenantSessionDetails(
+                        login,
+                        role,
+                        perfis,
+                        permissoes,
+                        passwordChangeRequired
+                );
+            }
+        } catch (SQLException ex) {
+            throw new ValidacaoException("Erro ao consultar sessao do tenant: " + ex.getMessage());
+        }
+    }
+
+    private record TenantSessionDetails(
+            String login,
+            String role,
+            List<String> perfis,
+            List<String> permissoes,
+            boolean passwordChangeRequired
+    ) {
     }
 }
