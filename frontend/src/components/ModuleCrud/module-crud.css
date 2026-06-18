@@ -260,6 +260,13 @@
   text-transform: uppercase;
 }
 
+.module-crud__field-description {
+  margin: -2px 0 0;
+  color: #707070;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
 .module-crud__input {
   width: 100%;
   min-height: 48px;
@@ -269,6 +276,16 @@
   background: #ffffff;
   color: #111111;
   font: inherit;
+}
+
+.module-crud__input[readonly],
+.module-crud__textarea[readonly],
+.module-crud__field select:disabled {
+  cursor: default;
+  border-color: #e1e1e1;
+  background: linear-gradient(180deg, #f7f7f7, #f1f1f1);
+  color: #575757;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .module-crud__input:focus {
