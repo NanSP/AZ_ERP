@@ -162,9 +162,9 @@ public class SystemUsersService {
     }
 
     private void validarRole(String role) {
-        if (!role.equals("MASTER_ADMIN")
-                && !role.equals("SUPPORT")
-                && !role.equals("OPERATIONS")) {
+        if (!role.equals("ADMIN_SISTEMA")
+                && !role.equals("SUPORTE")
+                && !role.equals("OPERADOR")) {
             throw new ValidacaoException("Role invalida");
         }
     }
@@ -198,7 +198,12 @@ public class SystemUsersService {
             throw new ValidacaoException("Role e obrigatoria");
         }
 
-        return role.trim().toUpperCase();
+        return switch (role.trim().toUpperCase()) {
+            case "MASTER_ADMIN" -> "ADMIN_SISTEMA";
+            case "SUPPORT" -> "SUPORTE";
+            case "OPERATIONS" -> "OPERADOR";
+            default -> role.trim().toUpperCase();
+        };
     }
 
     private String normalizarStatus(String status) {
