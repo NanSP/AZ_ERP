@@ -4,6 +4,7 @@ import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRepository;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.shared.exception.ValidacaoException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,18 +22,22 @@ public class TenantConnectionService {
     }
 
     public TenantConnectionInfo resolve(String tenantCode) {
+        if (tenantCode == null || tenantCode.isBlank()) {
+            throw new ValidacaoException("Codigo do tenant e obrigatorio");
+        }
+
         Tenants tenant = tenantsRepository.findByCodigo(tenantCode)
-                .orElseThrow(() -> new RuntimeException("Tenant nao encontrado"));
+                .orElseThrow(() -> new ValidacaoException("Tenant nao encontrado"));
 
         TenantDatabases tenantDatabase = tenantDatabasesRepository.findByTenantId(tenant)
-                .orElseThrow(() -> new RuntimeException("Banco do tenant nao encontrado"));
+                .orElseThrow(() -> new ValidacaoException("Banco do tenant nao encontrado"));
 
         if (!"ATIVO".equalsIgnoreCase(tenant.getStatus())) {
-            throw new RuntimeException("Tenant inativo");
+            throw new ValidacaoException("Tenant inativo");
         }
 
         if (!"ATIVO".equalsIgnoreCase(tenantDatabase.getProvisionStatus())) {
-            throw new RuntimeException("Banco do tenant nao esta ativo");
+            throw new ValidacaoException("Banco do tenant nao esta ativo");
         }
 
         return new TenantConnectionInfo(

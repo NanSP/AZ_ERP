@@ -1,6 +1,7 @@
 package com.example.backend.tenant.context;
 
 import com.zaxxer.hikari.HikariDataSource;
+import com.example.backend.shared.exception.ValidacaoException;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -53,18 +54,18 @@ public class TenantDataSourceRegistry {
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (!rs.next()) {
-                    throw new RuntimeException("Tenant nao encontrado");
+                    throw new ValidacaoException("Tenant nao encontrado");
                 }
 
                 String tenantStatus = rs.getString("tenant_status");
                 String provisionStatus = rs.getString("provision_status");
 
                 if (!"ATIVO".equalsIgnoreCase(tenantStatus)) {
-                    throw new RuntimeException("Tenant inativo");
+                    throw new ValidacaoException("Tenant inativo");
                 }
 
                 if (!"ATIVO".equalsIgnoreCase(provisionStatus)) {
-                    throw new RuntimeException("Banco do tenant nao esta ativo");
+                    throw new ValidacaoException("Banco do tenant nao esta ativo");
                 }
 
                 HikariDataSource dataSource = new HikariDataSource();
@@ -85,8 +86,10 @@ public class TenantDataSourceRegistry {
                 return dataSource;
             }
 
+        } catch (ValidacaoException ex) {
+            throw ex;
         } catch (Exception ex) {
-            throw new RuntimeException("Erro ao criar datasource do tenant: " + ex.getMessage(), ex);
+            throw new ValidacaoException("Erro ao criar datasource do tenant: " + ex.getMessage());
         }
     }
 
