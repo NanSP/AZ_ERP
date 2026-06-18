@@ -61,12 +61,20 @@ export async function logoutTenant(): Promise<void> {
   await api.post("/tenant/auth/logout");
 }
 
-export async function getMe(): Promise<AuthSession | null> {
+async function getSession(path: string): Promise<AuthSession | null> {
   try {
-    const { data } = await api.get("/auth/me");
+    const { data } = await api.get(path);
     if (!data) return null;
     return normalizeSession(data as Record<string, unknown>);
   } catch {
     return null;
   }
+}
+
+export async function getMasterMe(): Promise<AuthSession | null> {
+  return getSession("/auth/me");
+}
+
+export async function getTenantMe(): Promise<AuthSession | null> {
+  return getSession("/tenant/auth/me");
 }

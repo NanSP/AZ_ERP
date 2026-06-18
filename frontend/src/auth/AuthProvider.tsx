@@ -16,7 +16,8 @@ import {
   logoutTenant,
   loginMaster,
   loginTenant,
-  getMe,
+  getMasterMe,
+  getTenantMe,
 } from "../services/authService";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -40,7 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     (async () => {
       try {
-        const me = await getMe();
+        const savedSession = loadSession();
+        const me = savedSession?.scope === "tenant"
+          ? await getTenantMe()
+          : await getMasterMe();
         if (mounted) {
           commitSession(me);
         }
@@ -60,13 +64,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMasterAction = async (payload: MasterLoginPayload) => {
     const next = await loginMaster(payload);
-    const me = await getMe();
+    const me = await getMasterMe();
     commitSession(me ?? next);
   };
 
   const loginTenantAction = async (payload: TenantLoginPayload) => {
     const next = await loginTenant(payload);
-    const me = await getMe();
+    const me = await getTenantMe();
     commitSession(me ?? next);
   };
 
@@ -93,7 +97,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await changeTenantPassword(payload);
     }
 
-    const me = await getMe();
+    const me = session.scope === "tenant"
+      ? await getTenantMe()
+      : await getMasterMe();
     commitSession(
       me
         ? { ...me, passwordChangeRequired: false }

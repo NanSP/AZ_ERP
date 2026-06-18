@@ -1,7 +1,19 @@
+import { AxiosError } from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import AuthLayout from "../../layouts/AuthLayout";
+
+function getAuthErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof AxiosError) {
+    const message = error.response?.data?.message;
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+  }
+
+  return fallback;
+}
 
 export default function MasterLoginPage() {
   const navigate = useNavigate();
@@ -17,8 +29,8 @@ export default function MasterLoginPage() {
     try {
       await loginMasterAction({ login, senha });
       navigate("/app", { replace: true });
-    } catch {
-      setErro("Nao foi possivel autenticar no master.");
+    } catch (error) {
+      setErro(getAuthErrorMessage(error, "Nao foi possivel autenticar no master."));
     }
   }
 
