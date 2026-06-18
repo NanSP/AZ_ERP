@@ -55,7 +55,7 @@ class TenantSchemaUpgradeServiceTest {
 
         when(tenantsRepository.findAll()).thenReturn(List.of(outdated, updated));
         when(tenantDatabasesRepository.findByTenantId(outdated)).thenReturn(Optional.of(database));
-        when(configuration.dataSource("jdbc:postgresql://localhost:5432/tenant_1_db?sslmode=require", "tenant_user", "tenant_pass"))
+        when(configuration.dataSource("jdbc:postgresql://localhost:5432/tenant_1_db", "tenant_user", "tenant_pass"))
                 .thenReturn(configuration);
         when(configuration.locations("classpath:db/migration/template")).thenReturn(configuration);
         when(configuration.baselineOnMigrate(true)).thenReturn(configuration);

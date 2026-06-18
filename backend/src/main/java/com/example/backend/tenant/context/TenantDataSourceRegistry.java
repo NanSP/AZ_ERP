@@ -1,5 +1,6 @@
 package com.example.backend.tenant.context;
 
+import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import com.zaxxer.hikari.HikariDataSource;
 import com.example.backend.shared.exception.ValidacaoException;
 import org.springframework.stereotype.Component;
@@ -69,13 +70,11 @@ public class TenantDataSourceRegistry {
                 }
 
                 HikariDataSource dataSource = new HikariDataSource();
-                dataSource.setJdbcUrl(
-                        "jdbc:postgresql://" +
-                                rs.getString("db_host") + ":" +
-                                rs.getInt("db_port") + "/" +
-                                rs.getString("database_name") +
-                                "?sslmode=require"
-                );
+                dataSource.setJdbcUrl(PostgresJdbcUrlBuilder.build(
+                        rs.getString("db_host"),
+                        rs.getInt("db_port"),
+                        rs.getString("database_name")
+                ));
                 dataSource.setUsername(rs.getString("db_username"));
                 dataSource.setPassword(rs.getString("db_password_encrypted"));
                 dataSource.setDriverClassName("org.postgresql.Driver");
