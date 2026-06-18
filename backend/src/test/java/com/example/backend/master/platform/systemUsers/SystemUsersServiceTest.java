@@ -57,7 +57,7 @@ class SystemUsersServiceTest {
 
         ArgumentCaptor<SystemUsers> captor = ArgumentCaptor.forClass(SystemUsers.class);
         verify(repository).save(captor.capture());
-        assertEquals("MASTER_ADMIN", captor.getValue().getRole());
+        assertEquals("ADMIN_SISTEMA", captor.getValue().getRole());
     }
 
     @Test
@@ -101,7 +101,7 @@ class SystemUsersServiceTest {
         user.setEmail("master@erp.com");
         user.setLogin("admin.root");
         user.setSenha("senha-hash");
-        user.setRole("MASTER_ADMIN");
+        user.setRole("ADMIN_SISTEMA");
         user.setStatus("ATIVO");
         return user;
     }

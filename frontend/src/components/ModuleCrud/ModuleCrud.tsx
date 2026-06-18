@@ -61,7 +61,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     try {
       const response = await listResource(schema, entity);
       setItems(Array.isArray(response.data) ? response.data : []);
-    } catch (err) {
+    } catch {
       setError(`Nao foi possivel carregar ${label}.`);
     } finally {
       setLoading(false);
@@ -85,7 +85,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
       body = formSchema
         ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
         : (JSON.parse(payload) as GenericItem);
-    } catch (err) {
+    } catch {
       setError(
         formSchema
           ? "Formulario invalido para criacao."
@@ -123,7 +123,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
       body = formSchema
         ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
         : (JSON.parse(payload) as GenericItem);
-    } catch (err) {
+    } catch {
       setError(
         formSchema
           ? "Formulario invalido para atualizacao."
