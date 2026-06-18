@@ -1,6 +1,7 @@
 package com.example.backend.master.platform.tenantProvisioning.services;
 
 import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
+import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import com.example.backend.shared.exception.ValidacaoException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,11 @@ public class TenantApplicationUserProvisioningService {
             String login,
             String senha
     ) {
-        String jdbcUrl = "jdbc:postgresql://"
-                + tenantDatabase.getDbHost()
-                + ":"
-                + tenantDatabase.getDbPort()
-                + "/"
-                + tenantDatabase.getDatabaseName();
+        String jdbcUrl = PostgresJdbcUrlBuilder.build(
+                tenantDatabase.getDbHost(),
+                tenantDatabase.getDbPort(),
+                tenantDatabase.getDatabaseName()
+        );
 
         try (
                 Connection connection = DriverManager.getConnection(

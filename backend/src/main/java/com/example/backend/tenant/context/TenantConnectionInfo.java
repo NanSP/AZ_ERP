@@ -1,5 +1,7 @@
 package com.example.backend.tenant.context;
 
+import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
+
 public record TenantConnectionInfo(
         Long tenantId,
         String tenantCode,
@@ -10,6 +12,6 @@ public record TenantConnectionInfo(
         String password
 ) {
     public String jdbcUrl() {
-        return "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;
+        return PostgresJdbcUrlBuilder.build(host, port, databaseName);
     }
 }

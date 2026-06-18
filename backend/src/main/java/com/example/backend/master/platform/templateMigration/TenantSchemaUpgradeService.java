@@ -7,6 +7,7 @@ import com.example.backend.master.platform.tenantDatabases.TenantDatabasesReposi
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
 import com.example.backend.master.platform.tenants.TenantsService;
+import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import org.flywaydb.core.Flyway;
 import org.springframework.stereotype.Service;
 
@@ -112,12 +113,11 @@ public class TenantSchemaUpgradeService {
     }
 
     private String buildJdbcUrl(TenantDatabases database) {
-        return "jdbc:postgresql://"
-                + database.getDbHost()
-                + ":"
-                + database.getDbPort()
-                + "/"
-                + database.getDatabaseName();
+        return PostgresJdbcUrlBuilder.build(
+                database.getDbHost(),
+                database.getDbPort(),
+                database.getDatabaseName()
+        );
     }
 
     private void salvarLog(

@@ -1,5 +1,6 @@
 package com.example.backend.tenant.context;
 
+import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "app.datasource.master")
@@ -52,6 +53,6 @@ public class MasterConnectionProperties {
     }
 
     public String jdbcUrl() {
-        return "jdbc:postgresql://" + host + ":" + port + "/" + database;
+        return PostgresJdbcUrlBuilder.build(host, port, database);
     }
 }
