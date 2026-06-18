@@ -83,7 +83,7 @@ class TenantApplicationUserProvisioningServiceTest {
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/tenant_db",
+                    "jdbc:postgresql://localhost:5432/tenant_db?sslmode=require",
                     "tenant_user",
                     "tenant_pass"
             )).thenReturn(connection);
@@ -116,7 +116,7 @@ class TenantApplicationUserProvisioningServiceTest {
         ValidacaoException exception;
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/tenant_db",
+                    "jdbc:postgresql://localhost:5432/tenant_db?sslmode=require",
                     "tenant_user",
                     "tenant_pass"
             )).thenReturn(connection);
