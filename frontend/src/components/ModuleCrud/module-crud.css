@@ -220,12 +220,30 @@
   gap: 10px;
 }
 
+.module-crud__field--full {
+  grid-column: 1 / -1;
+}
+
+.module-crud__form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
 .module-crud__field-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.module-crud__field-required {
+  color: #7a7a7a;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .module-crud__field-status {
@@ -242,6 +260,23 @@
   text-transform: uppercase;
 }
 
+.module-crud__input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid #d7d7d7;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+}
+
+.module-crud__input:focus {
+  outline: none;
+  border-color: #bcbcbc;
+  box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.05);
+}
+
 .module-crud__textarea {
   width: 100%;
   min-height: 380px;
@@ -254,6 +289,10 @@
   font-size: 0.92rem;
   line-height: 1.7;
   resize: vertical;
+}
+
+.module-crud__textarea--compact {
+  min-height: 180px;
 }
 
 .module-crud__textarea:focus {
@@ -290,6 +329,10 @@
 
 @media (max-width: 980px) {
   .module-crud__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .module-crud__form-grid {
     grid-template-columns: 1fr;
   }
 }
