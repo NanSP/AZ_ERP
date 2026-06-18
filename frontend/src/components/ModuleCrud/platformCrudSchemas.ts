@@ -318,6 +318,10 @@ export function buildPayloadFromForm(
   const payload: Record<string, unknown> = {};
 
   for (const field of schema.fields) {
+    if (field.serverManaged) {
+      continue;
+    }
+
     const rawValue = (values[field.name] ?? "").trim();
 
     if (rawValue === "") {
