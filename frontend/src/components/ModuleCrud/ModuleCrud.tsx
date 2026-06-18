@@ -1,10 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   listResource,
   createResource,
   updateResource,
   deleteResource,
 } from "../../services/resourceService";
+import {
+  buildPayloadFromForm,
+  createEmptyFormValues,
+  getCrudFormSchema,
+  populateFormValues,
+} from "./platformCrudSchemas";
 import "./module-crud.css";
 
 export type GenericItem = { id?: number; [key: string]: unknown };
@@ -21,6 +27,10 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<GenericItem | null>(null);
   const [payload, setPayload] = useState("{}");
+  const formSchema = getCrudFormSchema(schema, entity);
+  const [formValues, setFormValues] = useState<Record<string, string>>(
+    formSchema ? createEmptyFormValues(formSchema) : {},
+  );
 
   const endpoint = `${schema}/${entity}`;
 
@@ -50,13 +60,25 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     void loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    if (formSchema) {
+      setFormValues(createEmptyFormValues(formSchema));
+    }
+  }, [formSchema]);
+
   async function handleCreate() {
     let body: GenericItem;
 
     try {
-      body = JSON.parse(payload) as GenericItem;
+      body = formSchema
+        ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
+        : (JSON.parse(payload) as GenericItem);
     } catch {
-      setError("JSON invalido para criacao.");
+      setError(
+        formSchema
+          ? "Formulario invalido para criacao."
+          : "JSON invalido para criacao.",
+      );
       return;
     }
 
@@ -64,7 +86,11 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
 
     try {
       await createResource(schema, entity, body);
-      setPayload("{}");
+      if (formSchema) {
+        setFormValues(createEmptyFormValues(formSchema));
+      } else {
+        setPayload("{}");
+      }
       await loadData();
     } catch {
       setError(`Erro ao criar ${label}.`);
@@ -82,9 +108,15 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     let body: GenericItem;
 
     try {
-      body = JSON.parse(payload) as GenericItem;
+      body = formSchema
+        ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
+        : (JSON.parse(payload) as GenericItem);
     } catch {
-      setError("JSON invalido para atualizacao.");
+      setError(
+        formSchema
+          ? "Formulario invalido para atualizacao."
+          : "JSON invalido para atualizacao.",
+      );
       return;
     }
 
@@ -93,7 +125,11 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     try {
       await updateResource(schema, entity, selectedItem.id, body);
       setSelectedItem(null);
-      setPayload("{}");
+      if (formSchema) {
+        setFormValues(createEmptyFormValues(formSchema));
+      } else {
+        setPayload("{}");
+      }
       await loadData();
     } catch {
       setError(`Erro ao atualizar ${label}.`);
@@ -122,13 +158,29 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
 
   function selectItem(item: GenericItem) {
     setSelectedItem(item);
+    if (formSchema) {
+      setFormValues(populateFormValues(formSchema, item));
+      return;
+    }
+
     setPayload(JSON.stringify(item, null, 2));
   }
 
   function resetEditor() {
     setSelectedItem(null);
-    setPayload("{}");
+    if (formSchema) {
+      setFormValues(createEmptyFormValues(formSchema));
+    } else {
+      setPayload("{}");
+    }
     setError(null);
+  }
+
+  function updateField(name: string, value: string) {
+    setFormValues((current) => ({
+      ...current,
+      [name]: value,
+    }));
   }
 
   return (
@@ -255,27 +307,95 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
           </div>
 
           <div className="module-crud__editor-shell">
-            <div className="module-crud__field">
-              <div className="module-crud__field-head">
-                <label
-                  className="module-crud__label"
-                  htmlFor="module-crud-payload"
-                >
-                  Payload do formulario
-                </label>
-                <span className="module-crud__field-status">
-                  {selectedItem ? "Registro selecionado" : "Aguardando dados"}
-                </span>
-              </div>
+            {formSchema ? (
+              <div className="module-crud__form-grid">
+                {formSchema.fields.map((field) => {
+                  const fieldId = `module-crud-${field.name}`;
+                  const value = formValues[field.name] ?? "";
+                  const hasOptions = Array.isArray(field.options) && field.options.length > 0;
+                  const commonProps = {
+                    id: fieldId,
+                    className:
+                      field.type === "textarea" || field.type === "json"
+                        ? "module-crud__textarea module-crud__textarea--compact"
+                        : "module-crud__input",
+                    value,
+                    onChange: (
+                      event:
+                        | ChangeEvent<HTMLInputElement>
+                        | ChangeEvent<HTMLTextAreaElement>
+                        | ChangeEvent<HTMLSelectElement>,
+                    ) => updateField(field.name, event.target.value),
+                  };
 
-              <textarea
-                id="module-crud-payload"
-                className="module-crud__textarea"
-                value={payload}
-                onChange={(event) => setPayload(event.target.value)}
-                placeholder={`{\n  "nome": "Exemplo",\n  "status": "ATIVO"\n}`}
-              />
-            </div>
+                  return (
+                    <div
+                      key={field.name}
+                      className={
+                        field.type === "textarea" || field.type === "json"
+                          ? "module-crud__field module-crud__field--full"
+                          : "module-crud__field"
+                      }
+                    >
+                      <div className="module-crud__field-head">
+                        <label className="module-crud__label" htmlFor={fieldId}>
+                          {field.label}
+                        </label>
+                        {field.required ? (
+                          <span className="module-crud__field-required">
+                            Obrigatorio
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {hasOptions ? (
+                        <select {...commonProps}>
+                          <option value="">Selecione</option>
+                          {field.options?.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : field.type === "textarea" || field.type === "json" ? (
+                        <textarea
+                          {...commonProps}
+                          placeholder={field.placeholder}
+                        />
+                      ) : (
+                        <input
+                          {...commonProps}
+                          type={field.type}
+                          placeholder={field.placeholder}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="module-crud__field">
+                <div className="module-crud__field-head">
+                  <label
+                    className="module-crud__label"
+                    htmlFor="module-crud-payload"
+                  >
+                    Payload do formulario
+                  </label>
+                  <span className="module-crud__field-status">
+                    {selectedItem ? "Registro selecionado" : "Aguardando dados"}
+                  </span>
+                </div>
+
+                <textarea
+                  id="module-crud-payload"
+                  className="module-crud__textarea"
+                  value={payload}
+                  onChange={(event) => setPayload(event.target.value)}
+                  placeholder={`{\n  "nome": "Exemplo",\n  "status": "ATIVO"\n}`}
+                />
+              </div>
+            )}
 
             <div className="module-crud__editor-actions">
               <button
@@ -295,8 +415,9 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
             </div>
 
             <p className="module-crud__hint">
-              Para criar, informe um JSON valido. Para editar, selecione uma
-              linha da tabela e ajuste apenas os campos necessarios.
+              {formSchema
+                ? "Preencha os campos do formulario. Para editar, selecione uma linha da tabela e ajuste apenas os dados necessarios."
+                : "Para criar, informe um JSON valido. Para editar, selecione uma linha da tabela e ajuste apenas os campos necessarios."}
             </p>
           </div>
         </aside>
