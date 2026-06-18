@@ -4,6 +4,7 @@ import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRepository;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.shared.exception.ValidacaoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,7 +51,7 @@ class TenantConnectionServiceTest {
         when(tenantsRepository.findByCodigo("TENANT_A")).thenReturn(Optional.of(tenant));
         when(tenantDatabasesRepository.findByTenantId(tenant)).thenReturn(Optional.of(tenantDatabase));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.resolve("TENANT_A"));
+        ValidacaoException exception = assertThrows(ValidacaoException.class, () -> service.resolve("TENANT_A"));
 
         assertEquals("Tenant inativo", exception.getMessage());
     }
@@ -63,7 +64,7 @@ class TenantConnectionServiceTest {
         when(tenantsRepository.findByCodigo("TENANT_A")).thenReturn(Optional.of(tenant));
         when(tenantDatabasesRepository.findByTenantId(tenant)).thenReturn(Optional.of(tenantDatabase));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> service.resolve("TENANT_A"));
+        ValidacaoException exception = assertThrows(ValidacaoException.class, () -> service.resolve("TENANT_A"));
 
         assertEquals("Banco do tenant nao esta ativo", exception.getMessage());
     }
