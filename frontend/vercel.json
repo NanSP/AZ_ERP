@@ -4,6 +4,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://az-erp-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/"
     }
   ]
 }
