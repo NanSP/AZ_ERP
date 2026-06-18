@@ -125,6 +125,12 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     setPayload(JSON.stringify(item, null, 2));
   }
 
+  function resetEditor() {
+    setSelectedItem(null);
+    setPayload("{}");
+    setError(null);
+  }
+
   return (
     <div className="module-crud">
       <header className="module-crud__header">
@@ -235,27 +241,64 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
 
         <aside className="module-crud__editor-panel">
           <div className="module-crud__panel-head">
-            <h4 className="module-crud__panel-title">Editor JSON</h4>
+            <div>
+              <h4 className="module-crud__panel-title">Formulario tecnico</h4>
+              <p className="module-crud__panel-description">
+                Preencha o payload do recurso em um formato estruturado para
+                criar ou atualizar registros da plataforma.
+              </p>
+            </div>
+
             <span className="module-crud__panel-meta">
               {selectedItem ? "Modo edicao" : "Novo registro"}
             </span>
           </div>
 
-          <label className="module-crud__label" htmlFor="module-crud-payload">
-            Payload
-          </label>
-          <textarea
-            id="module-crud-payload"
-            className="module-crud__textarea"
-            value={payload}
-            onChange={(event) => setPayload(event.target.value)}
-            placeholder='{"nome":"exemplo","ativo":true}'
-          />
+          <div className="module-crud__editor-shell">
+            <div className="module-crud__field">
+              <div className="module-crud__field-head">
+                <label
+                  className="module-crud__label"
+                  htmlFor="module-crud-payload"
+                >
+                  Payload do formulario
+                </label>
+                <span className="module-crud__field-status">
+                  {selectedItem ? "Registro selecionado" : "Aguardando dados"}
+                </span>
+              </div>
 
-          <p className="module-crud__hint">
-            Para criar, informe um JSON valido. Para editar, selecione uma linha
-            da tabela.
-          </p>
+              <textarea
+                id="module-crud-payload"
+                className="module-crud__textarea"
+                value={payload}
+                onChange={(event) => setPayload(event.target.value)}
+                placeholder={`{\n  "nome": "Exemplo",\n  "status": "ATIVO"\n}`}
+              />
+            </div>
+
+            <div className="module-crud__editor-actions">
+              <button
+                type="button"
+                className="module-crud__button module-crud__button--ghost"
+                onClick={resetEditor}
+              >
+                Limpar formulario
+              </button>
+              <button
+                type="button"
+                className="module-crud__button"
+                onClick={selectedItem ? handleUpdate : handleCreate}
+              >
+                {selectedItem ? "Salvar alteracoes" : "Criar registro"}
+              </button>
+            </div>
+
+            <p className="module-crud__hint">
+              Para criar, informe um JSON valido. Para editar, selecione uma
+              linha da tabela e ajuste apenas os campos necessarios.
+            </p>
+          </div>
         </aside>
       </div>
     </div>
