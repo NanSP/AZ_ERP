@@ -1,11 +1,11 @@
 package com.example.backend.master.platform.tenantDatabases;
 
+import com.example.backend.master.platform.templateMigration.TemplateMigrationProperties;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
 import com.example.backend.shared.exception.ValidacaoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,19 +29,32 @@ class TenantDatabasesServiceTest {
     @Mock
     private TenantsRepository tenantsRepository;
 
+    @Mock
+    private TemplateMigrationProperties templateMigrationProperties;
+
     @InjectMocks
     private TenantDatabasesService service;
 
+    void mockTemplateDefaults() {
+        lenient().when(templateMigrationProperties.getDatabase()).thenReturn("az_erp_template");
+        lenient().when(templateMigrationProperties.getHost()).thenReturn("render-host");
+        lenient().when(templateMigrationProperties.getPort()).thenReturn(5432);
+        lenient().when(templateMigrationProperties.getUsername()).thenReturn("render-user");
+        lenient().when(templateMigrationProperties.getPassword()).thenReturn("render-secret");
+    }
+
     @Test
     void deveCriarTenantDatabaseComDefaults() {
+        mockTemplateDefaults();
+
         TenantDatabasesRequestDTO request = new TenantDatabasesRequestDTO(
                 1L,
                 " az_erp_tenant_1 ",
-                " az_erp_template ",
-                " localhost ",
                 null,
-                " postgres ",
-                " secret ",
+                null,
+                null,
+                null,
+                null,
                 null,
                 null
         );
@@ -53,15 +66,17 @@ class TenantDatabasesServiceTest {
 
         assertEquals("az_erp_tenant_1", saved.getDatabaseName());
         assertEquals("az_erp_template", saved.getTemplateName());
-        assertEquals("localhost", saved.getDbHost());
+        assertEquals("render-host", saved.getDbHost());
         assertEquals(5432, saved.getDbPort());
-        assertEquals("postgres", saved.getDbUsername());
-        assertEquals("secret", saved.getDbPassword());
+        assertEquals("render-user", saved.getDbUsername());
+        assertEquals("render-secret", saved.getDbPassword());
         assertEquals("PENDENTE", saved.getProvisionStatus());
     }
 
     @Test
     void deveBloquearAlteracaoDeHostAposProvisionamento() {
+        mockTemplateDefaults();
+
         TenantDatabases entity = criarDatabase();
         entity.setProvisionStatus("ATIVO");
         entity.setProvisionedAt(LocalDateTime.now());
@@ -87,6 +102,8 @@ class TenantDatabasesServiceTest {
 
     @Test
     void deveAtualizarStatusParaAtivoEPreencherProvisionedAt() {
+        mockTemplateDefaults();
+
         TenantDatabases entity = criarDatabase();
 
         when(repository.findById(2L)).thenReturn(Optional.of(entity));
@@ -97,6 +114,33 @@ class TenantDatabasesServiceTest {
         assertEquals("ATIVO", saved.getProvisionStatus());
         assertEquals(LocalDateTime.of(2026, 5, 31, 1, 0), saved.getLastCheckAt());
         assertNotNull(saved.getProvisionedAt());
+    }
+
+    @Test
+    void deveSubstituirPlaceholdersPorConfiguracaoDoServidor() {
+        mockTemplateDefaults();
+
+        TenantDatabasesRequestDTO request = new TenantDatabasesRequestDTO(
+                1L,
+                "az_erp_test2",
+                "Gerenciado pelo servidor",
+                "Gerenciado pelo servidor",
+                5432,
+                "Gerenciado pelo servidor",
+                "********",
+                "PENDENTE",
+                null
+        );
+
+        when(tenantsRepository.findById(1L)).thenReturn(Optional.of(criarTenant()));
+        when(repository.save(any(TenantDatabases.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        TenantDatabases saved = service.criar(request);
+
+        assertEquals("az_erp_template", saved.getTemplateName());
+        assertEquals("render-host", saved.getDbHost());
+        assertEquals("render-user", saved.getDbUsername());
+        assertEquals("render-secret", saved.getDbPassword());
     }
 
     private Tenants criarTenant() {

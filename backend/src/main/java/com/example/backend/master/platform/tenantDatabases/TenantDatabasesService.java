@@ -1,5 +1,6 @@
 package com.example.backend.master.platform.tenantDatabases;
 
+import com.example.backend.master.platform.templateMigration.TemplateMigrationProperties;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
@@ -14,40 +15,45 @@ public class TenantDatabasesService {
 
     private final TenantDatabasesRepository repository;
     private final TenantsRepository tenantsRepository;
+    private final TemplateMigrationProperties templateMigrationProperties;
 
     public TenantDatabasesService(
             TenantDatabasesRepository tenantDatabasesRepository,
-            TenantsRepository tenantsRepository
+            TenantsRepository tenantsRepository,
+            TemplateMigrationProperties templateMigrationProperties
     ) {
         this.repository = tenantDatabasesRepository;
         this.tenantsRepository = tenantsRepository;
+        this.templateMigrationProperties = templateMigrationProperties;
     }
 
     @Transactional
     public TenantDatabases criar(TenantDatabasesRequestDTO data) {
-        validar(data);
-        validarDatabaseNameDuplicadoParaCriacao(normalizarObrigatorio(data.databaseName(), "Database name e obrigatorio"));
+        TenantDatabasesRequestDTO normalizedData = normalizarCamposGerenciados(data);
+        validar(normalizedData);
+        validarDatabaseNameDuplicadoParaCriacao(normalizarObrigatorio(normalizedData.databaseName(), "Database name e obrigatorio"));
 
-        Tenants tenant = buscarTenant(data.tenantId());
+        Tenants tenant = buscarTenant(normalizedData.tenantId());
 
         TenantDatabases entity = new TenantDatabases();
-        preencher(entity, data, tenant);
+        preencher(entity, normalizedData, tenant);
 
         return repository.save(entity);
     }
 
     @Transactional
     public TenantDatabases atualizar(Long id, TenantDatabasesRequestDTO data) {
-        validar(data);
+        TenantDatabasesRequestDTO normalizedData = normalizarCamposGerenciados(data);
+        validar(normalizedData);
 
         TenantDatabases entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant database nao encontrado"));
 
-        validarDatabaseNameDuplicadoParaAtualizacao(normalizarObrigatorio(data.databaseName(), "Database name e obrigatorio"), id);
-        validarAlteracoesSensiveis(entity, data);
+        validarDatabaseNameDuplicadoParaAtualizacao(normalizarObrigatorio(normalizedData.databaseName(), "Database name e obrigatorio"), id);
+        validarAlteracoesSensiveis(entity, normalizedData);
 
-        Tenants tenant = buscarTenant(data.tenantId());
-        preencher(entity, data, tenant);
+        Tenants tenant = buscarTenant(normalizedData.tenantId());
+        preencher(entity, normalizedData, tenant);
 
         return repository.save(entity);
     }
@@ -113,6 +119,24 @@ public class TenantDatabasesService {
 
         validarProvisionStatus(normalizarProvisionStatus(data.provisionStatus()));
         validarDbPort(normalizarDbPort(data.dbPort()));
+    }
+
+    private TenantDatabasesRequestDTO normalizarCamposGerenciados(TenantDatabasesRequestDTO data) {
+        if (data == null) {
+            return null;
+        }
+
+        return new TenantDatabasesRequestDTO(
+                data.tenantId(),
+                data.databaseName(),
+                resolverCampoGerenciado(data.templateName(), templateMigrationProperties.getDatabase()),
+                resolverCampoGerenciado(data.dbHost(), templateMigrationProperties.getHost()),
+                data.dbPort() == null ? templateMigrationProperties.getPort() : data.dbPort(),
+                resolverCampoGerenciado(data.dbUsername(), templateMigrationProperties.getUsername()),
+                resolverCampoGerenciado(data.dbPassword(), templateMigrationProperties.getPassword()),
+                data.provisionStatus(),
+                data.lastCheckAt()
+        );
     }
 
     private void validarAlteracoesSensiveis(TenantDatabases entity, TenantDatabasesRequestDTO data) {
@@ -209,5 +233,15 @@ public class TenantDatabasesService {
         }
         String normalizado = valor.trim();
         return normalizado.isBlank() ? null : normalizado;
+    }
+
+    private String resolverCampoGerenciado(String valor, String fallback) {
+        String normalizado = normalizarOpcional(valor);
+        if (normalizado == null
+                || normalizado.equalsIgnoreCase("Gerenciado pelo servidor")
+                || normalizado.equals("********")) {
+            return fallback;
+        }
+        return normalizado;
     }
 }
