@@ -19,6 +19,10 @@ export type CrudFieldDefinition = {
   required?: boolean;
   placeholder?: string;
   options?: CrudFieldOption[];
+  defaultValue?: string;
+  description?: string;
+  readOnly?: boolean;
+  serverManaged?: boolean;
 };
 
 export type CrudFormSchema = {
@@ -148,20 +152,50 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
         label: "Template",
         type: "text",
         required: true,
+        defaultValue: "Gerenciado pelo servidor",
+        description: "O template efetivo e definido pela configuracao do backend.",
+        readOnly: true,
+        serverManaged: true,
       },
-      { name: "dbHost", label: "Host", type: "text", required: true },
-      { name: "dbPort", label: "Porta", type: "number", required: true },
+      {
+        name: "dbHost",
+        label: "Host",
+        type: "text",
+        required: true,
+        defaultValue: "Gerenciado pelo servidor",
+        description: "O host de conexao e aplicado automaticamente no provisionamento.",
+        readOnly: true,
+        serverManaged: true,
+      },
+      {
+        name: "dbPort",
+        label: "Porta",
+        type: "number",
+        required: true,
+        defaultValue: "5432",
+        description: "A porta padrao e controlada pelo ambiente do backend.",
+        readOnly: true,
+        serverManaged: true,
+      },
       {
         name: "dbUsername",
         label: "Usuario do banco",
         type: "text",
         required: true,
+        defaultValue: "Gerenciado pelo servidor",
+        description: "O usuario tecnico e resolvido pelo backend no momento do provisionamento.",
+        readOnly: true,
+        serverManaged: true,
       },
       {
         name: "dbPassword",
         label: "Senha do banco",
         type: "password",
         required: true,
+        defaultValue: "********",
+        description: "A credencial tecnica e mantida apenas no servidor.",
+        readOnly: true,
+        serverManaged: true,
       },
       {
         name: "provisionStatus",
@@ -241,7 +275,9 @@ export function getCrudFormSchema(schema: string, entity: string) {
 }
 
 export function createEmptyFormValues(schema: CrudFormSchema) {
-  return Object.fromEntries(schema.fields.map((field) => [field.name, ""]));
+  return Object.fromEntries(
+    schema.fields.map((field) => [field.name, field.defaultValue ?? ""]),
+  );
 }
 
 export function populateFormValues(

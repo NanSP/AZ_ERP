@@ -407,7 +407,11 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
                         <label className="module-crud__label" htmlFor={fieldId}>
                           {field.label}
                         </label>
-                        {field.required ? (
+                        {field.serverManaged ? (
+                          <span className="module-crud__field-status">
+                            Gerenciado pelo servidor
+                          </span>
+                        ) : field.required ? (
                           <span className="module-crud__field-required">
                             Obrigatorio
                           </span>
@@ -415,7 +419,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
                       </div>
 
                       {hasOptions ? (
-                        <select {...commonProps}>
+                        <select {...commonProps} disabled={field.readOnly}>
                           <option value="">Selecione</option>
                           {field.options?.map((option) => (
                             <option key={option.value} value={option.value}>
@@ -427,14 +431,22 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
                         <textarea
                           {...commonProps}
                           placeholder={field.placeholder}
+                          readOnly={field.readOnly}
                         />
                       ) : (
                         <input
                           {...commonProps}
                           type={field.type}
                           placeholder={field.placeholder}
+                          readOnly={field.readOnly}
                         />
                       )}
+
+                      {field.description ? (
+                        <p className="module-crud__field-description">
+                          {field.description}
+                        </p>
+                      ) : null}
                     </div>
                   );
                 })}

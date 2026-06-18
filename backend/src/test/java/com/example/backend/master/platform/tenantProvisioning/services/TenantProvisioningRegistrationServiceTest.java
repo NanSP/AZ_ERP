@@ -62,10 +62,10 @@ class TenantProvisioningRegistrationServiceTest {
                 "71999999999",
                 "PROFESSIONAL",
                 "tenant_a_db",
-                "localhost",
-                5432,
-                "tenant_user",
-                "tenant_pass",
+                "payload-host-ignored",
+                6543,
+                "payload-user-ignored",
+                "payload-pass-ignored",
                 "Admin Tenant",
                 "admin@tenant.com",
                 "admin.tenant",
@@ -91,6 +91,10 @@ class TenantProvisioningRegistrationServiceTest {
         when(systemUsersRepository.findById(5L)).thenReturn(Optional.of(executor));
         when(templateRegistryService.getReadyRegistry()).thenReturn(templateRegistry);
         when(templateMigrationProperties.getDatabase()).thenReturn("az_erp_template");
+        when(templateMigrationProperties.getHost()).thenReturn("render-internal-host");
+        when(templateMigrationProperties.getPort()).thenReturn(5432);
+        when(templateMigrationProperties.getUsername()).thenReturn("az_erp_user");
+        when(templateMigrationProperties.getPassword()).thenReturn("render-secret");
         when(tenantsService.criar(any(TenantsRequestDTO.class))).thenReturn(tenant);
         when(tenantDatabasesService.criar(any(TenantDatabasesRequestDTO.class))).thenReturn(tenantDatabase);
 
@@ -109,6 +113,10 @@ class TenantProvisioningRegistrationServiceTest {
         ArgumentCaptor<TenantDatabasesRequestDTO> databaseRequestCaptor = ArgumentCaptor.forClass(TenantDatabasesRequestDTO.class);
         verify(tenantDatabasesService).criar(databaseRequestCaptor.capture());
         assertEquals("az_erp_template", databaseRequestCaptor.getValue().templateName());
+        assertEquals("render-internal-host", databaseRequestCaptor.getValue().dbHost());
+        assertEquals(5432, databaseRequestCaptor.getValue().dbPort());
+        assertEquals("az_erp_user", databaseRequestCaptor.getValue().dbUsername());
+        assertEquals("render-secret", databaseRequestCaptor.getValue().dbPassword());
         assertEquals("PENDENTE", databaseRequestCaptor.getValue().provisionStatus());
 
         ArgumentCaptor<ProvisioningLogsRequestDTO> logCaptor = ArgumentCaptor.forClass(ProvisioningLogsRequestDTO.class);
