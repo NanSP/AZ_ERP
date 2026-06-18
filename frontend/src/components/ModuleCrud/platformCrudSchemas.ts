@@ -32,14 +32,15 @@ const statusOptions = [
 ];
 
 const roleOptions = [
-  { label: "Admin sistema", value: "ADMIN_SISTEMA" },
-  { label: "Suporte", value: "SUPORTE" },
+  { label: "Master admin", value: "MASTER_ADMIN" },
+  { label: "Support", value: "SUPPORT" },
+  { label: "Operations", value: "OPERATIONS" },
 ];
 
 const tenantAdminRoleOptions = [
-  { label: "Admin tenant", value: "ADMIN" },
-  { label: "Gestor", value: "GESTOR" },
-  { label: "Operador", value: "OPERADOR" },
+  { label: "Master admin", value: "MASTER_ADMIN" },
+  { label: "Tenant admin", value: "TENANT_ADMIN" },
+  { label: "Support", value: "SUPPORT" },
 ];
 
 const platformCrudSchemas: Record<string, CrudFormSchema> = {
@@ -107,7 +108,7 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
         type: "text",
         options: [
           { label: "Starter", value: "STARTER" },
-          { label: "Business", value: "BUSINESS" },
+          { label: "Professional", value: "PROFESSIONAL" },
           { label: "Enterprise", value: "ENTERPRISE" },
         ],
       },
@@ -133,11 +134,26 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
         type: "text",
         required: true,
       },
-      { name: "templateName", label: "Template", type: "text" },
+      {
+        name: "templateName",
+        label: "Template",
+        type: "text",
+        required: true,
+      },
       { name: "dbHost", label: "Host", type: "text", required: true },
       { name: "dbPort", label: "Porta", type: "number", required: true },
-      { name: "dbUsername", label: "Usuario do banco", type: "text" },
-      { name: "dbPassword", label: "Senha do banco", type: "password" },
+      {
+        name: "dbUsername",
+        label: "Usuario do banco",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "dbPassword",
+        label: "Senha do banco",
+        type: "password",
+        required: true,
+      },
       {
         name: "provisionStatus",
         label: "Status de provisionamento",
