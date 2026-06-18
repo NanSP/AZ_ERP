@@ -117,7 +117,8 @@ public class TenantSchemaUpgradeService {
                 + ":"
                 + database.getDbPort()
                 + "/"
-                + database.getDatabaseName();
+                + database.getDatabaseName()
+                + "?sslmode=require";
     }
 
     private void salvarLog(

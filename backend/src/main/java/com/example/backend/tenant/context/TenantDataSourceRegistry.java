@@ -73,7 +73,8 @@ public class TenantDataSourceRegistry {
                         "jdbc:postgresql://" +
                                 rs.getString("db_host") + ":" +
                                 rs.getInt("db_port") + "/" +
-                                rs.getString("database_name")
+                                rs.getString("database_name") +
+                                "?sslmode=require"
                 );
                 dataSource.setUsername(rs.getString("db_username"));
                 dataSource.setPassword(rs.getString("db_password_encrypted"));

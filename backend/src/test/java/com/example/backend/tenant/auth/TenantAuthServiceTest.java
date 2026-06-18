@@ -120,7 +120,7 @@ class TenantAuthServiceTest {
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "jdbc:postgresql://localhost:5432/tenant_a_db?sslmode=require",
                     "tenant_user",
                     "tenant_pass"
             )).thenReturn(connection);
@@ -165,7 +165,7 @@ class TenantAuthServiceTest {
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "jdbc:postgresql://localhost:5432/tenant_a_db?sslmode=require",
                     "tenant_user",
                     "tenant_pass"
             )).thenReturn(connection);
@@ -199,7 +199,7 @@ class TenantAuthServiceTest {
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "jdbc:postgresql://localhost:5432/tenant_a_db?sslmode=require",
                     "tenant_user",
                     "tenant_pass"
             )).thenReturn(connection);
@@ -255,7 +255,7 @@ class TenantAuthServiceTest {
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "jdbc:postgresql://localhost:5432/tenant_a_db?sslmode=require",
                     "tenant_user",
                     "tenant_pass"
             )).thenReturn(connection);
@@ -291,7 +291,7 @@ class TenantAuthServiceTest {
 
         try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
             driverManager.when(() -> DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "jdbc:postgresql://localhost:5432/tenant_a_db?sslmode=require",
                     "tenant_user",
                     "tenant_pass"
             )).thenReturn(connection);

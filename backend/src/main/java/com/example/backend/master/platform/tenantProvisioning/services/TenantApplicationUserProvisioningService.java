@@ -32,7 +32,8 @@ public class TenantApplicationUserProvisioningService {
                 + ":"
                 + tenantDatabase.getDbPort()
                 + "/"
-                + tenantDatabase.getDatabaseName();
+                + tenantDatabase.getDatabaseName()
+                + "?sslmode=require";
 
         try (
                 Connection connection = DriverManager.getConnection(

@@ -10,6 +10,6 @@ public record TenantConnectionInfo(
         String password
 ) {
     public String jdbcUrl() {
-        return "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;
+        return "jdbc:postgresql://" + host + ":" + port + "/" + databaseName + "?sslmode=require";
     }
 }

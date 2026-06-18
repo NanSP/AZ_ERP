@@ -40,7 +40,7 @@ class TenantConnectionServiceTest {
 
         assertEquals(1L, info.tenantId());
         assertEquals("TENANT_A", info.tenantCode());
-        assertEquals("jdbc:postgresql://localhost:5432/tenant_a_db", info.jdbcUrl());
+        assertEquals("jdbc:postgresql://localhost:5432/tenant_a_db?sslmode=require", info.jdbcUrl());
     }
 
     @Test
