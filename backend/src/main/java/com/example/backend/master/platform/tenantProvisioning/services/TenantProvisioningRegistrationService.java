@@ -87,10 +87,10 @@ public class TenantProvisioningRegistrationService {
                 tenant.getId(),
                 data.databaseName(),
                 templateMigrationProperties.getDatabase(),
-                data.dbHost(),
-                data.dbPort(),
-                data.dbUsername(),
-                data.dbPassword(),
+                templateMigrationProperties.getHost(),
+                templateMigrationProperties.getPort(),
+                templateMigrationProperties.getUsername(),
+                templateMigrationProperties.getPassword(),
                 "PENDENTE",
                 null
         ));
