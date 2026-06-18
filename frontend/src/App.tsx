@@ -14,6 +14,9 @@ const DashboardPage = lazy(() => import("./pages/Dashboard/DashboardPage"));
 const ModuleWorkspacePage = lazy(
   () => import("./pages/Module/ModuleWorkspacePage"),
 );
+const PlatformWorkspacePage = lazy(
+  () => import("./pages/Platform/PlatformWorkspacePage"),
+);
 
 export default function App() {
   return (
@@ -31,6 +34,10 @@ export default function App() {
                 <Route element={<PasswordChangeGuard />}>
                   <Route path="/app" element={<AppShell />}>
                     <Route index element={<DashboardPage />} />
+                    <Route
+                      path="platform/:entity"
+                      element={<PlatformWorkspacePage />}
+                    />
                     <Route
                       path="module/:schema/:entity"
                       element={<ModuleWorkspacePage />}
