@@ -49,10 +49,6 @@ export function canAccessResourceAction(
     return false;
   }
 
-  if (isMasterSession(session)) {
-    return true;
-  }
-
   const permissionKey = getPermissionKey(resource, action);
   const permissions = new Set(session.permissoes ?? []);
   return permissions.has(permissionKey) || observedBackendAccess.has(permissionKey);

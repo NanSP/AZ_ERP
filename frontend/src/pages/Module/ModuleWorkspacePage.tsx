@@ -139,6 +139,21 @@ export default function ModuleWorkspacePage() {
   const { schema, entity } = useParams();
   const match = findResource(schema, entity);
 
+  if (session?.scope === "master") {
+    return (
+      <section className="module-workspace module-workspace--empty">
+        <span className="module-workspace__eyebrow">Escopo</span>
+        <h2 className="module-workspace__title">Workspace de tenant bloqueado</h2>
+        <p className="module-workspace__description">
+          Sessoes master acessam apenas a camada de plataforma, separada dos modulos operacionais do tenant.
+        </p>
+        <Link to="/app" className="module-workspace__back">
+          Voltar ao dashboard
+        </Link>
+      </section>
+    );
+  }
+
   if (!schema || !entity || !match) {
     return (
       <section className="module-workspace module-workspace--empty">

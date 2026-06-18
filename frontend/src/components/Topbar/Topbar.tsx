@@ -6,7 +6,8 @@ export default function Topbar() {
   const navigate = useNavigate();
   const { session, logout } = useAuth();
 
-  const scopeLabel = session?.scope === "master" ? "Master" : "Tenant";
+  const isMasterScope = session?.scope === "master";
+  const scopeLabel = isMasterScope ? "Master" : "Tenant";
   const tenantLabel =
     session?.scope === "tenant" ? session.tenantCode || "Tenant" : "Plataforma";
 
@@ -19,9 +20,13 @@ export default function Topbar() {
     <div className="topbar">
       <div className="topbar__intro">
         <span className="topbar__eyebrow">ERP Workspace</span>
-        <h1 className="topbar__title">Operação integrada</h1>
+        <h1 className="topbar__title">
+          {isMasterScope ? "Operacao da plataforma" : "Operacao integrada"}
+        </h1>
         <p className="topbar__subtitle">
-          Acesse módulos, acompanhe processos e navegue pelo ecossistema do ERP.
+          {isMasterScope
+            ? "Gerencie tenants, operadores globais e servicos centrais do ecossistema."
+            : "Acesse modulos, acompanhe processos e navegue pelo ecossistema do ERP."}
         </p>
       </div>
 
