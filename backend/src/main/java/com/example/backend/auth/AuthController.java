@@ -54,6 +54,16 @@ public class AuthController {
         return service.me(principal);
     }
 
+    @PostMapping("/change-password")
+    @ResponseStatus(HttpStatus.OK)
+    public PasswordChangeResponseDTO changePassword(
+            @RequestBody ChangePasswordRequestDTO data,
+            Authentication authentication
+    ) {
+        SecurityUserPrincipal principal = (SecurityUserPrincipal) authentication.getPrincipal();
+        return service.changePassword(principal, data);
+    }
+
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout(HttpServletRequest request, HttpServletResponse response) {
