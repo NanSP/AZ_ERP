@@ -33,6 +33,44 @@ function getErrorMessage(error: unknown, fallback: string) {
   return fallback;
 }
 
+function validateFormPayload(
+  schema: string,
+  entity: string,
+  values: Record<string, string>,
+) {
+  if (schema === "platform" && entity === "tenants") {
+    const documento = (values.documento ?? "").trim();
+    const tipoDocumento = (values.tipoDocumento ?? "").trim();
+    const schemaVersion = (values.schemaVersion ?? "").trim();
+
+    if (documento && !tipoDocumento) {
+      return "Selecione o tipo de documento ao informar CPF ou CNPJ.";
+    }
+
+    if (tipoDocumento === "CPF" && documento && !/^\d{11}$/.test(documento)) {
+      return "CPF deve conter 11 digitos numericos.";
+    }
+
+    if (tipoDocumento === "CNPJ" && documento && !/^\d{14}$/.test(documento)) {
+      return "CNPJ deve conter 14 digitos numericos.";
+    }
+
+    if (schemaVersion && !/^V\d+$/.test(schemaVersion)) {
+      return "Schema version deve seguir o formato V1, V2, V3...";
+    }
+  }
+
+  if (schema === "platform" && entity === "provisioningLogs") {
+    const executadoPorId = (values.executadoPorId ?? "").trim();
+
+    if (!executadoPorId) {
+      return "Informe o ID do usuario executor para registrar o log.";
+    }
+  }
+
+  return null;
+}
+
 export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
   const [items, setItems] = useState<GenericItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -82,6 +120,14 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     let body: GenericItem;
 
     try {
+      if (formSchema) {
+        const validationError = validateFormPayload(schema, entity, formValues);
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+      }
+
       body = formSchema
         ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
         : (JSON.parse(payload) as GenericItem);
@@ -120,6 +166,14 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     let body: GenericItem;
 
     try {
+      if (formSchema) {
+        const validationError = validateFormPayload(schema, entity, formValues);
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+      }
+
       body = formSchema
         ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
         : (JSON.parse(payload) as GenericItem);

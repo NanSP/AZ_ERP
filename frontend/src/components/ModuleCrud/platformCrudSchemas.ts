@@ -31,6 +31,13 @@ const statusOptions = [
   { label: "Inativo", value: "INATIVO" },
 ];
 
+const tenantStatusOptions = [
+  { label: "Pendente", value: "PENDENTE" },
+  { label: "Ativo", value: "ATIVO" },
+  { label: "Suspenso", value: "SUSPENSO" },
+  { label: "Inativo", value: "INATIVO" },
+];
+
 const roleOptions = [
   { label: "Master admin", value: "MASTER_ADMIN" },
   { label: "Support", value: "SUPPORT" },
@@ -101,7 +108,7 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
         name: "status",
         label: "Status",
         type: "text",
-        options: statusOptions,
+        options: tenantStatusOptions,
       },
       {
         name: "plano",
@@ -117,6 +124,7 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
         name: "schemaVersion",
         label: "Schema version",
         type: "text",
+        placeholder: "Ex.: V1",
       },
       {
         name: "observacoes",
@@ -222,6 +230,7 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
         name: "executadoPorId",
         label: "Executado por ID",
         type: "number",
+        required: true,
       },
     ],
   },
