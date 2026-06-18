@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   listResource,
@@ -20,6 +21,17 @@ type ModuleCrudProps = {
   entity: string;
   label: string;
 };
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof AxiosError) {
+    const message = error.response?.data?.message;
+    if (typeof message === "string" && message.trim()) {
+      return message;
+    }
+  }
+
+  return fallback;
+}
 
 export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
   const [items, setItems] = useState<GenericItem[]>([]);
@@ -49,7 +61,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     try {
       const response = await listResource(schema, entity);
       setItems(Array.isArray(response.data) ? response.data : []);
-    } catch {
+    } catch (err) {
       setError(`Nao foi possivel carregar ${label}.`);
     } finally {
       setLoading(false);
@@ -73,7 +85,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
       body = formSchema
         ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
         : (JSON.parse(payload) as GenericItem);
-    } catch {
+    } catch (err) {
       setError(
         formSchema
           ? "Formulario invalido para criacao."
@@ -92,8 +104,8 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
         setPayload("{}");
       }
       await loadData();
-    } catch {
-      setError(`Erro ao criar ${label}.`);
+    } catch (err) {
+      setError(getErrorMessage(err, `Erro ao criar ${label}.`));
     } finally {
       setLoading(false);
     }
@@ -111,7 +123,7 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
       body = formSchema
         ? (buildPayloadFromForm(formSchema, formValues) as GenericItem)
         : (JSON.parse(payload) as GenericItem);
-    } catch {
+    } catch (err) {
       setError(
         formSchema
           ? "Formulario invalido para atualizacao."
@@ -131,8 +143,8 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
         setPayload("{}");
       }
       await loadData();
-    } catch {
-      setError(`Erro ao atualizar ${label}.`);
+    } catch (err) {
+      setError(getErrorMessage(err, `Erro ao atualizar ${label}.`));
     } finally {
       setLoading(false);
     }
@@ -149,8 +161,8 @@ export default function ModuleCrud({ schema, entity, label }: ModuleCrudProps) {
     try {
       await deleteResource(schema, entity, id);
       await loadData();
-    } catch {
-      setError(`Erro ao excluir ${label}.`);
+    } catch (err) {
+      setError(getErrorMessage(err, `Erro ao excluir ${label}.`));
     } finally {
       setLoading(false);
     }

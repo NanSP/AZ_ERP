@@ -53,6 +53,7 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
         name: "senha",
         label: "Senha",
         type: "password",
+        required: true,
         placeholder: "Preencha para criar ou redefinir",
       },
       {
