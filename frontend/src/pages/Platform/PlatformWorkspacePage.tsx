@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import Breadcrumbs from "../../components/Breadcrumbs/Breadcrumbs";
 import ModuleCrud from "../../components/ModuleCrud/ModuleCrud";
+import TenantProvisioningForm from "../../components/Platform/TenantProvisioningForm";
 import {
   findPlatformResource,
   platformResources,
@@ -73,7 +74,7 @@ export default function PlatformWorkspacePage() {
           <div className="platform-workspace__meta-card">
             <span className="platform-workspace__meta-label">Endpoint</span>
             <strong className="platform-workspace__meta-value">
-              {`platform/${resource.entity}`}
+              {resource.endpoint ?? `platform/${resource.entity}`}
             </strong>
           </div>
 
@@ -91,20 +92,28 @@ export default function PlatformWorkspacePage() {
           <div>
             <span className="platform-workspace__panel-eyebrow">Operacao</span>
             <h3 className="platform-workspace__panel-title">
-              Gestao da plataforma
+              {resource.view === "provisioning"
+                ? "Provisionamento da plataforma"
+                : "Gestao da plataforma"}
             </h3>
           </div>
 
           <p className="platform-workspace__panel-text">
-            Esta interface atua sobre os endpoints master do backend.
+            {resource.view === "provisioning"
+              ? "Esta interface executa o fluxo completo de onboarding no backend master."
+              : "Esta interface atua sobre os endpoints master do backend."}
           </p>
         </div>
 
-        <ModuleCrud
-          schema="platform"
-          entity={resource.entity}
-          label={resource.label}
-        />
+        {resource.view === "provisioning" ? (
+          <TenantProvisioningForm />
+        ) : (
+          <ModuleCrud
+            schema="platform"
+            entity={resource.entity}
+            label={resource.label}
+          />
+        )}
       </section>
     </div>
   );

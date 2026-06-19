@@ -2,6 +2,7 @@ package com.example.backend.master.platform.templateMigration;
 
 import com.example.backend.shared.exception.ValidacaoException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +31,30 @@ public class TemplateDatabaseAdminService {
     }
 
     public void terminateConnections(String databaseName) {
-        masterJdbcTemplate.query(
-                "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()",
-                rs -> {
-                },
+        validarNomeBanco(databaseName);
+
+        Integer activeConnections = masterJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()",
+                Integer.class,
                 databaseName
         );
+
+        if (activeConnections == null || activeConnections == 0) {
+            return;
+        }
+
+        try {
+            masterJdbcTemplate.query(
+                    "SELECT pg_catalog.pg_terminate_backend(pid) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()",
+                    rs -> {
+                    },
+                    databaseName
+            );
+        } catch (DataAccessException ex) {
+            throw new ValidacaoException(
+                    "Nao foi possivel encerrar conexoes ativas do banco template. Verifique os privilegios do PostgreSQL gerenciado."
+            );
+        }
     }
 
     public void setConnectionsAllowed(String databaseName, boolean allowed) {

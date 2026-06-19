@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,12 +55,62 @@ class TemplateDatabaseAdminServiceTest {
 
     @Test
     void deveEncerrarConexoesDoTemplate() {
+        when(masterJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()",
+                Integer.class,
+                "az_erp_template"
+        )).thenReturn(2);
+
         service.terminateConnections("az_erp_template");
 
         verify(masterJdbcTemplate).query(
-                eq("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()"),
+                eq("SELECT pg_catalog.pg_terminate_backend(pid) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()"),
                 any(RowCallbackHandler.class),
                 eq("az_erp_template")
+        );
+    }
+
+    @Test
+    void deveIgnorarEncerramentoQuandoNaoHaConexoesAtivas() {
+        when(masterJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()",
+                Integer.class,
+                "az_erp_template"
+        )).thenReturn(0);
+
+        service.terminateConnections("az_erp_template");
+    }
+
+    @Test
+    void deveTraduzirFalhaDePermissaoAoEncerrarConexoes() {
+        when(masterJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()",
+                Integer.class,
+                "az_erp_template"
+        )).thenReturn(1);
+
+        BadSqlGrammarException failure = new BadSqlGrammarException(
+                "terminate",
+                "SELECT pg_catalog.pg_terminate_backend(pid) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()",
+                null
+        );
+
+        org.mockito.Mockito.doThrow(failure)
+                .when(masterJdbcTemplate)
+                .query(
+                        eq("SELECT pg_catalog.pg_terminate_backend(pid) FROM pg_catalog.pg_stat_activity WHERE datname = ? AND pid <> pg_backend_pid()"),
+                        any(RowCallbackHandler.class),
+                        eq("az_erp_template")
+                );
+
+        ValidacaoException exception = assertThrows(
+                ValidacaoException.class,
+                () -> service.terminateConnections("az_erp_template")
+        );
+
+        assertEquals(
+                "Nao foi possivel encerrar conexoes ativas do banco template. Verifique os privilegios do PostgreSQL gerenciado.",
+                exception.getMessage()
         );
     }
 
