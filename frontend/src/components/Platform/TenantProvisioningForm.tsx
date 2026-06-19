@@ -449,47 +449,6 @@ export default function TenantProvisioningForm() {
         </div>
       </form>
 
-      {success ? (
-        <section className="tenant-provisioning__result">
-          <div className="tenant-provisioning__section-head">
-            <div>
-              <h4 className="tenant-provisioning__section-title">Resumo da execucao</h4>
-              <p className="tenant-provisioning__section-text">
-                Resultado retornado pelo endpoint de onboarding da plataforma.
-              </p>
-            </div>
-          </div>
-
-          <div className="tenant-provisioning__result-grid">
-            <article className="tenant-provisioning__result-card">
-              <span>Tenant</span>
-              <strong>{success.tenantCodigo}</strong>
-              <p>{success.tenantNome}</p>
-            </article>
-            <article className="tenant-provisioning__result-card">
-              <span>Base</span>
-              <strong>{success.databaseName}</strong>
-              <p>{success.provisionStatus}</p>
-            </article>
-            <article className="tenant-provisioning__result-card">
-              <span>Administrador</span>
-              <strong>{success.adminLogin}</strong>
-              <p>{success.adminEmail}</p>
-            </article>
-          </div>
-
-          <div className="tenant-provisioning__stages">
-            <span className="tenant-provisioning__stages-label">Etapas executadas</span>
-            <div className="tenant-provisioning__stages-list">
-              {success.etapasExecutadas.map((stage) => (
-                <span key={stage} className="tenant-provisioning__stage">
-                  {stage}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }
