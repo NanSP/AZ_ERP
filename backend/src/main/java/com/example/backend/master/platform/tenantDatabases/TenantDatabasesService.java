@@ -31,6 +31,7 @@ public class TenantDatabasesService {
     public TenantDatabases criar(TenantDatabasesRequestDTO data) {
         TenantDatabasesRequestDTO normalizedData = normalizarCamposGerenciados(data);
         validar(normalizedData);
+        validarStatusManual(normalizarProvisionStatus(normalizedData.provisionStatus()));
         validarDatabaseNameDuplicadoParaCriacao(normalizarObrigatorio(normalizedData.databaseName(), "Database name e obrigatorio"));
 
         Tenants tenant = buscarTenant(normalizedData.tenantId());
@@ -49,6 +50,7 @@ public class TenantDatabasesService {
         TenantDatabases entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Tenant database nao encontrado"));
 
+        validarPromocaoManualDeStatus(entity, normalizedData);
         validarDatabaseNameDuplicadoParaAtualizacao(normalizarObrigatorio(normalizedData.databaseName(), "Database name e obrigatorio"), id);
         validarAlteracoesSensiveis(entity, normalizedData);
 
@@ -117,7 +119,8 @@ public class TenantDatabasesService {
         normalizarObrigatorio(data.dbUsername(), "DB username e obrigatorio");
         normalizarObrigatorio(data.dbPassword(), "DB password e obrigatorio");
 
-        validarProvisionStatus(normalizarProvisionStatus(data.provisionStatus()));
+        String provisionStatus = normalizarProvisionStatus(data.provisionStatus());
+        validarProvisionStatus(provisionStatus);
         validarDbPort(normalizarDbPort(data.dbPort()));
     }
 
@@ -185,6 +188,19 @@ public class TenantDatabasesService {
                 && !provisionStatus.equals("ERRO")
                 && !provisionStatus.equals("SUSPENSO")) {
             throw new ValidacaoException("Provision status invalido");
+        }
+    }
+
+    private void validarStatusManual(String provisionStatus) {
+        if ("ATIVO".equals(provisionStatus)) {
+            throw new ValidacaoException("Provision status ATIVO e reservado ao provisionamento automatico");
+        }
+    }
+
+    private void validarPromocaoManualDeStatus(TenantDatabases entity, TenantDatabasesRequestDTO data) {
+        String novoStatus = normalizarProvisionStatus(data.provisionStatus());
+        if (!"ATIVO".equals(entity.getProvisionStatus()) && "ATIVO".equals(novoStatus)) {
+            throw new ValidacaoException("Provision status ATIVO e reservado ao provisionamento automatico");
         }
     }
 
