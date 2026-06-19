@@ -143,6 +143,27 @@ class TenantDatabasesServiceTest {
         assertEquals("render-secret", saved.getDbPassword());
     }
 
+    @Test
+    void deveBloquearCriacaoManualComStatusAtivo() {
+        mockTemplateDefaults();
+
+        TenantDatabasesRequestDTO request = new TenantDatabasesRequestDTO(
+                1L,
+                "az_erp_test3",
+                null,
+                null,
+                null,
+                null,
+                null,
+                "ATIVO",
+                null
+        );
+
+        ValidacaoException exception = assertThrows(ValidacaoException.class, () -> service.criar(request));
+
+        assertEquals("Provision status ATIVO e reservado ao provisionamento automatico", exception.getMessage());
+    }
+
     private Tenants criarTenant() {
         Tenants tenant = new Tenants();
         tenant.setId(1L);

@@ -21,7 +21,7 @@ export const platformResources: PlatformResource[] = [
   {
     entity: "tenantDatabases",
     label: "Bases dos tenants",
-    description: "Acompanhe bancos provisionados, conexoes e estados operacionais.",
+    description: "Acompanhe o registro tecnico das bases provisionadas e os estados operacionais controlados pelo backend.",
     category: "Infraestrutura",
   },
   {
