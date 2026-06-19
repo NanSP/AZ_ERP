@@ -32,16 +32,18 @@ public class TenantDatabaseProvisioningService {
         validarNomeBanco(databaseName);
         TemplateRegistry registry = templateRegistryService.getReadyRegistry();
         templateRegistryService.acquireLock("CLONING");
-        templateDatabaseAdminService.setConnectionsAllowed(properties.getDatabase(), false);
-        templateDatabaseAdminService.terminateConnections(properties.getDatabase());
-
         String sql = String.format(
                 "CREATE DATABASE %s TEMPLATE %s",
                 databaseName,
                 registry.getDatabaseName()
         );
 
+        boolean connectionsDisabled = false;
+
         try {
+            templateDatabaseAdminService.setConnectionsAllowed(properties.getDatabase(), false);
+            connectionsDisabled = true;
+            templateDatabaseAdminService.terminateConnections(properties.getDatabase());
             jdbcTemplate.execute(sql);
             templateRegistryService.markCloneCompleted();
         } catch (Exception ex) {
@@ -51,7 +53,9 @@ public class TenantDatabaseProvisioningService {
                     ex
             );
         } finally {
-            templateDatabaseAdminService.setConnectionsAllowed(properties.getDatabase(), true);
+            if (connectionsDisabled) {
+                templateDatabaseAdminService.setConnectionsAllowed(properties.getDatabase(), true);
+            }
         }
     }
 

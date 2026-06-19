@@ -80,4 +80,26 @@ class TenantDatabaseProvisioningServiceTest {
         verify(templateRegistryService).releaseLockToReady();
         verify(templateDatabaseAdminService).setConnectionsAllowed("az_erp_template", true);
     }
+
+    @Test
+    void deveReabrirConexoesDoTemplateQuandoFalhaAoEncerrarSessoes() {
+        TemplateRegistry registry = new TemplateRegistry();
+        registry.setDatabaseName("az_erp_template");
+
+        when(properties.getDatabase()).thenReturn("az_erp_template");
+        when(templateRegistryService.getReadyRegistry()).thenReturn(registry);
+        doThrow(new RuntimeException("falha ao encerrar conexoes"))
+                .when(templateDatabaseAdminService)
+                .terminateConnections("az_erp_template");
+
+        TenantDatabaseProvisioningException exception = assertThrows(
+                TenantDatabaseProvisioningException.class,
+                () -> service.createTenantDatabase("tenant_db_01")
+        );
+
+        assertEquals("Erro ao criar banco do tenant: tenant_db_01", exception.getMessage());
+        verify(templateRegistryService).releaseLockToReady();
+        verify(templateDatabaseAdminService).setConnectionsAllowed("az_erp_template", false);
+        verify(templateDatabaseAdminService).setConnectionsAllowed("az_erp_template", true);
+    }
 }
