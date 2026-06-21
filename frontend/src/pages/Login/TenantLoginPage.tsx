@@ -22,6 +22,10 @@ export default function TenantLoginPage() {
   const [login, setLogin] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotTenantCode, setForgotTenantCode] = useState("");
+  const [forgotIdentity, setForgotIdentity] = useState("");
+  const [forgotMessage, setForgotMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +37,27 @@ export default function TenantLoginPage() {
     } catch (error) {
       setErro(getAuthErrorMessage(error, "Nao foi possivel autenticar no tenant."));
     }
+  }
+
+  function handleForgotPassword(event: React.FormEvent) {
+    event.preventDefault();
+
+    const currentTenantCode = forgotTenantCode.trim() || tenantCode.trim();
+    const currentIdentity = forgotIdentity.trim() || login.trim();
+
+    if (!currentTenantCode) {
+      setForgotMessage("Informe o codigo do tenant para orientar a redefinicao.");
+      return;
+    }
+
+    if (!currentIdentity) {
+      setForgotMessage("Informe seu login ou email para orientar a redefinicao.");
+      return;
+    }
+
+    setForgotMessage(
+      `Solicite a redefinicao ao administrador do tenant ${currentTenantCode.toUpperCase()} informando o usuario ${currentIdentity}.`,
+    );
   }
 
   return (
@@ -88,6 +113,61 @@ export default function TenantLoginPage() {
           Entrar
         </button>
       </form>
+
+      <div className="auth-secondary">
+        <button
+          type="button"
+          className="auth-secondary__toggle"
+          onClick={() => {
+            setForgotOpen((current) => !current);
+            setForgotMessage("");
+          }}
+        >
+          Esqueci a senha
+        </button>
+
+        {forgotOpen ? (
+          <form className="auth-secondary__panel" onSubmit={handleForgotPassword}>
+            <p className="auth-secondary__text">
+              Informe os dados abaixo para orientar a redefinicao com o administrador do tenant.
+            </p>
+
+            <div className="auth-field">
+              <label className="auth-label" htmlFor="forgot-tenant-code">
+                Codigo do tenant
+              </label>
+              <input
+                id="forgot-tenant-code"
+                className="auth-input"
+                value={forgotTenantCode}
+                onChange={(e) => setForgotTenantCode(e.target.value)}
+                placeholder={tenantCode || "Ex.: TENANT01"}
+              />
+            </div>
+
+            <div className="auth-field">
+              <label className="auth-label" htmlFor="forgot-identity">
+                Login ou email
+              </label>
+              <input
+                id="forgot-identity"
+                className="auth-input"
+                value={forgotIdentity}
+                onChange={(e) => setForgotIdentity(e.target.value)}
+                placeholder={login || "Seu login ou email"}
+              />
+            </div>
+
+            <button className="auth-submit auth-submit--secondary" type="submit">
+              Mostrar orientacao
+            </button>
+
+            {forgotMessage ? (
+              <p className="auth-secondary__message">{forgotMessage}</p>
+            ) : null}
+          </form>
+        ) : null}
+      </div>
 
       {erro && <p className="auth-error">{erro}</p>}
 
