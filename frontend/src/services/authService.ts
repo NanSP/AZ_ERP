@@ -4,6 +4,8 @@ import type {
   AuthSession,
   ChangePasswordPayload,
   MasterLoginPayload,
+  TenantForgotPasswordPayload,
+  TenantForgotPasswordResponse,
   TenantLoginPayload,
 } from "../auth/authTypes";
 
@@ -59,6 +61,13 @@ export async function logoutMaster(): Promise<void> {
 
 export async function logoutTenant(): Promise<void> {
   await api.post("/tenant/auth/logout");
+}
+
+export async function forgotTenantPassword(
+  payload: TenantForgotPasswordPayload,
+): Promise<TenantForgotPasswordResponse> {
+  const { data } = await api.post("/tenant/auth/forgot-password", payload);
+  return data as TenantForgotPasswordResponse;
 }
 
 async function getSession(path: string): Promise<AuthSession | null> {

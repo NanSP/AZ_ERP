@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import AuthLayout from "../../layouts/AuthLayout";
+import { forgotTenantPassword } from "../../services/authService";
 
 function getAuthErrorMessage(error: unknown, fallback: string) {
   if (error instanceof AxiosError) {
@@ -26,6 +27,7 @@ export default function TenantLoginPage() {
   const [forgotTenantCode, setForgotTenantCode] = useState("");
   const [forgotIdentity, setForgotIdentity] = useState("");
   const [forgotMessage, setForgotMessage] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,7 +41,7 @@ export default function TenantLoginPage() {
     }
   }
 
-  function handleForgotPassword(event: React.FormEvent) {
+  async function handleForgotPassword(event: React.FormEvent) {
     event.preventDefault();
 
     const currentTenantCode = forgotTenantCode.trim() || tenantCode.trim();
@@ -55,9 +57,38 @@ export default function TenantLoginPage() {
       return;
     }
 
-    setForgotMessage(
-      `Solicite a redefinicao ao administrador do tenant ${currentTenantCode.toUpperCase()} informando o usuario ${currentIdentity}.`,
-    );
+    setForgotLoading(true);
+
+    try {
+      const response = await forgotTenantPassword({
+        tenantCode: currentTenantCode,
+        identificador: currentIdentity,
+      });
+
+      const contactDetails = [
+        response.emailResponsavel
+          ? `Email responsavel: ${response.emailResponsavel}.`
+          : "",
+        response.telefoneResponsavel
+          ? `Telefone responsavel: ${response.telefoneResponsavel}.`
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+
+      setForgotMessage(
+        [response.mensagem, contactDetails].filter(Boolean).join(" ").trim(),
+      );
+    } catch (error) {
+      setForgotMessage(
+        getAuthErrorMessage(
+          error,
+          "Nao foi possivel iniciar a orientacao de recuperacao de senha.",
+        ),
+      );
+    } finally {
+      setForgotLoading(false);
+    }
   }
 
   return (
@@ -159,7 +190,7 @@ export default function TenantLoginPage() {
             </div>
 
             <button className="auth-submit auth-submit--secondary" type="submit">
-              Mostrar orientacao
+              {forgotLoading ? "Consultando..." : "Mostrar orientacao"}
             </button>
 
             {forgotMessage ? (

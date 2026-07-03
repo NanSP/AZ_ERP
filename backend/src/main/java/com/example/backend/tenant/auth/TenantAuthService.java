@@ -3,6 +3,8 @@ package com.example.backend.tenant.auth;
 import com.example.backend.auth.AuthSessionResponseDTO;
 import com.example.backend.auth.ChangePasswordRequestDTO;
 import com.example.backend.auth.PasswordChangeResponseDTO;
+import com.example.backend.master.platform.tenants.Tenants;
+import com.example.backend.master.platform.tenants.TenantsRepository;
 import com.example.backend.security.JwtService;
 import com.example.backend.security.SecurityUserPrincipal;
 import com.example.backend.shared.exception.ValidacaoException;
@@ -24,17 +26,20 @@ public class TenantAuthService {
 
     private final TenantConnectionService tenantConnectionService;
     private final TenantDataSourceRegistry tenantDataSourceRegistry;
+    private final TenantsRepository tenantsRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public TenantAuthService(
             TenantConnectionService tenantConnectionService,
             TenantDataSourceRegistry tenantDataSourceRegistry,
+            TenantsRepository tenantsRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService
     ) {
         this.tenantConnectionService = tenantConnectionService;
         this.tenantDataSourceRegistry = tenantDataSourceRegistry;
+        this.tenantsRepository = tenantsRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
@@ -178,6 +183,49 @@ public class TenantAuthService {
         }
     }
 
+    public TenantForgotPasswordResponseDTO forgotPassword(TenantForgotPasswordRequestDTO data) {
+        validarForgotPassword(data);
+
+        String tenantCode = normalizarTenantCode(data.tenantCode());
+        String identificador = normalizarIdentificador(data.identificador());
+        TenantConnectionInfo connectionInfo = tenantConnectionService.resolve(tenantCode);
+        Tenants tenant = tenantsRepository.findByCodigo(tenantCode)
+                .orElseThrow(() -> new ValidacaoException("Tenant nao encontrado"));
+
+        String sql = """
+                SELECT id
+                FROM sys.usuarios
+                WHERE lower(login) = ? OR lower(email) = ?
+                """;
+
+        try (
+                Connection connection = DriverManager.getConnection(
+                        connectionInfo.jdbcUrl(),
+                        connectionInfo.username(),
+                        connectionInfo.password()
+                );
+                PreparedStatement statement = connection.prepareStatement(sql)
+        ) {
+            statement.setString(1, identificador);
+            statement.setString(2, identificador);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    rs.getLong("id");
+                }
+            }
+
+            return new TenantForgotPasswordResponseDTO(
+                    tenantCode,
+                    montarMensagemForgotPassword(tenant),
+                    tenant.getEmailResponsavel(),
+                    tenant.getTelefoneResponsavel()
+            );
+        } catch (SQLException ex) {
+            throw new ValidacaoException("Erro ao iniciar recuperacao de senha do tenant: " + ex.getMessage());
+        }
+    }
+
     private List<String> carregarPerfis(PreparedStatement statement, Long userId) throws SQLException {
         statement.setLong(1, userId);
 
@@ -235,6 +283,36 @@ public class TenantAuthService {
         if (data.novaSenha().trim().length() < 8) {
             throw new ValidacaoException("Nova senha deve ter pelo menos 8 caracteres");
         }
+    }
+
+    private void validarForgotPassword(TenantForgotPasswordRequestDTO data) {
+        if (data == null) {
+            throw new ValidacaoException("Dados de recuperacao de senha sao obrigatorios");
+        }
+
+        if (data.tenantCode() == null || data.tenantCode().isBlank()) {
+            throw new ValidacaoException("Codigo do tenant e obrigatorio");
+        }
+
+        if (data.identificador() == null || data.identificador().isBlank()) {
+            throw new ValidacaoException("Login ou email e obrigatorio");
+        }
+    }
+
+    private String normalizarTenantCode(String tenantCode) {
+        return tenantCode.trim();
+    }
+
+    private String normalizarIdentificador(String identificador) {
+        return identificador.trim().toLowerCase();
+    }
+
+    private String montarMensagemForgotPassword(Tenants tenant) {
+        if (tenant.getEmailResponsavel() != null || tenant.getTelefoneResponsavel() != null) {
+            return "Se os dados informados estiverem corretos, solicite a redefinicao ao responsavel do tenant.";
+        }
+
+        return "Se os dados informados estiverem corretos, solicite a redefinicao ao administrador do tenant.";
     }
 
     public AuthSessionResponseDTO me(SecurityUserPrincipal principal) {

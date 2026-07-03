@@ -27,3 +27,15 @@ export type ChangePasswordPayload = {
   senhaAtual: string;
   novaSenha: string;
 };
+
+export type TenantForgotPasswordPayload = {
+  tenantCode: string;
+  identificador: string;
+};
+
+export type TenantForgotPasswordResponse = {
+  tenantCode: string;
+  mensagem: string;
+  emailResponsavel?: string | null;
+  telefoneResponsavel?: string | null;
+};

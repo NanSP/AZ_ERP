@@ -34,6 +34,12 @@ public class TenantAuthController {
         return auth;
     }
 
+    @PostMapping("/forgot-password")
+    @ResponseStatus(HttpStatus.OK)
+    public TenantForgotPasswordResponseDTO forgotPassword(@RequestBody TenantForgotPasswordRequestDTO data) {
+        return service.forgotPassword(data);
+    }
+
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public AuthSessionResponseDTO me(Authentication authentication) {
