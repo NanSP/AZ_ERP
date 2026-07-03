@@ -1,5 +1,6 @@
 package com.example.backend.tenant.context;
 
+import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import com.zaxxer.hikari.HikariDataSource;
 import com.example.backend.shared.exception.ValidacaoException;
@@ -16,10 +17,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TenantDataSourceRegistry {
 
     private final MasterConnectionProperties masterConnectionProperties;
+    private final SensitiveDataCipherService sensitiveDataCipherService;
     private final Map<String, DataSource> cache = new ConcurrentHashMap<>();
 
-    public TenantDataSourceRegistry(MasterConnectionProperties masterConnectionProperties) {
+    public TenantDataSourceRegistry(
+            MasterConnectionProperties masterConnectionProperties,
+            SensitiveDataCipherService sensitiveDataCipherService
+    ) {
         this.masterConnectionProperties = masterConnectionProperties;
+        this.sensitiveDataCipherService = sensitiveDataCipherService;
     }
 
     public DataSource getOrCreate(String tenantCode) {
@@ -76,7 +82,7 @@ public class TenantDataSourceRegistry {
                         rs.getString("database_name")
                 ));
                 dataSource.setUsername(rs.getString("db_username"));
-                dataSource.setPassword(rs.getString("db_password_encrypted"));
+                dataSource.setPassword(sensitiveDataCipherService.decrypt(rs.getString("db_password_encrypted")));
                 dataSource.setDriverClassName("org.postgresql.Driver");
 
                 dataSource.setPoolName("tenant-" + tenantCode);

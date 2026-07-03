@@ -11,4 +11,6 @@ public interface LogErrosRepository extends JpaRepository<LogErros, Long> {
             String url,
             LocalDateTime createdAt
     );
+
+    long deleteByCreatedAtBefore(LocalDateTime createdAt);
 }

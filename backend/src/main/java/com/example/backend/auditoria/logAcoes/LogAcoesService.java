@@ -2,6 +2,7 @@ package com.example.backend.auditoria.logAcoes;
 
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
+import com.example.backend.security.SensitiveDataSanitizer;
 import com.example.backend.sys.usuarios.Usuarios;
 import com.example.backend.sys.usuarios.UsuariosRepository;
 import jakarta.transaction.Transactional;
@@ -15,13 +16,23 @@ public class LogAcoesService {
 
     private final LogAcoesRepository repository;
     private final UsuariosRepository usuariosRepository;
+    private final SensitiveDataSanitizer sensitiveDataSanitizer;
+
+    public LogAcoesService(
+            LogAcoesRepository repository,
+            UsuariosRepository usuariosRepository,
+            SensitiveDataSanitizer sensitiveDataSanitizer
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+        this.sensitiveDataSanitizer = sensitiveDataSanitizer;
+    }
 
     public LogAcoesService(
             LogAcoesRepository repository,
             UsuariosRepository usuariosRepository
     ) {
-        this.repository = repository;
-        this.usuariosRepository = usuariosRepository;
+        this(repository, usuariosRepository, null);
     }
 
     @Transactional
@@ -60,10 +71,10 @@ public class LogAcoesService {
         entity.setAcao(normalizarObrigatorio(data.acao(), "Acao e obrigatoria"));
         entity.setTabela(normalizarObrigatorio(data.tabela(), "Tabela e obrigatoria"));
         entity.setRegistroId(data.registroId());
-        entity.setDadosAntigos(data.dadosAntigos());
-        entity.setDadosNovos(data.dadosNovos());
+        entity.setDadosAntigos(sanitizeMap(data.dadosAntigos()));
+        entity.setDadosNovos(sanitizeMap(data.dadosNovos()));
         entity.setIpAddress(data.ipAddress());
-        entity.setUserAgent(normalizarOpcional(data.userAgent()));
+        entity.setUserAgent(sanitizeUserAgent(data.userAgent()));
         entity.setCreatedAt(createdAt);
     }
 
@@ -142,5 +153,13 @@ public class LogAcoesService {
         if (usuarioId != null && ipAddress == null) {
             throw new ValidacaoException("IP deve ser informado quando houver usuario no log de acao");
         }
+    }
+
+    private Map<String, Object> sanitizeMap(Map<String, Object> value) {
+        return sensitiveDataSanitizer != null ? sensitiveDataSanitizer.sanitizeMap(value) : value;
+    }
+
+    private String sanitizeUserAgent(String value) {
+        return sensitiveDataSanitizer != null ? sensitiveDataSanitizer.sanitizeUserAgent(value) : normalizarOpcional(value);
     }
 }

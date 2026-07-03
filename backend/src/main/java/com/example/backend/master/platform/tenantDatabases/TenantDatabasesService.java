@@ -3,6 +3,7 @@ package com.example.backend.master.platform.tenantDatabases;
 import com.example.backend.master.platform.templateMigration.TemplateMigrationProperties;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
@@ -16,15 +17,26 @@ public class TenantDatabasesService {
     private final TenantDatabasesRepository repository;
     private final TenantsRepository tenantsRepository;
     private final TemplateMigrationProperties templateMigrationProperties;
+    private final SensitiveDataCipherService sensitiveDataCipherService;
+
+    public TenantDatabasesService(
+            TenantDatabasesRepository tenantDatabasesRepository,
+            TenantsRepository tenantsRepository,
+            TemplateMigrationProperties templateMigrationProperties,
+            SensitiveDataCipherService sensitiveDataCipherService
+    ) {
+        this.repository = tenantDatabasesRepository;
+        this.tenantsRepository = tenantsRepository;
+        this.templateMigrationProperties = templateMigrationProperties;
+        this.sensitiveDataCipherService = sensitiveDataCipherService;
+    }
 
     public TenantDatabasesService(
             TenantDatabasesRepository tenantDatabasesRepository,
             TenantsRepository tenantsRepository,
             TemplateMigrationProperties templateMigrationProperties
     ) {
-        this.repository = tenantDatabasesRepository;
-        this.tenantsRepository = tenantsRepository;
-        this.templateMigrationProperties = templateMigrationProperties;
+        this(tenantDatabasesRepository, tenantsRepository, templateMigrationProperties, null);
     }
 
     @Transactional
@@ -95,7 +107,7 @@ public class TenantDatabasesService {
         entity.setDbHost(normalizarObrigatorio(data.dbHost(), "DB host e obrigatorio"));
         entity.setDbPort(normalizarDbPort(data.dbPort()));
         entity.setDbUsername(normalizarObrigatorio(data.dbUsername(), "DB username e obrigatorio"));
-        entity.setDbPassword(normalizarObrigatorio(data.dbPassword(), "DB password e obrigatorio"));
+        entity.setDbPassword(encryptSensitive(normalizarObrigatorio(data.dbPassword(), "DB password e obrigatorio")));
         entity.setProvisionStatus(normalizarProvisionStatus(data.provisionStatus()));
         entity.setLastCheckAt(data.lastCheckAt());
 
@@ -150,6 +162,7 @@ public class TenantDatabasesService {
         Integer novaDbPort = normalizarDbPort(data.dbPort());
         String novoDbUsername = normalizarObrigatorio(data.dbUsername(), "DB username e obrigatorio");
         String novaDbPassword = normalizarObrigatorio(data.dbPassword(), "DB password e obrigatorio");
+        String dbPasswordAtual = decryptSensitive(entity.getDbPassword());
 
         if ("ATIVO".equals(entity.getProvisionStatus()) || entity.getProvisionedAt() != null) {
             if (!novoDatabaseName.equals(entity.getDatabaseName())) {
@@ -172,7 +185,7 @@ public class TenantDatabasesService {
                 throw new ValidacaoException("Nao e permitido alterar DB username apos provisionamento");
             }
 
-            if (!novaDbPassword.equals(entity.getDbPassword())) {
+            if (!novaDbPassword.equals(dbPasswordAtual)) {
                 throw new ValidacaoException("Nao e permitido alterar DB password apos provisionamento");
             }
         }
@@ -259,5 +272,13 @@ public class TenantDatabasesService {
             return fallback;
         }
         return normalizado;
+    }
+
+    private String encryptSensitive(String value) {
+        return sensitiveDataCipherService != null ? sensitiveDataCipherService.encrypt(value) : value;
+    }
+
+    private String decryptSensitive(String value) {
+        return sensitiveDataCipherService != null ? sensitiveDataCipherService.decrypt(value) : value;
     }
 }
