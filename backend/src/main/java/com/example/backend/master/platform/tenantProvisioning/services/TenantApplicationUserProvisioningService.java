@@ -1,8 +1,10 @@
 package com.example.backend.master.platform.tenantProvisioning.services;
 
 import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
+import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import com.example.backend.shared.exception.ValidacaoException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +18,19 @@ import java.sql.SQLException;
 public class TenantApplicationUserProvisioningService {
 
     private final PasswordEncoder passwordEncoder;
+    private final SensitiveDataCipherService sensitiveDataCipherService;
+
+    @Autowired
+    public TenantApplicationUserProvisioningService(
+            PasswordEncoder passwordEncoder,
+            SensitiveDataCipherService sensitiveDataCipherService
+    ) {
+        this.passwordEncoder = passwordEncoder;
+        this.sensitiveDataCipherService = sensitiveDataCipherService;
+    }
 
     public TenantApplicationUserProvisioningService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+        this(passwordEncoder, null);
     }
 
     public void createInitialAdminUser(
@@ -38,7 +50,7 @@ public class TenantApplicationUserProvisioningService {
                 Connection connection = DriverManager.getConnection(
                         jdbcUrl,
                         tenantDatabase.getDbUsername(),
-                        tenantDatabase.getDbPassword()
+                        decryptSensitive(tenantDatabase.getDbPassword())
                 )
         ) {
             if (userExists(connection, login, email)) {
@@ -120,5 +132,9 @@ public class TenantApplicationUserProvisioningService {
                 return rs.next() ? rs.getInt("id") : null;
             }
         }
+    }
+
+    private String decryptSensitive(String value) {
+        return sensitiveDataCipherService != null ? sensitiveDataCipherService.decrypt(value) : value;
     }
 }

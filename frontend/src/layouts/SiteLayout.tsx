@@ -7,10 +7,10 @@ const { mainLogo, standaloneLogo } = brandingAssets;
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Módulos", href: "/#modulos" },
-  { label: "Benefícios", href: "/#beneficios" },
+  { label: "Modulos", href: "/#modulos" },
+  { label: "Beneficios", href: "/#beneficios" },
   { label: "Tecnologia", href: "/#tecnologia" },
-  { label: "Preços", href: "/#pricing" },
+  { label: "Precos", href: "/#pricing" },
   { label: "Contato", href: "/#contato" },
 ];
 
@@ -78,13 +78,13 @@ export default function SiteLayout() {
 
           <div className="site-footer__column">
             <h4>Produto</h4>
-            <a href="/#modulos">Módulos</a>
-            <a href="/#beneficios">Benefícios</a>
+            <a href="/#modulos">Modulos</a>
+            <a href="/#beneficios">Beneficios</a>
             <a href="/#tecnologia">Tecnologia</a>
           </div>
 
           <div className="site-footer__column">
-            <h4>Módulos</h4>
+            <h4>Modulos</h4>
             <a href="/#modulos">Financeiro</a>
             <a href="/#modulos">Supply Chain</a>
             <a href="/#modulos">Recursos Humanos</a>
@@ -106,9 +106,9 @@ export default function SiteLayout() {
 
           <div className="site-footer__column">
             <h4>Legal</h4>
-            <a href="/#legal">Politica de Privacidade</a>
-            <a href="/#legal">Termos de Serviço</a>
-            <a href="/#legal">LGPD</a>
+            <NavLink to="/privacy">Politica de Privacidade</NavLink>
+            <NavLink to="/privacy#terms">Termos de Servico</NavLink>
+            <NavLink to="/privacy#lgpd">LGPD</NavLink>
           </div>
         </div>
 

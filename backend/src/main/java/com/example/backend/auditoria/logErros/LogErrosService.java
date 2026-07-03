@@ -2,9 +2,11 @@ package com.example.backend.auditoria.logErros;
 
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
+import com.example.backend.security.SensitiveDataSanitizer;
 import com.example.backend.sys.usuarios.Usuarios;
 import com.example.backend.sys.usuarios.UsuariosRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -17,13 +19,24 @@ public class LogErrosService {
 
     private final LogErrosRepository repository;
     private final UsuariosRepository usuariosRepository;
+    private final SensitiveDataSanitizer sensitiveDataSanitizer;
+
+    @Autowired
+    public LogErrosService(
+            LogErrosRepository repository,
+            UsuariosRepository usuariosRepository,
+            SensitiveDataSanitizer sensitiveDataSanitizer
+    ) {
+        this.repository = repository;
+        this.usuariosRepository = usuariosRepository;
+        this.sensitiveDataSanitizer = sensitiveDataSanitizer;
+    }
 
     public LogErrosService(
             LogErrosRepository repository,
             UsuariosRepository usuariosRepository
     ) {
-        this.repository = repository;
-        this.usuariosRepository = usuariosRepository;
+        this(repository, usuariosRepository, null);
     }
 
     @Transactional
@@ -63,7 +76,7 @@ public class LogErrosService {
         entity.setModulo(normalizarObrigatorio(data.modulo(), "Modulo e obrigatorio"));
         entity.setUsuario(usuario);
         entity.setUrl(normalizarOpcional(data.url()));
-        entity.setParametros(data.parametros());
+        entity.setParametros(sanitizeMap(data.parametros()));
         entity.setIpAddress(data.ipAddress());
         entity.setCreatedAt(createdAt);
     }
@@ -157,5 +170,9 @@ public class LogErrosService {
         } catch (URISyntaxException ex) {
             return false;
         }
+    }
+
+    private Map<String, Object> sanitizeMap(Map<String, Object> value) {
+        return sensitiveDataSanitizer != null ? sensitiveDataSanitizer.sanitizeMap(value) : value;
     }
 }

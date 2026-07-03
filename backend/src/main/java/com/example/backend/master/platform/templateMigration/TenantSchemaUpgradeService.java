@@ -7,8 +7,10 @@ import com.example.backend.master.platform.tenantDatabases.TenantDatabasesReposi
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
 import com.example.backend.master.platform.tenants.TenantsService;
+import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +23,22 @@ public class TenantSchemaUpgradeService {
     private final TenantDatabasesRepository tenantDatabasesRepository;
     private final TenantsService tenantsService;
     private final ProvisioningLogsService provisioningLogsService;
+    private final SensitiveDataCipherService sensitiveDataCipherService;
+
+    @Autowired
+    public TenantSchemaUpgradeService(
+            TenantsRepository tenantsRepository,
+            TenantDatabasesRepository tenantDatabasesRepository,
+            TenantsService tenantsService,
+            ProvisioningLogsService provisioningLogsService,
+            SensitiveDataCipherService sensitiveDataCipherService
+    ) {
+        this.tenantsRepository = tenantsRepository;
+        this.tenantDatabasesRepository = tenantDatabasesRepository;
+        this.tenantsService = tenantsService;
+        this.provisioningLogsService = provisioningLogsService;
+        this.sensitiveDataCipherService = sensitiveDataCipherService;
+    }
 
     public TenantSchemaUpgradeService(
             TenantsRepository tenantsRepository,
@@ -28,10 +46,7 @@ public class TenantSchemaUpgradeService {
             TenantsService tenantsService,
             ProvisioningLogsService provisioningLogsService
     ) {
-        this.tenantsRepository = tenantsRepository;
-        this.tenantDatabasesRepository = tenantDatabasesRepository;
-        this.tenantsService = tenantsService;
-        this.provisioningLogsService = provisioningLogsService;
+        this(tenantsRepository, tenantDatabasesRepository, tenantsService, provisioningLogsService, null);
     }
 
     public void upgradeOutdatedTenants(Long systemUserId, String targetSchemaVersion) {
@@ -76,7 +91,7 @@ public class TenantSchemaUpgradeService {
                     .dataSource(
                             buildJdbcUrl(database),
                             database.getDbUsername(),
-                            database.getDbPassword()
+                            decryptSensitive(database.getDbPassword())
                     )
                     .locations("classpath:db/migration/template")
                     .baselineOnMigrate(true)
@@ -140,5 +155,9 @@ public class TenantSchemaUpgradeService {
                 detalhes,
                 systemUserId
         ));
+    }
+
+    private String decryptSensitive(String value) {
+        return sensitiveDataCipherService != null ? sensitiveDataCipherService.decrypt(value) : value;
     }
 }

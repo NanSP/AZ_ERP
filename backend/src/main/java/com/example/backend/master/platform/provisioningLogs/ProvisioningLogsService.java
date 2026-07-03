@@ -4,9 +4,11 @@ import com.example.backend.master.platform.systemUsers.SystemUsers;
 import com.example.backend.master.platform.systemUsers.SystemUsersRepository;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.security.SensitiveDataSanitizer;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -17,15 +19,27 @@ public class ProvisioningLogsService {
     private final ProvisioningLogsRepository repository;
     private final TenantsRepository tenantsRepository;
     private final SystemUsersRepository systemUsersRepository;
+    private final SensitiveDataSanitizer sensitiveDataSanitizer;
+
+    @Autowired
+    public ProvisioningLogsService(
+            ProvisioningLogsRepository provisioningLogsRepository,
+            TenantsRepository tenantsRepository,
+            SystemUsersRepository systemUsersRepository,
+            SensitiveDataSanitizer sensitiveDataSanitizer
+    ) {
+        this.repository = provisioningLogsRepository;
+        this.tenantsRepository = tenantsRepository;
+        this.systemUsersRepository = systemUsersRepository;
+        this.sensitiveDataSanitizer = sensitiveDataSanitizer;
+    }
 
     public ProvisioningLogsService(
             ProvisioningLogsRepository provisioningLogsRepository,
             TenantsRepository tenantsRepository,
             SystemUsersRepository systemUsersRepository
     ) {
-        this.repository = provisioningLogsRepository;
-        this.tenantsRepository = tenantsRepository;
-        this.systemUsersRepository = systemUsersRepository;
+        this(provisioningLogsRepository, tenantsRepository, systemUsersRepository, null);
     }
 
     @Transactional
@@ -134,7 +148,7 @@ public class ProvisioningLogsService {
     }
 
     private Map<String, Object> normalizarDetalhes(Map<String, Object> detalhes) {
-        return detalhes == null || detalhes.isEmpty() ? null : detalhes;
+        return sensitiveDataSanitizer != null ? sensitiveDataSanitizer.sanitizeMap(detalhes) : detalhes;
     }
 
     private String normalizarObrigatorio(String valor, String mensagem) {

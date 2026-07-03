@@ -4,7 +4,9 @@ import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
 import com.example.backend.master.platform.tenantDatabases.TenantDatabasesRepository;
 import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
+import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.exception.ValidacaoException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,13 +14,24 @@ public class TenantConnectionService {
 
     private final TenantsRepository tenantsRepository;
     private final TenantDatabasesRepository tenantDatabasesRepository;
+    private final SensitiveDataCipherService sensitiveDataCipherService;
+
+    @Autowired
+    public TenantConnectionService(
+            TenantsRepository tenantsRepository,
+            TenantDatabasesRepository tenantDatabasesRepository,
+            SensitiveDataCipherService sensitiveDataCipherService
+    ) {
+        this.tenantsRepository = tenantsRepository;
+        this.tenantDatabasesRepository = tenantDatabasesRepository;
+        this.sensitiveDataCipherService = sensitiveDataCipherService;
+    }
 
     public TenantConnectionService(
             TenantsRepository tenantsRepository,
             TenantDatabasesRepository tenantDatabasesRepository
     ) {
-        this.tenantsRepository = tenantsRepository;
-        this.tenantDatabasesRepository = tenantDatabasesRepository;
+        this(tenantsRepository, tenantDatabasesRepository, null);
     }
 
     public TenantConnectionInfo resolve(String tenantCode) {
@@ -47,8 +60,12 @@ public class TenantConnectionService {
                 tenantDatabase.getDbHost(),
                 tenantDatabase.getDbPort(),
                 tenantDatabase.getDbUsername(),
-                tenantDatabase.getDbPassword()
+                decryptSensitive(tenantDatabase.getDbPassword())
         );
+    }
+
+    private String decryptSensitive(String value) {
+        return sensitiveDataCipherService != null ? sensitiveDataCipherService.decrypt(value) : value;
     }
 }
 

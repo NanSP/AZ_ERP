@@ -17,6 +17,7 @@ const ModuleWorkspacePage = lazy(
 const PlatformWorkspacePage = lazy(
   () => import("./pages/Platform/PlatformWorkspacePage"),
 );
+const PrivacyPage = lazy(() => import("./pages/Privacy/PrivacyPage"));
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="/login" element={<MasterLoginPage />} />
               <Route path="/tenant-login" element={<TenantLoginPage />} />
               <Route path="/change-password" element={<ChangePasswordPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
 
               <Route element={<ProtectedRoute />}>
                 <Route element={<PasswordChangeGuard />}>
