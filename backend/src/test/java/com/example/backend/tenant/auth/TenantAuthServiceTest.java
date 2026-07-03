@@ -1,6 +1,8 @@
 package com.example.backend.tenant.auth;
 
 import com.example.backend.auth.ChangePasswordRequestDTO;
+import com.example.backend.master.platform.tenants.Tenants;
+import com.example.backend.master.platform.tenants.TenantsRepository;
 import com.example.backend.security.JwtService;
 import com.example.backend.security.SecurityUserPrincipal;
 import com.example.backend.shared.exception.ValidacaoException;
@@ -41,6 +43,8 @@ class TenantAuthServiceTest {
     @Mock
     private TenantDataSourceRegistry tenantDataSourceRegistry;
     @Mock
+    private TenantsRepository tenantsRepository;
+    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private JwtService jwtService;
@@ -57,6 +61,8 @@ class TenantAuthServiceTest {
     @Mock
     private PreparedStatement updatePasswordStatement;
     @Mock
+    private PreparedStatement forgotPasswordStatement;
+    @Mock
     private DataSource tenantDataSource;
     @Mock
     private ResultSet userResultSet;
@@ -66,10 +72,12 @@ class TenantAuthServiceTest {
     private ResultSet permissoesResultSet;
     @Mock
     private ResultSet passwordResultSet;
+    @Mock
+    private ResultSet forgotPasswordResultSet;
 
     @Test
     void deveAutenticarUsuarioDoTenantComPerfisEPermissoes() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, tenantsRepository, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
         TenantConnectionInfo connectionInfo = new TenantConnectionInfo(
                 1L,
@@ -147,7 +155,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveBloquearUsuarioInativoDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, tenantsRepository, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
 
         when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
@@ -180,7 +188,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveBloquearSenhaInvalidaDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, tenantsRepository, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
 
         when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
@@ -220,7 +228,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveSinalizarTrocaObrigatoriaDeSenhaDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, tenantsRepository, passwordEncoder, jwtService);
         TenantAuthRequestDTO request = new TenantAuthRequestDTO("TENANT_A", "joao", "Senha123");
 
         when(tenantConnectionService.resolve("TENANT_A")).thenReturn(new TenantConnectionInfo(
@@ -267,7 +275,7 @@ class TenantAuthServiceTest {
 
     @Test
     void deveAlterarSenhaDoUsuarioDoTenant() throws Exception {
-        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, passwordEncoder, jwtService);
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, tenantsRepository, passwordEncoder, jwtService);
         SecurityUserPrincipal principal = new SecurityUserPrincipal(
                 10L,
                 "joao",
@@ -307,5 +315,49 @@ class TenantAuthServiceTest {
         verify(updatePasswordStatement).setString(1, "HASH_NOVO");
         verify(updatePasswordStatement).setLong(2, 10L);
         verify(updatePasswordStatement).executeUpdate();
+    }
+
+    @Test
+    void deveOrientarRecuperacaoDeSenhaDoTenantComContatoDoResponsavel() throws Exception {
+        TenantAuthService service = new TenantAuthService(tenantConnectionService, tenantDataSourceRegistry, tenantsRepository, passwordEncoder, jwtService);
+        TenantConnectionInfo connectionInfo = new TenantConnectionInfo(
+                1L,
+                "TENANT_A",
+                "tenant_a_db",
+                "localhost",
+                5432,
+                "tenant_user",
+                "tenant_pass"
+        );
+        Tenants tenant = new Tenants();
+        tenant.setCodigo("TENANT_A");
+        tenant.setEmailResponsavel("contato@tenant.com");
+        tenant.setTelefoneResponsavel("71999999999");
+
+        when(tenantConnectionService.resolve("TENANT_A")).thenReturn(connectionInfo);
+        when(tenantsRepository.findByCodigo("TENANT_A")).thenReturn(java.util.Optional.of(tenant));
+        when(connection.prepareStatement(anyString())).thenReturn(forgotPasswordStatement);
+        when(forgotPasswordStatement.executeQuery()).thenReturn(forgotPasswordResultSet);
+        when(forgotPasswordResultSet.next()).thenReturn(true, false);
+        when(forgotPasswordResultSet.getLong("id")).thenReturn(10L);
+
+        try (MockedStatic<DriverManager> driverManager = mockStatic(DriverManager.class)) {
+            driverManager.when(() -> DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/tenant_a_db",
+                    "tenant_user",
+                    "tenant_pass"
+            )).thenReturn(connection);
+
+            TenantForgotPasswordResponseDTO response = service.forgotPassword(
+                    new TenantForgotPasswordRequestDTO("TENANT_A", "joao")
+            );
+
+            assertEquals("TENANT_A", response.tenantCode());
+            assertEquals("contato@tenant.com", response.emailResponsavel());
+            assertEquals("71999999999", response.telefoneResponsavel());
+        }
+
+        verify(forgotPasswordStatement).setString(1, "joao");
+        verify(forgotPasswordStatement).setString(2, "joao");
     }
 }
