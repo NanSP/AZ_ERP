@@ -4,6 +4,7 @@ import com.example.backend.master.platform.tenantDatabases.TenantDatabases;
 import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import com.example.backend.shared.exception.ValidacaoException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ public class TenantApplicationUserProvisioningService {
     private final PasswordEncoder passwordEncoder;
     private final SensitiveDataCipherService sensitiveDataCipherService;
 
+    @Autowired
     public TenantApplicationUserProvisioningService(
             PasswordEncoder passwordEncoder,
             SensitiveDataCipherService sensitiveDataCipherService

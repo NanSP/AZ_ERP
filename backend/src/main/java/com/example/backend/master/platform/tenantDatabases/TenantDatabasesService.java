@@ -7,6 +7,7 @@ import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class TenantDatabasesService {
     private final TemplateMigrationProperties templateMigrationProperties;
     private final SensitiveDataCipherService sensitiveDataCipherService;
 
+    @Autowired
     public TenantDatabasesService(
             TenantDatabasesRepository tenantDatabasesRepository,
             TenantsRepository tenantsRepository,

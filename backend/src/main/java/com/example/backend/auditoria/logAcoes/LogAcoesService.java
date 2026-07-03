@@ -6,6 +6,7 @@ import com.example.backend.security.SensitiveDataSanitizer;
 import com.example.backend.sys.usuarios.Usuarios;
 import com.example.backend.sys.usuarios.UsuariosRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ public class LogAcoesService {
     private final UsuariosRepository usuariosRepository;
     private final SensitiveDataSanitizer sensitiveDataSanitizer;
 
+    @Autowired
     public LogAcoesService(
             LogAcoesRepository repository,
             UsuariosRepository usuariosRepository,

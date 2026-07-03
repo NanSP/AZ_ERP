@@ -10,6 +10,7 @@ import com.example.backend.master.platform.tenants.TenantsService;
 import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.db.PostgresJdbcUrlBuilder;
 import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class TenantSchemaUpgradeService {
     private final ProvisioningLogsService provisioningLogsService;
     private final SensitiveDataCipherService sensitiveDataCipherService;
 
+    @Autowired
     public TenantSchemaUpgradeService(
             TenantsRepository tenantsRepository,
             TenantDatabasesRepository tenantDatabasesRepository,

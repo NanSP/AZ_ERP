@@ -8,6 +8,7 @@ import com.example.backend.security.SensitiveDataSanitizer;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -20,6 +21,7 @@ public class ProvisioningLogsService {
     private final SystemUsersRepository systemUsersRepository;
     private final SensitiveDataSanitizer sensitiveDataSanitizer;
 
+    @Autowired
     public ProvisioningLogsService(
             ProvisioningLogsRepository provisioningLogsRepository,
             TenantsRepository tenantsRepository,

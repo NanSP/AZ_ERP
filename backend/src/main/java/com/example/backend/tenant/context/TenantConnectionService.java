@@ -6,6 +6,7 @@ import com.example.backend.master.platform.tenants.Tenants;
 import com.example.backend.master.platform.tenants.TenantsRepository;
 import com.example.backend.security.SensitiveDataCipherService;
 import com.example.backend.shared.exception.ValidacaoException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,7 @@ public class TenantConnectionService {
     private final TenantDatabasesRepository tenantDatabasesRepository;
     private final SensitiveDataCipherService sensitiveDataCipherService;
 
+    @Autowired
     public TenantConnectionService(
             TenantsRepository tenantsRepository,
             TenantDatabasesRepository tenantDatabasesRepository,
