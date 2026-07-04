@@ -275,6 +275,16 @@ public class SecurityConfig {
         auth.requestMatchers(HttpMethod.POST, "/grc/consentimentos/**").hasAnyAuthority("PERMISSAO_grc:consentimentos:create");
         auth.requestMatchers(HttpMethod.PUT, "/grc/consentimentos/**").hasAnyAuthority("PERMISSAO_grc:consentimentos:update");
         auth.requestMatchers(HttpMethod.DELETE, "/grc/consentimentos/**").hasAnyAuthority("PERMISSAO_grc:consentimentos:delete");
+
+        auth.requestMatchers(HttpMethod.GET, "/grc/registrosTratamento/**").hasAnyAuthority("PERMISSAO_grc:registrosTratamento:read");
+        auth.requestMatchers(HttpMethod.POST, "/grc/registrosTratamento/**").hasAnyAuthority("PERMISSAO_grc:registrosTratamento:create");
+        auth.requestMatchers(HttpMethod.PUT, "/grc/registrosTratamento/**").hasAnyAuthority("PERMISSAO_grc:registrosTratamento:update");
+        auth.requestMatchers(HttpMethod.DELETE, "/grc/registrosTratamento/**").hasAnyAuthority("PERMISSAO_grc:registrosTratamento:delete");
+
+        auth.requestMatchers(HttpMethod.GET, "/grc/solicitacoesTitular/**").hasAnyAuthority("PERMISSAO_grc:solicitacoesTitular:read");
+        auth.requestMatchers(HttpMethod.POST, "/grc/solicitacoesTitular/**").hasAnyAuthority("PERMISSAO_grc:solicitacoesTitular:create");
+        auth.requestMatchers(HttpMethod.PUT, "/grc/solicitacoesTitular/**").hasAnyAuthority("PERMISSAO_grc:solicitacoesTitular:update");
+        auth.requestMatchers(HttpMethod.DELETE, "/grc/solicitacoesTitular/**").hasAnyAuthority("PERMISSAO_grc:solicitacoesTitular:delete");
     }
 
     private void configurarPortal(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {

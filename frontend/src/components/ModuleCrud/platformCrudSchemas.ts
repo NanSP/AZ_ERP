@@ -55,6 +55,162 @@ const tenantAdminRoleOptions = [
 ];
 
 const platformCrudSchemas: Record<string, CrudFormSchema> = {
+  "grc.registrosTratamento": {
+    fields: [
+      { name: "modulo", label: "Modulo", type: "text", required: true },
+      { name: "entidade", label: "Entidade", type: "text", required: true },
+      {
+        name: "finalidade",
+        label: "Finalidade",
+        type: "textarea",
+        required: true,
+      },
+      {
+        name: "baseLegal",
+        label: "Base legal",
+        type: "text",
+        required: true,
+        options: [
+          { label: "Consentimento", value: "consentimento" },
+          { label: "Execucao de contrato", value: "execucao_contrato" },
+          { label: "Obrigacao legal", value: "obrigacao_legal" },
+          { label: "Legitimo interesse", value: "legitimo_interesse" },
+          { label: "Exercicio regular de direitos", value: "exercicio_regular_direitos" },
+          { label: "Protecao ao credito", value: "protecao_credito" },
+        ],
+      },
+      {
+        name: "categoriaTitular",
+        label: "Categoria do titular",
+        type: "text",
+        required: true,
+        options: [
+          { label: "Cliente", value: "cliente" },
+          { label: "Colaborador", value: "colaborador" },
+          { label: "Fornecedor", value: "fornecedor" },
+          { label: "Usuario", value: "usuario" },
+          { label: "Visitante", value: "visitante" },
+          { label: "Outro", value: "outro" },
+        ],
+      },
+      {
+        name: "categoriaDados",
+        label: "Categoria dos dados",
+        type: "text",
+        required: true,
+        options: [
+          { label: "Cadastral", value: "cadastral" },
+          { label: "Contato", value: "contato" },
+          { label: "Financeiro", value: "financeiro" },
+          { label: "Acesso", value: "acesso" },
+          { label: "Trabalhista", value: "trabalhista" },
+          { label: "Fiscal", value: "fiscal" },
+          { label: "Sensivel", value: "sensivel" },
+          { label: "Operacional", value: "operacional" },
+        ],
+      },
+      { name: "retencaoDias", label: "Retencao em dias", type: "number" },
+      {
+        name: "compartilhamento",
+        label: "Compartilhamento",
+        type: "text",
+        placeholder: "Ex.: contador, integrador, banco parceiro",
+      },
+      {
+        name: "requerConsentimento",
+        label: "Requer consentimento",
+        type: "text",
+        required: true,
+        defaultValue: "false",
+        options: [
+          { label: "Sim", value: "true" },
+          { label: "Nao", value: "false" },
+        ],
+      },
+      {
+        name: "ativo",
+        label: "Registro ativo",
+        type: "text",
+        required: true,
+        defaultValue: "true",
+        options: [
+          { label: "Sim", value: "true" },
+          { label: "Nao", value: "false" },
+        ],
+      },
+      { name: "responsavel", label: "Responsavel ID", type: "number" },
+      { name: "observacoes", label: "Observacoes", type: "textarea" },
+    ],
+  },
+  "grc.solicitacoesTitular": {
+    fields: [
+      { name: "titularNome", label: "Nome do titular", type: "text", required: true },
+      { name: "titularContato", label: "Contato do titular", type: "text", required: true },
+      {
+        name: "tipoTitular",
+        label: "Tipo do titular",
+        type: "text",
+        required: true,
+        options: [
+          { label: "Cliente", value: "cliente" },
+          { label: "Colaborador", value: "colaborador" },
+          { label: "Fornecedor", value: "fornecedor" },
+          { label: "Usuario", value: "usuario" },
+          { label: "Visitante", value: "visitante" },
+          { label: "Outro", value: "outro" },
+        ],
+      },
+      {
+        name: "direitoSolicitado",
+        label: "Direito solicitado",
+        type: "text",
+        required: true,
+        options: [
+          { label: "Confirmacao", value: "confirmacao" },
+          { label: "Acesso", value: "acesso" },
+          { label: "Correcao", value: "correcao" },
+          { label: "Anonimizacao", value: "anonimizacao" },
+          { label: "Eliminacao", value: "eliminacao" },
+          { label: "Portabilidade", value: "portabilidade" },
+          { label: "Oposicao", value: "oposicao" },
+          { label: "Revogacao de consentimento", value: "revogacao_consentimento" },
+          { label: "Revisao", value: "revisao" },
+        ],
+      },
+      { name: "modulo", label: "Modulo relacionado", type: "text" },
+      { name: "entidade", label: "Entidade relacionada", type: "text" },
+      {
+        name: "status",
+        label: "Status",
+        type: "text",
+        defaultValue: "aberta",
+        options: [
+          { label: "Aberta", value: "aberta" },
+          { label: "Em analise", value: "em_analise" },
+          { label: "Aguardando titular", value: "aguardando_titular" },
+          { label: "Concluida", value: "concluida" },
+          { label: "Indeferida", value: "indeferida" },
+        ],
+      },
+      {
+        name: "canalOrigem",
+        label: "Canal de origem",
+        type: "text",
+        options: [
+          { label: "Portal", value: "portal" },
+          { label: "Email", value: "email" },
+          { label: "Telefone", value: "telefone" },
+          { label: "Presencial", value: "presencial" },
+          { label: "Suporte", value: "suporte" },
+        ],
+      },
+      { name: "detalhes", label: "Detalhes", type: "textarea" },
+      { name: "prazoResposta", label: "Prazo de resposta", type: "datetime-local" },
+      { name: "dataConclusao", label: "Data de conclusao", type: "datetime-local" },
+      { name: "respostaResumo", label: "Resposta resumo", type: "textarea" },
+      { name: "atendidoPor", label: "Atendido por ID", type: "number" },
+    ],
+  },
   "platform.systemUsers": {
     fields: [
       { name: "nome", label: "Nome", type: "text", required: true },
@@ -338,6 +494,16 @@ export function buildPayloadFromForm(
 
     if (field.type === "number") {
       payload[field.name] = Number(rawValue);
+      continue;
+    }
+
+    if (rawValue === "true") {
+      payload[field.name] = true;
+      continue;
+    }
+
+    if (rawValue === "false") {
+      payload[field.name] = false;
       continue;
     }
 
