@@ -310,6 +310,18 @@ export const tenantModules: TenantModule[] = [
       },
       {
         schema: "grc",
+        entity: "registrosTratamento",
+        label: "Registros de Tratamento",
+        description: "Inventario operacional de finalidades, bases legais e retencao.",
+      },
+      {
+        schema: "grc",
+        entity: "solicitacoesTitular",
+        label: "Solicitacoes do Titular",
+        description: "Atendimento aos direitos LGPD e trilha de resposta ao titular.",
+      },
+      {
+        schema: "grc",
         entity: "controles",
         label: "Controles",
         description: "Controles internos e governanca.",
