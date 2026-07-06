@@ -11,6 +11,7 @@ public record ConsentimentosRequestDTO
                 LocalDateTime dataConsentimento,
                 LocalDateTime dataRevogacao,
                 InetAddress ipAddress,
-                String userAgent
+                String userAgent,
+                Integer registroTratamentoId
         ) {
 }

@@ -24,4 +24,6 @@ public interface ConsentimentosRepository extends JpaRepository<Consentimentos, 
             String finalidade,
             LocalDateTime dataConsentimento
     );
+
+    long countByRegistroTratamentoIdAndDataRevogacaoIsNull(Integer registroTratamentoId);
 }
