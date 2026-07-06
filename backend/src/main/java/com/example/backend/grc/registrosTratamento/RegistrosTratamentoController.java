@@ -1,5 +1,6 @@
 package com.example.backend.grc.registrosTratamento;
 
+import com.example.backend.grc.consentimentos.ConsentimentosRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,20 +13,26 @@ public class RegistrosTratamentoController {
 
     private final RegistrosTratamentoRepository repository;
     private final RegistrosTratamentoService service;
+    private final ConsentimentosRepository consentimentosRepository;
 
     public RegistrosTratamentoController(
             RegistrosTratamentoRepository repository,
-            RegistrosTratamentoService service
+            RegistrosTratamentoService service,
+            ConsentimentosRepository consentimentosRepository
     ) {
         this.repository = repository;
         this.service = service;
+        this.consentimentosRepository = consentimentosRepository;
     }
 
     @GetMapping
     public List<RegistrosTratamentoResponseDTO> getAll() {
         return repository.findAll()
                 .stream()
-                .map(RegistrosTratamentoResponseDTO::new)
+                .map(entity -> new RegistrosTratamentoResponseDTO(
+                        entity,
+                        consentimentosRepository.countByRegistroTratamentoIdAndDataRevogacaoIsNull(entity.getId())
+                ))
                 .toList();
     }
 
@@ -33,7 +40,10 @@ public class RegistrosTratamentoController {
     public RegistrosTratamentoResponseDTO getById(@PathVariable Integer id) {
         RegistrosTratamento entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Registro de tratamento nao encontrado"));
-        return new RegistrosTratamentoResponseDTO(entity);
+        return new RegistrosTratamentoResponseDTO(
+                entity,
+                consentimentosRepository.countByRegistroTratamentoIdAndDataRevogacaoIsNull(entity.getId())
+        );
     }
 
     @PostMapping
