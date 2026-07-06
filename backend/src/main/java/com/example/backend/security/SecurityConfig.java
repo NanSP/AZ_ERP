@@ -285,6 +285,21 @@ public class SecurityConfig {
         auth.requestMatchers(HttpMethod.POST, "/grc/solicitacoesTitular/**").hasAnyAuthority("PERMISSAO_grc:solicitacoesTitular:create");
         auth.requestMatchers(HttpMethod.PUT, "/grc/solicitacoesTitular/**").hasAnyAuthority("PERMISSAO_grc:solicitacoesTitular:update");
         auth.requestMatchers(HttpMethod.DELETE, "/grc/solicitacoesTitular/**").hasAnyAuthority("PERMISSAO_grc:solicitacoesTitular:delete");
+
+        auth.requestMatchers(HttpMethod.GET, "/grc/relatoriosImpacto/**").hasAnyAuthority("PERMISSAO_grc:relatoriosImpacto:read");
+        auth.requestMatchers(HttpMethod.POST, "/grc/relatoriosImpacto/**").hasAnyAuthority("PERMISSAO_grc:relatoriosImpacto:create");
+        auth.requestMatchers(HttpMethod.PUT, "/grc/relatoriosImpacto/**").hasAnyAuthority("PERMISSAO_grc:relatoriosImpacto:update");
+        auth.requestMatchers(HttpMethod.DELETE, "/grc/relatoriosImpacto/**").hasAnyAuthority("PERMISSAO_grc:relatoriosImpacto:delete");
+
+        auth.requestMatchers(HttpMethod.GET, "/grc/incidentesSeguranca/**").hasAnyAuthority("PERMISSAO_grc:incidentesSeguranca:read");
+        auth.requestMatchers(HttpMethod.POST, "/grc/incidentesSeguranca/**").hasAnyAuthority("PERMISSAO_grc:incidentesSeguranca:create");
+        auth.requestMatchers(HttpMethod.PUT, "/grc/incidentesSeguranca/**").hasAnyAuthority("PERMISSAO_grc:incidentesSeguranca:update");
+        auth.requestMatchers(HttpMethod.DELETE, "/grc/incidentesSeguranca/**").hasAnyAuthority("PERMISSAO_grc:incidentesSeguranca:delete");
+
+        auth.requestMatchers(HttpMethod.GET, "/grc/governancaPrivacidade/**").hasAnyAuthority("PERMISSAO_grc:governancaPrivacidade:read");
+        auth.requestMatchers(HttpMethod.POST, "/grc/governancaPrivacidade/**").hasAnyAuthority("PERMISSAO_grc:governancaPrivacidade:create");
+        auth.requestMatchers(HttpMethod.PUT, "/grc/governancaPrivacidade/**").hasAnyAuthority("PERMISSAO_grc:governancaPrivacidade:update");
+        auth.requestMatchers(HttpMethod.DELETE, "/grc/governancaPrivacidade/**").hasAnyAuthority("PERMISSAO_grc:governancaPrivacidade:delete");
     }
 
     private void configurarPortal(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry auth) {
