@@ -322,6 +322,24 @@ export const tenantModules: TenantModule[] = [
       },
       {
         schema: "grc",
+        entity: "relatoriosImpacto",
+        label: "Relatorios de Impacto",
+        description: "DPIA operacional para RH, fiscal, autenticacao e demais blocos por prioridade de risco.",
+      },
+      {
+        schema: "grc",
+        entity: "incidentesSeguranca",
+        label: "Incidentes de Seguranca",
+        description: "Deteccao, registro, avaliacao, resposta e comunicacao de incidentes com dados pessoais.",
+      },
+      {
+        schema: "grc",
+        entity: "governancaPrivacidade",
+        label: "Governanca de Privacidade",
+        description: "Papel controlador x operador, canal do encarregado e clausulas contratuais por tenant.",
+      },
+      {
+        schema: "grc",
         entity: "controles",
         label: "Controles",
         description: "Controles internos e governanca.",
