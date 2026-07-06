@@ -1,5 +1,9 @@
 package com.example.backend.grc.solicitacoesTitular;
 
+import com.example.backend.grc.consentimentos.Consentimentos;
+import com.example.backend.grc.consentimentos.ConsentimentosRepository;
+import com.example.backend.grc.registrosTratamento.RegistrosTratamento;
+import com.example.backend.grc.registrosTratamento.RegistrosTratamentoRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import com.example.backend.sys.usuarios.Usuarios;
@@ -9,19 +13,30 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SolicitacoesTitularService {
 
     private final SolicitacoesTitularRepository repository;
     private final UsuariosRepository usuariosRepository;
+    private final RegistrosTratamentoRepository registrosTratamentoRepository;
+    private final ConsentimentosRepository consentimentosRepository;
+    private final SolicitacaoTitularEventosService eventosService;
 
     public SolicitacoesTitularService(
             SolicitacoesTitularRepository repository,
-            UsuariosRepository usuariosRepository
+            UsuariosRepository usuariosRepository,
+            RegistrosTratamentoRepository registrosTratamentoRepository,
+            ConsentimentosRepository consentimentosRepository,
+            SolicitacaoTitularEventosService eventosService
     ) {
         this.repository = repository;
         this.usuariosRepository = usuariosRepository;
+        this.registrosTratamentoRepository = registrosTratamentoRepository;
+        this.consentimentosRepository = consentimentosRepository;
+        this.eventosService = eventosService;
     }
 
     @Transactional
@@ -32,7 +47,18 @@ public class SolicitacoesTitularService {
         preencher(entity, data, LocalDateTime.now(), null, null);
         entity.setProtocolo(gerarProtocolo());
 
-        return repository.save(entity);
+        SolicitacoesTitular saved = repository.save(entity);
+        eventosService.registrarEventoAutomatico(
+                saved,
+                "abertura",
+                "Solicitacao aberta",
+                "Solicitacao registrada e pronta para tratamento.",
+                Map.of(
+                        "status", saved.getStatus(),
+                        "direitoSolicitado", saved.getDireitoSolicitado()
+                )
+        );
+        return saved;
     }
 
     @Transactional
@@ -42,8 +68,38 @@ public class SolicitacoesTitularService {
         SolicitacoesTitular entity = repository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Solicitacao do titular nao encontrada"));
 
+        String statusAnterior = entity.getStatus();
+        Integer atendidoPorAnterior = entity.getAtendidoPor() != null ? entity.getAtendidoPor().getId() : null;
         preencher(entity, data, entity.getCreatedAt(), entity.getDataSolicitacao(), entity.getProtocolo());
-        return repository.save(entity);
+        SolicitacoesTitular saved = repository.save(entity);
+
+        eventosService.registrarEventoAutomatico(
+                saved,
+                "atualizacao",
+                "Solicitacao atualizada",
+                "Dados operacionais da solicitacao foram atualizados.",
+                Map.of(
+                        "statusAnterior", statusAnterior,
+                        "statusAtual", saved.getStatus(),
+                        "atendidoPorAnterior", atendidoPorAnterior,
+                        "atendidoPorAtual", saved.getAtendidoPor() != null ? saved.getAtendidoPor().getId() : null
+                )
+        );
+
+        if (!String.valueOf(statusAnterior).equalsIgnoreCase(saved.getStatus())) {
+            eventosService.registrarEventoAutomatico(
+                    saved,
+                    "mudanca_status",
+                    "Mudanca de status",
+                    "Status da solicitacao alterado durante o tratamento.",
+                    Map.of(
+                            "de", statusAnterior,
+                            "para", saved.getStatus()
+                    )
+            );
+        }
+
+        return saved;
     }
 
     @Transactional
@@ -55,7 +111,37 @@ public class SolicitacoesTitularService {
             throw new ValidacaoException("Nao e permitido excluir solicitacao que ja entrou em tratamento");
         }
 
+        eventosService.registrarEventoAutomatico(
+                entity,
+                "cancelamento",
+                "Solicitacao removida",
+                "Solicitacao excluida antes de entrar em tratamento.",
+                Map.of("status", entity.getStatus())
+        );
         repository.delete(entity);
+    }
+
+    public SolicitacoesTitularResumoResponseDTO gerarResumo() {
+        LocalDateTime now = LocalDateTime.now();
+        List<String> statusesAbertos = List.of("aberta", "em_analise", "aguardando_titular");
+
+        long abertas = repository.countByStatusIgnoreCase("aberta");
+        long emAnalise = repository.countByStatusIgnoreCase("em_analise");
+        long aguardandoTitular = repository.countByStatusIgnoreCase("aguardando_titular");
+        long concluidas = repository.countByStatusIgnoreCase("concluida");
+        long indeferidas = repository.countByStatusIgnoreCase("indeferida");
+        long vencidas = repository.countByPrazoRespostaBeforeAndStatusIgnoreCaseIn(now, statusesAbertos);
+        long vencendoEmBreve = repository.countByPrazoRespostaBetweenAndStatusIgnoreCaseIn(now, now.plusDays(3), statusesAbertos);
+
+        return new SolicitacoesTitularResumoResponseDTO(
+                abertas,
+                emAnalise,
+                aguardandoTitular,
+                concluidas,
+                indeferidas,
+                vencidas,
+                vencendoEmBreve
+        );
     }
 
     private void preencher(
@@ -81,6 +167,8 @@ public class SolicitacoesTitularService {
         entity.setDataConclusao(resolverDataConclusao(status, data.dataConclusao()));
         entity.setRespostaResumo(normalizarOpcional(data.respostaResumo()));
         entity.setAtendidoPor(buscarUsuarioOpcional(data.atendidoPor()));
+        entity.setRegistroTratamento(buscarRegistroTratamentoOpcional(data.registroTratamentoId()));
+        entity.setConsentimento(buscarConsentimentoOpcional(data.consentimentoId()));
         entity.setCreatedAt(createdAt);
     }
 
@@ -95,6 +183,7 @@ public class SolicitacoesTitularService {
         normalizarTipoTitular(data.tipoTitular());
         normalizarDireito(data.direitoSolicitado());
         normalizarCanalOrigem(data.canalOrigem());
+        validarRelacionamentos(data);
 
         if ((status.equals("concluida") || status.equals("indeferida"))
                 && normalizarOpcional(data.respostaResumo()) == null) {
@@ -111,6 +200,26 @@ public class SolicitacoesTitularService {
         }
     }
 
+    private void validarRelacionamentos(SolicitacoesTitularRequestDTO data) {
+        Consentimentos consentimento = buscarConsentimentoOpcional(data.consentimentoId());
+        RegistrosTratamento registroTratamento = buscarRegistroTratamentoOpcional(data.registroTratamentoId());
+
+        if ("revogacao_consentimento".equalsIgnoreCase(normalizarDireito(data.direitoSolicitado()))
+                && consentimento == null) {
+            throw new ValidacaoException("Solicitacao de revogacao de consentimento exige vinculacao com um consentimento");
+        }
+
+        if (consentimento != null && registroTratamento != null) {
+            Integer registroDoConsentimento = consentimento.getRegistroTratamento() != null
+                    ? consentimento.getRegistroTratamento().getId()
+                    : null;
+
+            if (registroDoConsentimento != null && !registroDoConsentimento.equals(registroTratamento.getId())) {
+                throw new ValidacaoException("Consentimento e registro de tratamento informados nao pertencem ao mesmo contexto LGPD");
+            }
+        }
+    }
+
     private Usuarios buscarUsuarioOpcional(Integer usuarioId) {
         if (usuarioId == null) {
             return null;
@@ -118,6 +227,24 @@ public class SolicitacoesTitularService {
 
         return usuariosRepository.findById(usuarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuario executor nao encontrado"));
+    }
+
+    private RegistrosTratamento buscarRegistroTratamentoOpcional(Integer registroTratamentoId) {
+        if (registroTratamentoId == null) {
+            return null;
+        }
+
+        return registrosTratamentoRepository.findById(registroTratamentoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Registro de tratamento nao encontrado"));
+    }
+
+    private Consentimentos buscarConsentimentoOpcional(Integer consentimentoId) {
+        if (consentimentoId == null) {
+            return null;
+        }
+
+        return consentimentosRepository.findById(consentimentoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Consentimento nao encontrado"));
     }
 
     private String gerarProtocolo() {

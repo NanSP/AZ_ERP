@@ -19,6 +19,8 @@ public record SolicitacoesTitularResponseDTO(
         LocalDateTime dataConclusao,
         String respostaResumo,
         Integer atendidoPor,
+        Integer registroTratamentoId,
+        Integer consentimentoId,
         LocalDateTime createdAt
 ) {
     public SolicitacoesTitularResponseDTO(SolicitacoesTitular entity) {
@@ -39,6 +41,8 @@ public record SolicitacoesTitularResponseDTO(
                 entity.getDataConclusao(),
                 entity.getRespostaResumo(),
                 entity.getAtendidoPor() != null ? entity.getAtendidoPor().getId() : null,
+                entity.getRegistroTratamento() != null ? entity.getRegistroTratamento().getId() : null,
+                entity.getConsentimento() != null ? entity.getConsentimento().getId() : null,
                 entity.getCreatedAt()
         );
     }

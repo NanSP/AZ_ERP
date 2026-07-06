@@ -12,13 +12,16 @@ public class SolicitacoesTitularController {
 
     private final SolicitacoesTitularRepository repository;
     private final SolicitacoesTitularService service;
+    private final SolicitacaoTitularEventosService eventosService;
 
     public SolicitacoesTitularController(
             SolicitacoesTitularRepository repository,
-            SolicitacoesTitularService service
+            SolicitacoesTitularService service,
+            SolicitacaoTitularEventosService eventosService
     ) {
         this.repository = repository;
         this.service = service;
+        this.eventosService = eventosService;
     }
 
     @GetMapping
@@ -27,6 +30,11 @@ public class SolicitacoesTitularController {
                 .stream()
                 .map(SolicitacoesTitularResponseDTO::new)
                 .toList();
+    }
+
+    @GetMapping("/summary")
+    public SolicitacoesTitularResumoResponseDTO getSummary() {
+        return service.gerarResumo();
     }
 
     @GetMapping("/{id}")
@@ -45,6 +53,23 @@ public class SolicitacoesTitularController {
     @PutMapping("/{id}")
     public SolicitacoesTitularResponseDTO update(@PathVariable Integer id, @RequestBody SolicitacoesTitularRequestDTO data) {
         return new SolicitacoesTitularResponseDTO(service.atualizar(id, data));
+    }
+
+    @GetMapping("/{id}/eventos")
+    public List<SolicitacaoTitularEventoResponseDTO> getEvents(@PathVariable Integer id) {
+        return eventosService.listarPorSolicitacao(id)
+                .stream()
+                .map(SolicitacaoTitularEventoResponseDTO::new)
+                .toList();
+    }
+
+    @PostMapping("/{id}/eventos")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SolicitacaoTitularEventoResponseDTO createEvent(
+            @PathVariable Integer id,
+            @RequestBody SolicitacaoTitularEventoRequestDTO data
+    ) {
+        return new SolicitacaoTitularEventoResponseDTO(eventosService.registrarEventoManual(id, data));
     }
 
     @DeleteMapping("/{id}")
