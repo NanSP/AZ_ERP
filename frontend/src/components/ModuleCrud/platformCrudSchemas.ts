@@ -209,6 +209,8 @@ const platformCrudSchemas: Record<string, CrudFormSchema> = {
       { name: "dataConclusao", label: "Data de conclusao", type: "datetime-local" },
       { name: "respostaResumo", label: "Resposta resumo", type: "textarea" },
       { name: "atendidoPor", label: "Atendido por ID", type: "number" },
+      { name: "registroTratamentoId", label: "Registro de tratamento ID", type: "number" },
+      { name: "consentimentoId", label: "Consentimento ID", type: "number" },
     ],
   },
   "platform.systemUsers": {

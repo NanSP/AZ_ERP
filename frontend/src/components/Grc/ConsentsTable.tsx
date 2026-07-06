@@ -32,20 +32,21 @@ export default function ConsentsTable({
             <tr>
               <th>Titular</th>
               <th>Finalidade</th>
+              <th>Vinculo LGPD</th>
               <th>Rastreabilidade</th>
-              <th>Ações</th>
+              <th>Acoes</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={4} className="consents-table__empty">
+                <td colSpan={5} className="consents-table__empty">
                   Carregando consentimentos...
                 </td>
               </tr>
             ) : items.length === 0 ? (
               <tr>
-                <td colSpan={4} className="consents-table__empty">
+                <td colSpan={5} className="consents-table__empty">
                   Nenhum consentimento encontrado.
                 </td>
               </tr>
@@ -69,6 +70,16 @@ export default function ConsentsTable({
                   </td>
                   <td>
                     <div className="consents-table__details">
+                      <strong>
+                        {item.registroTratamentoId
+                          ? `Registro #${item.registroTratamentoId}`
+                          : "Sem vinculo"}
+                      </strong>
+                      <span>Base legal e finalidade rastreadas</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="consents-table__details">
                       <strong>{item.dataConsentimento || "-"}</strong>
                       <span>{item.ipAddress || "-"}</span>
                       <span>{item.userAgent || "-"}</span>
@@ -87,7 +98,7 @@ export default function ConsentsTable({
                     ) : null}
                     {!canEdit && !canDelete ? (
                       <span className="consents-table__empty-action">
-                        Sem ações
+                        Sem acoes
                       </span>
                     ) : null}
                   </td>
