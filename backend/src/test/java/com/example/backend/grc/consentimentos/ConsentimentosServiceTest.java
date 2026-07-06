@@ -1,5 +1,6 @@
 package com.example.backend.grc.consentimentos;
 
+import com.example.backend.grc.registrosTratamento.RegistrosTratamentoRepository;
 import com.example.backend.shared.exception.ValidacaoException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,9 @@ class ConsentimentosServiceTest {
     @Mock
     private ConsentimentosRepository repository;
 
+    @Mock
+    private RegistrosTratamentoRepository registrosTratamentoRepository;
+
     @InjectMocks
     private ConsentimentosService service;
 
@@ -38,7 +42,8 @@ class ConsentimentosServiceTest {
                 null,
                 null,
                 InetAddress.getByName("127.0.0.1"),
-                " browser "
+                " browser ",
+                null
         );
 
         when(repository.save(any(Consentimentos.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -63,6 +68,7 @@ class ConsentimentosServiceTest {
                 LocalDateTime.now(),
                 null,
                 InetAddress.getByName("127.0.0.1"),
+                null,
                 null
         );
 

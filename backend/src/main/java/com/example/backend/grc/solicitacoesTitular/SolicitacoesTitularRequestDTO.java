@@ -15,6 +15,8 @@ public record SolicitacoesTitularRequestDTO(
         LocalDateTime prazoResposta,
         LocalDateTime dataConclusao,
         String respostaResumo,
-        Integer atendidoPor
+        Integer atendidoPor,
+        Integer registroTratamentoId,
+        Integer consentimentoId
 ) {
 }

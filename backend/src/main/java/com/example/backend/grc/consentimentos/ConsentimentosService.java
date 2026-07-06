@@ -1,5 +1,7 @@
 package com.example.backend.grc.consentimentos;
 
+import com.example.backend.grc.registrosTratamento.RegistrosTratamento;
+import com.example.backend.grc.registrosTratamento.RegistrosTratamentoRepository;
 import com.example.backend.shared.exception.RecursoNaoEncontradoException;
 import com.example.backend.shared.exception.ValidacaoException;
 import jakarta.transaction.Transactional;
@@ -11,9 +13,14 @@ import java.time.LocalDateTime;
 public class ConsentimentosService {
 
     private final ConsentimentosRepository repository;
+    private final RegistrosTratamentoRepository registrosTratamentoRepository;
 
-    public ConsentimentosService(ConsentimentosRepository repository) {
+    public ConsentimentosService(
+            ConsentimentosRepository repository,
+            RegistrosTratamentoRepository registrosTratamentoRepository
+    ) {
         this.repository = repository;
+        this.registrosTratamentoRepository = registrosTratamentoRepository;
     }
 
     @Transactional
@@ -58,6 +65,7 @@ public class ConsentimentosService {
         entity.setDataRevogacao(data.dataRevogacao());
         entity.setIpAddress(data.ipAddress());
         entity.setUserAgent(normalizarOpcional(data.userAgent()));
+        entity.setRegistroTratamento(buscarRegistroTratamentoOpcional(data.registroTratamentoId()));
     }
 
     private void validar(ConsentimentosRequestDTO data) {
@@ -77,6 +85,8 @@ public class ConsentimentosService {
                 && data.dataRevogacao().isBefore(data.dataConsentimento())) {
             throw new ValidacaoException("Data de revogacao nao pode ser anterior a data de consentimento");
         }
+
+        validarRegistroTratamento(data.registroTratamentoId(), data.finalidade());
     }
 
     private void validarAtualizacao(Consentimentos entity, ConsentimentosRequestDTO data) {
@@ -139,6 +149,34 @@ public class ConsentimentosService {
 
         String normalizado = valor.trim();
         return normalizado.isBlank() ? null : normalizado;
+    }
+
+    private RegistrosTratamento buscarRegistroTratamentoOpcional(Integer registroTratamentoId) {
+        if (registroTratamentoId == null) {
+            return null;
+        }
+
+        return registrosTratamentoRepository.findById(registroTratamentoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Registro de tratamento nao encontrado"));
+    }
+
+    private void validarRegistroTratamento(Integer registroTratamentoId, String finalidade) {
+        if (registroTratamentoId == null) {
+            return;
+        }
+
+        RegistrosTratamento registro = buscarRegistroTratamentoOpcional(registroTratamentoId);
+
+        if (!Boolean.TRUE.equals(registro.getRequerConsentimento())
+                && !"consentimento".equalsIgnoreCase(registro.getBaseLegal())) {
+            throw new ValidacaoException("Registro de tratamento informado nao exige consentimento");
+        }
+
+        String finalidadeNormalizada = normalizarObrigatorio(finalidade, "Finalidade e obrigatoria");
+
+        if (!registro.getFinalidade().equalsIgnoreCase(finalidadeNormalizada)) {
+            throw new ValidacaoException("Finalidade do consentimento deve ser coerente com o registro de tratamento vinculado");
+        }
     }
 
     private String normalizarTipoTitular(String tipoTitular) {

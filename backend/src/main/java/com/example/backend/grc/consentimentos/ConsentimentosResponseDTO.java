@@ -12,7 +12,8 @@ public record ConsentimentosResponseDTO
                 LocalDateTime dataConsentimento,
                 LocalDateTime dataRevogacao,
                 InetAddress ipAddress,
-                String userAgent
+                String userAgent,
+                Integer registroTratamentoId
         ) {
     public ConsentimentosResponseDTO(Consentimentos consentimentos) {
         this
@@ -24,7 +25,10 @@ public record ConsentimentosResponseDTO
                         consentimentos.getDataConsentimento(),
                         consentimentos.getDataRevogacao(),
                         consentimentos.getIpAddress(),
-                        consentimentos.getUserAgent()
+                        consentimentos.getUserAgent(),
+                        consentimentos.getRegistroTratamento() != null
+                                ? consentimentos.getRegistroTratamento().getId()
+                                : null
                 );
     }
 }

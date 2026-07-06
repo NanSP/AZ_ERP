@@ -82,6 +82,9 @@ const resourcePages: Record<string, LazyPage> = {
   "grc.controles": lazyDefault(() => import("../Grc/ControlsPage")),
   "grc.auditorias": lazyDefault(() => import("../Grc/AuditsPage")),
   "grc.consentimentos": lazyDefault(() => import("../Grc/ConsentsPage")),
+  "grc.solicitacoesTitular": lazyDefault(
+    () => import("../Grc/SubjectRequestsPage"),
+  ),
   "mm.materiais": lazyDefault(() => import("../Mm/MaterialsPage")),
   "mm.estoques": lazyDefault(() => import("../Mm/StocksPage")),
   "mm.movimentacoes": lazyDefault(() => import("../Mm/MovementsPage")),

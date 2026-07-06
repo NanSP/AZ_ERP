@@ -1,5 +1,7 @@
 package com.example.backend.grc.solicitacoesTitular;
 
+import com.example.backend.grc.consentimentos.Consentimentos;
+import com.example.backend.grc.registrosTratamento.RegistrosTratamento;
 import com.example.backend.sys.usuarios.Usuarios;
 import jakarta.persistence.*;
 import lombok.*;
@@ -57,6 +59,14 @@ public class SolicitacoesTitular {
     @ManyToOne
     @JoinColumn(name = "atendido_por_id")
     private Usuarios atendidoPor;
+
+    @ManyToOne
+    @JoinColumn(name = "registro_tratamento_id")
+    private RegistrosTratamento registroTratamento;
+
+    @ManyToOne
+    @JoinColumn(name = "consentimento_id")
+    private Consentimentos consentimento;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

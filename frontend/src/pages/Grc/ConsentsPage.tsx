@@ -21,6 +21,7 @@ export type ConsentRecord = {
   dataRevogacao: string;
   ipAddress: string;
   userAgent: string;
+  registroTratamentoId: string;
 };
 
 type ConsentsPageProps = {
@@ -31,7 +32,7 @@ const consentsResource = {
   schema: "grc",
   entity: "consentimentos",
   label: "Consentimentos",
-  description: "Consentimentos e bases legais.",
+  description: "Consentimentos, finalidades e vinculos com o inventario LGPD.",
 } as const;
 
 const emptyConsent: ConsentRecord = {
@@ -42,6 +43,7 @@ const emptyConsent: ConsentRecord = {
   dataRevogacao: "",
   ipAddress: "",
   userAgent: "",
+  registroTratamentoId: "",
 };
 
 function normalizeDateTimeLocal(value: unknown) {
@@ -63,6 +65,8 @@ function normalizeConsent(data: Record<string, unknown>): ConsentRecord {
     dataRevogacao: normalizeDateTimeLocal(data.dataRevogacao),
     ipAddress: String(data.ipAddress ?? ""),
     userAgent: String(data.userAgent ?? ""),
+    registroTratamentoId:
+      data.registroTratamentoId == null ? "" : String(data.registroTratamentoId),
   };
 }
 
@@ -75,6 +79,10 @@ function toRequestPayload(item: ConsentRecord) {
     dataRevogacao: item.dataRevogacao.trim() || null,
     ipAddress: item.ipAddress.trim() || null,
     userAgent: item.userAgent.trim() || null,
+    registroTratamentoId:
+      item.registroTratamentoId.trim() === ""
+        ? null
+        : Number(item.registroTratamentoId),
   };
 }
 
@@ -101,21 +109,9 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
   const [selected, setSelected] = useState<ConsentRecord | null>(null);
   const [draft, setDraft] = useState<ConsentRecord>(emptyConsent);
   const canRead = canAccessResourceAction(session, consentsResource, "read");
-  const canCreate = canAccessResourceAction(
-    session,
-    consentsResource,
-    "create",
-  );
-  const canUpdate = canAccessResourceAction(
-    session,
-    consentsResource,
-    "update",
-  );
-  const canDelete = canAccessResourceAction(
-    session,
-    consentsResource,
-    "delete",
-  );
+  const canCreate = canAccessResourceAction(session, consentsResource, "create");
+  const canUpdate = canAccessResourceAction(session, consentsResource, "update");
+  const canDelete = canAccessResourceAction(session, consentsResource, "delete");
   const canSubmitCurrent = selected ? canUpdate : canCreate;
   const isBusy = loading || saving;
 
@@ -142,7 +138,7 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
       setItems(nextItems);
     } catch (err) {
       setError(
-        getErrorMessage(err, "Não foi possível carregar os consentimentos."),
+        getErrorMessage(err, "Nao foi possivel carregar os consentimentos."),
       );
     } finally {
       setLoading(false);
@@ -161,7 +157,13 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
     }
 
     return items.filter((item) =>
-      [item.titular, item.tipoTitular, item.finalidade, item.userAgent]
+      [
+        item.titular,
+        item.tipoTitular,
+        item.finalidade,
+        item.userAgent,
+        item.registroTratamentoId,
+      ]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalized)),
     );
@@ -189,16 +191,12 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
     setError(null);
   }
 
-  function handleChange(next: ConsentRecord) {
-    setDraft(next);
-  }
-
   async function handleSave() {
     if (!canSubmitCurrent) {
       setError(
         selected
-          ? "Seu perfil não possui permissão para atualizar consentimentos."
-          : "Seu perfil não possui permissão para criar consentimentos.",
+          ? "Seu perfil nao possui permissao para atualizar consentimentos."
+          : "Seu perfil nao possui permissao para criar consentimentos.",
       );
       return;
     }
@@ -227,8 +225,8 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
         getErrorMessage(
           err,
           selected?.id
-            ? "Não foi possível atualizar o consentimento."
-            : "Não foi possível criar o consentimento.",
+            ? "Nao foi possivel atualizar o consentimento."
+            : "Nao foi possivel criar o consentimento.",
         ),
       );
     } finally {
@@ -238,12 +236,12 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
 
   async function handleDelete(item: ConsentRecord) {
     if (!canDelete) {
-      setError("Seu perfil não possui permissão para excluir consentimentos.");
+      setError("Seu perfil nao possui permissao para excluir consentimentos.");
       return;
     }
 
     if (!item.id) {
-      setError("Não foi possível identificar o consentimento para exclusão.");
+      setError("Nao foi possivel identificar o consentimento para exclusao.");
       return;
     }
 
@@ -262,10 +260,10 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
     try {
       await deleteResource("grc", "consentimentos", item.id);
       await loadConsents();
-      setSuccess("Consentimento excluído com sucesso.");
+      setSuccess("Consentimento excluido com sucesso.");
     } catch (err) {
       setError(
-        getErrorMessage(err, "Não foi possível excluir o consentimento."),
+        getErrorMessage(err, "Nao foi possivel excluir o consentimento."),
       );
     } finally {
       setSaving(false);
@@ -284,8 +282,8 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
             <span className="consents-page__eyebrow">GRC</span>
             <h2 className="consents-page__title">Consentimentos</h2>
             <p className="consents-page__subtitle">
-              Registre base de consentimento, titular, rastreabilidade e
-              revogação com foco em governanca e LGPD.
+              Registre a concessao, revogacao e o vinculo do consentimento com
+              o respectivo registro de tratamento.
             </p>
           </div>
 
@@ -294,7 +292,7 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por titular, tipo, finalidade ou user agent"
+              placeholder="Buscar por titular, finalidade ou registro LGPD"
               className="consents-page__search"
               disabled={isBusy || !canRead}
             />
@@ -314,7 +312,7 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar por titular, tipo, finalidade ou user agent"
+            placeholder="Buscar por titular, finalidade ou registro LGPD"
             className="consents-page__search"
             disabled={isBusy || !canRead}
           />
@@ -349,8 +347,8 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
         <div className="consents-page__alert consents-page__alert--info">
           {[
             canRead ? null : "leitura desabilitada",
-            canCreate ? null : "criação desabilitada",
-            canDelete ? null : "exclusão desabilitada",
+            canCreate ? null : "criacao desabilitada",
+            canDelete ? null : "exclusao desabilitada",
           ]
             .filter(Boolean)
             .join(" - ")}
@@ -374,7 +372,7 @@ export default function ConsentsPage({ embedded = false }: ConsentsPageProps) {
           canEditFields={canRead && (selected ? canUpdate : canCreate)}
           canSubmit={canRead && canSubmitCurrent}
           saving={saving}
-          onChange={handleChange}
+          onChange={setDraft}
           onSave={() => void handleSave()}
           onReset={handleCreateNew}
         />

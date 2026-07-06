@@ -16,9 +16,14 @@ public record RegistrosTratamentoResponseDTO(
         Boolean ativo,
         Integer responsavel,
         String observacoes,
+        Long consentimentosAtivos,
         LocalDateTime createdAt
 ) {
     public RegistrosTratamentoResponseDTO(RegistrosTratamento entity) {
+        this(entity, null);
+    }
+
+    public RegistrosTratamentoResponseDTO(RegistrosTratamento entity, Long consentimentosAtivos) {
         this(
                 entity.getId(),
                 entity.getModulo(),
@@ -33,6 +38,7 @@ public record RegistrosTratamentoResponseDTO(
                 entity.getAtivo(),
                 entity.getResponsavel() != null ? entity.getResponsavel().getId() : null,
                 entity.getObservacoes(),
+                consentimentosAtivos,
                 entity.getCreatedAt()
         );
     }
