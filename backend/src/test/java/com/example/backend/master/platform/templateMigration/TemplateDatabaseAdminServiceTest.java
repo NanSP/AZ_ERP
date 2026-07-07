@@ -43,14 +43,14 @@ class TemplateDatabaseAdminServiceTest {
     void deveCriarBancoTemplateQuandoNomeForValido() {
         service.createDatabase("az_erp_template");
 
-        verify(masterJdbcTemplate).execute("CREATE DATABASE az_erp_template");
+        verify(masterJdbcTemplate).execute("CREATE DATABASE \"az_erp_template\"");
     }
 
     @Test
     void deveAlternarPermissaoDeConexaoDoTemplate() {
         service.setConnectionsAllowed("az_erp_template", false);
 
-        verify(masterJdbcTemplate).execute("ALTER DATABASE az_erp_template WITH ALLOW_CONNECTIONS false");
+        verify(masterJdbcTemplate).execute("ALTER DATABASE \"az_erp_template\" WITH ALLOW_CONNECTIONS false");
     }
 
     @Test
