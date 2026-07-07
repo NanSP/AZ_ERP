@@ -27,7 +27,7 @@ public class TemplateDatabaseAdminService {
 
     public void createDatabase(String databaseName) {
         validarNomeBanco(databaseName);
-        masterJdbcTemplate.execute("CREATE DATABASE " + databaseName);
+        masterJdbcTemplate.execute("CREATE DATABASE " + quoteIdentifier(databaseName));
     }
 
     public void terminateConnections(String databaseName) {
@@ -59,7 +59,9 @@ public class TemplateDatabaseAdminService {
 
     public void setConnectionsAllowed(String databaseName, boolean allowed) {
         validarNomeBanco(databaseName);
-        masterJdbcTemplate.execute("ALTER DATABASE " + databaseName + " WITH ALLOW_CONNECTIONS " + allowed);
+        masterJdbcTemplate.execute(
+                "ALTER DATABASE " + quoteIdentifier(databaseName) + " WITH ALLOW_CONNECTIONS " + allowed
+        );
     }
 
     private void validarNomeBanco(String databaseName) {
@@ -70,5 +72,10 @@ public class TemplateDatabaseAdminService {
         if (!databaseName.matches("^[a-zA-Z0-9_]+$")) {
             throw new ValidacaoException("Nome do banco template contem caracteres invalidos");
         }
+    }
+
+    public String quoteIdentifier(String databaseName) {
+        validarNomeBanco(databaseName);
+        return "\"" + databaseName + "\"";
     }
 }

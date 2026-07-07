@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,10 +40,12 @@ class TenantDatabaseProvisioningServiceTest {
 
         when(properties.getDatabase()).thenReturn("az_erp_template");
         when(templateRegistryService.getReadyRegistry()).thenReturn(registry);
+        when(templateDatabaseAdminService.quoteIdentifier(anyString()))
+                .thenAnswer(invocation -> "\"" + invocation.getArgument(0, String.class) + "\"");
 
         service.createTenantDatabase("tenant_db_01");
 
-        verify(jdbcTemplate).execute("CREATE DATABASE tenant_db_01 TEMPLATE az_erp_template");
+        verify(jdbcTemplate).execute("CREATE DATABASE \"tenant_db_01\" TEMPLATE \"az_erp_template\"");
         verify(templateRegistryService).acquireLock("CLONING");
         verify(templateRegistryService).markCloneCompleted();
         verify(templateDatabaseAdminService).setConnectionsAllowed("az_erp_template", false);
@@ -67,9 +70,11 @@ class TenantDatabaseProvisioningServiceTest {
 
         when(properties.getDatabase()).thenReturn("az_erp_template");
         when(templateRegistryService.getReadyRegistry()).thenReturn(registry);
+        when(templateDatabaseAdminService.quoteIdentifier(anyString()))
+                .thenAnswer(invocation -> "\"" + invocation.getArgument(0, String.class) + "\"");
         doThrow(new RuntimeException("erro postgres"))
                 .when(jdbcTemplate)
-                .execute("CREATE DATABASE tenant_db_01 TEMPLATE az_erp_template");
+                .execute("CREATE DATABASE \"tenant_db_01\" TEMPLATE \"az_erp_template\"");
 
         TenantDatabaseProvisioningException exception = assertThrows(
                 TenantDatabaseProvisioningException.class,
@@ -88,6 +93,8 @@ class TenantDatabaseProvisioningServiceTest {
 
         when(properties.getDatabase()).thenReturn("az_erp_template");
         when(templateRegistryService.getReadyRegistry()).thenReturn(registry);
+        when(templateDatabaseAdminService.quoteIdentifier(anyString()))
+                .thenAnswer(invocation -> "\"" + invocation.getArgument(0, String.class) + "\"");
         doThrow(new RuntimeException("falha ao encerrar conexoes"))
                 .when(templateDatabaseAdminService)
                 .terminateConnections("az_erp_template");

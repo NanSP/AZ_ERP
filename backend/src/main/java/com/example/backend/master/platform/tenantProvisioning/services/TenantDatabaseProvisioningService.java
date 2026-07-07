@@ -34,8 +34,8 @@ public class TenantDatabaseProvisioningService {
         templateRegistryService.acquireLock("CLONING");
         String sql = String.format(
                 "CREATE DATABASE %s TEMPLATE %s",
-                databaseName,
-                registry.getDatabaseName()
+                templateDatabaseAdminService.quoteIdentifier(databaseName),
+                templateDatabaseAdminService.quoteIdentifier(registry.getDatabaseName())
         );
 
         boolean connectionsDisabled = false;
