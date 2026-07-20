@@ -35,7 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
   }
 
-  // Ao montar, tentamos popular a sessão consultando o endpoint /auth/me.
   useEffect(() => {
     let mounted = true;
 

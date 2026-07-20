@@ -247,10 +247,6 @@ export default function ModuleWorkspacePage() {
             <span className="module-workspace__panel-eyebrow">Operação</span>
             <h3 className="module-workspace__panel-title">Gestão do recurso</h3>
           </div>
-
-          <p className="module-workspace__panel-text">
-            Abaixo esta a camada operacional atual conectada ao backend.
-          </p>
         </div>
 
         <div className="module-workspace__crud">
